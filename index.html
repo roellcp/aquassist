@@ -42,7 +42,7 @@
       justify-content: space-between;
     }
     .brand-wrap { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-    .brand-title { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+    .brand-title { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; display: flex; align-items: center; }
     .part-aqua { color: var(--cyan); }
     .part-assist { color: #fff; }
     .green-i { position: relative; display: inline-block; }
@@ -115,7 +115,7 @@
     .view-panel { display: none; }
     .view-panel.active { display: block; }
 
-    /* The Approved Brand Showcase Hero */
+    /* Hero Showcase */
     .hero-banner {
       background: linear-gradient(180deg, #0F172A 0%, #0B1320 100%);
       border: 1px solid var(--card-border);
@@ -135,6 +135,14 @@
       padding: 18px;
       margin-bottom: 14px;
       box-shadow: 0 10px 25px -10px rgba(0, 0, 0, 0.6);
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+    }
+    .card:active {
+      border-color: var(--cyan);
+      background: rgba(56, 189, 248, 0.05);
     }
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .card-title { font-size: 18px; font-weight: 700; color: #fff; }
@@ -268,7 +276,6 @@
   <!-- Top Bar -->
   <header>
     <div class="brand-wrap" onclick="showView('home')">
-      <!-- Scaled Header Logo -->
       <svg width="34" height="34" viewBox="0 0 100 100" fill="none">
         <rect width="100" height="100" rx="24" fill="#0F172A" stroke="#38BDF8" stroke-width="3"/>
         <path d="M56 34C54 23 42 19 32 24C36 29 40 33 42 38C46 36 51 34 56 34Z" fill="#38BDF8" opacity="0.8"/>
@@ -279,7 +286,7 @@
       </svg>
       <div class="brand-title">
         <span class="part-aqua">aqu</span><span class="part-assist">Ass<span class="green-i">&#305;</span>st</span>
-        <span class="version-tag">v1.1</span>
+        <span class="version-tag">v1.2</span>
       </div>
     </div>
     <button class="menu-btn" onclick="toggleMenu(true)">☰ Menu</button>
@@ -290,10 +297,8 @@
     <!-- ==================== VIEW 1: HOME ==================== -->
     <div id="view-home" class="view-panel active">
       
-      <!-- APPROVED BRAND HERO SHOWCASE -->
       <div class="hero-banner">
         <div class="hero-icon">
-          <!-- Full Size 100% Faithful Approved Fish SVG -->
           <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="heroBg" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -338,10 +343,10 @@
         <button class="btn btn-secondary" style="width:auto; padding:6px 14px; font-size:13px;" onclick="openAddTankModal()">+ Add Tank</button>
       </div>
 
-      <!-- Hardcoded Fallback Tank List (Guarantees content is visible immediately) -->
+      <!-- Tappable Tank Cards using native anchor tags -->
       <div id="tank-card-list">
-        <!-- Tank 1 Card -->
-        <div class="card" onclick="openTank(0)" style="cursor:pointer;">
+        
+        <a href="javascript:void(0)" class="card" onclick="openTank(0)">
           <div class="card-header">
             <div>
               <h3 class="card-title" id="t0-name">Planted Community</h3>
@@ -355,10 +360,9 @@
             <span>NO₃: <b id="t0-no3">20 ppm</b></span>
             <span>pH: <b id="t0-ph">7.2</b></span>
           </div>
-        </div>
+        </a>
 
-        <!-- Tank 2 Card -->
-        <div class="card" onclick="openTank(1)" style="cursor:pointer;">
+        <a href="javascript:void(0)" class="card" onclick="openTank(1)">
           <div class="card-header">
             <div>
               <h3 class="card-title" id="t1-name">Shrimp & Moss Nano</h3>
@@ -372,13 +376,14 @@
             <span>NO₃: <b id="t1-no3">5 ppm</b></span>
             <span>pH: <b id="t1-ph">6.8</b></span>
           </div>
-        </div>
+        </a>
+
       </div>
     </div>
 
     <!-- ==================== VIEW 2: TANK HUB ==================== -->
     <div id="view-tank" class="view-panel">
-      <div class="card" style="margin-bottom:12px;">
+      <div class="card" style="margin-bottom:12px; cursor:default;">
         <div class="card-header">
           <div>
             <h2 id="tank-view-title" class="card-title">Tank Details</h2>
@@ -402,7 +407,7 @@
 
       <!-- Subtab: Quick Log -->
       <div id="subtab-log" class="subtab-content">
-        <div class="card">
+        <div class="card" style="cursor:default;">
           <h3 style="font-size:15px; margin-bottom:12px;">Log Water Test & Maintenance</h3>
           
           <div class="input-grid">
@@ -439,7 +444,7 @@
 
       <!-- Subtab: Equipment -->
       <div id="subtab-equipment" class="subtab-content" style="display:none;">
-        <div class="card">
+        <div class="card" style="cursor:default;">
           <h3 style="font-size:15px; margin-bottom:8px;">Installed Equipment</h3>
           <div style="display:flex; gap:8px; margin-bottom:12px;">
             <input type="text" id="new-equip" placeholder="e.g. Aquaclear 50 Filter">
@@ -451,7 +456,7 @@
 
       <!-- Subtab: Livestock -->
       <div id="subtab-livestock" class="subtab-content" style="display:none;">
-        <div class="card">
+        <div class="card" style="cursor:default;">
           <h3 style="font-size:15px; margin-bottom:8px;">Livestock Inventory</h3>
           <div style="display:flex; gap:8px; margin-bottom:12px;">
             <input type="text" id="new-live" placeholder="e.g. 8x Cardinal Tetra">
@@ -463,7 +468,7 @@
 
       <!-- Subtab: Plants & Decor -->
       <div id="subtab-plants" class="subtab-content" style="display:none;">
-        <div class="card">
+        <div class="card" style="cursor:default;">
           <h3 style="font-size:15px; margin-bottom:8px;">Flora & Hardscape</h3>
           <div style="display:flex; gap:8px; margin-bottom:12px;">
             <input type="text" id="new-plant" placeholder="e.g. Anubias Nana, Driftwood">
@@ -476,7 +481,7 @@
 
     <!-- ==================== VIEW 3: GLOBAL SUPPLY CLOSET ==================== -->
     <div id="view-closet" class="view-panel">
-      <div class="card">
+      <div class="card" style="cursor:default;">
         <h2 class="card-title" style="margin-bottom:6px;">Global Supply Closet</h2>
         <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Items on this shelf are shared across all your tanks and used by the AI for dosing advice.</p>
         
@@ -491,117 +496,13 @@
 
     <!-- ==================== VIEW 4: SETTINGS & BACKUP ==================== -->
     <div id="view-settings" class="view-panel">
-      <div class="card">
-        <h2 claini Chat
-        </button>
-      </div>
-
-      <!-- Tank Sub Tabs -->
-      <div class="tab-bar">
-        <button class="tab-btn active" id="tab-btn-log">Quick Log</button>
-        <button class="tab-btn" id="tab-btn-equipment">Equipment</button>
-        <button class="tab-btn" id="tab-btn-livestock">Livestock</button>
-        <button class="tab-btn" id="tab-btn-plants">Plants & Decor</button>
-      </div>
-
-      <!-- Subtab: Quick Log -->
-      <div id="subtab-log" class="subtab-content">
-        <div class="card">
-          <h3 style="font-size:15px; margin-bottom:12px;">Log Water Test & Maintenance</h3>
-          
-          <div class="input-grid">
-            <div>
-              <label>Ammonia (NH₃ ppm)</label>
-              <input type="number" id="log-nh3" step="0.25" placeholder="0">
-            </div>
-            <div>
-              <label>Nitrite (NO₂ ppm)</label>
-              <input type="number" id="log-no2" step="0.25" placeholder="0">
-            </div>
-            <div>
-              <label>Nitrate (NO₃ ppm)</label>
-              <input type="number" id="log-no3" step="5" placeholder="20">
-            </div>
-            <div>
-              <label>pH</label>
-              <input type="number" id="log-ph" step="0.1" placeholder="7.2">
-            </div>
-            <div>
-              <label>Water Change (%)</label>
-              <input type="number" id="log-wc" step="5" placeholder="e.g. 25">
-            </div>
-            <div>
-              <label>Dosed Product</label>
-              <input type="text" id="log-dose" placeholder="e.g. Prime 2ml">
-            </div>
-          </div>
-
-          <button class="btn btn-neon" id="btn-submit-log">Save & Run Smart Analysis</button>
-          <div id="log-feedback-box" class="ai-feedback" style="display:none;"></div>
-        </div>
-      </div>
-
-      <!-- Subtab: Equipment -->
-      <div id="subtab-equipment" class="subtab-content" style="display:none;">
-        <div class="card">
-          <h3 style="font-size:15px; margin-bottom:8px;">Installed Equipment</h3>
-          <div style="display:flex; gap:8px; margin-bottom:12px;">
-            <input type="text" id="new-equip" placeholder="e.g. Aquaclear 50 Filter">
-            <button class="btn" style="width:70px;" id="btn-add-equip">Add</button>
-          </div>
-          <div id="equipment-list" class="pill-list"></div>
-        </div>
-      </div>
-
-      <!-- Subtab: Livestock -->
-      <div id="subtab-livestock" class="subtab-content" style="display:none;">
-        <div class="card">
-          <h3 style="font-size:15px; margin-bottom:8px;">Livestock Inventory</h3>
-          <div style="display:flex; gap:8px; margin-bottom:12px;">
-            <input type="text" id="new-live" placeholder="e.g. 8x Cardinal Tetra">
-            <button class="btn" style="width:70px;" id="btn-add-live">Add</button>
-          </div>
-          <div id="livestock-list" class="pill-list"></div>
-        </div>
-      </div>
-
-      <!-- Subtab: Plants & Decor -->
-      <div id="subtab-plants" class="subtab-content" style="display:none;">
-        <div class="card">
-          <h3 style="font-size:15px; margin-bottom:8px;">Flora & Hardscape</h3>
-          <div style="display:flex; gap:8px; margin-bottom:12px;">
-            <input type="text" id="new-plant" placeholder="e.g. Anubias Nana, Driftwood">
-            <button class="btn" style="width:70px;" id="btn-add-plant">Add</button>
-          </div>
-          <div id="plants-list" class="pill-list"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ==================== VIEW 3: GLOBAL SUPPLY CLOSET ==================== -->
-    <div id="view-closet" class="view-panel">
-      <div class="card">
-        <h2 class="card-title" style="margin-bottom:6px;">Global Supply Closet</h2>
-        <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Items on this shelf are shared across all your tanks and used by the AI for dosing advice.</p>
-        
-        <div style="display:flex; gap:8px; margin-bottom:16px;">
-          <input type="text" id="new-supply" placeholder="e.g. Seachem Prime, API Master Kit">
-          <button class="btn" style="width:80px;" id="btn-add-supply">Add</button>
-        </div>
-
-        <div id="supply-list" class="pill-list"></div>
-      </div>
-    </div>
-
-    <!-- ==================== VIEW 4: SETTINGS & BACKUP ==================== -->
-    <div id="view-settings" class="view-panel">
-      <div class="card">
+      <div class="card" style="cursor:default;">
         <h2 class="card-title" style="margin-bottom:14px;">Settings & Cloud AI</h2>
 
         <div style="margin-bottom:14px;">
           <label>Google AI Studio (Gemini) API Key</label>
           <input type="password" id="gemini-key" placeholder="Paste your AIza... key here">
-          <button class="btn btn-secondary" style="margin-top:8px; font-size:13px; padding:10px;" id="btn-save-key">Save API Key</button>
+          <button class="btn btn-secondary" style="margin-top:8px; font-size:13px; padding:10px;" onclick="saveApiKey()">Save API Key</button>
         </div>
 
         <div style="margin-bottom:18px;">
@@ -618,9 +519,9 @@
         <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Save your database to a file so phone resets never delete your tank logs.</p>
         
         <div style="display:flex; gap:10px;">
-          <button class="btn btn-secondary" id="btn-export-json">💾 Export JSON</button>
-          <button class="btn btn-secondary" id="btn-import-trigger">📂 Restore Backup</button>
-          <input type="file" id="importFile" style="display:none">
+          <button class="btn btn-secondary" onclick="exportData()">💾 Export JSON</button>
+          <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Restore Backup</button>
+          <input type="file" id="importFile" style="display:none" onchange="importData(event)">
         </div>
       </div>
     </div>
@@ -640,14 +541,13 @@
         <input type="number" id="modal-tank-gal" placeholder="20">
       </div>
       <div style="display:flex; gap:10px;">
-        <button class="btn btn-secondary" id="modal-tank-cancel">Cancel</button>
-        <button class="btn btn-neon" id="modal-tank-save">Create Tank</button>
+        <button class="btn btn-secondary" onclick="closeAddTankModal()">Cancel</button>
+        <button class="btn btn-neon" onclick="saveNewTank()">Create Tank</button>
       </div>
     </div>
   </div>
 
   <script>
-    // Bulletproof Master State
     const defaultData = {
       apiKey: "",
       units: "us",
@@ -659,7 +559,7 @@
           grossGal: 20,
           dispPercent: 18,
           status: "Established",
-          lastTest: { nh3: 0, no2: 0, no3: 20, ph: 7.2, date: "Yesterday" },
+          lastTest: { nh3: 0, no2: 0, no3: 20, ph: 7.2 },
           equipment: ["Aquaclear 30 Filter", "50W Heater", "Fluval 3.0 Plant Light"],
           livestock: ["8x Neon Tetra", "3x Amano Shrimp", "1x Nerite Snail"],
           plants: ["Java Fern", "Anubias Nana", "Manzanita Driftwood"]
@@ -670,7 +570,7 @@
           grossGal: 10,
           dispPercent: 20,
           status: "Cycling",
-          lastTest: { nh3: 0.5, no2: 0.25, no3: 5, ph: 6.8, date: "Today" },
+          lastTest: { nh3: 0.5, no2: 0.25, no3: 5, ph: 6.8 },
           equipment: ["Sponge Filter", "USB Air Pump", "25W Preset Heater"],
           livestock: ["Fishless Cycling (Pure Ammonia Dosed)"],
           plants: ["Java Moss", "Dragon Stone"]
@@ -680,7 +580,7 @@
 
     let appData;
     try {
-      const stored = localStorage.getItem("aquassist_db");
+      const stored = localStorage.getItem("aquassist_v2");
       appData = stored ? JSON.parse(stored) : defaultData;
       if (!appData || !Array.isArray(appData.tanks) || appData.tanks.length === 0) {
         appData = defaultData;
@@ -692,17 +592,16 @@
     let activeTankIndex = 0;
 
     function saveData() {
-      localStorage.setItem("aquassist_db", JSON.stringify(appData));
+      localStorage.setItem("aquassist_v2", JSON.stringify(appData));
     }
 
-    // View Switching
     function showView(viewId) {
       document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
       const target = document.getElementById("view-" + viewId);
       if (target) target.classList.add("active");
-      if (viewId === "home") renderHomeCards();
       if (viewId === "closet") renderCloset();
       toggleMenu(false);
+      window.scrollTo(0,0);
     }
 
     function toggleMenu(forceState) {
@@ -719,256 +618,220 @@
       showView("tank");
     }
 
-    // Render Home Cards
-    function renderHomeCards() {
-      const container = document.getElementById("tank-card-list");
-      if (!container) return;
-      container.innerHTML = "";
-
-      appData.tanks.forEach((tank, idx) => {
-        const netGal = (tank.grossGal * (1 - (tank.dispPercent / 100))).toFixed(1);
-        const isStable = tank.status === "Established";
-        const badgeClass = isStable ? "badge-stable" : "badge-cycling";
-        
-        const card = document.createElement("div");
-        card.className = "card";
-        card.style.cursor = "pointer";
-        card.innerHTML = `
-          <div class="card-header">
-            <div>
-              <h3 class="card-title">${tank.name}</h3>
-              <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">${tank.grossGal}G (${netGal}G Net Water)</div>
-            </div>
-            <span class="badge ${badgeClass}">● ${tank.status}</span>
-          </div>
-  nt')">Equipment</button>
-        <button class="tab-btn" onclick="switchTankTab('livestock')">Livestock</button>
-        <button class="tab-btn" onclick="switchTankTab('plants')">Plants & Decor</button>
-      </div>
-
-      <!-- Subtab: Quick Log -->
-      <div id="subtab-log" class="subtab-content">
-        <div class="card">
-          <h3 style="font-size:15px; margin-bottom:12px;">Log Water Test & Maintenance</h3>
-          
-          <div class="input-grid">
-            <div>
-              <label>Ammonia (NH₃ ppm)</label>
-              <input type="number" id="log-nh3" step="0.25" placeholder="0">
-            </div>
-            <div>
-              <label>Nitrite (NO₂ ppm)</label>
-              <input type="number" id="log-no2" step="0.25" placeholder="0">
-            </div>
-            <div>
-              <label>Nitrate (NO₃ ppm)</label>
-              <input type="number" id="log-no3" step="5" placeholder="20">
-            </div>
-            <div>
-              <label>pH</label>
-              <input type="number" id="log-ph" step="0.1" placeholder="7.2">
-            </div>
-            <div>
-              <label>Water Change (%)</label>
-              <input type="number" id="log-wc" step="5" placeholder="e.g. 25">
-            </div>
-            <div>
-              <label>Dosed Product</label>
-              <input type="text" id="log-dose" placeholder="e.g. Prime 2ml">
-            </div>
-          </div>
-
-          <button class="btn btn-neon" onclick="submitLog()">Save & Run Smart Analysis</button>
-
-          <div id="log-feedback-box" class="ai-feedback" style="display:none;"></div>
-        </div>
-      </div>
-
-      <!-- Subtab: Equipment -->
-      <div id="subtab-equipment" class="subtab-content" style="display:none;">
-        <div class="card">
-          <h3 style="font-size:15px; margin-bottom:8px;">Installed Equipment</h3>
-          <div style="display:flex; gap:8px; margin-bottom:12px;">
-            <input type="text" id="new-equip" placeholder="e.g. Aquaclear 50 Filter">
-            <button class="btn" style="width:70px;" onclick="addItem('equipment')">Add</button>
-          </div>
-          <div id="equipment-list" class="pill-list"></div>
-        </div>
-      </div>
-
-      <!-- Subtab: Livestock -->
-      <div id="subtab-livestock" class="subtab-content" style="display:none;">
-        <div class="card">
-          <h3 style="font-size:15px; margin-bottom:8px;">Livestock Inventory</h3>
-          <div style="display:flex; gap:8px; margin-bottom:12px;">
-            <input type="text" id="new-live" placeholder="e.g. 8x Cardinal Tetra">
-            <button class="btn" style="width:70px;" onclick="addItem('livestock')">Add</button>
-          </div>
-          <div id="livestock-list" class="pill-list"></div>
-        </div>
-      </div>
-
-      <!-- Subtab: Plants & Decor -->
-      <div id="subtab-plants" class="subtab-content" style="display:none;">
-        <div class="card">
-          <h3 style="font-size:15px; margin-bottom:8px;">Flora & Hardscape</h3>
-          <div style="display:flex; gap:8px; margin-bottom:12px;">
-            <input type="text" id="new-plant" placeholder="e.g. Anubias Nana, Driftwood">
-            <button class="btn" style="width:70px;" onclick="addItem('plants')">Add</button>
-          </div>
-          <div id="plants-list" class="pill-list"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ==================== VIEW 3: GLOBAL SUPPLY CLOSET ==================== -->
-    <div id="view-closet" class="view-panel">
-      <div class="card">
-        <h2 class="card-title" style="margin-bottom:6px;">Global Supply Closet</h2>
-        <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Items on this shelf are shared across all your tanks and used by the AI for dosing advice.</p>
-        
-        <div style="display:flex; gap:8px; margin-bottom:16px;">
-          <input type="text" id="new-supply" placeholder="e.g. Seachem Prime, API Master Kit">
-          <button class="btn" style="width:80px;" onclick="addSupply()">Add</button>
-        </div>
-
-        <div id="supply-list" class="pill-list"></div>
-      </div>
-    </div>
-
-    <!-- ==================== VIEW 4: SETTINGS & BACKUP ==================== -->
-    <div id="view-settings" class="view-panel">
-      <div class="card">
-        <h2 class="card-title" style="margin-bottom:14px;">Settings & Cloud AI</h2>
-
-        <div style="margin-bottom:14px;">
-          <label>Google AI Studio (Gemini) API Key</label>
-          <input type="password" id="gemini-key" placeholder="Paste your AIza... key here">
-          <button class="btn btn-secondary" style="margin-top:6px; font-size:12px; padding:8px;" onclick="saveApiKey()">Save API Key</button>
-        </div>
-
-        <div style="margin-bottom:18px;">
-          <label>Unit System</label>
-          <select id="unit-select" onchange="saveUnits()">
-            <option value="us">US Imperial (Gallons, °F, Inches)</option>
-            <option value="metric">Metric (Liters, °C, Centimeters)</option>
-          </select>
-        </div>
-
-        <hr style="border:0; border-top:1px solid rgba(255,255,255,0.08); margin:18px 0;">
-
-        <h3 style="font-size:15px; margin-bottom:10px;">Data Backup & Safety</h3>
-        <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Save your database to a tiny file so browser clearing can never delete your tank logs.</p>
-        
-        <div style="display:flex; gap:10px;">
-          <button class="btn btn-secondary" onclick="exportData()">💾 Export JSON</button>
-          <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Restore Backup</button>
-          <input type="file" id="importFile" style="display:none" onchange="importData(event)">
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <script>
-    // Master State with Starter Data
-    const defaultData = {
-      apiKey: "",
-      units: "us",
-      closet: ["Seachem Prime", "API Freshwater Master Test Kit", "Aquarium Co-Op Easy Green"],
-      tanks: [
-        {
-          id: 1,
-          name: "Planted Community",
-          grossGal: 20,
-          dispPercent: 18, // 18% displacement for net volume
-          status: "Established",
-          lastTest: { nh3: 0, no2: 0, no3: 20, ph: 7.2, date: "Yesterday" },
-          equipment: ["Aquaclear 30 Filter", "50W Heater", "Fluval 3.0 Plant Light"],
-          livestock: ["8x Neon Tetra", "3x Amano Shrimp", "1x Nerite Snail"],
-          plants: ["Java Fern", "Anubias Nana", "Manzanita Driftwood"]
-        },
-        {
-          id: 2,
-          name: "Shrimp & Moss Nano",
-          grossGal: 10,
-          dispPercent: 20,
-          status: "Cycling",
-          lastTest: { nh3: 0.5, no2: 0.25, no3: 5, ph: 6.8, date: "Today" },
-          equipment: ["Sponge Filter", "USB Air Pump", "25W Preset Heater"],
-          livestock: ["Fishless Cycling (Pure Ammonia Dosed)"],
-          plants: ["Java Moss", "Dragon Stone"]
-        }
-      ]
-    };
-
-    let appData = JSON.parse(localStorage.getItem("aquassist_db")) || defaultData;
-    let activeTankIndex = 0;
-
-    function saveData() {
-      localStorage.setItem("aquassist_db", JSON.stringify(appData));
-    }
-
-    // Navigation & Views
-    function showView(viewId) {
-      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
-      document.getElementById("view-" + viewId).classList.add("active");
-      if (viewId === "home") renderHomeCards();
-      if (viewId === "closet") renderCloset();
-      toggleMenu(false);
-    }
-
-    function toggleMenu(forceState) {
-      const drawer = document.getElementById("sidebarDrawer");
-      const overlay = document.getElementById("drawerOverlay");
-      const shouldOpen = forceState !== undefined ? forceState : !drawer.classList.contains("open");
-      drawer.classList.toggle("open", shouldOpen);
-      overlay.classList.toggle("open", shouldOpen);
-    }
-
-    function openTank(idx) {
-      activeTankIndex = idx;
-      renderTankView();
-      showView("tank");
-    }
-
-    // Render Home Cards
-    function renderHomeCards() {
-      const container = document.getElementById("tank-card-list");
-      container.innerHTML = "";
-      appData.tanks.forEach((tank, idx) => {
-        const netGal = (tank.grossGal * (1 - (tank.dispPercent / 100))).toFixed(1);
-        const isStable = tank.status === "Established";
-        const badgeClass = isStable ? "badge-stable" : "badge-cycling";
-        
-        container.innerHTML += `
-          <div class="card" onclick="openTank(${idx})" style="cursor:pointer;">
-            <div class="card-header">
-              <div>
-                <h3 class="card-title">${tank.name}</h3>
-                <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">${tank.grossGal}G (${netGal}G Net Water)</div>
-              </div>
-              <span class="badge ${badgeClass}">● ${tank.status}</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.06); font-size:12px;">
-              <span>NH₃: <b>${tank.lastTest.nh3}</b></span>
-              <span>NO₂: <b>${tank.lastTest.no2}</b></span>
-              <span>NO₃: <b>${tank.lastTest.no3} ppm</b></span>
-              <span>pH: <b>${tank.lastTest.ph}</b></span>
-            </div>
-          </div>
-        `;
-      });
-    }
-
-    // Render Active Tank
     function renderTankView() {
       const tank = appData.tanks[activeTankIndex];
+      if (!tank) return;
       const netGal = (tank.grossGal * (1 - (tank.dispPercent / 100))).toFixed(1);
       
       document.getElementById("tank-view-title").innerText = tank.name;
-      document.getElementById("tank-vol-calc").innerText = `Gross: ${tank.grossGal}G • Net Water: ${netGal}G (Hardscape Displacement: ${tank.dispPercent}%)`;
+      document.getElementById("tank-vol-calc").innerText = `Gross: ${tank.grossGal}G • Net Water: ${netGal}G (Displacement: ${tank.dispPercent}%)`;
       
       const badge = document.getElementById("tank-status-toggle");
       badge.innerText = `● ${tank.status}`;
-      badge.className = `badge ${tank.status ==
+      badge.className = `badge ${tank.status === "Established" ? "badge-stable" : "badge-cycling"}`;
+
+      renderSubLists();
+    }
+
+    function toggleTankLifecycle() {
+      const tank = appData.tanks[activeTankIndex];
+      tank.status = tank.status === "Established" ? "Cycling" : "Established";
+      saveData();
+      renderTankView();
+      updateHomeFallback();
+    }
+
+    function switchTankTab(tabName, clickedBtn) {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      if (clickedBtn) clickedBtn.classList.add("active");
+      document.querySelectorAll(".subtab-content").forEach(c => c.style.display = "none");
+      const target = document.getElementById("subtab-" + tabName);
+      if (target) target.style.display = "block";
+    }
+
+    function renderSubLists() {
+      const tank = appData.tanks[activeTankIndex];
+      ["equipment", "livestock", "plants"].forEach(type => {
+        const list = document.getElementById(type + "-list");
+        if (!list) return;
+        list.innerHTML = "";
+        (tank[type] || []).forEach((item, idx) => {
+          list.innerHTML += `<div class="pill"><span>${item}</span><span class="delete-x" onclick="deleteItem('${type}', ${idx})">×</span></div>`;
+        });
+      });
+    }
+
+    function addItem(type, inputId) {
+      const input = document.getElementById(inputId);
+      if (!input || !input.value.trim()) return;
+      if (!appData.tanks[activeTankIndex][type]) appData.tanks[activeTankIndex][type] = [];
+      appData.tanks[activeTankIndex][type].push(input.value.trim());
+      input.value = "";
+      saveData();
+      renderSubLists();
+    }
+
+    function deleteItem(type, idx) {
+      appData.tanks[activeTankIndex][type].splice(idx, 1);
+      saveData();
+      renderSubLists();
+    }
+
+    function renderCloset() {
+      const list = document.getElementById("supply-list");
+      if (!list) return;
+      list.innerHTML = "";
+      appData.closet.forEach((item, idx) => {
+        list.innerHTML += `<div class="pill"><span>${item}</span><span class="delete-x" onclick="deleteSupply(${idx})">×</span></div>`;
+      });
+    }
+
+    function addSupply() {
+      const input = document.getElementById("new-supply");
+      if (!input || !input.value.trim()) return;
+      appData.closet.push(input.value.trim());
+      input.value = "";
+      saveData();
+      renderCloset();
+    }
+
+    function deleteSupply(idx) {
+      appData.closet.splice(idx, 1);
+      saveData();
+      renderCloset();
+    }
+
+    function submitLog() {
+      const nh3 = parseFloat(document.getElementById("log-nh3").value) || 0;
+      const no2 = parseFloat(document.getElementById("log-no2").value) || 0;
+      const no3 = parseFloat(document.getElementById("log-no3").value) || 0;
+      const ph = parseFloat(document.getElementById("log-ph").value) || 7.2;
+      const wc = parseFloat(document.getElementById("log-wc").value) || 0;
+      const dose = document.getElementById("log-dose").value.trim();
+
+      const tank = appData.tanks[activeTankIndex];
+      tank.lastTest = { nh3, no2, no3, ph };
+      saveData();
+      updateHomeFallback();
+
+      let feedback = `<b>✓ Log Recorded Successfully.</b>`;
+      if (tank.status === "Established") {
+        if (nh3 > 0 || no2 > 0) {
+          feedback += `<br><span style="color:var(--alert-red)">⚠️ Critical:</span> Ammonia (${nh3}) or Nitrite (${no2}) present! `;
+          if (appData.closet.some(s => s.toLowerCase().includes("prime"))) {
+            feedback += `Dose <b>Seachem Prime</b> immediately to detoxify.`;
+          }
+        } else if (no3 >= 40) {
+          const neededWc = Math.round(((no3 - 20) / no3) * 100);
+          feedback += `<br><span style="color:var(--alert-yellow)">Nitrate Elevated (${no3} ppm):</span> Dilution calculation advises a <b>${neededWc}% water change</b> to return to safe 20 ppm zone.`;
+        } else {
+          feedback += `<br><span style="color:var(--neon-green)">● Parameters Nominal:</span> Water biology balanced.`;
+        }
+      } else {
+        feedback += `<br><span style="color:var(--alert-yellow)">Cycling Mode Active:</span> Ammonia/Nitrite are normal during cycle. Do not change water unless Ammonia exceeds 4.0 ppm.`;
+      }
+
+      if (wc > 0) feedback += `<br>• Recorded ${wc}% water change.`;
+      if (dose) feedback += `<br>• Recorded dose: ${dose}`;
+
+      const box = document.getElementById("log-feedback-box");
+      box.style.display = "block";
+      box.innerHTML = feedback;
+    }
+
+    function copyGeminiDelta() {
+      const tank = appData.tanks[activeTankIndex];
+      const netGal = (tank.grossGal * (1 - (tank.dispPercent / 100))).toFixed(1);
+      
+      const deltaText = `Quick Update for ${tank.name} (${tank.status} Mode):
+- Net Water Volume: ${netGal} Gallons (${tank.grossGal}G gross)
+- Latest Test: NH3: ${tank.lastTest?.nh3 ?? 0} ppm, NO2: ${tank.lastTest?.no2 ?? 0} ppm, NO3: ${tank.lastTest?.no3 ?? 0} ppm, pH: ${tank.lastTest?.ph ?? 7.0}
+- In Supply Closet: ${appData.closet.join(", ")}
+- Question/Next Step: `;
+
+      navigator.clipboard.writeText(deltaText).then(() => {
+        alert("Copied Delta Update to Clipboard! Ready to paste into Gemini.");
+      }).catch(() => {
+        prompt("Copy this update text:", deltaText);
+      });
+    }
+
+    function updateHomeFallback() {
+      if (appData.tanks[0]) {
+        document.getElementById("t0-name").innerText = appData.tanks[0].name;
+        document.getElementById("t0-status").innerText = "● " + appData.tanks[0].status;
+        document.getElementById("t0-nh3").innerText = appData.tanks[0].lastTest?.nh3 ?? 0;
+        document.getElementById("t0-no2").innerText = appData.tanks[0].lastTest?.no2 ?? 0;
+        document.getElementById("t0-no3").innerText = (appData.tanks[0].lastTest?.no3 ?? 0) + " ppm";
+        document.getElementById("t0-ph").innerText = appData.tanks[0].lastTest?.ph ?? 7.2;
+      }
+      if (appData.tanks[1]) {
+        document.getElementById("t1-name").innerText = appData.tanks[1].name;
+        document.getElementById("t1-status").innerText = "● " + appData.tanks[1].status;
+        document.getElementById("t1-nh3").innerText = appData.tanks[1].lastTest?.nh3 ?? 0;
+        document.getElementById("t1-no2").innerText = appData.tanks[1].lastTest?.no2 ?? 0;
+        document.getElementById("t1-no3").innerText = (appData.tanks[1].lastTest?.no3 ?? 0) + " ppm";
+        document.getElementById("t1-ph").innerText = appData.tanks[1].lastTest?.ph ?? 6.8;
+      }
+    }
+
+    function openAddTankModal() { document.getElementById("addTankModal").classList.add("open"); }
+    function closeAddTankModal() { document.getElementById("addTankModal").classList.remove("open"); }
+    
+    function saveNewTank() {
+      const name = document.getElementById("modal-tank-name").value.trim() || "New Aquarium";
+      const gal = parseFloat(document.getElementById("modal-tank-gal").value) || 20;
+      appData.tanks.push({
+        id: Date.now(),
+        name,
+        grossGal: gal,
+        dispPercent: 18,
+        status: "Cycling",
+        lastTest: { nh3: 0, no2: 0, no3: 0, ph: 7.0 },
+        equipment: [],
+        livestock: [],
+        plants: []
+      });
+      saveData();
+      closeAddTankModal();
+      location.reload();
+    }
+
+    function saveApiKey() {
+      appData.apiKey = document.getElementById("gemini-key").value.trim();
+      saveData();
+      alert("API Key Saved Securely!");
+    }
+
+    function exportData() {
+      const blob = new Blob([JSON.stringify(appData, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `aquassist_backup_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+    }
+
+    function importData(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          appData = JSON.parse(evt.target.result);
+          saveData();
+          alert("Backup successfully restored!");
+          location.reload();
+        } catch(err) {
+          alert("Invalid backup file.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    updateHomeFallback();
+    const keyField = document.getElementById("gemini-key");
+    if (keyField && appData.apiKey) keyField.value = appData.apiKey;
+  </script>
+</body>
+</html>
