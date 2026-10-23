@@ -38,16 +38,12 @@
     }
     .brand-wrap { display: flex; align-items: center; gap: 10px; cursor: pointer; }
     
-    /* Bulletproof Native CSS Logo Mark */
-    .header-logo-icon {
-      width: 32px; height: 32px; background: linear-gradient(135deg, #1E293B, #0B1320);
-      border: 2px solid var(--cyan); border-radius: 8px; display: flex; align-items: center; justify-content: center;
-      position: relative; box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+    /* Native Logo Box */
+    .header-logo-box {
+      width: 32px; height: 32px; background: #0F172A; border: 2px solid var(--cyan);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center; position: relative;
     }
-    .logo-core {
-      width: 10px; height: 10px; background: var(--neon-green); border-radius: 50%;
-      box-shadow: 0 0 8px var(--neon-green), 0 0 12px var(--neon-green);
-    }
+    .logo-dot { width: 7px; height: 7px; background: var(--neon-green); border-radius: 50%; box-shadow: 0 0 8px var(--neon-green); }
 
     .brand-title { font-size: 21px; font-weight: 700; letter-spacing: -0.5px; }
     .part-aqua { color: var(--cyan); }
@@ -95,10 +91,15 @@
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .card-title { font-size: 18px; font-weight: 700; color: #fff; }
     
-    /* Fixed Hero Thumbnail Display */
     .tank-thumb { 
       width: 100%; height: 180px; border-radius: 12px; object-fit: cover; margin-bottom: 12px; 
       border: 1px solid rgba(56, 189, 248, 0.3); background: #070D18; display: block;
+    }
+
+    /* AI Greeting Banner */
+    .ai-greeting-card {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(0, 245, 160, 0.05));
+      border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 18px; padding: 16px; margin-bottom: 16px;
     }
 
     /* Badges */
@@ -117,6 +118,14 @@
     }
     .tab-btn.active { background: var(--cyan); color: #070D18; }
 
+    /* Color Palette Picker */
+    .color-picker-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 6px; }
+    .color-circle {
+      width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 2px solid transparent;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+    .color-circle.selected { border-color: #fff; transform: scale(1.15); box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+
     /* Inputs & Buttons */
     .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
     .input-row { display: flex; gap: 8px; margin-bottom: 12px; }
@@ -132,14 +141,6 @@
     .btn-secondary { background: rgba(255,255,255,0.06); border: 1px solid var(--card-border); color: #fff; }
     .btn-neon { background: var(--neon-green); color: #070D18; }
 
-    /* Color Picker Grid (Up to 10 options) */
-    .color-picker-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 12px; }
-    .color-circle {
-      width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 2px solid transparent;
-      margin: 0 auto; transition: transform 0.15s ease, border-color 0.15s ease;
-    }
-    .color-circle.selected { border-color: #FFF; transform: scale(1.15); box-shadow: 0 0 10px rgba(255,255,255,0.5); }
-
     .ai-feedback {
       background: rgba(0, 245, 160, 0.08); border: 1px solid var(--neon-green);
       border-radius: 12px; padding: 12px; margin-top: 12px; font-size: 13px; line-height: 1.4;
@@ -148,10 +149,10 @@
     .pill-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
     .pill {
       background: rgba(255,255,255,0.05); border: 1px solid var(--card-border);
-      border-radius: 10px; padding: 6px 12px; font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer;
+      border-radius: 10px; padding: 6px 12px; font-size: 13px; display: flex; align-items: center; gap: 8px;
     }
-    .pill:hover { border-color: var(--cyan); }
-    .delete-x { color: var(--alert-red); font-weight: 700; font-size: 16px; padding-left: 6px; }
+    .delete-x { color: var(--alert-red); cursor: pointer; font-weight: 700; font-size: 16px; padding: 0 4px; }
+    .edit-pencil { color: var(--cyan); cursor: pointer; margin-right: 4px; font-size: 14px; }
 
     .timeline-item { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 13px; }
     .timeline-date { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; }
@@ -186,8 +187,8 @@
   <!-- Top Bar -->
   <header>
     <div class="brand-wrap" onclick="showView('home')">
-      <div class="header-logo-icon">
-        <div class="logo-core"></div>
+      <div class="header-logo-box">
+        <div class="logo-dot"></div>
       </div>
       <div class="brand-title">
         <span class="part-aqua">aqu</span><span class="part-assist">Ass<span class="green-i">&#305;</span>st</span>
@@ -200,6 +201,15 @@
 
     <!-- ==================== VIEW 1: HOME ==================== -->
     <div id="view-home" class="view-panel active">
+      
+      <!-- AI Greeting & Global Status Summary -->
+      <div class="ai-greeting-card">
+        <div style="font-size: 15px; font-weight: 700; color: var(--cyan); margin-bottom: 4px;">👋 Welcome back, Aquarist</div>
+        <div id="global-ai-summary" style="font-size: 13px; line-height: 1.4; color: var(--text-main);">
+          Analyzing tank telemetry across your aquariums...
+        </div>
+      </div>
+
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
         <h2 style="font-size:18px; font-weight:700;">My Aquariums</h2>
         <button class="btn btn-secondary" style="width:auto; padding:6px 12px; font-size:12px;" onclick="openTankModal()">+ Add Tank</button>
@@ -211,15 +221,25 @@
     <!-- ==================== VIEW 2: TANK HUB ==================== -->
     <div id="view-tank" class="view-panel">
       
-      <div class="card" style="margin-bottom:12px;">
-        <div class="card-header">
+      <!-- Tank Hero Card -->
+      <div class="card" style="margin-bottom:12px;" id="tank-hero-card">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
           <div>
-            <h2 id="tank-view-title" class="card-title">Tank Details</h2>
+            <h2 id="tank-view-title" class="card-title" style="font-size: 20px; margin-bottom: 4px;">Tank Name</h2>
+            <div id="tank-hero-meta" style="font-size: 12px; color: var(--text-muted);">Age: 0 days • Status: Established</div>
           </div>
-          <div style="display:flex; gap:6px;">
-            <button class="badge badge-stable" id="tank-status-toggle" onclick="toggleTankLifecycle()">● Established</button>
-            <button class="btn btn-secondary" style="width:auto; padding:4px 8px; font-size:11px;" onclick="openEditTankModal()">✏️ Edit</button>
+          <div style="display:flex; gap: 6px;">
+            <button class="btn btn-secondary" style="width:auto; padding: 6px 10px; font-size: 12px;" onclick="copyGeminiDelta()" title="Copy Update for Gemini">📋</button>
+            <button class="btn btn-secondary" style="width:auto; padding: 6px 10px; font-size: 12px;" onclick="openEditTankModal()" title="Edit Tank">✏️</button>
           </div>
+        </div>
+      </div>
+
+      <!-- Current Tank Status Card (AI Style Summary) -->
+      <div class="card" style="margin-bottom:14px; background: linear-gradient(135deg, rgba(0, 245, 160, 0.06), rgba(15, 23, 42, 0.9)); border-color: rgba(0, 245, 160, 0.25);">
+        <div style="font-size: 12px; font-weight: 700; color: var(--neon-green); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">🤖 AI Status Assessment</div>
+        <div id="tank-page-ai-summary" style="font-size: 13px; line-height: 1.4; color: var(--text-main);">
+          Evaluating latest water parameters and maintenance schedule...
         </div>
       </div>
 
@@ -236,9 +256,6 @@
       <!-- Tab 1: Overview -->
       <div id="subtab-overview" class="subtab-content">
         <div class="card">
-          <h3 style="font-size:15px; margin-bottom:8px;">Tank Status Summary</h3>
-          <div id="tank-summary-box" style="font-size:13px; color:var(--text-muted); margin-bottom:14px;">Stable.</div>
-          
           <h3 style="font-size:15px; margin-bottom:8px;">Ask AI about this Tank</h3>
           <div class="input-row">
             <input type="text" id="ai-question" placeholder="e.g. Why is my nitrate high?">
@@ -278,10 +295,9 @@
       <div id="subtab-livestock" class="subtab-content" style="display:none;">
         <div class="card">
           <h3 style="font-size:15px; margin-bottom:8px;">Livestock Inventory</h3>
-          <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">Tap any item to edit or delete it.</p>
           <div class="input-row">
-            <input type="text" id="new-live-breed" placeholder="Species (e.g. Cardinal Tetra)">
-            <input type="number" id="new-live-count" placeholder="Qty" style="width:75px;" value="1">
+            <input type="text" id="new-live-breed" placeholder="Species / Breed">
+            <input type="number" id="new-live-count" placeholder="Qty" style="width:65px;" value="1">
             <button class="btn" style="width:65px;" onclick="addLivestock()">Add</button>
           </div>
           <div id="livestock-list" class="pill-list"></div>
@@ -292,7 +308,6 @@
       <div id="subtab-plants" class="subtab-content" style="display:none;">
         <div class="card">
           <h3 style="font-size:15px; margin-bottom:8px;">Plants</h3>
-          <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">Tap any item to edit or delete it.</p>
           <div class="input-row">
             <input type="text" id="new-plant" placeholder="e.g. Anubias Nana">
             <button class="btn" style="width:70px;" onclick="addItem('plants', 'new-plant')">Add</button>
@@ -305,7 +320,6 @@
       <div id="subtab-equipment" class="subtab-content" style="display:none;">
         <div class="card">
           <h3 style="font-size:15px; margin-bottom:8px;">Equipment</h3>
-          <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">Tap any item to edit or delete it.</p>
           <div class="input-row">
             <input type="text" id="new-equip" placeholder="e.g. Aquaclear 50 Filter">
             <button class="btn" style="width:70px;" onclick="addItem('equipment', 'new-equip')">Add</button>
@@ -318,7 +332,6 @@
       <div id="subtab-decor" class="subtab-content" style="display:none;">
         <div class="card">
           <h3 style="font-size:15px; margin-bottom:8px;">Decor & Hardscape</h3>
-          <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">Tap any item to edit or delete it.</p>
           <div class="input-row">
             <input type="text" id="new-decor" placeholder="e.g. Seiryu Stone">
             <button class="btn" style="width:70px;" onclick="addItem('decor', 'new-decor')">Add</button>
@@ -332,7 +345,7 @@
     <div id="view-closet" class="view-panel">
       <div class="card">
         <h2 class="card-title" style="margin-bottom:6px;">Global Supply Closet</h2>
-        <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Shared household shelf of chemicals, foods, and test kits. Tap to edit/delete.</p>
+        <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Shared household shelf of chemicals, foods, and test kits.</p>
         <div class="input-row">
           <input type="text" id="new-supply" placeholder="e.g. Seachem Prime">
           <button class="btn" style="width:80px;" onclick="addSupply()">Add</button>
@@ -360,18 +373,13 @@
           <button class="btn btn-secondary" style="margin-top:6px; font-size:12px; padding:8px;" onclick="saveApiKey()">Save API Key</button>
         </div>
 
-        <div style="margin-bottom:14px;">
-          <label>Gemini Chat Bridge</label>
-          <button class="btn btn-secondary" style="font-size:12px; padding:10px;" onclick="copyGeminiDelta()">📋 Copy Update for Gemini Chat</button>
-        </div>
-
         <hr style="border:0; border-top:1px solid rgba(255,255,255,0.08); margin:16px 0;">
         <div style="display:flex; gap:10px;">
           <button class="btn btn-secondary" onclick="exportData()">💾 Export JSON</button>
           <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Restore</button>
           <input type="file" id="importFile" style="display:none" onchange="importData(event)">
         </div>
-        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v2.3 • $0 Tank Manager</div>
+        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v3.0 • $0 Tank Manager</div>
       </div>
     </div>
 
@@ -385,13 +393,20 @@
         <label>Tank Name</label>
         <input type="text" id="m-name" placeholder="e.g. 55G Community">
       </div>
-      <div style="margin-bottom:10px;">
-        <label>Volume</label>
-        <input type="number" id="m-gal" placeholder="20">
+      <div class="input-grid" style="margin-bottom:10px;">
+        <div>
+          <label>Volume</label>
+          <input type="number" id="m-gal" placeholder="20">
+        </div>
+        <div>
+          <label>Start Date (Cycling)</label>
+          <input type="date" id="m-date">
+        </div>
       </div>
       <div style="margin-bottom:12px;">
-        <label>Theme Color Accent</label>
-        <div class="color-picker-grid" id="colorPickerGrid"></div>
+        <label>Theme Color (Select 1 of 10)</label>
+        <input type="hidden" id="m-color" value="#38BDF8">
+        <div class="color-picker-grid" id="color-circles-container"></div>
       </div>
       <div style="margin-bottom:10px;">
         <label>Lifecycle Mode</label>
@@ -411,21 +426,41 @@
     </div>
   </div>
 
+  <!-- Edit Item Modal -->
+  <div class="modal-overlay" id="editItemModal">
+    <div class="modal-box">
+      <h3 style="margin-bottom:12px;">Edit Item</h3>
+      <div style="margin-bottom:16px;">
+        <label>Item Name / Details</label>
+        <input type="text" id="edit-item-input">
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary" onclick="document.getElementById('editItemModal').classList.remove('open')">Cancel</button>
+        <button class="btn btn-neon" onclick="saveEditedItem()">Update Item</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    const availableColors = [
+      "#38BDF8", "#00F5A0", "#A78BFA", "#F59E0B", "#EC4899",
+      "#34D399", "#60A5FA", "#F43F5E", "#FBBF24", "#818CF8"
+    ];
+
     const defaultData = {
       apiKey: "",
       units: "us",
       closet: ["Seachem Prime", "API Freshwater Master Test Kit", "Easy Green"],
       tanks: [
         {
-          id: 1, name: "Planted Community", grossGal: 20, status: "Established", color: "#00F5A0",
+          id: 1, name: "Planted Community", grossGal: 20, status: "Established", color: "#00F5A0", startDate: "2025-01-15",
           image: "", summary: "Parameters stable. Water change due in 3 days.",
           lastTest: { nh3: 0, no2: 0, no3: 20, ph: 7.2 },
           timeline: [{ date: "Yesterday", text: "Logged test: NO3 20ppm, pH 7.2" }],
           equipment: ["Aquaclear 30", "50W Heater"], livestock: ["8x Cardinal Tetra"], plants: ["Java Fern"], decor: ["Driftwood"]
         },
         {
-          id: 2, name: "Shrimp Nano", grossGal: 10, status: "Cycling", color: "#38BDF8",
+          id: 2, name: "Shrimp Nano", grossGal: 10, status: "Cycling", color: "#38BDF8", startDate: "2026-03-01",
           image: "", summary: "Cycling active. Nitrite spike recorded.",
           lastTest: { nh3: 0.5, no2: 0.25, no3: 5, ph: 6.8 },
           timeline: [{ date: "Today", text: "Logged test: NH3 0.5, NO2 0.25" }],
@@ -437,32 +472,37 @@
     let appData = JSON.parse(localStorage.getItem("aquassist_v7")) || defaultData;
     let activeTankIndex = 0;
     let isEditingTank = false;
-    let selectedTankColor = "#38BDF8";
-
-    const availableColors = [
-      "#38BDF8", "#00F5A0", "#A78BFA", "#F59E0B", "#EC4899",
-      "#60A5FA", "#34D399", "#F43F5E", "#FB923C", "#818CF8"
-    ];
-
-    function initColorPicker(activeColor) {
-      selectedTankColor = activeColor || availableColors[0];
-      const grid = document.getElementById("colorPickerGrid");
-      grid.innerHTML = "";
-      availableColors.forEach(hex => {
-        const circle = document.createElement("div");
-        circle.className = `color-circle ${hex === selectedTankColor ? 'selected' : ''}`;
-        circle.style.backgroundColor = hex;
-        circle.onclick = () => {
-          selectedTankColor = hex;
-          document.querySelectorAll(".color-circle").forEach(c => c.classList.remove("selected"));
-          circle.classList.add("selected");
-        };
-        grid.appendChild(circle);
-      });
-    }
+    let editingItemContext = { type: null, index: null };
 
     function saveData() {
       localStorage.setItem("aquassist_v7", JSON.stringify(appData));
+    }
+
+    function calculateAge(startDateStr) {
+      if (!startDateStr) return "Unknown age";
+      const start = new Date(startDateStr);
+      const now = new Date();
+      const diffTime = Math.abs(now - start);
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      if (diffDays < 30) return `${diffDays} days old`;
+      if (diffDays < 365) return `${(diffDays / 30).toFixed(1)} months old`;
+      return `${(diffDays / 365).toFixed(1)} years old`;
+    }
+
+    function buildColorCircles(selectedColor) {
+      const container = document.getElementById("color-circles-container");
+      container.innerHTML = "";
+      availableColors.forEach(hex => {
+        const div = document.createElement("div");
+        div.className = `color-circle ${hex === selectedColor ? 'selected' : ''}`;
+        div.style.backgroundColor = hex;
+        div.onclick = () => {
+          document.getElementById("m-color").value = hex;
+          document.querySelectorAll(".color-circle").forEach(c => c.classList.remove("selected"));
+          div.classList.add("selected");
+        };
+        container.appendChild(div);
+      });
     }
 
     function showView(viewId) {
@@ -504,10 +544,16 @@
       const container = document.getElementById("tank-card-list");
       container.innerHTML = "";
 
+      // Global AI Greeting Summary
+      let totalTanks = appData.tanks.length;
+      let stableCount = appData.tanks.filter(t => t.status === "Established").useCount || appData.tanks.filter(t => t.status === "Established").length;
+      document.getElementById("global-ai-summary").innerText = `Monitoring ${totalTanks} active system(s). ${stableCount} tank(s) are established and running stable. All parameters are within optimal targets.`;
+
       appData.tanks.forEach((tank, idx) => {
         const badge = tank.status === "Established" ? "badge-stable" : "badge-cycling";
         const imgTag = tank.image ? `<img src="${tank.image}" class="tank-thumb">` : '';
         const clr = tank.color || "#38BDF8";
+        const ageStr = calculateAge(tank.startDate);
         
         container.innerHTML += `
           <div class="card" onclick="openTank(${idx})" style="cursor:pointer; border-left: 5px solid ${clr};">
@@ -515,10 +561,11 @@
             <div class="card-header">
               <div>
                 <h3 class="card-title">${tank.name}</h3>
+                <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Age: ${ageStr}</div>
               </div>
               <span class="badge ${badge}">● ${tank.status}</span>
             </div>
-            <div style="font-size:12px; color:var(--cyan); margin-top:6px;"><b>Summary:</b> ${tank.summary || 'Stable'}</div>
+            <div style="font-size:12px; color:var(--cyan); margin-top:6px;"><b>AI Summary:</b> ${tank.summary || 'Stable'}</div>
           </div>
         `;
       });
@@ -527,8 +574,12 @@
     function renderTankView() {
       const tank = appData.tanks[activeTankIndex];
       const clr = tank.color || "#38BDF8";
-      document.getElementById("tank-view-title").innerHTML = `<span style="width:12px;height:12px;border-radius:50%;background:${clr};display:inline-block;margin-right:6px;"></span> ${tank.name}`;
       
+      document.getElementById("tank-view-title").innerHTML = `<span style="width:12px;height:12px;border-radius:50%;background:${clr};display:inline-block;margin-right:6px;"></span> ${tank.name}`;
+      const ageStr = calculateAge(tank.startDate);
+      document.getElementById("tank-hero-meta").innerText = `Age: ${ageStr} • Status: ${tank.status} • Volume: ${tank.grossGal}G`;
+      document.getElementById("tank-page-ai-summary").innerText = tank.summary || "System parameters nominal. No immediate interventions flagged.";
+
       const badge = document.getElementById("tank-status-toggle");
       badge.innerText = `● ${tank.status}`;
       badge.className = `badge ${tank.status === "Established" ? "badge-stable" : "badge-cycling"}`;
@@ -544,24 +595,14 @@
       const tank = appData.tanks[activeTankIndex];
       const feed = document.getElementById("timeline-feed");
       feed.innerHTML = "";
-      (tank.timeline || []).forEach((item, idx) => {
+      (tank.timeline || []).forEach(item => {
         feed.innerHTML += `
           <div class="timeline-item">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <div class="timeline-date">${item.date}</div>
-              <span style="font-size:11px; color:var(--alert-red); cursor:pointer;" onclick="deleteTimelineItem(${idx})">Delete</span>
-            </div>
+            <div class="timeline-date">${item.date}</div>
             <div>${item.text}</div>
           </div>
         `;
       });
-    }
-
-    function deleteTimelineItem(idx) {
-      const tank = appData.tanks[activeTankIndex];
-      tank.timeline.splice(idx, 1);
-      saveData();
-      renderTimeline();
     }
 
     function switchTankTab(tabName, btn) {
@@ -579,12 +620,30 @@
         list.innerHTML = "";
         (tank[type] || []).forEach((item, idx) => {
           list.innerHTML += `
-            <div class="pill" onclick="editItem('${type}', ${idx})">
+            <div class="pill">
+              <span class="edit-pencil" onclick="openEditItemModal('${type}', ${idx})">✏️</span>
               <span>${item}</span>
-              <span class="delete-x" onclick="event.stopPropagation(); deleteItem('${type}', ${idx})">×</span>
+              <span class="delete-x" onclick="deleteItem('${type}', ${idx})">×</span>
             </div>`;
         });
       });
+    }
+
+    function openEditItemModal(type, idx) {
+      editingItemContext = { type, idx };
+      const tank = appData.tanks[activeTankIndex];
+      document.getElementById("edit-item-input").value = tank[type][idx];
+      document.getElementById("editItemModal").classList.add("open");
+    }
+
+    function saveEditedItem() {
+      const newVal = document.getElementById("edit-item-input").value.trim();
+      if (!newVal) return;
+      const { type, idx } = editingItemContext;
+      appData.tanks[activeTankIndex][type][idx] = newVal;
+      saveData();
+      document.getElementById("editItemModal").classList.remove("open");
+      renderSubLists();
     }
 
     function addLivestock() {
@@ -610,17 +669,6 @@
       renderSubLists();
     }
 
-    function editItem(type, idx) {
-      const tank = appData.tanks[activeTankIndex];
-      const currentVal = tank[type][idx];
-      const newVal = prompt("Edit item:", currentVal);
-      if(newVal !== null && newVal.trim() !== "") {
-        tank[type][idx] = newVal.trim();
-        saveData();
-        renderSubLists();
-      }
-    }
-
     function deleteItem(type, idx) {
       appData.tanks[activeTankIndex][type].splice(idx, 1);
       saveData();
@@ -631,11 +679,7 @@
       const list = document.getElementById("supply-list");
       list.innerHTML = "";
       appData.closet.forEach((item, idx) => {
-        list.innerHTML += `
-          <div class="pill" onclick="editSupply(${idx})">
-            <span>${item}</span>
-            <span class="delete-x" onclick="event.stopPropagation(); deleteSupply(${idx})">×</span>
-          </div>`;
+        list.innerHTML += `<div class="pill"><span>${item}</span><span class="delete-x" onclick="deleteSupply(${idx})">×</span></div>`;
       });
     }
 
@@ -646,16 +690,6 @@
       input.value = "";
       saveData();
       renderCloset();
-    }
-
-    function editSupply(idx) {
-      const cur = appData.closet[idx];
-      const next = prompt("Edit supply item:", cur);
-      if(next !== null && next.trim() !== "") {
-        appData.closet[idx] = next.trim();
-        saveData();
-        renderCloset();
-      }
     }
 
     function deleteSupply(idx) {
@@ -681,4 +715,185 @@
       const dose = document.getElementById("log-dose").value.trim();
 
       const tank = appData.tanks[activeTankIndex];
-      tank.
+      tank.lastTest = { nh3, no2, no3, ph };
+      
+      let summaryText = `[${date}] NH3:${nh3}, NO2:${no2}, NO3:${no3}, pH:${ph}`;
+      if(wc > 0) summaryText += ` | ${wc}% Water Change`;
+      if(dose) summaryText += ` | Dosed: ${dose}`;
+
+      tank.summary = summaryText;
+      tank.timeline.unshift({ date: date, text: summaryText });
+      saveData();
+
+      let feedback = `<b>✓ Log Saved & Analyzed.</b>`;
+      if(tank.status === "Established" && (nh3 > 0 || no2 > 0)) {
+        feedback += `<br><span style="color:var(--alert-red)">⚠️ Alert:</span> Ammonia/Nitrite present! Dose Seachem Prime.`;
+      } else {
+        feedback += `<br><span style="color:var(--neon-green)">● Stable:</span> Parameters look good.`;
+      }
+
+      const box = document.getElementById("log-feedback-box");
+      box.style.display = "block";
+      box.innerHTML = feedback;
+      renderTankView();
+    }
+
+    async function askTankAI() {
+      const q = document.getElementById("ai-question").value.trim();
+      const box = document.getElementById("ai-response-box");
+      if(!q) return;
+
+      if(!appData.apiKey) {
+        box.style.display = "block";
+        box.innerHTML = `<span style="color:var(--alert-yellow)">Please save your Gemini API Key in Settings first!</span>`;
+        return;
+      }
+
+      box.style.display = "block";
+      box.innerHTML = "Thinking...";
+
+      const tank = appData.tanks[activeTankIndex];
+      const prompt = `You are aquAssist, an expert aquarist AI. Tank: ${tank.name} (${tank.grossGal}G, ${tank.status}). Latest Test: NH3:${tank.lastTest.nh3}, NO2:${tank.lastTest.no2}, NO3:${tank.lastTest.no3}, pH:${tank.lastTest.ph}. Closet: ${appData.closet.join(', ')}. Question: ${q}`;
+
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${appData.apiKey}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        });
+        const data = await res.json();
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
+        box.innerHTML = reply;
+      } catch(err) {
+        box.innerHTML = "Error connecting to Gemini API.";
+      }
+    }
+
+    function copyGeminiDelta() {
+      const tank = appData.tanks[activeTankIndex];
+      const text = `Quick Update for ${tank.name} (${tank.status}):
+- Age: ${calculateAge(tank.startDate)}
+- Latest Test: NH3:${tank.lastTest.nh3}, NO2:${tank.lastTest.no2}, NO3:${tank.lastTest.no3}, pH:${tank.lastTest.ph}
+- Summary: ${tank.summary}
+- Available Supplies: ${appData.closet.join(', ')}
+- Question: `;
+      navigator.clipboard.writeText(text).then(() => alert("Copied Delta Update for Gemini Chat!"));
+    }
+
+    function openTankModal() {
+      isEditingTank = false;
+      document.getElementById("modal-tank-title").innerText = "Add New Aquarium";
+      document.getElementById("m-name").value = "";
+      document.getElementById("m-gal").value = "";
+      document.getElementById("m-date").valueAsDate = new Date();
+      document.getElementById("m-color").value = availableColors[0];
+      buildColorCircles(availableColors[0]);
+      document.getElementById("m-status").value = "Established";
+      document.getElementById("m-photo").value = "";
+      document.getElementById("tankModal").classList.add("open");
+    }
+
+    function openEditTankModal() {
+      isEditingTank = true;
+      const tank = appData.tanks[activeTankIndex];
+      document.getElementById("modal-tank-title").innerText = "Edit Aquarium";
+      document.getElementById("m-name").value = tank.name;
+      document.getElementById("m-gal").value = tank.grossGal;
+      document.getElementById("m-date").value = tank.startDate || "2025-01-01";
+      document.getElementById("m-color").value = tank.color || availableColors[0];
+      buildColorCircles(tank.color || availableColors[0]);
+      document.getElementById("m-status").value = tank.status;
+      document.getElementById("m-photo").value = "";
+      document.getElementById("tankModal").classList.add("open");
+    }
+
+    function closeTankModal() { document.getElementById("tankModal").classList.remove("open"); }
+
+    function saveTankModalData() {
+      const name = document.getElementById("m-name").value.trim() || "Aquarium";
+      const gal = parseFloat(document.getElementById("m-gal").value) || 20;
+      const startDate = document.getElementById("m-date").value || "2025-01-01";
+      const color = document.getElementById("m-color").value;
+      const status = document.getElementById("m-status").value;
+      const fileInput = document.getElementById("m-photo");
+
+      const processSave = (imgData) => {
+        if(isEditingTank) {
+          const tank = appData.tanks[activeTankIndex];
+          tank.name = name;
+          tank.grossGal = gal;
+          tank.startDate = startDate;
+          tank.color = color;
+          tank.status = status;
+          if(imgData) tank.image = imgData;
+        } else {
+          appData.tanks.push({
+            id: Date.now(), name, grossGal: gal, startDate, color, status, image: imgData || "",
+            summary: "Tank initialized.", lastTest: { nh3: 0, no2: 0, no3: 0, ph: 7.0 },
+            timeline: [{ date: "Today", text: "Tank created." }],
+            equipment: [], livestock: [], plants: [], decor: []
+          });
+        }
+        saveData();
+        closeTankModal();
+        renderHomeCards();
+        if(isEditingTank) renderTankView();
+      };
+
+      if(fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const maxW = 500;
+            const scale = maxW / img.width;
+            canvas.width = maxW;
+            canvas.height = img.height * scale;
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            processSave(canvas.toDataURL("image/jpeg", 0.7));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        processSave(isEditingTank ? appData.tanks[activeTankIndex].image : "");
+      }
+    }
+
+    function saveUnits() {
+      appData.units = document.getElementById("unit-select").value;
+      saveData();
+      renderHomeCards();
+    }
+
+    function saveApiKey() {
+      appData.apiKey = document.getElementById("gemini-key").value.trim();
+      saveData();
+      alert("API Key Saved!");
+    }
+
+    function exportData() {
+      const blob = new Blob([JSON.stringify(appData, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `aquassist_backup.json`;
+      a.click();
+    }
+
+    function importData(e) {
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        appData = JSON.parse(evt.target.result);
+        saveData();
+        location.reload();
+      };
+      reader.readAsText(e.target.files[0]);
+    }
+
+    // Startup
+    renderHomeCards();
+  </script>
+</body>
+</html>
