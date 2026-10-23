@@ -33,17 +33,16 @@
     header {
       position: sticky; top: 0; z-index: 50;
       background: rgba(11, 19, 32, 0.95); backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--card-border); padding: 12px 16px;
+      border-bottom: 1px solid var(--card-border); padding: 10px 16px;
       display: flex; align-items: center; justify-content: space-between;
     }
     .brand-wrap { display: flex; align-items: center; gap: 10px; cursor: pointer; }
     
-    /* Native Logo Box */
-    .header-logo-box {
-      width: 32px; height: 32px; background: #0F172A; border: 2px solid var(--cyan);
-      border-radius: 8px; display: flex; align-items: center; justify-content: center; position: relative;
+    /* Permanent Unbreakable Logo Graphic */
+    .header-logo-icon {
+      width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
     }
-    .logo-dot { width: 7px; height: 7px; background: var(--neon-green); border-radius: 50%; box-shadow: 0 0 8px var(--neon-green); }
 
     .brand-title { font-size: 21px; font-weight: 700; letter-spacing: -0.5px; }
     .part-aqua { color: var(--cyan); }
@@ -187,9 +186,8 @@
   <!-- Top Bar -->
   <header>
     <div class="brand-wrap" onclick="showView('home')">
-      <div class="header-logo-box">
-        <div class="logo-dot"></div>
-      </div>
+      <!-- Permanent Unbreakable Embedded Logo Graphic -->
+      <img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYXBwQmciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMUUyOTNCIi8+CiAgICAgID<zdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzA4MEUxQSIvPgog   PC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYm9keUdyYWQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMzhCREY4Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iNjAlIiBzdG9wLWNvbG9yPSIjMDZCNkQ0Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzBENDQ4OCIvPgog   PC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZmluRG9yc2FsIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzdERDNGQyIgc3RvcC1vcGFjaXR5PSIwLjgiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDZCNkQ0IiBzdG9wLW9wYWNpdHk9IjAuMiIvPgog   PC9saW5lYXJHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0ibmVvbkV5ZVNwYXJrbGUiIGN4PSI1MCUiIGN5PSI1MCUiIHI9IjUwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGRkZGRkYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSI0MCUiIHN0b3AtY29sb3I9IiMwMEY1QTgiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDU5NjY5Ii8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjI2IiBmaWxsPSJ1cmwoI2FwcEJnKSIgc3Ryb2tlPSJyZ2JhKDU2LDE4OSwyNDgsMC4zKSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHBhdGggZD0iTTU2IDM0QzU0IDIzIDQyIDE5IDMyIDI0QzM2IDI5IDQwIDMzIDQyIDM4QzQ2IDM2IDUxIDM0IDU2IDM0WiIgZmlsbD0idXJsKCNmaW5Eb3JzYWwpIi8+CiAgPHBhdGggZD0iTTQ4IDY0QzQ0IDczIDMzIDc4IDI2IDc2QzI5IDcwIDMzIDY2IDM4IDYzQzQxIDY0IDQ1IDY0IDQ4IDY0WiIgZmlsbD0idXJsKCNmaW5Eb3JzYWwpIi8+CiAgPHBhdGggZD0iTTgyIDQ5QzgxIDQ0IDczIDM3IDYwIDM2QzQ2IDM1IDM0IDQ0IDI2IDQ4QzIwIDQyIDE0IDM2IDEyIDM3QzEzIDQzIDE2IDQ4IDE4IDUwQzE2IDUyIDEzIDU3IDEyIDYzQzE0IDY0IDIwIDU4IDI2IDUyQzM0IDU2IDQ2IDY1IDYwIDY0QzczIDYzIDgxIDU2IDgyIDUxQzgyLjUgNTAuNSA4Mi41IDQ5LjUgODIgNDlaIiBmaWxsPSJ1cmwoImJvZHlHcmFkKSIvPgogIDxwYXRoIGQ9Ik01NCA0OEM1MCA1MSA0NCA1MyA0MCA1MkM0MiA0OSA0NiA0NyA1MCA0N0M1MS41IDQ3IDUzIDQ3LjUgNTQgNDhaIiBmaWxsPSIjQTdGM0QwIiBvcGFjaXR5PSIwLjYiLz4KICA8Y2lyY2xlIGN4PSI3OCIgY3k9IjI4IiByPSIyLjIiIGZpbGw9IiMzOEJERjgiIG9wYWNpdHk9IjAuNCIvPgogIDxjaXJjbGUgY3g9Ijg2IiBjeT0iMzUiIHI9IjEuNCIgZmlsbD0iIzAwRjVBMCIgb3BhY2l0eT0iMC42Ii8+CiAgPHBhdGggZD0iTTcyIDQ1QzcyLjMgNDcuOCA3My4yIDQ4LjcgNzYgNDlDNzMuMiA0OS4zIDcyLjMgNTAuMiA3MiA1M0M3MS43IDUwLjIgNzAuOCA0OS4zIDY4IDQ5QzcwLjggNDguNyA3MS43IDQ3LjggNzIgNDVaIiBmaWxsPSJ1cmwoI25lb25FeWVTcGFya2xlKSIgZmlsdGVyPSJkcm9wLXNoYWRvdygwIDAgNnJnYmEoMCwgMjQ1LDE2MCwgMC45KSkiLz4KPC9zdmc+" class="header-logo-icon" alt="aquAssist Logo">
       <div class="brand-title">
         <span class="part-aqua">aqu</span><span class="part-assist">Ass<span class="green-i">&#305;</span>st</span>
       </div>
@@ -379,7 +377,7 @@
           <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Restore</button>
           <input type="file" id="importFile" style="display:none" onchange="importData(event)">
         </div>
-        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v3.0 • $0 Tank Manager</div>
+        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v3.1 • $0 Tank Manager</div>
       </div>
     </div>
 
@@ -469,13 +467,13 @@
       ]
     };
 
-    let appData = JSON.parse(localStorage.getItem("aquassist_v7")) || defaultData;
+    let appData = JSON.parse(localStorage.getItem("aquassist_v8")) || defaultData;
     let activeTankIndex = 0;
     let isEditingTank = false;
     let editingItemContext = { type: null, index: null };
 
     function saveData() {
-      localStorage.setItem("aquassist_v7", JSON.stringify(appData));
+      localStorage.setItem("aquassist_v8", JSON.stringify(appData));
     }
 
     function calculateAge(startDateStr) {
@@ -544,9 +542,8 @@
       const container = document.getElementById("tank-card-list");
       container.innerHTML = "";
 
-      // Global AI Greeting Summary
       let totalTanks = appData.tanks.length;
-      let stableCount = appData.tanks.filter(t => t.status === "Established").useCount || appData.tanks.filter(t => t.status === "Established").length;
+      let stableCount = appData.tanks.filter(t => t.status === "Established").length;
       document.getElementById("global-ai-summary").innerText = `Monitoring ${totalTanks} active system(s). ${stableCount} tank(s) are established and running stable. All parameters are within optimal targets.`;
 
       appData.tanks.forEach((tank, idx) => {
