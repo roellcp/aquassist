@@ -33,18 +33,25 @@
     header {
       position: sticky; top: 0; z-index: 50;
       background: rgba(11, 19, 32, 0.95); backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--card-border); padding: 10px 16px;
+      border-bottom: 1px solid var(--card-border); padding: 12px 16px;
       display: flex; align-items: center; justify-content: space-between;
     }
-    .brand-wrap { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-    .brand-logo-img { width: 32px; height: 32px; border-radius: 8px; object-fit: contain; }
-    .brand-title { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+    .brand-wrap { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .header-logo-img { width: 34px; height: 34px; border-radius: 8px; object-fit: contain; }
+    .brand-title { font-size: 21px; font-weight: 700; letter-spacing: -0.5px; }
     .part-aqua { color: var(--cyan); }
     .part-assist { color: #fff; }
+    .green-i { position: relative; display: inline-block; }
+    .green-i::after {
+      content: ""; position: absolute; top: 2px; left: 50%;
+      transform: translateX(-50%); width: 5px; height: 5px;
+      background: var(--neon-green); border-radius: 50%;
+      box-shadow: 0 0 8px var(--neon-green);
+    }
     
     .menu-btn {
       background: rgba(255,255,255,0.06); border: 1px solid var(--card-border);
-      color: var(--text-main); border-radius: 10px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer;
+      color: var(--text-main); border-radius: 10px; padding: 8px 14px; font-size: 14px; font-weight: 600; cursor: pointer;
     }
 
     /* Sidebar Drawer */
@@ -79,7 +86,7 @@
     /* Increased Hero Image Height */
     .tank-thumb { 
       width: 100%; height: 180px; border-radius: 12px; object-fit: cover; margin-bottom: 12px; 
-      border: 1px solid rgba(56, 189, 248, 0.3); 
+      border: 1px solid rgba(56, 189, 248, 0.3); background: #070D18; display: block;
     }
 
     /* Badges */
@@ -158,10 +165,10 @@
   <!-- Top Bar -->
   <header>
     <div class="brand-wrap" onclick="showView('home')">
-      <!-- Embedded Static Image Logo (Zero Distortion) -->
-      <img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIHJ4PSIyNiIgZmlsbD0iIzBGMTdFQSIgc3Ryb2tlPSIjMzhCREY4IiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTU2IDM0QzU0IDIzIDQyIDE5IDMyIDI0QzM2IDI5IDQwIDMzIDQyIDM4QzQ2IDM2IDUxIDM0IDU2IDM0WiIgZmlsbD0iIzM4QkRGOCIgb3BhY2l0eT0iMC44Ii8+CjxwYXRoIGQ9Ik00OCA2NEM0NCA3MyAzNCA3OCAyNiA3NlMyOSA3MCAzMyA2NiAzOCA2MyA0MSA2NCA0NSA2NCA0OCA2NFoiIGZpbGw9IiMzOEJERjgiIG9wYWNpdHk9IjAuOCIvPgo8cGF0aCBkPSJNODIgNDlDOC4xIDQ0IDczIDM3IDYwIDM2QzQ2IDM1IDM0IDQ0IDI2IDQ4QzIwIDQyIDE0IDM2IDEyIDM3QzEzIDQzIDE2IDQ4IDE4IDUwQzE2IDUyIDEzIDU3IDEyIDYzQzE0IDY0IDIwIDU4IDI2IDUyQzM0IDU2IDQ2IDY1IDYwIDY0QzczIDYzIDgxIDU2IDgyIDUxQzgyLjUgNTAuNSA4Mi41IDQ5LjUgODIgNDlaIiBmaWxsPSIjMDZCNkQ0Ii8+CjxjaXJjbGUgY3g9IjcwIiBjeT0iNDYiIHI9IjYiIGZpbGw9IiEwMEY1QTAiLz4KPGNpcmNsZSBjeD0iNzAiIGN5PSI0NiIHIz0iMi41IiBmaWxsPSIjRkZGRkZGIi8+Cjwvc3ZnPg==" class="brand-logo-img">
+      <!-- Unbreakable Base64 Embedded Logo Image -->
+      <img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgmlwPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiByeD0iMjQiIGZpbGw9IiMwRjE3MkEiIHN0cm9rZT0iIzM4QkRGOCIgc3Ryb2tlLXdpZHRoPSIzIi8+PHBhdGggZD0iTTU2IDM0QzU0IDIzIDQyIDE5IDMyIDI0QzM2IDI5IDQwIDMzIDQyIDM4QzQ2IDM2IDUxIDM0IDU2IDM0WiIgZmlsbD0iIzM4QkRGOCIgb3BhY2l0eT0iMC44Ii8+PHBhdGggZD0iTTQ4IDY0QzQ0IDczIDMzIDc4IDI2IDc2QzI5IDcwIDMzIDY2IDM4IDYzQzQxIDY0IDQ1IDY0IDQ4IDY0WiIgZmlsbD0iIzM4QkRGOCIgb3BhY2l0eT0iMC44Ii8+PHBhdGggZD0iTTgyIDQ5QzgxIDQ0IDczIDM3IDYwIDM2QzQ2IDM1IDM0IDQ0IDI2IDQ4QzIwIDQyIDE0IDM2IDEyIDM3QzEzIDQzIDE2IDQ4IDE4IDUwQzE2IDUyIDEzIDU3IDEyIDYzQzE0IDY0IDIwIDU4IDI2IDUyQzM0IDU2IDQ2IDY1IDYwIDY0QzczIDYzIDgxIDU2IDgyIDUxWiIgZmlsbD0iIzA2QjZENCIvPjxjaXJjbGUgY3g9IjcyIiBjeT0iNDYiIHI9IjYiIGZpbGw9IiMwMEY1QTAiLz48Y2lyY2xlIGN4PSI3MiIgY3k9IjQ2IiByPSIyLjUiIGZpbGw9IiNGRkZGRkYiLz48L3N2Zz4=" class="header-logo-img" alt="aquAssist Logo">
       <div class="brand-title">
-        <span class="part-aqua">aqu</span><span class="part-assist">Assist</span>
+        <span class="part-aqua">aqu</span><span class="part-assist">Ass<span class="green-i">&#305;</span>st</span>
       </div>
     </div>
     <button class="menu-btn" onclick="toggleMenu(true)">☰ Menu</button>
@@ -171,7 +178,7 @@
 
     <!-- ==================== VIEW 1: HOME ==================== -->
     <div id="view-home" class="view-panel active">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; margin-top:4px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
         <h2 style="font-size:18px; font-weight:700;">My Aquariums</h2>
         <button class="btn btn-secondary" style="width:auto; padding:6px 12px; font-size:12px;" onclick="openTankModal()">+ Add Tank</button>
       </div>
@@ -457,6 +464,7 @@
 
       appData.tanks.forEach((tank, idx) => {
         const badge = tank.status === "Established" ? "badge-stable" : "badge-cycling";
+        // Fixed: Ensure image renders correctly if present
         const imgTag = tank.image ? `<img src="${tank.image}" class="tank-thumb">` : '';
         
         container.innerHTML += `
@@ -464,4 +472,307 @@
             ${imgTag}
             <div class="card-header">
               <div>
-                <
+                <h3 class="card-title">${tank.icon || '🐠'} ${tank.name}</h3>
+              </div>
+              <span class="badge ${badge}">● ${tank.status}</span>
+            </div>
+            <div style="font-size:12px; color:var(--cyan); margin-top:6px;"><b>Summary:</b> ${tank.summary || 'Stable'}</div>
+          </div>
+        `;
+      });
+    }
+
+    function renderTankView() {
+      const tank = appData.tanks[activeTankIndex];
+      // Fixed: Target correct elements without syntax crash
+      document.getElementById("tank-view-title").innerHTML = `${tank.icon || '🐠'} ${tank.name}`;
+      
+      const badge = document.getElementById("tank-status-toggle");
+      badge.innerText = `● ${tank.status}`;
+      badge.className = `badge ${tank.status === "Established" ? "badge-stable" : "badge-cycling"}`;
+
+      document.getElementById("tank-summary-box").innerText = tank.summary || "No active warnings.";
+      
+      document.getElementById("log-date").valueAsDate = new Date();
+
+      renderTimeline();
+      renderSubLists();
+    }
+
+    function renderTimeline() {
+      const tank = appData.tanks[activeTankIndex];
+      const feed = document.getElementById("timeline-feed");
+      feed.innerHTML = "";
+      (tank.timeline || []).forEach(item => {
+        feed.innerHTML += `
+          <div class="timeline-item">
+            <div class="timeline-date">${item.date}</div>
+            <div>${item.text}</div>
+          </div>
+        `;
+      });
+    }
+
+    function switchTankTab(tabName, btn) {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      if(btn) btn.classList.add("active");
+      document.querySelectorAll(".subtab-content").forEach(c => c.style.display = "none");
+      document.getElementById("subtab-" + tabName).style.display = "block";
+    }
+
+    function renderSubLists() {
+      const tank = appData.tanks[activeTankIndex];
+      ["livestock", "plants", "decor", "equipment"].forEach(type => {
+        const list = document.getElementById(type + "-list");
+        if(!list) return;
+        list.innerHTML = "";
+        (tank[type] || []).forEach((item, idx) => {
+          list.innerHTML += `<div class="pill"><span>${item}</span><span class="delete-x" onclick="deleteItem('${type}', ${idx})">×</span></div>`;
+        });
+      });
+    }
+
+    function addLivestock() {
+      const breed = document.getElementById("new-live-breed").value.trim();
+      const count = document.getElementById("new-live-count").value || "1";
+      if(!breed) return;
+      const entry = `${count}x ${breed}`;
+      if(!appData.tanks[activeTankIndex].livestock) appData.tanks[activeTankIndex].livestock = [];
+      appData.tanks[activeTankIndex].livestock.push(entry);
+      document.getElementById("new-live-breed").value = "";
+      document.getElementById("new-live-count").value = "1";
+      saveData();
+      renderSubLists();
+    }
+
+    function addItem(type, inputId) {
+      const input = document.getElementById(inputId);
+      if(!input || !input.value.trim()) return;
+      if(!appData.tanks[activeTankIndex][type]) appData.tanks[activeTankIndex][type] = [];
+      appData.tanks[activeTankIndex][type].push(input.value.trim());
+      input.value = "";
+      saveData();
+      renderSubLists();
+    }
+
+    function deleteItem(type, idx) {
+      appData.tanks[activeTankIndex][type].splice(idx, 1);
+      saveData();
+      renderSubLists();
+    }
+
+    function renderCloset() {
+      const list = document.getElementById("supply-list");
+      list.innerHTML = "";
+      appData.closet.forEach((item, idx) => {
+        list.innerHTML += `<div class="pill"><span>${item}</span><span class="delete-x" onclick="deleteSupply(${idx})">×</span></div>`;
+      });
+    }
+
+    function addSupply() {
+      const input = document.getElementById("new-supply");
+      if(!input || !input.value.trim()) return;
+      appData.closet.push(input.value.trim());
+      input.value = "";
+      saveData();
+      renderCloset();
+    }
+
+    function deleteSupply(idx) {
+      appData.closet.splice(idx, 1);
+      saveData();
+      renderCloset();
+    }
+
+    function toggleTankLifecycle() {
+      const tank = appData.tanks[activeTankIndex];
+      tank.status = tank.status === "Established" ? "Cycling" : "Established";
+      saveData();
+      renderTankView();
+    }
+
+    function submitLog() {
+      const date = document.getElementById("log-date").value || "Today";
+      const nh3 = parseFloat(document.getElementById("log-nh3").value) || 0;
+      const no2 = parseFloat(document.getElementById("log-no2").value) || 0;
+      const no3 = parseFloat(document.getElementById("log-no3").value) || 0;
+      const ph = parseFloat(document.getElementById("log-ph").value) || 7.2;
+      const wc = parseFloat(document.getElementById("log-wc").value) || 0;
+      const dose = document.getElementById("log-dose").value.trim();
+
+      const tank = appData.tanks[activeTankIndex];
+      tank.lastTest = { nh3, no2, no3, ph };
+      
+      let summaryText = `[${date}] NH3:${nh3}, NO2:${no2}, NO3:${no3}, pH:${ph}`;
+      if(wc > 0) summaryText += ` | ${wc}% Water Change`;
+      if(dose) summaryText += ` | Dosed: ${dose}`;
+
+      tank.summary = summaryText;
+      tank.timeline.unshift({ date: date, text: summaryText });
+      saveData();
+
+      let feedback = `<b>✓ Log Saved & Analyzed.</b>`;
+      if(tank.status === "Established" && (nh3 > 0 || no2 > 0)) {
+        feedback += `<br><span style="color:var(--alert-red)">⚠️ Alert:</span> Ammonia/Nitrite present! Dose Seachem Prime.`;
+      } else {
+        feedback += `<br><span style="color:var(--neon-green)">● Stable:</span> Parameters look good.`;
+      }
+
+      const box = document.getElementById("log-feedback-box");
+      box.style.display = "block";
+      box.innerHTML = feedback;
+      renderTankView();
+    }
+
+    async function askTankAI() {
+      const q = document.getElementById("ai-question").value.trim();
+      const box = document.getElementById("ai-response-box");
+      if(!q) return;
+
+      if(!appData.apiKey) {
+        box.style.display = "block";
+        box.innerHTML = `<span style="color:var(--alert-yellow)">Please save your Gemini API Key in Settings first!</span>`;
+        return;
+      }
+
+      box.style.display = "block";
+      box.innerHTML = "Thinking...";
+
+      const tank = appData.tanks[activeTankIndex];
+      const prompt = `You are aquAssist, an expert aquarist AI. Tank: ${tank.name} (${tank.grossGal}G, ${tank.status}). Latest Test: NH3:${tank.lastTest.nh3}, NO2:${tank.lastTest.no2}, NO3:${tank.lastTest.no3}, pH:${tank.lastTest.ph}. Closet: ${appData.closet.join(', ')}. Question: ${q}`;
+
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${appData.apiKey}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        });
+        const data = await res.json();
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
+        box.innerHTML = reply;
+      } catch(err) {
+        box.innerHTML = "Error connecting to Gemini API.";
+      }
+    }
+
+    function copyGeminiDelta() {
+      const tank = appData.tanks[activeTankIndex];
+      const text = `Quick Update for ${tank.name} (${tank.status}):
+- Latest Test: NH3:${tank.lastTest.nh3}, NO2:${tank.lastTest.no2}, NO3:${tank.lastTest.no3}, pH:${tank.lastTest.ph}
+- Summary: ${tank.summary}
+- Available Supplies: ${appData.closet.join(', ')}
+- Question: `;
+      navigator.clipboard.writeText(text).then(() => alert("Copied Delta Update for Gemini Chat!"));
+    }
+
+    function openTankModal() {
+      isEditingTank = false;
+      document.getElementById("modal-tank-title").innerText = "Add New Aquarium";
+      document.getElementById("m-name").value = "";
+      document.getElementById("m-gal").value = "";
+      document.getElementById("m-icon").value = "🐠";
+      document.getElementById("m-status").value = "Established";
+      document.getElementById("m-photo").value = "";
+      document.getElementById("tankModal").classList.add("open");
+    }
+
+    function openEditTankModal() {
+      isEditingTank = true;
+      const tank = appData.tanks[activeTankIndex];
+      document.getElementById("modal-tank-title").innerText = "Edit Aquarium";
+      document.getElementById("m-name").value = tank.name;
+      document.getElementById("m-gal").value = tank.grossGal;
+      document.getElementById("m-icon").value = tank.icon || "🐠";
+      document.getElementById("m-status").value = tank.status;
+      document.getElementById("m-photo").value = "";
+      document.getElementById("tankModal").classList.add("open");
+    }
+
+    function closeTankModal() { document.getElementById("tankModal").classList.remove("open"); }
+
+    function saveTankModalData() {
+      const name = document.getElementById("m-name").value.trim() || "Aquarium";
+      const gal = parseFloat(document.getElementById("m-gal").value) || 20;
+      const icon = document.getElementById("m-icon").value;
+      const status = document.getElementById("m-status").value;
+      const fileInput = document.getElementById("m-photo");
+
+      const processSave = (imgData) => {
+        if(isEditingTank) {
+          const tank = appData.tanks[activeTankIndex];
+          tank.name = name;
+          tank.grossGal = gal;
+          tank.icon = icon;
+          tank.status = status;
+          if(imgData) tank.image = imgData;
+        } else {
+          appData.tanks.push({
+            id: Date.now(), name, grossGal: gal, icon, status, image: imgData || "",
+            summary: "Tank initialized.", lastTest: { nh3: 0, no2: 0, no3: 0, ph: 7.0 },
+            timeline: [{ date: "Today", text: "Tank created." }],
+            equipment: [], livestock: [], plants: [], decor: []
+          });
+        }
+        saveData();
+        closeTankModal();
+        renderHomeCards();
+        if(isEditingTank) renderTankView();
+      };
+
+      if(fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const maxW = 500;
+            const scale = maxW / img.width;
+            canvas.width = maxW;
+            canvas.height = img.height * scale;
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            processSave(canvas.toDataURL("image/jpeg", 0.7));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        processSave(isEditingTank ? appData.tanks[activeTankIndex].image : "");
+      }
+    }
+
+    function saveUnits() {
+      appData.units = document.getElementById("unit-select").value;
+      saveData();
+      renderHomeCards();
+    }
+
+    function saveApiKey() {
+      appData.apiKey = document.getElementById("gemini-key").value.trim();
+      saveData();
+      alert("API Key Saved!");
+    }
+
+    function exportData() {
+      const blob = new Blob([JSON.stringify(appData, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `aquassist_backup.json`;
+      a.click();
+    }
+
+    function importData(e) {
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        appData = JSON.parse(evt.target.result);
+        saveData();
+        location.reload();
+      };
+      reader.readAsText(e.target.files[0]);
+    }
+
+    // Startup
+    renderHomeCards();
+  </script>
+</body>
+</html>
