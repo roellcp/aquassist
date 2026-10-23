@@ -41,8 +41,8 @@
       align-items: center;
       justify-content: space-between;
     }
-    .brand-wrap { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-    .brand-title { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; display: flex; align-items: center; }
+    .brand-wrap { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .brand-title { font-size: 21px; font-weight: 700; letter-spacing: -0.5px; }
     .part-aqua { color: var(--cyan); }
     .part-assist { color: #fff; }
     .green-i { position: relative; display: inline-block; }
@@ -86,11 +86,7 @@
     }
     .drawer.open { left: 0; }
     .drawer-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      z-index: 90;
-      display: none;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 90; display: none;
     }
     .drawer-overlay.open { display: block; }
     .nav-item {
@@ -105,27 +101,23 @@
       gap: 12px;
       cursor: pointer;
     }
-    .nav-item:active {
-      background: rgba(56, 189, 248, 0.15);
-      color: var(--cyan);
-    }
+    .nav-item:active { background: rgba(56, 189, 248, 0.15); color: var(--cyan); }
 
     /* Container */
     .container { padding: 16px; max-width: 560px; margin: 0 auto; }
     .view-panel { display: none; }
     .view-panel.active { display: block; }
 
-    /* Hero Showcase */
+    /* Hero Banner */
     .hero-banner {
       background: linear-gradient(180deg, #0F172A 0%, #0B1320 100%);
       border: 1px solid var(--card-border);
-      box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 245, 160, 0.08);
-      border-radius: 26px;
-      padding: 24px 20px;
+      border-radius: 24px;
+      padding: 20px;
       text-align: center;
       margin-bottom: 20px;
     }
-    .hero-icon { width: 90px; height: 90px; margin: 0 auto 14px auto; filter: drop-shadow(0 8px 20px rgba(0, 245, 160, 0.35)); }
+    .hero-icon { width: 75px; height: 75px; margin: 0 auto 10px auto; filter: drop-shadow(0 6px 15px rgba(0, 245, 160, 0.3)); }
 
     /* Cards */
     .card {
@@ -135,27 +127,20 @@
       padding: 18px;
       margin-bottom: 14px;
       box-shadow: 0 10px 25px -10px rgba(0, 0, 0, 0.6);
-      display: block;
-      text-decoration: none;
-      color: inherit;
-      cursor: pointer;
     }
-    .card:active {
-      border-color: var(--cyan);
-      background: rgba(56, 189, 248, 0.05);
-    }
-    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .card-title { font-size: 18px; font-weight: 700; color: #fff; }
+
+    /* Tank Card Hero Thumbnail */
+    .tank-thumb {
+      width: 100%; height: 130px; border-radius: 12px; object-fit: cover; margin-bottom: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
 
     /* Badges */
     .badge {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 5px 11px;
-      border-radius: 20px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+      font-size: 11px; font-weight: 600; padding: 5px 11px; border-radius: 20px;
+      display: inline-flex; align-items: center; gap: 6px;
     }
     .badge-stable { background: rgba(0, 245, 160, 0.15); color: var(--neon-green); border: 1px solid rgba(0, 245, 160, 0.35); }
     .badge-cycling { background: rgba(245, 158, 11, 0.15); color: var(--alert-yellow); border: 1px solid rgba(245, 158, 11, 0.35); }
@@ -167,84 +152,47 @@
 
     /* Sub Tabs */
     .tab-bar {
-      display: flex;
-      overflow-x: auto;
-      gap: 6px;
-      margin-bottom: 16px;
-      background: rgba(15, 23, 42, 0.8);
-      padding: 4px;
-      border-radius: 14px;
-      border: 1px solid var(--card-border);
+      display: flex; overflow-x: auto; gap: 6px; margin-bottom: 16px;
+      background: rgba(15, 23, 42, 0.8); padding: 4px; border-radius: 14px; border: 1px solid var(--card-border);
     }
     .tab-btn {
-      flex: 1;
-      padding: 10px 8px;
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-size: 13px;
-      font-weight: 600;
-      border-radius: 10px;
-      cursor: pointer;
-      white-space: nowrap;
+      flex: 1; padding: 10px 8px; background: transparent; border: none; color: var(--text-muted);
+      font-size: 12px; font-weight: 600; border-radius: 10px; cursor: pointer; white-space: nowrap;
     }
-    .tab-btn.active {
-      background: var(--cyan);
-      color: #070D18;
-    }
+    .tab-btn.active { background: var(--cyan); color: #070D18; }
 
     /* Inputs & Buttons */
     .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
     label { font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px; font-weight: 500; }
-    input, select {
-      width: 100%;
-      background: #080E1A;
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 10px;
-      padding: 10px;
-      color: #fff;
-      font-size: 14px;
+    input, select, textarea {
+      width: 100%; background: #080E1A; border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px; padding: 10px; color: #fff; font-size: 14px;
     }
     .btn {
-      width: 100%;
-      background: var(--cyan);
-      color: #070D18;
-      border: none;
-      border-radius: 12px;
-      padding: 12px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      width: 100%; background: var(--cyan); color: #070D18; border: none; border-radius: 12px;
+      padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; gap: 8px;
     }
     .btn-secondary { background: rgba(255,255,255,0.06); border: 1px solid var(--card-border); color: #fff; }
     .btn-neon { background: var(--neon-green); color: #070D18; }
 
     .ai-feedback {
-      background: rgba(0, 245, 160, 0.08);
-      border: 1px solid var(--neon-green);
-      border-radius: 14px;
-      padding: 14px;
-      margin-top: 14px;
-      font-size: 13px;
-      line-height: 1.5;
+      background: rgba(0, 245, 160, 0.08); border: 1px solid var(--neon-green);
+      border-radius: 14px; padding: 14px; margin-top: 14px; font-size: 13px; line-height: 1.5;
     }
 
     .pill-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
     .pill {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 6px 12px;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 6px 12px; font-size: 13px; display: flex; align-items: center; gap: 8px;
     }
     .delete-x { color: var(--alert-red); cursor: pointer; font-weight: 700; font-size: 16px; padding: 0 4px; }
+
+    /* Timeline */
+    .timeline-item {
+      padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 13px;
+    }
+    .timeline-date { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; }
 
     /* Modal */
     .modal-overlay {
@@ -254,7 +202,7 @@
     .modal-overlay.open { display: flex; }
     .modal-box {
       background: #0F172A; border: 1px solid var(--cyan); border-radius: 20px;
-      padding: 22px; width: 100%; max-width: 400px;
+      padding: 22px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto;
     }
   </style>
 </head>
@@ -276,17 +224,9 @@
   <!-- Top Bar -->
   <header>
     <div class="brand-wrap" onclick="showView('home')">
-      <svg width="34" height="34" viewBox="0 0 100 100" fill="none">
-        <rect width="100" height="100" rx="24" fill="#0F172A" stroke="#38BDF8" stroke-width="3"/>
-        <path d="M56 34C54 23 42 19 32 24C36 29 40 33 42 38C46 36 51 34 56 34Z" fill="#38BDF8" opacity="0.8"/>
-        <path d="M48 64C44 73 34 78 26 76C29 70 33 66 38 63C41 64 45 64 48 64Z" fill="#38BDF8" opacity="0.8"/>
-        <path d="M82 49C81 44 73 37 60 36C46 35 34 44 26 48C20 42 14 36 12 37C13 43 16 48 18 50C16 52 13 57 12 63C14 64 20 58 26 52C34 56 46 65 60 64C73 63 81 56 82 51Z" fill="#06B6D4"/>
-        <circle cx="72" cy="46" r="6" fill="#00F5A0"/>
-        <circle cx="72" cy="46" r="2.5" fill="#FFFFFF"/>
-      </svg>
       <div class="brand-title">
         <span class="part-aqua">aqu</span><span class="part-assist">Ass<span class="green-i">&#305;</span>st</span>
-        <span class="version-tag">v1.2</span>
+        <span class="version-tag">v1.5</span>
       </div>
     </div>
     <button class="menu-btn" onclick="toggleMenu(true)">☰ Menu</button>
@@ -297,166 +237,102 @@
     <!-- ==================== VIEW 1: HOME ==================== -->
     <div id="view-home" class="view-panel active">
       
+      <!-- Hero Banner -->
       <div class="hero-banner">
         <div class="hero-icon">
-          <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="heroBg" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#1E293B"/>
-                <stop offset="100%" stop-color="#080E1A"/>
-              </linearGradient>
-              <linearGradient id="heroFish" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#38BDF8"/>
-                <stop offset="60%" stop-color="#06B6D4"/>
-                <stop offset="100%" stop-color="#0D9488"/>
-              </linearGradient>
-              <linearGradient id="heroFin" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#7DD3FC" stop-opacity="0.8"/>
-                <stop offset="100%" stop-color="#06B6D4" stop-opacity="0.2"/>
-              </linearGradient>
-              <radialGradient id="heroSparkle" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#FFFFFF"/>
-                <stop offset="40%" stop-color="#00F5A0"/>
-                <stop offset="100%" stop-color="#059669"/>
-              </radialGradient>
-            </defs>
-            <rect width="100" height="100" rx="26" fill="url(#heroBg)" stroke="rgba(56, 189, 248, 0.3)" stroke-width="2"/>
-            <path d="M56 34C54 23 42 19 32 24C36 29 40 33 42 38C46 36 51 34 56 34Z" fill="url(#heroFin)"/>
-            <path d="M48 64C44 73 34 78 26 76C29 70 33 66 38 63C41 64 45 64 48 64Z" fill="url(#heroFin)"/>
-            <path d="M82 49C81 44 73 37 60 36C46 35 34 44 26 48C20 42 14 36 12 37C13 43 16 48 18 50C16 52 13 57 12 63C14 64 20 58 26 52C34 56 46 65 60 64C73 63 81 56 82 51C82.5 50.5 82.5 49.5 82 49Z" fill="url(#heroFish)"/>
-            <path d="M54 48C50 51 44 53 40 52C42 49 46 47 50 47C51.5 47 53 47.5 54 48Z" fill="#A7F3D0" opacity="0.6"/>
-            <circle cx="78" cy="28" r="2.2" fill="#38BDF8" opacity="0.4"/>
-            <circle cx="86" cy="35" r="1.4" fill="#00F5A0" opacity="0.6"/>
-            <path d="M72 45C72.3 47.8 73.2 48.7 76 49C73.2 49.3 72.3 50.2 72 53C71.7 50.2 70.8 49.3 68 49C70.8 48.7 71.7 47.8 72 45Z" fill="url(#heroSparkle)"/>
+          <svg viewBox="0 0 100 100" fill="none">
+            <rect width="100" height="100" rx="26" fill="#1E293B" stroke="#38BDF8" stroke-width="2"/>
+            <path d="M82 49C81 44 73 37 60 36C46 35 34 44 26 48C20 42 14 36 12 37C13 43 16 48 18 50C16 52 13 57 12 63C14 64 20 58 26 52C34 56 46 65 60 64C73 63 81 56 82 51Z" fill="#06B6D4"/>
+            <circle cx="72" cy="46" r="6" fill="#00F5A0"/>
+            <circle cx="72" cy="46" r="2.5" fill="#FFFFFF"/>
           </svg>
         </div>
-        <div style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">
-          <span class="part-aqua">aqu</span><span class="part-assist">Ass<span class="green-i">&#305;</span>st</span> Hub
-        </div>
-        <div style="display:inline-flex; align-items:center; gap:8px; font-size:12px; color:var(--neon-green); margin-top:4px;">
-          <div class="pulse-dot"></div> All Systems Connected & Monitored
+        <div style="font-size: 18px; font-weight: 700;">Smart Aquarium Hub</div>
+        <div style="display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--neon-green); margin-top:4px;">
+          <div class="pulse-dot"></div> All Systems Operational
         </div>
       </div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
         <h2 style="font-size:18px; font-weight:700;">My Aquariums</h2>
-        <button class="btn btn-secondary" style="width:auto; padding:6px 14px; font-size:13px;" onclick="openAddTankModal()">+ Add Tank</button>
+        <button class="btn btn-secondary" style="width:auto; padding:6px 14px; font-size:13px;" onclick="openTankModal()">+ Add Tank</button>
       </div>
 
-      <!-- Tappable Tank Cards using native anchor tags -->
-      <div id="tank-card-list">
-        
-        <a href="javascript:void(0)" class="card" onclick="openTank(0)">
-          <div class="card-header">
-            <div>
-              <h3 class="card-title" id="t0-name">Planted Community</h3>
-              <div style="font-size:12px; color:var(--text-muted); margin-top:2px;" id="t0-vol">20G (16.4G Net Water)</div>
-            </div>
-            <span class="badge badge-stable" id="t0-status">● Established</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.06); font-size:13px;">
-            <span>NH₃: <b id="t0-nh3">0</b></span>
-            <span>NO₂: <b id="t0-no2">0</b></span>
-            <span>NO₃: <b id="t0-no3">20 ppm</b></span>
-            <span>pH: <b id="t0-ph">7.2</b></span>
-          </div>
-        </a>
-
-        <a href="javascript:void(0)" class="card" onclick="openTank(1)">
-          <div class="card-header">
-            <div>
-              <h3 class="card-title" id="t1-name">Shrimp & Moss Nano</h3>
-              <div style="font-size:12px; color:var(--text-muted); margin-top:2px;" id="t1-vol">10G (8.0G Net Water)</div>
-            </div>
-            <span class="badge badge-cycling" id="t1-status">● Cycling</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.06); font-size:13px;">
-            <span>NH₃: <b id="t1-nh3">0.5</b></span>
-            <span>NO₂: <b id="t1-no2">0.25</b></span>
-            <span>NO₃: <b id="t1-no3">5 ppm</b></span>
-            <span>pH: <b id="t1-ph">6.8</b></span>
-          </div>
-        </a>
-
-      </div>
+      <div id="tank-card-list"></div>
     </div>
 
     <!-- ==================== VIEW 2: TANK HUB ==================== -->
     <div id="view-tank" class="view-panel">
-      <div class="card" style="margin-bottom:12px; cursor:default;">
+      
+      <!-- Tank Header Card -->
+      <div class="card" style="margin-bottom:12px;">
         <div class="card-header">
           <div>
             <h2 id="tank-view-title" class="card-title">Tank Details</h2>
-            <div id="tank-vol-calc" style="font-size:12px; color:var(--text-muted); margin-top:3px;">Gross: 20G • Net: 16.5G</div>
+            <div id="tank-vol-calc" style="font-size:12px; color:var(--text-muted); margin-top:3px;">Gross: 20G</div>
           </div>
-          <button class="badge badge-stable" id="tank-status-toggle" onclick="toggleTankLifecycle()">● Established</button>
+          <div style="display:flex; gap:6px;">
+            <button class="badge badge-stable" id="tank-status-toggle" onclick="toggleTankLifecycle()">● Established</button>
+            <button class="btn btn-secondary" style="width:auto; padding:4px 8px; font-size:11px;" onclick="openEditTankModal()">✏️ Edit</button>
+          </div>
         </div>
 
-        <button class="btn btn-secondary" style="font-size:13px; padding:10px;" onclick="copyGeminiDelta()">
-          📋 Copy Delta Update for Gemini Chat
+        <!-- Prominent Gemini Delta Bridge -->
+        <button class="btn btn-secondary" style="font-size:13px; padding:10px; margin-top:6px;" onclick="copyGeminiDelta()">
+          📋 Copy Update for Gemini Chat
         </button>
       </div>
 
-      <!-- Sub Tabs -->
+      <!-- New Tab Bar (Overview/Timeline First) -->
       <div class="tab-bar">
-        <button class="tab-btn active" onclick="switchTankTab('log', this)">Quick Log</button>
-        <button class="tab-btn" onclick="switchTankTab('equipment', this)">Equipment</button>
+        <button class="tab-btn active" onclick="switchTankTab('overview', this)">Overview & AI</button>
+        <button class="tab-btn" onclick="switchTankTab('water', this)">Water & Trends</button>
         <button class="tab-btn" onclick="switchTankTab('livestock', this)">Livestock</button>
-        <button class="tab-btn" onclick="switchTankTab('plants', this)">Plants & Decor</button>
+        <button class="tab-btn" onclick="switchTankTab('plants', this)">Plants</button>
+        <button class="tab-btn" onclick="switchTankTab('decor', this)">Decor</button>
+        <button class="tab-btn" onclick="switchTankTab('equipment', this)">Equipment</button>
       </div>
 
-      <!-- Subtab: Quick Log -->
-      <div id="subtab-log" class="subtab-content">
-        <div class="card" style="cursor:default;">
-          <h3 style="font-size:15px; margin-bottom:12px;">Log Water Test & Maintenance</h3>
+      <!-- Subtab 1: Overview & AI Timeline -->
+      <div id="subtab-overview" class="subtab-content">
+        <div class="card">
+          <h3 style="font-size:15px; margin-bottom:8px;">Tank Health Summary</h3>
+          <div id="tank-summary-box" style="font-size:13px; color:var(--text-muted); margin-bottom:14px;">All parameters stable. No immediate actions required.</div>
           
-          <div class="input-grid">
-            <div>
-              <label>Ammonia (NH₃ ppm)</label>
-              <input type="number" id="log-nh3" step="0.25" placeholder="0">
-            </div>
-            <div>
-              <label>Nitrite (NO₂ ppm)</label>
-              <input type="number" id="log-no2" step="0.25" placeholder="0">
-            </div>
-            <div>
-              <label>Nitrate (NO₃ ppm)</label>
-              <input type="number" id="log-no3" step="5" placeholder="20">
-            </div>
-            <div>
-              <label>pH</label>
-              <input type="number" id="log-ph" step="0.1" placeholder="7.2">
-            </div>
-            <div>
-              <label>Water Change (%)</label>
-              <input type="number" id="log-wc" step="5" placeholder="e.g. 25">
-            </div>
-            <div>
-              <label>Dosed Product</label>
-              <input type="text" id="log-dose" placeholder="e.g. Prime 2ml">
-            </div>
+          <h3 style="font-size:15px; margin-bottom:8px;">Ask AI about this Tank</h3>
+          <div style="display:flex; gap:8px; margin-bottom:14px;">
+            <input type="text" id="ai-question" placeholder="e.g. Why is my pH dropping?">
+            <button class="btn" style="width:80px;" onclick="askTankAI()">Ask AI</button>
           </div>
+          <div id="ai-response-box" class="ai-feedback" style="display:none;"></div>
+        </div>
 
-          <button class="btn btn-neon" onclick="submitLog()">Save & Run Smart Analysis</button>
+        <div class="card">
+          <h3 style="font-size:15px; margin-bottom:8px;">Activity & Event Timeline</h3>
+          <div id="timeline-feed"></div>
+        </div>
+      </div>
+
+      <!-- Subtab 2: Water & Tests -->
+      <div id="subtab-water" class="subtab-content" style="display:none;">
+        <div class="card">
+          <h3 style="font-size:15px; margin-bottom:12px;">Log Water Test & Maintenance</h3>
+          <div class="input-grid">
+            <div><label>Ammonia (NH₃)</label><input type="number" id="log-nh3" step="0.25" placeholder="0"></div>
+            <div><label>Nitrite (NO₂)</label><input type="number" id="log-no2" step="0.25" placeholder="0"></div>
+            <div><label>Nitrate (NO₃)</label><input type="number" id="log-no3" step="5" placeholder="20"></div>
+            <div><label>pH</label><input type="number" id="log-ph" step="0.1" placeholder="7.2"></div>
+            <div><label>Water Change (%)</label><input type="number" id="log-wc" step="5" placeholder="25"></div>
+            <div><label>Dosed Product</label><input type="text" id="log-dose" placeholder="Prime 2ml"></div>
+          </div>
+          <button class="btn btn-neon" onclick="submitLog()">Save Test & Run Analysis</button>
           <div id="log-feedback-box" class="ai-feedback" style="display:none;"></div>
         </div>
       </div>
 
-      <!-- Subtab: Equipment -->
-      <div id="subtab-equipment" class="subtab-content" style="display:none;">
-        <div class="card" style="cursor:default;">
-          <h3 style="font-size:15px; margin-bottom:8px;">Installed Equipment</h3>
-          <div style="display:flex; gap:8px; margin-bottom:12px;">
-            <input type="text" id="new-equip" placeholder="e.g. Aquaclear 50 Filter">
-            <button class="btn" style="width:70px;" onclick="addItem('equipment', 'new-equip')">Add</button>
-          </div>
-          <div id="equipment-list" class="pill-list"></div>
-        </div>
-      </div>
-
-      <!-- Subtab: Livestock -->
+      <!-- Subtab 3: Livestock -->
       <div id="subtab-livestock" class="subtab-content" style="display:none;">
-        <div class="card" style="cursor:default;">
+        <div class="card">
           <h3 style="font-size:15px; margin-bottom:8px;">Livestock Inventory</h3>
           <div style="display:flex; gap:8px; margin-bottom:12px;">
             <input type="text" id="new-live" placeholder="e.g. 8x Cardinal Tetra">
@@ -466,61 +342,69 @@
         </div>
       </div>
 
-      <!-- Subtab: Plants & Decor -->
+      <!-- Subtab 4: Plants -->
       <div id="subtab-plants" class="subtab-content" style="display:none;">
-        <div class="card" style="cursor:default;">
-          <h3 style="font-size:15px; margin-bottom:8px;">Flora & Hardscape</h3>
+        <div class="card">
+          <h3 style="font-size:15px; margin-bottom:8px;">Plants</h3>
           <div style="display:flex; gap:8px; margin-bottom:12px;">
-            <input type="text" id="new-plant" placeholder="e.g. Anubias Nana, Driftwood">
+            <input type="text" id="new-plant" placeholder="e.g. Anubias Nana">
             <button class="btn" style="width:70px;" onclick="addItem('plants', 'new-plant')">Add</button>
           </div>
           <div id="plants-list" class="pill-list"></div>
         </div>
       </div>
+
+      <!-- Subtab 5: Decor -->
+      <div id="subtab-decor" class="subtab-content" style="display:none;">
+        <div class="card">
+          <h3 style="font-size:15px; margin-bottom:8px;">Decor & Hardscape</h3>
+          <div style="display:flex; gap:8px; margin-bottom:12px;">
+            <input type="text" id="new-decor" placeholder="e.g. Seiryu Stone, Driftwood">
+            <button class="btn" style="width:70px;" onclick="addItem('decor', 'new-decor')">Add</button>
+          </div>
+          <div id="decor-list" class="pill-list"></div>
+        </div>
+      </div>
+
+      <!-- Subtab 6: Equipment -->
+      <div id="subtab-equipment" class="subtab-content" style="display:none;">
+        <div class="card">
+          <h3 style="font-size:15px; margin-bottom:8px;">Equipment</h3>
+          <div style="display:flex; gap:8px; margin-bottom:12px;">
+            <input type="text" id="new-equip" placeholder="e.g. Aquaclear 50 Filter">
+            <button class="btn" style="width:70px;" onclick="addItem('equipment', 'new-equip')">Add</button>
+          </div>
+          <div id="equipment-list" class="pill-list"></div>
+        </div>
+      </div>
     </div>
 
-    <!-- ==================== VIEW 3: GLOBAL SUPPLY CLOSET ==================== -->
+    <!-- ==================== VIEW 3: SUPPLY CLOSET ==================== -->
     <div id="view-closet" class="view-panel">
-      <div class="card" style="cursor:default;">
+      <div class="card">
         <h2 class="card-title" style="margin-bottom:6px;">Global Supply Closet</h2>
-        <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Items on this shelf are shared across all your tanks and used by the AI for dosing advice.</p>
-        
+        <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Shared household shelf of chemicals, foods, and test kits.</p>
         <div style="display:flex; gap:8px; margin-bottom:16px;">
-          <input type="text" id="new-supply" placeholder="e.g. Seachem Prime, API Master Kit">
+          <input type="text" id="new-supply" placeholder="e.g. Seachem Prime">
           <button class="btn" style="width:80px;" onclick="addSupply()">Add</button>
         </div>
-
         <div id="supply-list" class="pill-list"></div>
       </div>
     </div>
 
-    <!-- ==================== VIEW 4: SETTINGS & BACKUP ==================== -->
+    <!-- ==================== VIEW 4: SETTINGS ==================== -->
     <div id="view-settings" class="view-panel">
-      <div class="card" style="cursor:default;">
+      <div class="card">
         <h2 class="card-title" style="margin-bottom:14px;">Settings & Cloud AI</h2>
-
         <div style="margin-bottom:14px;">
           <label>Google AI Studio (Gemini) API Key</label>
-          <input type="password" id="gemini-key" placeholder="Paste your AIza... key here">
+          <input type="password" id="gemini-key" placeholder="AIza...">
           <button class="btn btn-secondary" style="margin-top:8px; font-size:13px; padding:10px;" onclick="saveApiKey()">Save API Key</button>
         </div>
-
-        <div style="margin-bottom:18px;">
-          <label>Unit System</label>
-          <select id="unit-select">
-            <option value="us">US Imperial (Gallons, °F, Inches)</option>
-            <option value="metric">Metric (Liters, °C, Centimeters)</option>
-          </select>
-        </div>
-
         <hr style="border:0; border-top:1px solid rgba(255,255,255,0.08); margin:18px 0;">
-
-        <h3 style="font-size:15px; margin-bottom:10px;">Data Backup & Safety</h3>
-        <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Save your database to a file so phone resets never delete your tank logs.</p>
-        
         <div style="display:flex; gap:10px;">
           <button class="btn btn-secondary" onclick="exportData()">💾 Export JSON</button>
-          <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Restore Backup</button>
+          <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Restore</button>
           <input type="file" id="importFile" style="display:none" onchange="importData(event)">
         </div>
       </div>
@@ -528,21 +412,32 @@
 
   </div>
 
-  <!-- Add Tank Modal -->
-  <div class="modal-overlay" id="addTankModal">
+  <!-- Tank Add/Edit Modal -->
+  <div class="modal-overlay" id="tankModal">
     <div class="modal-box">
-      <h3 style="margin-bottom:12px;">Add New Aquarium</h3>
+      <h3 id="modal-tank-title" style="margin-bottom:12px;">Add New Aquarium</h3>
       <div style="margin-bottom:10px;">
         <label>Tank Name</label>
-        <input type="text" id="modal-tank-name" placeholder="e.g. 55G Community">
+        <input type="text" id="m-name" placeholder="e.g. 55G Community">
+      </div>
+      <div style="margin-bottom:10px;">
+        <label>Gross Volume (Gallons)</label>
+        <input type="number" id="m-gal" placeholder="20">
+      </div>
+      <div style="margin-bottom:10px;">
+        <label>Lifecycle Mode</label>
+        <select id="m-status">
+          <option value="Established">Established</option>
+          <option value="Cycling">Cycling</option>
+        </select>
       </div>
       <div style="margin-bottom:16px;">
-        <label>Gross Volume (Gallons)</label>
-        <input type="number" id="modal-tank-gal" placeholder="20">
+        <label>Tank Photo (Optional)</label>
+        <input type="file" id="m-photo" accept="image/*">
       </div>
       <div style="display:flex; gap:10px;">
-        <button class="btn btn-secondary" onclick="closeAddTankModal()">Cancel</button>
-        <button class="btn btn-neon" onclick="saveNewTank()">Create Tank</button>
+        <button class="btn btn-secondary" onclick="closeTankModal()">Cancel</button>
+        <button class="btn btn-neon" onclick="saveTankModalData()">Save Tank</button>
       </div>
     </div>
   </div>
@@ -550,66 +445,44 @@
   <script>
     const defaultData = {
       apiKey: "",
-      units: "us",
-      closet: ["Seachem Prime", "API Freshwater Master Test Kit", "Aquarium Co-Op Easy Green"],
+      closet: ["Seachem Prime", "API Freshwater Master Test Kit", "Easy Green"],
       tanks: [
         {
-          id: 1,
-          name: "Planted Community",
-          grossGal: 20,
-          dispPercent: 18,
-          status: "Established",
+          id: 1, name: "Planted Community", grossGal: 20, status: "Established",
+          image: "", summary: "All parameters nominal. Water change due in 3 days.",
           lastTest: { nh3: 0, no2: 0, no3: 20, ph: 7.2 },
-          equipment: ["Aquaclear 30 Filter", "50W Heater", "Fluval 3.0 Plant Light"],
-          livestock: ["8x Neon Tetra", "3x Amano Shrimp", "1x Nerite Snail"],
-          plants: ["Java Fern", "Anubias Nana", "Manzanita Driftwood"]
+          timeline: [{ date: "Yesterday", text: "Logged test: NO3 20ppm, pH 7.2" }],
+          equipment: ["Aquaclear 30", "50W Heater"], livestock: ["8x Neon Tetra"], plants: ["Java Fern"], decor: ["Driftwood"]
         },
         {
-          id: 2,
-          name: "Shrimp & Moss Nano",
-          grossGal: 10,
-          dispPercent: 20,
-          status: "Cycling",
+          id: 2, name: "Shrimp Nano", grossGal: 10, status: "Cycling",
+          image: "", summary: "Cycling in progress. Nitrite spike detected.",
           lastTest: { nh3: 0.5, no2: 0.25, no3: 5, ph: 6.8 },
-          equipment: ["Sponge Filter", "USB Air Pump", "25W Preset Heater"],
-          livestock: ["Fishless Cycling (Pure Ammonia Dosed)"],
-          plants: ["Java Moss", "Dragon Stone"]
+          timeline: [{ date: "Today", text: "Logged test: NH3 0.5, NO2 0.25" }],
+          equipment: ["Sponge Filter"], livestock: [], plants: ["Java Moss"], decor: ["Dragon Stone"]
         }
       ]
     };
 
-    let appData;
-    try {
-      const stored = localStorage.getItem("aquassist_v2");
-      appData = stored ? JSON.parse(stored) : defaultData;
-      if (!appData || !Array.isArray(appData.tanks) || appData.tanks.length === 0) {
-        appData = defaultData;
-      }
-    } catch(e) {
-      appData = defaultData;
-    }
-
+    let appData = JSON.parse(localStorage.getItem("aquassist_v3")) || defaultData;
     let activeTankIndex = 0;
+    let isEditingTank = false;
 
     function saveData() {
-      localStorage.setItem("aquassist_v2", JSON.stringify(appData));
+      localStorage.setItem("aquassist_v3", JSON.stringify(appData));
     }
 
     function showView(viewId) {
       document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
-      const target = document.getElementById("view-" + viewId);
-      if (target) target.classList.add("active");
+      document.getElementById("view-" + viewId).classList.add("active");
+      if (viewId === "home") renderHomeCards();
       if (viewId === "closet") renderCloset();
       toggleMenu(false);
-      window.scrollTo(0,0);
     }
 
-    function toggleMenu(forceState) {
-      const drawer = document.getElementById("sidebarDrawer");
-      const overlay = document.getElementById("drawerOverlay");
-      const isOpen = forceState !== undefined ? forceState : !drawer.classList.contains("open");
-      drawer.classList.toggle("open", isOpen);
-      overlay.classList.toggle("open", isOpen);
+    function toggleMenu(isOpen) {
+      document.getElementById("sidebarDrawer").classList.toggle("open", isOpen);
+      document.getElementById("drawerOverlay").classList.toggle("open", isOpen);
     }
 
     function openTank(idx) {
@@ -618,42 +491,70 @@
       showView("tank");
     }
 
+    function renderHomeCards() {
+      const container = document.getElementById("tank-card-list");
+      container.innerHTML = "";
+      appData.tanks.forEach((tank, idx) => {
+        const badge = tank.status === "Established" ? "badge-stable" : "badge-cycling";
+        const imgTag = tank.image ? `<img src="${tank.image}" class="tank-thumb">` : '';
+        
+        container.innerHTML += `
+          <div class="card" onclick="openTank(${idx})" style="cursor:pointer;">
+            ${imgTag}
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">${tank.name}</h3>
+                <div style="font-size:12px; color:var(--text-muted);">${tank.grossGal} Gallons</div>
+              </div>
+              <span class="badge ${badge}">● ${tank.status}</span>
+            </div>
+            <div style="font-size:12px; color:var(--cyan); margin-top:6px;"><b>Summary:</b> ${tank.summary || 'Stable'}</div>
+          </div>
+        `;
+      });
+    }
+
     function renderTankView() {
       const tank = appData.tanks[activeTankIndex];
-      if (!tank) return;
-      const netGal = (tank.grossGal * (1 - (tank.dispPercent / 100))).toFixed(1);
-      
       document.getElementById("tank-view-title").innerText = tank.name;
-      document.getElementById("tank-vol-calc").innerText = `Gross: ${tank.grossGal}G • Net Water: ${netGal}G (Displacement: ${tank.dispPercent}%)`;
+      document.getElementById("tank-vol-calc").innerText = `Gross Volume: ${tank.grossGal} Gallons`;
       
       const badge = document.getElementById("tank-status-toggle");
       badge.innerText = `● ${tank.status}`;
       badge.className = `badge ${tank.status === "Established" ? "badge-stable" : "badge-cycling"}`;
 
+      document.getElementById("tank-summary-box").innerText = tank.summary || "No active warnings.";
+      
+      renderTimeline();
       renderSubLists();
     }
 
-    function toggleTankLifecycle() {
+    function renderTimeline() {
       const tank = appData.tanks[activeTankIndex];
-      tank.status = tank.status === "Established" ? "Cycling" : "Established";
-      saveData();
-      renderTankView();
-      updateHomeFallback();
+      const feed = document.getElementById("timeline-feed");
+      feed.innerHTML = "";
+      (tank.timeline || []).forEach(item => {
+        feed.innerHTML += `
+          <div class="timeline-item">
+            <div class="timeline-date">${item.date}</div>
+            <div>${item.text}</div>
+          </div>
+        `;
+      });
     }
 
-    function switchTankTab(tabName, clickedBtn) {
+    function switchTankTab(tabName, btn) {
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-      if (clickedBtn) clickedBtn.classList.add("active");
+      if(btn) btn.classList.add("active");
       document.querySelectorAll(".subtab-content").forEach(c => c.style.display = "none");
-      const target = document.getElementById("subtab-" + tabName);
-      if (target) target.style.display = "block";
+      document.getElementById("subtab-" + tabName).style.display = "block";
     }
 
     function renderSubLists() {
       const tank = appData.tanks[activeTankIndex];
-      ["equipment", "livestock", "plants"].forEach(type => {
+      ["livestock", "plants", "decor", "equipment"].forEach(type => {
         const list = document.getElementById(type + "-list");
-        if (!list) return;
+        if(!list) return;
         list.innerHTML = "";
         (tank[type] || []).forEach((item, idx) => {
           list.innerHTML += `<div class="pill"><span>${item}</span><span class="delete-x" onclick="deleteItem('${type}', ${idx})">×</span></div>`;
@@ -663,8 +564,8 @@
 
     function addItem(type, inputId) {
       const input = document.getElementById(inputId);
-      if (!input || !input.value.trim()) return;
-      if (!appData.tanks[activeTankIndex][type]) appData.tanks[activeTankIndex][type] = [];
+      if(!input || !input.value.trim()) return;
+      if(!appData.tanks[activeTankIndex][type]) appData.tanks[activeTankIndex][type] = [];
       appData.tanks[activeTankIndex][type].push(input.value.trim());
       input.value = "";
       saveData();
@@ -679,7 +580,6 @@
 
     function renderCloset() {
       const list = document.getElementById("supply-list");
-      if (!list) return;
       list.innerHTML = "";
       appData.closet.forEach((item, idx) => {
         list.innerHTML += `<div class="pill"><span>${item}</span><span class="delete-x" onclick="deleteSupply(${idx})">×</span></div>`;
@@ -688,7 +588,7 @@
 
     function addSupply() {
       const input = document.getElementById("new-supply");
-      if (!input || !input.value.trim()) return;
+      if(!input || !input.value.trim()) return;
       appData.closet.push(input.value.trim());
       input.value = "";
       saveData();
@@ -701,6 +601,13 @@
       renderCloset();
     }
 
+    function toggleTankLifecycle() {
+      const tank = appData.tanks[activeTankIndex];
+      tank.status = tank.status === "Established" ? "Cycling" : "Established";
+      saveData();
+      renderTankView();
+    }
+
     function submitLog() {
       const nh3 = parseFloat(document.getElementById("log-nh3").value) || 0;
       const no2 = parseFloat(document.getElementById("log-no2").value) || 0;
@@ -711,127 +618,170 @@
 
       const tank = appData.tanks[activeTankIndex];
       tank.lastTest = { nh3, no2, no3, ph };
+      
+      let summaryText = `Tested: NH3 ${nh3}, NO2 ${no2}, NO3 ${no3}, pH ${ph}`;
+      if(wc > 0) summaryText += ` | ${wc}% Water Change`;
+      if(dose) summaryText += ` | Dosed: ${dose}`;
+
+      tank.summary = summaryText;
+      tank.timeline.unshift({ date: "Just now", text: summaryText });
       saveData();
-      updateHomeFallback();
 
-      let feedback = `<b>✓ Log Recorded Successfully.</b>`;
-      if (tank.status === "Established") {
-        if (nh3 > 0 || no2 > 0) {
-          feedback += `<br><span style="color:var(--alert-red)">⚠️ Critical:</span> Ammonia (${nh3}) or Nitrite (${no2}) present! `;
-          if (appData.closet.some(s => s.toLowerCase().includes("prime"))) {
-            feedback += `Dose <b>Seachem Prime</b> immediately to detoxify.`;
-          }
-        } else if (no3 >= 40) {
-          const neededWc = Math.round(((no3 - 20) / no3) * 100);
-          feedback += `<br><span style="color:var(--alert-yellow)">Nitrate Elevated (${no3} ppm):</span> Dilution calculation advises a <b>${neededWc}% water change</b> to return to safe 20 ppm zone.`;
-        } else {
-          feedback += `<br><span style="color:var(--neon-green)">● Parameters Nominal:</span> Water biology balanced.`;
-        }
+      let feedback = `<b>✓ Log Saved & Analyzed.</b>`;
+      if(tank.status === "Established" && (nh3 > 0 || no2 > 0)) {
+        feedback += `<br><span style="color:var(--alert-red)">⚠️ Alert:</span> Ammonia/Nitrite present! Dose Seachem Prime.`;
       } else {
-        feedback += `<br><span style="color:var(--alert-yellow)">Cycling Mode Active:</span> Ammonia/Nitrite are normal during cycle. Do not change water unless Ammonia exceeds 4.0 ppm.`;
+        feedback += `<br><span style="color:var(--neon-green)">● Stable:</span> Parameters look good.`;
       }
-
-      if (wc > 0) feedback += `<br>• Recorded ${wc}% water change.`;
-      if (dose) feedback += `<br>• Recorded dose: ${dose}`;
 
       const box = document.getElementById("log-feedback-box");
       box.style.display = "block";
       box.innerHTML = feedback;
+      renderTankView();
+    }
+
+    async function askTankAI() {
+      const q = document.getElementById("ai-question").value.trim();
+      const box = document.getElementById("ai-response-box");
+      if(!q) return;
+
+      if(!appData.apiKey) {
+        box.style.display = "block";
+        box.innerHTML = `<span style="color:var(--alert-yellow)">Please save your Gemini API Key in Settings first!</span>`;
+        return;
+      }
+
+      box.style.display = "block";
+      box.innerHTML = "Thinking...";
+
+      const tank = appData.tanks[activeTankIndex];
+      const prompt = `You are aquAssist, an expert aquarist AI. Tank: ${tank.name} (${tank.grossGal}G, ${tank.status}). Latest Test: NH3:${tank.lastTest.nh3}, NO2:${tank.lastTest.no2}, NO3:${tank.lastTest.no3}, pH:${tank.lastTest.ph}. Closet: ${appData.closet.join(', ')}. Question: ${q}`;
+
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${appData.apiKey}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        });
+        const data = await res.json();
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
+        box.innerHTML = reply;
+      } catch(err) {
+        box.innerHTML = "Error connecting to Gemini API.";
+      }
     }
 
     function copyGeminiDelta() {
       const tank = appData.tanks[activeTankIndex];
-      const netGal = (tank.grossGal * (1 - (tank.dispPercent / 100))).toFixed(1);
-      
-      const deltaText = `Quick Update for ${tank.name} (${tank.status} Mode):
-- Net Water Volume: ${netGal} Gallons (${tank.grossGal}G gross)
-- Latest Test: NH3: ${tank.lastTest?.nh3 ?? 0} ppm, NO2: ${tank.lastTest?.no2 ?? 0} ppm, NO3: ${tank.lastTest?.no3 ?? 0} ppm, pH: ${tank.lastTest?.ph ?? 7.0}
-- In Supply Closet: ${appData.closet.join(", ")}
-- Question/Next Step: `;
-
-      navigator.clipboard.writeText(deltaText).then(() => {
-        alert("Copied Delta Update to Clipboard! Ready to paste into Gemini.");
-      }).catch(() => {
-        prompt("Copy this update text:", deltaText);
-      });
+      const text = `Quick Update for ${tank.name} (${tank.status}):
+- Latest Test: NH3:${tank.lastTest.nh3}, NO2:${tank.lastTest.no2}, NO3:${tank.lastTest.no3}, pH:${tank.lastTest.ph}
+- Summary: ${tank.summary}
+- Available Supplies: ${appData.closet.join(', ')}
+- Question: `;
+      navigator.clipboard.writeText(text).then(() => alert("Copied Delta Update for Gemini Chat!"));
     }
 
-    function updateHomeFallback() {
-      if (appData.tanks[0]) {
-        document.getElementById("t0-name").innerText = appData.tanks[0].name;
-        document.getElementById("t0-status").innerText = "● " + appData.tanks[0].status;
-        document.getElementById("t0-nh3").innerText = appData.tanks[0].lastTest?.nh3 ?? 0;
-        document.getElementById("t0-no2").innerText = appData.tanks[0].lastTest?.no2 ?? 0;
-        document.getElementById("t0-no3").innerText = (appData.tanks[0].lastTest?.no3 ?? 0) + " ppm";
-        document.getElementById("t0-ph").innerText = appData.tanks[0].lastTest?.ph ?? 7.2;
-      }
-      if (appData.tanks[1]) {
-        document.getElementById("t1-name").innerText = appData.tanks[1].name;
-        document.getElementById("t1-status").innerText = "● " + appData.tanks[1].status;
-        document.getElementById("t1-nh3").innerText = appData.tanks[1].lastTest?.nh3 ?? 0;
-        document.getElementById("t1-no2").innerText = appData.tanks[1].lastTest?.no2 ?? 0;
-        document.getElementById("t1-no3").innerText = (appData.tanks[1].lastTest?.no3 ?? 0) + " ppm";
-        document.getElementById("t1-ph").innerText = appData.tanks[1].lastTest?.ph ?? 6.8;
-      }
+    // Modal Handlers with Image Compression
+    function openTankModal() {
+      isEditingTank = false;
+      document.getElementById("modal-tank-title").innerText = "Add New Aquarium";
+      document.getElementById("m-name").value = "";
+      document.getElementById("m-gal").value = "";
+      document.getElementById("m-status").value = "Established";
+      document.getElementById("m-photo").value = "";
+      document.getElementById("tankModal").classList.add("open");
     }
 
-    function openAddTankModal() { document.getElementById("addTankModal").classList.add("open"); }
-    function closeAddTankModal() { document.getElementById("addTankModal").classList.remove("open"); }
-    
-    function saveNewTank() {
-      const name = document.getElementById("modal-tank-name").value.trim() || "New Aquarium";
-      const gal = parseFloat(document.getElementById("modal-tank-gal").value) || 20;
-      appData.tanks.push({
-        id: Date.now(),
-        name,
-        grossGal: gal,
-        dispPercent: 18,
-        status: "Cycling",
-        lastTest: { nh3: 0, no2: 0, no3: 0, ph: 7.0 },
-        equipment: [],
-        livestock: [],
-        plants: []
-      });
-      saveData();
-      closeAddTankModal();
-      location.reload();
+    function openEditTankModal() {
+      isEditingTank = true;
+      const tank = appData.tanks[activeTankIndex];
+      document.getElementById("modal-tank-title").innerText = "Edit Aquarium";
+      document.getElementById("m-name").value = tank.name;
+      document.getElementById("m-gal").value = tank.grossGal;
+      document.getElementById("m-status").value = tank.status;
+      document.getElementById("m-photo").value = "";
+      document.getElementById("tankModal").classList.add("open");
+    }
+
+    function closeTankModal() { document.getElementById("tankModal").classList.remove("open"); }
+
+    function saveTankModalData() {
+      const name = document.getElementById("m-name").value.trim() || "Aquarium";
+      const gal = parseFloat(document.getElementById("m-gal").value) || 20;
+      const status = document.getElementById("m-status").value;
+      const fileInput = document.getElementById("m-photo");
+
+      const processSave = (imgData) => {
+        if(isEditingTank) {
+          const tank = appData.tanks[activeTankIndex];
+          tank.name = name;
+          tank.grossGal = gal;
+          tank.status = status;
+          if(imgData) tank.image = imgData;
+        } else {
+          appData.tanks.push({
+            id: Date.now(), name, grossGal: gal, status, image: imgData || "",
+            summary: "Tank initialized.", lastTest: { nh3: 0, no2: 0, no3: 0, ph: 7.0 },
+            timeline: [{ date: "Today", text: "Tank created." }],
+            equipment: [], livestock: [], plants: [], decor: []
+          });
+        }
+        saveData();
+        closeTankModal();
+        renderHomeCards();
+        if(isEditingTank) renderTankView();
+      };
+
+      if(fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          // Compress image via canvas to prevent storage overflow
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const maxW = 500;
+            const scale = maxW / img.width;
+            canvas.width = maxW;
+            canvas.height = img.height * scale;
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            processSave(canvas.toDataURL("image/jpeg", 0.7));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        processSave(isEditingTank ? appData.tanks[activeTankIndex].image : "");
+      }
     }
 
     function saveApiKey() {
       appData.apiKey = document.getElementById("gemini-key").value.trim();
       saveData();
-      alert("API Key Saved Securely!");
+      alert("API Key Saved!");
     }
 
     function exportData() {
       const blob = new Blob([JSON.stringify(appData, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = url;
-      a.download = `aquassist_backup_${new Date().toISOString().slice(0,10)}.json`;
+      a.href = URL.createObjectURL(blob);
+      a.download = `aquassist_backup.json`;
       a.click();
     }
 
     function importData(e) {
-      const file = e.target.files[0];
-      if (!file) return;
       const reader = new FileReader();
       reader.onload = function(evt) {
-        try {
-          appData = JSON.parse(evt.target.result);
-          saveData();
-          alert("Backup successfully restored!");
-          location.reload();
-        } catch(err) {
-          alert("Invalid backup file.");
-        }
+        appData = JSON.parse(evt.target.result);
+        saveData();
+        location.reload();
       };
-      reader.readAsText(file);
+      reader.readAsText(e.target.files[0]);
     }
 
-    updateHomeFallback();
-    const keyField = document.getElementById("gemini-key");
-    if (keyField && appData.apiKey) keyField.value = appData.apiKey;
+    // Startup
+    renderHomeCards();
+    document.getElementById("gemini-key").value = appData.apiKey || "";
   </script>
 </body>
 </html>
