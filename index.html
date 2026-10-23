@@ -19,14 +19,14 @@
       --text-muted: #94A3B8;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    body {
+    html, body {
       background-color: var(--bg-dark);
       color: var(--text-main);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       padding-bottom: 80px;
       min-height: 100vh;
       overflow-x: hidden;
-      overscroll-behavior-y: none;
+      overscroll-behavior-x: none; /* Stops swipe-to-back exit bug */
     }
 
     /* Top Bar */
@@ -37,7 +37,14 @@
       display: flex; align-items: center; justify-content: space-between;
     }
     .brand-wrap { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-    .header-logo-img { width: 34px; height: 34px; border-radius: 8px; object-fit: contain; }
+    
+    /* Reliable Pure HTML/CSS Logo */
+    .header-logo-box {
+      width: 34px; height: 34px; background: #0F172A; border: 2px solid var(--cyan);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center; position: relative;
+    }
+    .logo-dot { width: 8px; height: 8px; background: var(--neon-green); border-radius: 50%; box-shadow: 0 0 8px var(--neon-green); }
+
     .brand-title { font-size: 21px; font-weight: 700; letter-spacing: -0.5px; }
     .part-aqua { color: var(--cyan); }
     .part-assist { color: #fff; }
@@ -79,11 +86,11 @@
     .card {
       background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px;
       padding: 16px; margin-bottom: 14px; box-shadow: 0 10px 25px -10px rgba(0, 0, 0, 0.6);
+      position: relative; overflow: hidden;
     }
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .card-title { font-size: 18px; font-weight: 700; color: #fff; }
     
-    /* Increased Hero Image Height */
     .tank-thumb { 
       width: 100%; height: 180px; border-radius: 12px; object-fit: cover; margin-bottom: 12px; 
       border: 1px solid rgba(56, 189, 248, 0.3); background: #070D18; display: block;
@@ -165,8 +172,9 @@
   <!-- Top Bar -->
   <header>
     <div class="brand-wrap" onclick="showView('home')">
-      <!-- Unbreakable Base64 Embedded Logo Image -->
-      <img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgmlwPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiByeD0iMjQiIGZpbGw9IiMwRjE3MkEiIHN0cm9rZT0iIzM4QkRGOCIgc3Ryb2tlLXdpZHRoPSIzIi8+PHBhdGggZD0iTTU2IDM0QzU0IDIzIDQyIDE5IDMyIDI0QzM2IDI5IDQwIDMzIDQyIDM4QzQ2IDM2IDUxIDM0IDU2IDM0WiIgZmlsbD0iIzM4QkRGOCIgb3BhY2l0eT0iMC44Ii8+PHBhdGggZD0iTTQ4IDY0QzQ0IDczIDMzIDc4IDI2IDc2QzI5IDcwIDMzIDY2IDM4IDYzQzQxIDY0IDQ1IDY0IDQ4IDY0WiIgZmlsbD0iIzM4QkRGOCIgb3BhY2l0eT0iMC44Ii8+PHBhdGggZD0iTTgyIDQ5QzgxIDQ0IDczIDM3IDYwIDM2QzQ2IDM1IDM0IDQ0IDI2IDQ4QzIwIDQyIDE0IDM2IDEyIDM3QzEzIDQzIDE2IDQ4IDE4IDUwQzE2IDUyIDEzIDU3IDEyIDYzQzE0IDY0IDIwIDU4IDI2IDUyQzM0IDU2IDQ2IDY1IDYwIDY0QzczIDYzIDgxIDU2IDgyIDUxWiIgZmlsbD0iIzA2QjZENCIvPjxjaXJjbGUgY3g9IjcyIiBjeT0iNDYiIHI9IjYiIGZpbGw9IiMwMEY1QTAiLz48Y2lyY2xlIGN4PSI3MiIgY3k9IjQ2IiByPSIyLjUiIGZpbGw9IiNGRkZGRkYiLz48L3N2Zz4=" class="header-logo-img" alt="aquAssist Logo">
+      <div class="header-logo-box">
+        <div class="logo-dot"></div>
+      </div>
       <div class="brand-title">
         <span class="part-aqua">aqu</span><span class="part-assist">Ass<span class="green-i">&#305;</span>st</span>
       </div>
@@ -201,14 +209,14 @@
         </div>
       </div>
 
-      <!-- Sub Tabs -->
+      <!-- Sub Tabs (Equipment before Decor) -->
       <div class="tab-bar">
         <button class="tab-btn active" onclick="switchTankTab('overview', this)">Overview</button>
         <button class="tab-btn" onclick="switchTankTab('water', this)">Water</button>
         <button class="tab-btn" onclick="switchTankTab('livestock', this)">Livestock</button>
         <button class="tab-btn" onclick="switchTankTab('plants', this)">Plants</button>
-        <button class="tab-btn" onclick="switchTankTab('decor', this)">Decor</button>
         <button class="tab-btn" onclick="switchTankTab('equipment', this)">Equipment</button>
+        <button class="tab-btn" onclick="switchTankTab('decor', this)">Decor</button>
       </div>
 
       <!-- Tab 1: Overview -->
@@ -277,19 +285,7 @@
         </div>
       </div>
 
-      <!-- Tab 5: Decor -->
-      <div id="subtab-decor" class="subtab-content" style="display:none;">
-        <div class="card">
-          <h3 style="font-size:15px; margin-bottom:8px;">Decor & Hardscape</h3>
-          <div class="input-row">
-            <input type="text" id="new-decor" placeholder="e.g. Seiryu Stone">
-            <button class="btn" style="width:70px;" onclick="addItem('decor', 'new-decor')">Add</button>
-          </div>
-          <div id="decor-list" class="pill-list"></div>
-        </div>
-      </div>
-
-      <!-- Tab 6: Equipment -->
+      <!-- Tab 5: Equipment -->
       <div id="subtab-equipment" class="subtab-content" style="display:none;">
         <div class="card">
           <h3 style="font-size:15px; margin-bottom:8px;">Equipment</h3>
@@ -298,6 +294,18 @@
             <button class="btn" style="width:70px;" onclick="addItem('equipment', 'new-equip')">Add</button>
           </div>
           <div id="equipment-list" class="pill-list"></div>
+        </div>
+      </div>
+
+      <!-- Tab 6: Decor -->
+      <div id="subtab-decor" class="subtab-content" style="display:none;">
+        <div class="card">
+          <h3 style="font-size:15px; margin-bottom:8px;">Decor & Hardscape</h3>
+          <div class="input-row">
+            <input type="text" id="new-decor" placeholder="e.g. Seiryu Stone">
+            <button class="btn" style="width:70px;" onclick="addItem('decor', 'new-decor')">Add</button>
+          </div>
+          <div id="decor-list" class="pill-list"></div>
         </div>
       </div>
     </div>
@@ -345,7 +353,7 @@
           <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Restore</button>
           <input type="file" id="importFile" style="display:none" onchange="importData(event)">
         </div>
-        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v2.1 • $0 Tank Manager</div>
+        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v2.2 • $0 Tank Manager</div>
       </div>
     </div>
 
@@ -365,13 +373,13 @@
           <input type="number" id="m-gal" placeholder="20">
         </div>
         <div>
-          <label>Icon Emoji</label>
-          <select id="m-icon">
-            <option value="🐠">🐠 Tropical</option>
-            <option value="🌱">🌱 Planted</option>
-            <option value="🦐">🦐 Shrimp</option>
-            <option value="🌊">🌊 Reef/Marine</option>
-            <option value="🪨">🪨 Cichlid/Hardscape</option>
+          <label>Theme Color</label>
+          <select id="m-color">
+            <option value="#38BDF8">Cyan Blue</option>
+            <option value="#00F5A0">Neon Green</option>
+            <option value="#A78BFA">Violet Purple</option>
+            <option value="#F59E0B">Amber Gold</option>
+            <option value="#EC4899">Hot Pink</option>
           </select>
         </div>
       </div>
@@ -400,14 +408,14 @@
       closet: ["Seachem Prime", "API Freshwater Master Test Kit", "Easy Green"],
       tanks: [
         {
-          id: 1, name: "Planted Community", grossGal: 20, status: "Established", icon: "🌱",
+          id: 1, name: "Planted Community", grossGal: 20, status: "Established", color: "#00F5A0",
           image: "", summary: "Parameters stable. Water change due in 3 days.",
           lastTest: { nh3: 0, no2: 0, no3: 20, ph: 7.2 },
           timeline: [{ date: "Yesterday", text: "Logged test: NO3 20ppm, pH 7.2" }],
           equipment: ["Aquaclear 30", "50W Heater"], livestock: ["8x Cardinal Tetra"], plants: ["Java Fern"], decor: ["Driftwood"]
         },
         {
-          id: 2, name: "Shrimp Nano", grossGal: 10, status: "Cycling", icon: "🦐",
+          id: 2, name: "Shrimp Nano", grossGal: 10, status: "Cycling", color: "#38BDF8",
           image: "", summary: "Cycling active. Nitrite spike recorded.",
           lastTest: { nh3: 0.5, no2: 0.25, no3: 5, ph: 6.8 },
           timeline: [{ date: "Today", text: "Logged test: NH3 0.5, NO2 0.25" }],
@@ -416,12 +424,12 @@
       ]
     };
 
-    let appData = JSON.parse(localStorage.getItem("aquassist_v5")) || defaultData;
+    let appData = JSON.parse(localStorage.getItem("aquassist_v6")) || defaultData;
     let activeTankIndex = 0;
     let isEditingTank = false;
 
     function saveData() {
-      localStorage.setItem("aquassist_v5", JSON.stringify(appData));
+      localStorage.setItem("aquassist_v6", JSON.stringify(appData));
     }
 
     function showView(viewId) {
@@ -447,7 +455,8 @@
       const list = document.getElementById("sidebar-tank-list");
       list.innerHTML = "";
       appData.tanks.forEach((tank, idx) => {
-        list.innerHTML += `<div class="nav-item" onclick="openTank(${idx})">${tank.icon || '🐠'} ${tank.name}</div>`;
+        const clr = tank.color || "#38BDF8";
+        list.innerHTML += `<div class="nav-item" onclick="openTank(${idx})"><span style="width:10px;height:10px;border-radius:50%;background:${clr};display:inline-block;"></span> ${tank.name}</div>`;
       });
     }
 
@@ -464,15 +473,15 @@
 
       appData.tanks.forEach((tank, idx) => {
         const badge = tank.status === "Established" ? "badge-stable" : "badge-cycling";
-        // Fixed: Ensure image renders correctly if present
         const imgTag = tank.image ? `<img src="${tank.image}" class="tank-thumb">` : '';
+        const clr = tank.color || "#38BDF8";
         
         container.innerHTML += `
-          <div class="card" onclick="openTank(${idx})" style="cursor:pointer;">
+          <div class="card" onclick="openTank(${idx})" style="cursor:pointer; border-left: 5px solid ${clr};">
             ${imgTag}
             <div class="card-header">
               <div>
-                <h3 class="card-title">${tank.icon || '🐠'} ${tank.name}</h3>
+                <h3 class="card-title">${tank.name}</h3>
               </div>
               <span class="badge ${badge}">● ${tank.status}</span>
             </div>
@@ -484,15 +493,14 @@
 
     function renderTankView() {
       const tank = appData.tanks[activeTankIndex];
-      // Fixed: Target correct elements without syntax crash
-      document.getElementById("tank-view-title").innerHTML = `${tank.icon || '🐠'} ${tank.name}`;
+      const clr = tank.color || "#38BDF8";
+      document.getElementById("tank-view-title").innerHTML = `<span style="width:12px;height:12px;border-radius:50%;background:${clr};display:inline-block;margin-right:6px;"></span> ${tank.name}`;
       
       const badge = document.getElementById("tank-status-toggle");
       badge.innerText = `● ${tank.status}`;
       badge.className = `badge ${tank.status === "Established" ? "badge-stable" : "badge-cycling"}`;
 
       document.getElementById("tank-summary-box").innerText = tank.summary || "No active warnings.";
-      
       document.getElementById("log-date").valueAsDate = new Date();
 
       renderTimeline();
@@ -522,7 +530,7 @@
 
     function renderSubLists() {
       const tank = appData.tanks[activeTankIndex];
-      ["livestock", "plants", "decor", "equipment"].forEach(type => {
+      ["livestock", "plants", "equipment", "decor"].forEach(type => {
         const list = document.getElementById(type + "-list");
         if(!list) return;
         list.innerHTML = "";
@@ -670,7 +678,7 @@
       document.getElementById("modal-tank-title").innerText = "Add New Aquarium";
       document.getElementById("m-name").value = "";
       document.getElementById("m-gal").value = "";
-      document.getElementById("m-icon").value = "🐠";
+      document.getElementById("m-color").value = "#38BDF8";
       document.getElementById("m-status").value = "Established";
       document.getElementById("m-photo").value = "";
       document.getElementById("tankModal").classList.add("open");
@@ -682,7 +690,7 @@
       document.getElementById("modal-tank-title").innerText = "Edit Aquarium";
       document.getElementById("m-name").value = tank.name;
       document.getElementById("m-gal").value = tank.grossGal;
-      document.getElementById("m-icon").value = tank.icon || "🐠";
+      document.getElementById("m-color").value = tank.color || "#38BDF8";
       document.getElementById("m-status").value = tank.status;
       document.getElementById("m-photo").value = "";
       document.getElementById("tankModal").classList.add("open");
@@ -693,7 +701,7 @@
     function saveTankModalData() {
       const name = document.getElementById("m-name").value.trim() || "Aquarium";
       const gal = parseFloat(document.getElementById("m-gal").value) || 20;
-      const icon = document.getElementById("m-icon").value;
+      const color = document.getElementById("m-color").value;
       const status = document.getElementById("m-status").value;
       const fileInput = document.getElementById("m-photo");
 
@@ -702,12 +710,12 @@
           const tank = appData.tanks[activeTankIndex];
           tank.name = name;
           tank.grossGal = gal;
-          tank.icon = icon;
+          tank.color = color;
           tank.status = status;
           if(imgData) tank.image = imgData;
         } else {
           appData.tanks.push({
-            id: Date.now(), name, grossGal: gal, icon, status, image: imgData || "",
+            id: Date.now(), name, grossGal: gal, color, status, image: imgData || "",
             summary: "Tank initialized.", lastTest: { nh3: 0, no2: 0, no3: 0, ph: 7.0 },
             timeline: [{ date: "Today", text: "Tank created." }],
             equipment: [], livestock: [], plants: [], decor: []
