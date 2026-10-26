@@ -100,11 +100,6 @@
     /* Modern Full-Bleed Tank Card Banner */
     .tank-card-hero {
       padding: 0 !important;
-      cursor: pointer;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-    .tank-card-hero:active {
-      transform: scale(0.98);
     }
     .tank-banner-wrap {
       width: 100%; height: 140px; position: relative; background-size: cover; background-position: center;
@@ -465,7 +460,7 @@
           <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Restore</button>
           <input type="file" id="importFile" style="display:none" onchange="importData(event)">
         </div>
-        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v5.2 • $0 Tank Manager</div>
+        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v5.3 • $0 Tank Manager</div>
       </div>
     </div>
 
@@ -557,7 +552,7 @@
 
     let appData = defaultData;
     try {
-      const stored = localStorage.getItem("aquassist_v16");
+      const stored = localStorage.getItem("aquassist_v17");
       if (stored) appData = JSON.parse(stored);
     } catch(e) {
       appData = defaultData;
@@ -568,7 +563,7 @@
     let editingItemContext = { type: null, index: null };
 
     function saveData() {
-      localStorage.setItem("aquassist_v16", JSON.stringify(appData));
+      localStorage.setItem("aquassist_v17", JSON.stringify(appData));
     }
 
     function calculateAge(startDateStr) {
@@ -641,7 +636,6 @@
       if (!container) return;
       container.innerHTML = "";
 
-      // Time of day greeting
       const hour = new Date().getHours();
       let timeGreeting = "Good day";
       if (hour >= 4 && hour < 12) timeGreeting = "Good morning";
@@ -652,7 +646,6 @@
       const greetingEl = document.getElementById("dynamic-greeting");
       if (greetingEl) greetingEl.innerText = `${timeGreeting}, Aquarist`;
 
-      // Metrics
       let totalTanks = appData.tanks.length;
       let establishedTanks = appData.tanks.filter(t => t.status === "Established").length;
       let stabilityPct = totalTanks > 0 ? Math.round((establishedTanks / totalTanks) * 100) + "%" : "100%";
@@ -688,7 +681,6 @@
         const cardDiv = document.createElement("div");
         cardDiv.className = "card tank-card-hero";
         cardDiv.style.borderLeft = `6px solid ${clr}`;
-        cardDiv.onclick = () => openTank(idx);
 
         cardDiv.innerHTML = `
           <div class="tank-banner-wrap" style="${bannerStyle}">
@@ -713,6 +705,9 @@
               <div class="param-chip">NO₃ <b>${t.no3}p</b></div>
               <div class="param-chip">pH <b>${t.ph}</b></div>
             </div>
+
+            <!-- Explicit Action Button to Guarantee Hub Opens -->
+            <button class="btn btn-secondary" style="margin-top: 12px; padding: 8px; font-size: 12px;" onclick="openTank(${idx})">Open Tank Hub →</button>
           </div>
         `;
         container.appendChild(cardDiv);
