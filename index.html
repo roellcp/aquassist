@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+6<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -97,12 +97,10 @@
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .card-title { font-size: 19px; font-weight: 700; color: #fff; letter-spacing: -0.3px; text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
 
-    /* Modern Full-Bleed Tank Card Banner */
-    .tank-card-hero {
-      padding: 0 !important;
-    }
+    .tank-card-hero { padding: 0 !important; cursor: pointer; }
+    .tank-card-hero:active { transform: scale(0.98); }
     .tank-banner-wrap {
-      width: 100%; height: 140px; position: relative; background-size: cover; background-position: center;
+      width: 100%; height: 130px; position: relative; background-size: cover; background-position: center;
       display: flex; flex-direction: column; justify-content: flex-end; padding: 16px;
     }
     .tank-banner-overlay {
@@ -218,6 +216,186 @@
     <div class="nav-item" onclick="showView('home')">🏠 All Tanks</div>
     <div id="sidebar-tank-list" style="display:flex; flex-direction:column; gap:8px; margin: 4px 0;"></div>
     <hr style="border:0; border-top:1px solid rgba(255,255,255,0.08); margin: 6px 0;">
+    <div class="nav-item" onclick="showView('closet')">🧴 Global Supply Closet</div>
+    <div class="nav-item" onclick="showView('settings')">⚙️ Settings & Backup</div>
+  </nav>
+
+  <!-- Top Bar -->
+  <header>
+    <div class="brand-wrap" onclick="showView('home')">
+      <svg class="header-logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#38BDF8"/>
+            <stop offset="60%" stop-color="#06B6D4"/>
+            <stop offset="100%" stop-color="#0D9488"/>
+          </linearGradient>
+          <linearGradient id="finDorsal" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#7DD3FC" stop-opacity="0.8"/>
+            <stop offset="100%" stop-color="#06B6D4" stop-opacity="0.2"/>
+          </linearGradient>
+          <radialGradient id="neonEyeSparkle" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#FFFFFF"/>
+            <stop offset="40%" stop-color="#00F5A0"/>
+            <stop offset="100%" stop-color="#059669"/>
+          </radialGradient>
+        </defs>
+        <rect width="100" height="100" rx="22" fill="#080E1A" stroke="#38BDF8" stroke-width="2.5"/>
+        <path d="M56 34C54 23 42 19 32 24C36 29 40 33 42 38C46 36 51 34 56 34Z" fill="url(#finDorsal)"/>
+        <path d="M48 64C44 73 33 78 26 76C29 70 33 66 38 63C41 64 45 64 48 64Z" fill="url(#finDorsal)"/>
+        <path d="M82 49C81 44 73 37 60 36C46 35 34 44 26 48C20 42 14 36 12 37C13 43 16 48 18 50C16 52 13 57 12 63C14 64 20 58 26 52C34 56 46 65 60 64C73 63 81 56 82 51C82.5 50.5 82.5 49.5 82 49Z" fill="url(#bodyGrad)"/>
+        <path d="M54 48C50 51 44 53 40 52C42 49 46 47 50 47C51.5 47 53 47.5 54 48Z" fill="#A7F3D0" opacity="0.6"/>
+        <circle cx="78" cy="28" r="2.2" fill="#38BDF8" opacity="0.4"/>
+        <circle cx="86" cy="35" r="1.4" fill="#00F5A0" opacity="0.6"/>
+        <path d="M72 45C72.3 47.8 73.2 48.7 76 49C73.2 49.3 72.3 50.2 72 53C71.7 50.2 70.8 49.3 68 49C70.8 48.7 71.7 47.8 72 45Z" fill="url(#neonEyeSparkle)" filter="drop-shadow(0 0 6px rgba(0, 245, 160, 0.9))"/>
+      </svg>
+      <div class="brand-title">
+        <span class="part-aqua">aqu</span><span class="part-assist">Ass<span class="green-i">&#305;</span>st</span>
+      </div>
+    </div>
+    <button class="menu-btn" onclick="toggleMenu(true)">☰ Menu</button>
+  </header>
+
+  <div class="container">
+
+    <!-- ==================== VIEW 1: HOME ==================== -->
+    <div id="view-home" class="view-panel active">
+      <div class="ai-greeting-card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+          <div id="dynamic-greeting" style="font-size: 19px; font-weight: 700; color: var(--cyan);">Good day</div>
+          <div class="badge badge-stable" style="font-size: 10px;">🟢 All Systems Nominal</div>
+        </div>
+        <div id="global-ai-summary" style="font-size: 13px; line-height: 1.5; color: var(--text-main); margin-bottom: 12px;">
+          Scanning telemetry across aquatic environments...
+        </div>
+        
+        <div class="hero-metrics-grid">
+          <div class="hero-metric-box">
+            <div class="hero-metric-val" id="metric-total-tanks">2</div>
+            <div class="hero-metric-lbl">Active Tanks</div>
+          </div>
+          <div class="hero-metric-box">
+            <div class="hero-metric-val" id="metric-stable-pct">100%</div>
+            <div class="hero-metric-lbl">Stability Index</div>
+          </div>
+          <div class="hero-metric-box">
+            <div class="hero-metric-val" id="metric-tasks-due">0</div>
+            <div class="hero-metric-lbl">Action Items</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h2 style="font-size:18px; font-weight:700;">My Aquariums</h2>
+        <button class="btn btn-secondary" style="width:auto; padding:6px 12px; font-size:12px;" onclick="openTankModal()">+ Add Tank</button>
+      </div>
+
+      <div id="tank-card-list"></div>
+    </div>
+
+    <!-- ==================== VIEW 2: TANK HUB ==================== -->
+    <div id="view-tank" class="view-panel">
+      
+      <!-- Back to Home Bar -->
+      <button class="btn btn-secondary" style="margin-bottom: 12px; padding: 8px; font-size: 13px;" onclick="showView('home')">← Back to All Tanks</button>
+
+      <div class="card" style="margin-bottom:12px;" id="tank-hero-card">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <h2 id="tank-view-title" class="card-title" style="font-size: 20px; margin-bottom: 4px;">Tank Name</h2>
+            <div id="tank-hero-meta" style="font-size: 12px; color: var(--text-muted);">Age: 0 days • Status: Established</div>
+          </div>
+          <div style="display:flex; gap: 6px;">
+            <button class="btn btn-secondary" style="width:auto; padding: 6px 10px; font-size: 12px;" onclick="copyGeminiDelta()" title="Copy Update for Gemini">📋</button>
+            <button class="btn btn-secondary" style="width:auto; padding: 6px 10px; font-size: 12px;" onclick="openEditTankModal()" title="Edit Tank">✏️</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px; background: linear-gradient(135deg, rgba(0, 245, 160, 0.06), rgba(15, 23, 42, 0.9)); border-color: rgba(0, 245, 160, 0.25);">
+        <div style="font-size: 12px; font-weight: 700; color: var(--neon-green); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">🤖 AI Status Assessment</div>
+        <div id="tank-page-ai-summary" style="font-size: 13px; line-height: 1.4; color: var(--text-main);">
+          Evaluating latest water parameters and maintenance schedule...
+        </div>
+      </div>
+
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTankTab('overview', this)">Overview</button>
+        <button class="tab-btn" onclick="switchTankTab('water', this)">Water</button>
+        <button class="tab-btn" onclick="switchTankTab('livestock', this)">Livestock</button>
+        <button class="tab-btn" onclick="switchTankTab('plants', this)">Plants</button>
+        <button class="tab-btn" onclick="switchTankTab('equipment', this)">Equipment</button>
+        <button class="tab-btn" onclick="switchTankTab('decor', this)">Decor</button>
+      </div>
+
+      <!-- Tab 1: Overview -->
+      <div id="subtab-overview" class="subtab-content">
+        <div class="card">
+          <h3 style="font-size:15px; margin-bottom:8px;">Ask AI about this Tank</h3>
+          <div class="input-row">
+            <input type="text" id="ai-question" placeholder="e.g. Why is my nitrate high?">
+            <button class="btn" style="width:75px;" onclick="askTankAI()">Ask</button>
+          </div>
+          <div id="ai-response-box" class="ai-feedback" style="display:none;"></div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size:15px; margin-bottom:8px;">Activity Timeline</h3>
+          <div id="timeline-feed"></div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Water -->
+      <div id="subtab-water" class="subtab-content" style="display:none;">
+        <div class="card">
+          <h3 style="font-size:15px; margin-bottom:12px;">Log Water Test</h3>
+          <div style="margin-bottom:10px;">
+            <label>Test Date</label>
+            <input type="date" id="log-date">
+          </div>
+          <div class="input-grid">
+            <div><label>Ammonia (NH₃)</label><input type="number" id="log-nh3" step="0.25" placeholder="0"></div>
+            <div><label>Nitrite (NO₂)</label><input type="number" id="log-no2" step="0.25" placeholder="0"></div>
+            <div><label>Nitrate (NO₃)</label><input type="number" id="log-no3" step="5" placeholder="20"></div>
+            <div><label>pH</label><input type="number" id="log-ph" step="0.1" placeholder="7.2"></div>
+            <div><label>Water Change (%)</label><input type="number" id="log-wc" step="5" placeholder="25"></div>
+            <div><label>Dosed Product</label><input type="text" id="log-dose" placeholder="Prime 2ml"></div>
+          </div>
+          <button class="btn btn-neon" onclick="submitLog()">Save Test & Run Analysis</button>
+          <div id="log-feedback-box" class="ai-feedback" style="display:none;"></div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Livestock -->
+      <div id="subtab-livestock" class="subtab-content" style="display:none;">
+        <div class="card">
+          <h3 style="font-size:15px; margin-bottom:8px;">Livestock Inventory</h3>
+          <div class="input-row">
+            <input type="text" id="new-live-breed" placeholder="Species / Breed">
+            <input type="number" id="new-live-count" placeholder="Qty" style="width:65px;" value="1">
+            <button class="btn" style="width:65px;" onclick="addLivestock()">Add</button>
+          </div>
+          <div id="livestock-list" class="pill-list"></div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Plants -->
+      <div id="subtab-plants" class="subtab-content" style="display:none;">
+        <div class="card">
+          <h3 style="font-size:15px; margin-bottom:8px;">Plants</h3>
+          <div class="input-row">
+            <input type="text" id="new-plant" placeholder="e.g. Anubias Nana">
+            <button class="btn" style="width:70px;" onclick="addItem('plants', 'new-plant')">Add</button>
+          </div>
+          <div id="plants-list" class="pill-list"></div>
+        </div>
+      </div>
+
+      <!-- Tab 5: Equipment -->
+      <div id="subtab-equipment" class="subtab-content" style="display:none;">
+        <div class="card">
+          <h3 style="font-size:15px; margin-bottom:8px;">Equipment</h3>
+          <div class="input-rox solid rgba(255,255,255,0.08); margin: 6px 0;">
     <div class="nav-item" onclick="showView('closet')">🧴 Global Supply Closet</div>
     <div class="nav-item" onclick="showView('settings')">⚙️ Settings & Backup</div>
   </nav>
