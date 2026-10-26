@@ -94,12 +94,12 @@
       border: 1px solid rgba(56, 189, 248, 0.3); background: #070D18; display: block;
     }
 
-    /* Upgraded Larger AI Greeting & Summary Banner */
+    /* Upgraded AI Greeting & Summary Banner */
     .ai-greeting-card {
       background: linear-gradient(135deg, rgba(56, 189, 248, 0.14), rgba(0, 245, 160, 0.07));
       border: 1px solid rgba(56, 189, 248, 0.4);
       border-radius: 24px;
-      padding: 24px 22px;
+      padding: 22px;
       margin-bottom: 20px;
       box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6);
     }
@@ -228,10 +228,10 @@
     <!-- ==================== VIEW 1: HOME ==================== -->
     <div id="view-home" class="view-panel active">
       
-      <!-- Upgraded Up-Sized AI Greeting & Summary Banner -->
+      <!-- AI Greeting & Global Status Summary -->
       <div class="ai-greeting-card">
-        <div id="dynamic-greeting" style="font-size: 20px; font-weight: 700; color: var(--cyan); margin-bottom: 8px;">Good day</div>
-        <div id="global-ai-summary" style="font-size: 14px; line-height: 1.6; color: var(--text-main);">
+        <div id="dynamic-greeting" style="font-size: 19px; font-weight: 700; color: var(--cyan); margin-bottom: 8px;">Good day</div>
+        <div id="global-ai-summary" style="font-size: 13px; line-height: 1.6; color: var(--text-main);">
           Analyzing tank telemetry across your aquariums...
         </div>
       </div>
@@ -405,7 +405,7 @@
           <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Restore</button>
           <input type="file" id="importFile" style="display:none" onchange="importData(event)">
         </div>
-        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v3.4 • $0 Tank Manager</div>
+        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v3.5 • $0 Tank Manager</div>
       </div>
     </div>
 
@@ -479,29 +479,29 @@
       closet: ["Seachem Prime", "API Freshwater Master Test Kit", "Easy Green"],
       tanks: [
         {
-          id: 1, name: "Planted Community", grossGal: 20, status: "Established", color: "#00F5A0", startDate: "2025-01-15",
-          image: "", summary: "Parameters stable. Water change due in 3 days.",
-          lastTest: { nh3: 0, no2: 0, no3: 20, ph: 7.2 },
-          timeline: [{ date: "Yesterday", text: "Logged test: NO3 20ppm, pH 7.2" }],
-          equipment: ["Aquaclear 30", "50W Heater"], livestock: ["8x Cardinal Tetra"], plants: ["Java Fern"], decor: ["Driftwood"]
+          id: 1, name: "40G Community", grossGal: 40, status: "Established", color: "#00F5A0", startDate: "2025-01-15",
+          image: "", summary: "All systems stable. Next water change in 3 days.",
+          lastTest: { nh3: 0, no2: 0, no3: 15, ph: 7.2 },
+          timeline: [{ date: "3 days ago", text: "Logged test: NO3 15ppm, pH 7.2" }],
+          equipment: ["Fluval 407", "150W Heater"], livestock: ["12x Neon Tetra"], plants: ["Amazon Sword"], decor: ["Spider Wood"]
         },
         {
-          id: 2, name: "Shrimp Nano", grossGal: 10, status: "Cycling", color: "#38BDF8", startDate: "2026-03-01",
-          image: "", summary: "Cycling active. Nitrite spike recorded.",
-          lastTest: { nh3: 0.5, no2: 0.25, no3: 5, ph: 6.8 },
-          timeline: [{ date: "Today", text: "Logged test: NH3 0.5, NO2 0.25" }],
-          equipment: ["Sponge Filter"], livestock: ["5x Cherry Shrimp"], plants: ["Java Moss"], decor: ["Dragon Stone"]
+          id: 2, name: "10G Betta", grossGal: 10, status: "Cycling", color: "#38BDF8", startDate: "2026-03-20",
+          image: "", summary: "In cycling stage phase 4. Expect nitrite to drop over the next few days. Test water again in 3 days.",
+          lastTest: { nh3: 0, no2: 1.5, no3: 10, ph: 7.0 },
+          timeline: [{ date: "Yesterday", text: "Logged test: NO2 1.5ppm" }],
+          equipment: ["Sponge Filter", "50W Heater"], livestock: [], plants: ["Anubias"], decor: ["Slate Rock"]
         }
       ]
     };
 
-    let appData = JSON.parse(localStorage.getItem("aquassist_v11")) || defaultData;
+    let appData = JSON.parse(localStorage.getItem("aquassist_v12")) || defaultData;
     let activeTankIndex = 0;
     let isEditingTank = false;
     let editingItemContext = { type: null, index: null };
 
     function saveData() {
-      localStorage.setItem("aquassist_v11", JSON.stringify(appData));
+      localStorage.setItem("aquassist_v12", JSON.stringify(appData));
     }
 
     function calculateAge(startDateStr) {
@@ -578,20 +578,17 @@
       else if (hour >= 17 && hour < 22) timeGreeting = "Good evening";
       else timeGreeting = "Good night";
 
-      document.getElementById("dynamic-greeting").innerText = timeGreeting;
+      document.getElementById("dynamic-greeting").innerText = `${timeGreeting}!`;
 
-      // Global AI Aggregate Summary across all tanks
+      // Smart Aggregate Summary matching exact user request format
       let totalTanks = appData.tanks.length;
-      let establishedTanks = appData.tanks.filter(t => t.status === "Established").length;
-      let cyclingTanks = appData.tanks.filter(t => t.status === "Cycling").length;
+      let summaryText = `Monitoring ${totalTanks} active systems.<br>`;
       
-      let summaryHtml = `Monitoring <b>${totalTanks}</b> active aquarium system(s) (${establishedTanks} established, ${cyclingTanks} in cycle phase). `;
-      if (cyclingTanks > 0) {
-        summaryHtml += `Active telemetry tracking nitrogen cycle progression for cycling systems. `;
-      } else {
-        summaryHtml += `All established biotopes are operating smoothly within target parameters. `;
-      }
-      document.getElementById("global-ai-summary").innerHTML = summaryHtml;
+      appData.tanks.forEach(tank => {
+        summaryText += `• <b>${tank.grossGal}G ${tank.name}</b> — ${tank.summary || 'Systems stable.'}<br>`;
+      });
+
+      document.getElementById("global-ai-summary").innerHTML = summaryText;
 
       appData.tanks.forEach((tank, idx) => {
         const badge = tank.status === "Established" ? "badge-stable" : "badge-cycling";
