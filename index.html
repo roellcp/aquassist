@@ -453,7 +453,7 @@
           <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Restore</button>
           <input type="file" id="importFile" style="display:none" onchange="importData(event)">
         </div>
-        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v5.6 • $0 Tank Manager</div>
+        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v21.0 • $0 Tank Manager</div>
       </div>
     </div>
 
@@ -545,7 +545,7 @@
 
     let appData = defaultData;
     try {
-      const stored = localStorage.getItem("aquassist_v20");
+      const stored = localStorage.getItem("aquassist_v21");
       if (stored) appData = JSON.parse(stored);
     } catch(e) {
       appData = defaultData;
@@ -556,7 +556,7 @@
     let editingItemContext = { type: null, index: null };
 
     function saveData() {
-      localStorage.setItem("aquassist_v20", JSON.stringify(appData));
+      localStorage.setItem("aquassist_v21", JSON.stringify(appData));
     }
 
     function calculateAge(startDateStr) {
@@ -720,10 +720,21 @@
       if (!tank) return;
       const clr = tank.color || "#38BDF8";
       
-      document.getElementById("tank-view-title").innerHTML = `<span style="width:12px;height:12px;border-radius:50%;background:${clr};display:inline-block;margin-right:6px;"></span> ${tank.name}`;
+      const titleEl = document.getElementById("tank-view-title");
+      if (titleEl) {
+        titleEl.innerHTML = `<span style="width:12px;height:12px;border-radius:50%;background:${clr};display:inline-block;margin-right:6px;"></span> ${tank.name}`;
+      }
+      
       const ageStr = calculateAge(tank.startDate);
-      document.getElementById("tank-hero-meta").innerText = `Age: ${ageStr} • Status: ${tank.status} • Volume: ${tank.grossGal}G`;
-      document.getElementById("tank-page-ai-summary").innerText = tank.summary || "System parameters nominal. No immediate interventions flagged.";
+      const metaEl = document.getElementById("tank-hero-meta");
+      if (metaEl) {
+        metaEl.innerText = `Age: ${ageStr} • Status: ${tank.status} • Volume: ${tank.grossGal}G`;
+      }
+
+      const aiSumEl = document.getElementById("tank-page-ai-summary");
+      if (aiSumEl) {
+        aiSumEl.innerText = tank.summary || "System parameters nominal. No immediate interventions flagged.";
+      }
 
       const badge = document.getElementById("tank-status-toggle");
       if (badge) {
@@ -731,7 +742,11 @@
         badge.className = `badge ${tank.status === "Established" ? "badge-stable" : "badge-cycling"}`;
       }
 
-      document.getElementById("tank-summary-box").innerText = tank.summary || "No active warnings.";
+      const sumBox = document.getElementById("tank-summary-box");
+      if (sumBox) {
+        sumBox.innerText = tank.summary || "No active warnings.";
+      }
+
       const dateInput = document.getElementById("log-date");
       if (dateInput) dateInput.valueAsDate = new Date();
 
@@ -764,6 +779,7 @@
 
     function renderSubLists() {
       const tank = appData.tanks[activeTankIndex];
+      if (!tank) return;
       ["livestock", "plants", "equipment", "decor"].forEach(type => {
         const list = document.getElementById(type + "-list");
         if(!list) return;
