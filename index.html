@@ -76,7 +76,7 @@
     }
     .nav-item:active { background: rgba(56, 189, 248, 0.15); color: var(--cyan); }
 
-    /* Container & View Panels Routing */
+    /* Container */
     .container { padding: 16px; max-width: 560px; margin: 0 auto; }
     .view-panel { display: none; }
     .view-panel.active { display: block; }
@@ -95,17 +95,20 @@
       overflow: hidden;
     }
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .card-title { font-size: 19px; font-weight: 700; color: #fff; letter-spacing: -0.3px; text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
+    .card-title { font-size: 20px; font-weight: 700; color: #fff; letter-spacing: -0.3px; text-shadow: 0 2px 6px rgba(0,0,0,0.8); }
 
-    .tank-card-hero { padding: 0 !important; cursor: pointer; }
-    .tank-card-hero:active { transform: scale(0.98); }
+    /* Taller Full-Bleed Tank Card Banner */
+    .tank-card-hero {
+      padding: 0 !important; cursor: pointer;
+    }
+    .tank-card-hero:active { transform: scale(0.98); transition: transform 0.1s ease; }
     .tank-banner-wrap {
-      width: 100%; height: 130px; position: relative; background-size: cover; background-position: center;
-      display: flex; flex-direction: column; justify-content: flex-end; padding: 16px;
+      width: 100%; height: 210px; position: relative; background-size: cover; background-position: center;
+      display: flex; flex-direction: column; justify-content: flex-end; padding: 18px;
     }
     .tank-banner-overlay {
       position: absolute; inset: 0; pointer-events: none;
-      background: linear-gradient(180deg, rgba(15,23,42,0.1) 0%, rgba(15,23,42,0.92) 85%);
+      background: linear-gradient(180deg, rgba(15,23,42,0.15) 20%, rgba(15,23,42,0.95) 90%);
     }
     .tank-banner-content { position: relative; z-index: 2; pointer-events: none; }
     .tank-card-body { padding: 14px 18px 18px 18px; }
@@ -141,7 +144,7 @@
 
     /* Badges */
     .badge { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; }
-    .badge-cycling { background: rgba(245, 158, 11, 0.2); color: var(--alert-yellow); border: 1px solid rgba(245, 158, 11, 0.4); }
+    .badge-cycling { background: rgba(245, 158, 11, 0.25); color: var(--alert-yellow); border: 1px solid rgba(245, 158, 11, 0.5); backdrop-filter: blur(4px); }
 
     /* Sub Tabs */
     .tab-bar {
@@ -275,8 +278,8 @@
             <div class="hero-metric-lbl">Active Tanks</div>
           </div>
           <div class="hero-metric-box">
-            <div class="hero-metric-val" id="metric-stable-pct">100%</div>
-            <div class="hero-metric-lbl">Stability Index</div>
+            <div class="hero-metric-val" id="metric-total-vol">50G</div>
+            <div class="hero-metric-lbl">Total Volume</div>
           </div>
           <div class="hero-metric-box">
             <div class="hero-metric-val" id="metric-tasks-due">0</div>
@@ -453,7 +456,7 @@
           <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Restore</button>
           <input type="file" id="importFile" style="display:none" onchange="importData(event)">
         </div>
-        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v21.0 • $0 Tank Manager</div>
+        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v6.0 • $0 Tank Manager</div>
       </div>
     </div>
 
@@ -545,7 +548,7 @@
 
     let appData = defaultData;
     try {
-      const stored = localStorage.getItem("aquassist_v21");
+      const stored = localStorage.getItem("aquassist_v22");
       if (stored) appData = JSON.parse(stored);
     } catch(e) {
       appData = defaultData;
@@ -556,7 +559,7 @@
     let editingItemContext = { type: null, index: null };
 
     function saveData() {
-      localStorage.setItem("aquassist_v21", JSON.stringify(appData));
+      localStorage.setItem("aquassist_v22", JSON.stringify(appData));
     }
 
     function calculateAge(startDateStr) {
@@ -587,9 +590,7 @@
       });
     }
 
-    // Bulletproof View Router
     function showView(viewId) {
-      console.log("Routing to view:", viewId);
       document.querySelectorAll(".view-panel").forEach(p => {
         p.classList.remove("active");
         p.style.display = "none";
@@ -626,7 +627,6 @@
     }
 
     function openTank(idx) {
-      console.log("Opening tank index:", idx);
       activeTankIndex = idx;
       renderTankView();
       showView("tank");
@@ -649,20 +649,19 @@
       if (greetingEl) greetingEl.innerText = `${timeGreeting}, Aquarist`;
 
       let totalTanks = appData.tanks.length;
-      let establishedTanks = appData.tanks.filter(t => t.status === "Established").length;
-      let stabilityPct = totalTanks > 0 ? Math.round((establishedTanks / totalTanks) * 100) + "%" : "100%";
+      let totalVol = appData.tanks.reduce((acc, t) => acc + (parseFloat(t.grossGal) || 0), 0);
       let actionItems = appData.tanks.filter(t => t.status === "Cycling").length;
       
       const tTot = document.getElementById("metric-total-tanks");
-      const tStab = document.getElementById("metric-stable-pct");
+      const tVol = document.getElementById("metric-total-vol");
       const tTask = document.getElementById("metric-tasks-due");
       if (tTot) tTot.innerText = totalTanks;
-      if (tStab) tStab.innerText = stabilityPct;
+      if (tVol) tVol.innerText = `${totalVol}G`;
       if (tTask) tTask.innerText = actionItems;
 
       const summaryEl = document.getElementById("global-ai-summary");
       if (summaryEl) {
-        summaryEl.innerHTML = `Monitoring <b>${totalTanks}</b> active ecosystems. All biological filters are responding correctly to routine maintenance schedules.`;
+        summaryEl.innerHTML = `Monitoring <b>${totalTanks}</b> active systems totaling <b>${totalVol} Gallons</b>. All biological filters are responding correctly.`;
       }
 
       appData.tanks.forEach((tank, idx) => {
@@ -677,21 +676,22 @@
           bannerStyle = `background-image: url('${tank.image}');`;
           bannerOverlay = `<div class="tank-banner-overlay"></div>`;
         } else {
-          bannerStyle = `background: linear-gradient(135deg, ${clr}33, #0F172A);`;
+          bannerStyle = `background: linear-gradient(135deg, ${clr}44, #0F172A);`;
         }
 
         const cardDiv = document.createElement("div");
         cardDiv.className = "card tank-card-hero";
         cardDiv.style.borderLeft = `6px solid ${clr}`;
+        cardDiv.onclick = () => openTank(idx);
 
         cardDiv.innerHTML = `
-          <div class="tank-banner-wrap" style="${bannerStyle}" onclick="openTank(${idx})">
+          <div class="tank-banner-wrap" style="${bannerStyle}">
             ${bannerOverlay}
             <div class="tank-banner-content" style="width:100%;">
               <div style="display: flex; justify-content: space-between; align-items: flex-end;">
                 <div>
                   <h3 class="card-title">${tank.name}</h3>
-                  <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Age: ${ageStr} • ${tank.grossGal} Gallons</div>
+                  <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${ageStr} • ${tank.grossGal} Gallons</div>
                 </div>
                 ${badgeHtml}
               </div>
@@ -699,16 +699,14 @@
           </div>
           
           <div class="tank-card-body">
-            <div style="font-size:12px; color:var(--text-main); margin-bottom:8px; line-height: 1.4;" onclick="openTank(${idx})"><b>AI Summary:</b> ${tank.summary || 'Stable'}</div>
+            <div style="font-size:12px; color:var(--text-main); margin-bottom:8px; line-height: 1.4;">${tank.summary || 'Stable'}</div>
             
-            <div class="param-strip" onclick="openTank(${idx})">
+            <div class="param-strip">
               <div class="param-chip">NH₃ <b>${t.nh3}</b></div>
               <div class="param-chip">NO₂ <b>${t.no2}</b></div>
               <div class="param-chip">NO₃ <b>${t.no3}p</b></div>
               <div class="param-chip">pH <b>${t.ph}</b></div>
             </div>
-
-            <button class="btn btn-secondary" style="margin-top: 12px; padding: 10px; font-size: 13px; font-weight: 700; color: var(--cyan); border-color: rgba(56, 189, 248, 0.4);" onclick="openTank(${idx})">Open Tank Hub →</button>
           </div>
         `;
         container.appendChild(cardDiv);
@@ -728,7 +726,7 @@
       const ageStr = calculateAge(tank.startDate);
       const metaEl = document.getElementById("tank-hero-meta");
       if (metaEl) {
-        metaEl.innerText = `Age: ${ageStr} • Status: ${tank.status} • Volume: ${tank.grossGal}G`;
+        metaEl.innerText = `${ageStr} • Status: ${tank.status} • Volume: ${tank.grossGal}G`;
       }
 
       const aiSumEl = document.getElementById("tank-page-ai-summary");
