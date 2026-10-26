@@ -88,11 +88,6 @@
     }
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .card-title { font-size: 18px; font-weight: 700; color: #fff; }
-    
-    .tank-thumb { 
-      width: 100%; height: 180px; border-radius: 12px; object-fit: cover; margin-bottom: 12px; 
-      border: 1px solid rgba(56, 189, 248, 0.3); background: #070D18; display: block;
-    }
 
     /* Upgraded AI Greeting & Summary Banner */
     .ai-greeting-card {
@@ -106,7 +101,6 @@
 
     /* Badges */
     .badge { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; }
-    .badge-stable { background: rgba(0, 245, 160, 0.15); color: var(--neon-green); border: 1px solid rgba(0, 245, 160, 0.35); }
     .badge-cycling { background: rgba(245, 158, 11, 0.15); color: var(--alert-yellow); border: 1px solid rgba(245, 158, 11, 0.35); }
 
     /* Sub Tabs */
@@ -261,10 +255,10 @@
         </div>
       </div>
 
-      <!-- Current Tank Status Card (AI Style Summary) -->
+      <!-- Current Tank Status Card (AI Style Detailed Summary) -->
       <div class="card" style="margin-bottom:14px; background: linear-gradient(135deg, rgba(0, 245, 160, 0.06), rgba(15, 23, 42, 0.9)); border-color: rgba(0, 245, 160, 0.25);">
         <div style="font-size: 12px; font-weight: 700; color: var(--neon-green); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">🤖 AI Status Assessment</div>
-        <div id="tank-page-ai-summary" style="font-size: 13px; line-height: 1.4; color: var(--text-main);">
+        <div id="tank-page-ai-summary" style="font-size: 13px; line-height: 1.5; color: var(--text-main);">
           Evaluating latest water parameters and maintenance schedule...
         </div>
       </div>
@@ -405,13 +399,13 @@
           <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Restore</button>
           <input type="file" id="importFile" style="display:none" onchange="importData(event)">
         </div>
-        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v3.5 • $0 Tank Manager</div>
+        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v3.6 • $0 Tank Manager</div>
       </div>
     </div>
 
   </div>
 
-  <!-- Tank Add/Edit Modal -->
+  <!-- Tank Add/Edit Modal (Hero Image Dropped) -->
   <div class="modal-overlay" id="tankModal">
     <div class="modal-box">
       <h3 id="modal-tank-title" style="margin-bottom:12px;">Add New Aquarium</h3>
@@ -421,11 +415,11 @@
       </div>
       <div class="input-grid" style="margin-bottom:10px;">
         <div>
-          <label>Volume</label>
+          <label>Volume (Gallons)</label>
           <input type="number" id="m-gal" placeholder="20">
         </div>
         <div>
-          <label>Start Date (Cycling)</label>
+          <label>Start Date</label>
           <input type="date" id="m-date">
         </div>
       </div>
@@ -434,16 +428,12 @@
         <input type="hidden" id="m-color" value="#38BDF8">
         <div class="color-picker-grid" id="color-circles-container"></div>
       </div>
-      <div style="margin-bottom:10px;">
+      <div style="margin-bottom:16px;">
         <label>Lifecycle Mode</label>
         <select id="m-status">
           <option value="Established">Established</option>
           <option value="Cycling">Cycling</option>
         </select>
-      </div>
-      <div style="margin-bottom:16px;">
-        <label>Tank Photo (Optional)</label>
-        <input type="file" id="m-photo" accept="image/*">
       </div>
       <div style="display:flex; gap:10px;">
         <button class="btn btn-secondary" onclick="closeTankModal()">Cancel</button>
@@ -479,15 +469,15 @@
       closet: ["Seachem Prime", "API Freshwater Master Test Kit", "Easy Green"],
       tanks: [
         {
-          id: 1, name: "40G Community", grossGal: 40, status: "Established", color: "#00F5A0", startDate: "2025-01-15",
-          image: "", summary: "All systems stable. Next water change in 3 days.",
+          id: 1, name: "Community", grossGal: 40, status: "Established", color: "#00F5A0", startDate: "2025-01-15",
+          summary: "All systems stable. Next water change in 3 days.",
           lastTest: { nh3: 0, no2: 0, no3: 15, ph: 7.2 },
           timeline: [{ date: "3 days ago", text: "Logged test: NO3 15ppm, pH 7.2" }],
           equipment: ["Fluval 407", "150W Heater"], livestock: ["12x Neon Tetra"], plants: ["Amazon Sword"], decor: ["Spider Wood"]
         },
         {
-          id: 2, name: "10G Betta", grossGal: 10, status: "Cycling", color: "#38BDF8", startDate: "2026-03-20",
-          image: "", summary: "In cycling stage phase 4. Expect nitrite to drop over the next few days. Test water again in 3 days.",
+          id: 2, name: "Betta", grossGal: 10, status: "Cycling", color: "#38BDF8", startDate: "2026-03-20",
+          summary: "In cycling stage phase 4. Expect nitrite to drop over the next few days. Test water again in 3 days.",
           lastTest: { nh3: 0, no2: 1.5, no3: 10, ph: 7.0 },
           timeline: [{ date: "Yesterday", text: "Logged test: NO2 1.5ppm" }],
           equipment: ["Sponge Filter", "50W Heater"], livestock: [], plants: ["Anubias"], decor: ["Slate Rock"]
@@ -495,13 +485,13 @@
       ]
     };
 
-    let appData = JSON.parse(localStorage.getItem("aquassist_v12")) || defaultData;
+    let appData = JSON.parse(localStorage.getItem("aquassist_v13")) || defaultData;
     let activeTankIndex = 0;
     let isEditingTank = false;
     let editingItemContext = { type: null, index: null };
 
     function saveData() {
-      localStorage.setItem("aquassist_v12", JSON.stringify(appData));
+      localStorage.setItem("aquassist_v13", JSON.stringify(appData));
     }
 
     function calculateAge(startDateStr) {
@@ -555,7 +545,7 @@
       list.innerHTML = "";
       appData.tanks.forEach((tank, idx) => {
         const clr = tank.color || "#38BDF8";
-        list.innerHTML += `<div class="nav-item" onclick="openTank(${idx})"><span style="width:10px;height:10px;border-radius:50%;background:${clr};display:inline-block;"></span> ${tank.name}</div>`;
+        list.innerHTML += `<div class="nav-item" onclick="openTank(${idx})"><span style="width:10px;height:10px;border-radius:50%;background:${clr};display:inline-block;"></span> ${tank.grossGal}G ${tank.name}</div>`;
       });
     }
 
@@ -580,9 +570,9 @@
 
       document.getElementById("dynamic-greeting").innerText = `${timeGreeting}!`;
 
-      // Smart Aggregate Summary matching exact user request format
+      // Smart Aggregate Summary matching exact user format
       let totalTanks = appData.tanks.length;
-      let summaryText = `Monitoring ${totalTanks} active systems.<br>`;
+      let summaryText = `Monitoring ${totalTanks} active systems.<br><br>`;
       
       appData.tanks.forEach(tank => {
         summaryText += `• <b>${tank.grossGal}G ${tank.name}</b> — ${tank.summary || 'Systems stable.'}<br>`;
@@ -591,22 +581,21 @@
       document.getElementById("global-ai-summary").innerHTML = summaryText;
 
       appData.tanks.forEach((tank, idx) => {
-        const badge = tank.status === "Established" ? "badge-stable" : "badge-cycling";
-        const imgTag = tank.image ? `<img src="${tank.image}" class="tank-thumb">` : '';
+        // Only show badge if cycling; hide if Established
+        const badgeHtml = tank.status === "Cycling" ? `<span class="badge badge-cycling">● Cycling</span>` : '';
         const clr = tank.color || "#38BDF8";
         const ageStr = calculateAge(tank.startDate);
         
         container.innerHTML += `
           <div class="card" onclick="openTank(${idx})" style="cursor:pointer; border-left: 5px solid ${clr};">
-            ${imgTag}
             <div class="card-header">
               <div>
-                <h3 class="card-title">${tank.name}</h3>
+                <h3 class="card-title">${tank.grossGal}G ${tank.name}</h3>
                 <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Age: ${ageStr}</div>
               </div>
-              <span class="badge ${badge}">● ${tank.status}</span>
+              ${badgeHtml}
             </div>
-            <div style="font-size:12px; color:var(--cyan); margin-top:6px;"><b>AI Summary:</b> ${tank.summary || 'Stable'}</div>
+            <div style="font-size:12px; color:var(--cyan); margin-top:6px;">${tank.summary || 'Stable'}</div>
           </div>
         `;
       });
@@ -616,16 +605,11 @@
       const tank = appData.tanks[activeTankIndex];
       const clr = tank.color || "#38BDF8";
       
-      document.getElementById("tank-view-title").innerHTML = `<span style="width:12px;height:12px;border-radius:50%;background:${clr};display:inline-block;margin-right:6px;"></span> ${tank.name}`;
+      document.getElementById("tank-view-title").innerHTML = `<span style="width:12px;height:12px;border-radius:50%;background:${clr};display:inline-block;margin-right:6px;"></span> ${tank.grossGal}G ${tank.name}`;
       const ageStr = calculateAge(tank.startDate);
-      document.getElementById("tank-hero-meta").innerText = `Age: ${ageStr} • Status: ${tank.status} • Volume: ${tank.grossGal}G`;
+      document.getElementById("tank-hero-meta").innerText = `Age: ${ageStr} • Status: ${tank.status}`;
       document.getElementById("tank-page-ai-summary").innerText = tank.summary || "System parameters nominal. No immediate interventions flagged.";
 
-      const badge = document.getElementById("tank-status-toggle");
-      badge.innerText = `● ${tank.status}`;
-      badge.className = `badge ${tank.status === "Established" ? "badge-stable" : "badge-cycling"}`;
-
-      document.getElementById("tank-summary-box").innerText = tank.summary || "No active warnings.";
       document.getElementById("log-date").valueAsDate = new Date();
 
       renderTimeline();
@@ -743,6 +727,7 @@
       const tank = appData.tanks[activeTankIndex];
       tank.status = tank.status === "Established" ? "Cycling" : "Established";
       saveData();
+      renderHomeCards();
       renderTankView();
     }
 
@@ -776,6 +761,7 @@
       const box = document.getElementById("log-feedback-box");
       box.style.display = "block";
       box.innerHTML = feedback;
+      renderHomeCards();
       renderTankView();
     }
 
@@ -812,7 +798,7 @@
 
     function copyGeminiDelta() {
       const tank = appData.tanks[activeTankIndex];
-      const text = `Quick Update for ${tank.name} (${tank.status}):
+      const text = `Quick Update for ${tank.grossGal}G ${tank.name} (${tank.status}):
 - Age: ${calculateAge(tank.startDate)}
 - Latest Test: NH3:${tank.lastTest.nh3}, NO2:${tank.lastTest.no2}, NO3:${tank.lastTest.no3}, pH:${tank.lastTest.ph}
 - Summary: ${tank.summary}
@@ -830,7 +816,6 @@
       document.getElementById("m-color").value = availableColors[0];
       buildColorCircles(availableColors[0]);
       document.getElementById("m-status").value = "Established";
-      document.getElementById("m-photo").value = "";
       document.getElementById("tankModal").classList.add("open");
     }
 
@@ -844,7 +829,6 @@
       document.getElementById("m-color").value = tank.color || availableColors[0];
       buildColorCircles(tank.color || availableColors[0]);
       document.getElementById("m-status").value = tank.status;
-      document.getElementById("m-photo").value = "";
       document.getElementById("tankModal").classList.add("open");
     }
 
@@ -856,51 +840,26 @@
       const startDate = document.getElementById("m-date").value || "2025-01-01";
       const color = document.getElementById("m-color").value;
       const status = document.getElementById("m-status").value;
-      const fileInput = document.getElementById("m-photo");
 
-      const processSave = (imgData) => {
-        if(isEditingTank) {
-          const tank = appData.tanks[activeTankIndex];
-          tank.name = name;
-          tank.grossGal = gal;
-          tank.startDate = startDate;
-          tank.color = color;
-          tank.status = status;
-          if(imgData) tank.image = imgData;
-        } else {
-          appData.tanks.push({
-            id: Date.now(), name, grossGal: gal, startDate, color, status, image: imgData || "",
-            summary: "Tank initialized.", lastTest: { nh3: 0, no2: 0, no3: 0, ph: 7.0 },
-            timeline: [{ date: "Today", text: "Tank created." }],
-            equipment: [], livestock: [], plants: [], decor: []
-          });
-        }
-        saveData();
-        closeTankModal();
-        renderHomeCards();
-        if(isEditingTank) renderTankView();
-      };
-
-      if(fileInput.files && fileInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const img = new Image();
-          img.onload = function() {
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            const maxW = 500;
-            const scale = maxW / img.width;
-            canvas.width = maxW;
-            canvas.height = img.height * scale;
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            processSave(canvas.toDataURL("image/jpeg", 0.7));
-          };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(fileInput.files[0]);
+      if(isEditingTank) {
+        const tank = appData.tanks[activeTankIndex];
+        tank.name = name;
+        tank.grossGal = gal;
+        tank.startDate = startDate;
+        tank.color = color;
+        tank.status = status;
       } else {
-        processSave(isEditingTank ? appData.tanks[activeTankIndex].image : "");
+        appData.tanks.push({
+          id: Date.now(), name, grossGal: gal, startDate, color, status,
+          summary: "Tank initialized.", lastTest: { nh3: 0, no2: 0, no3: 0, ph: 7.0 },
+          timeline: [{ date: "Today", text: "Tank created." }],
+          equipment: [], livestock: [], plants: [], decor: []
+        });
       }
+      saveData();
+      closeTankModal();
+      renderHomeCards();
+      if(isEditingTank) renderTankView();
     }
 
     function saveUnits() {
