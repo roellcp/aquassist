@@ -95,40 +95,30 @@
       overflow: hidden;
     }
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .card-title { font-size: 20px; font-weight: 700; color: #fff; letter-spacing: -0.3px; text-shadow: 0 2px 6px rgba(0,0,0,0.8); }
+    .card-title { font-size: 19px; font-weight: 700; color: #fff; letter-spacing: -0.3px; text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
 
-    /* Taller Full-Bleed Tank Card Banner */
-    .tank-card-hero {
-      padding: 0 !important; cursor: pointer;
-    }
-    .tank-card-hero:active { transform: scale(0.98); transition: transform 0.1s ease; }
+    .tank-card-hero { padding: 0 !important; cursor: pointer; }
+    .tank-card-hero:active { transform: scale(0.98); }
     .tank-banner-wrap {
-      width: 100%; height: 210px; position: relative; background-size: cover; background-position: center;
-      display: flex; flex-direction: column; justify-content: flex-end; padding: 18px;
+      width: 100%; height: 130px; position: relative; background-size: cover; background-position: center;
+      display: flex; flex-direction: column; justify-content: flex-end; padding: 16px;
     }
     .tank-banner-overlay {
       position: absolute; inset: 0; pointer-events: none;
-      background: linear-gradient(180deg, rgba(15,23,42,0.15) 20%, rgba(15,23,42,0.95) 90%);
+      background: linear-gradient(180deg, rgba(15,23,42,0.1) 0%, rgba(15,23,42,0.92) 85%);
     }
     .tank-banner-content { position: relative; z-index: 2; pointer-events: none; }
     .tank-card-body { padding: 14px 18px 18px 18px; }
 
-    /* Executive Briefing Greeting Card */
+    /* Clean Option B Greeting Card */
     .ai-greeting-card {
       background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(0, 245, 160, 0.08));
       border: 1px solid rgba(56, 189, 248, 0.4);
       border-radius: 22px;
-      padding: 22px;
+      padding: 24px;
       margin-bottom: 20px;
       box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6);
     }
-    .hero-metrics-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; padding-top: 14px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1); text-align: center;
-    }
-    .hero-metric-box { background: rgba(0, 0, 0, 0.2); border-radius: 10px; padding: 8px 4px; }
-    .hero-metric-val { font-size: 16px; font-weight: 700; color: var(--cyan); }
-    .hero-metric-lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; }
 
     /* Parameter Pill Chips */
     .param-strip {
@@ -144,7 +134,7 @@
 
     /* Badges */
     .badge { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; }
-    .badge-cycling { background: rgba(245, 158, 11, 0.25); color: var(--alert-yellow); border: 1px solid rgba(245, 158, 11, 0.5); backdrop-filter: blur(4px); }
+    .badge-cycling { background: rgba(245, 158, 11, 0.2); color: var(--alert-yellow); border: 1px solid rgba(245, 158, 11, 0.4); }
 
     /* Sub Tabs */
     .tab-bar {
@@ -263,28 +253,14 @@
 
     <!-- ==================== VIEW 1: HOME ==================== -->
     <div id="view-home" class="view-panel active">
+      <!-- Clean Option B Executive Greeting Banner -->
       <div class="ai-greeting-card">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
-          <div id="dynamic-greeting" style="font-size: 19px; font-weight: 700; color: var(--cyan);">Good day</div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+          <div id="dynamic-greeting" style="font-size: 20px; font-weight: 700; color: var(--cyan);">Good day</div>
           <div class="badge badge-stable" style="font-size: 10px;">🟢 All Systems Nominal</div>
         </div>
-        <div id="global-ai-summary" style="font-size: 13px; line-height: 1.5; color: var(--text-main); margin-bottom: 12px;">
+        <div id="global-ai-summary" style="font-size: 14px; line-height: 1.6; color: var(--text-main);">
           Scanning telemetry across aquatic environments...
-        </div>
-        
-        <div class="hero-metrics-grid">
-          <div class="hero-metric-box">
-            <div class="hero-metric-val" id="metric-total-tanks">2</div>
-            <div class="hero-metric-lbl">Active Tanks</div>
-          </div>
-          <div class="hero-metric-box">
-            <div class="hero-metric-val" id="metric-total-vol">50G</div>
-            <div class="hero-metric-lbl">Total Volume</div>
-          </div>
-          <div class="hero-metric-box">
-            <div class="hero-metric-val" id="metric-tasks-due">0</div>
-            <div class="hero-metric-lbl">Action Items</div>
-          </div>
         </div>
       </div>
 
@@ -456,7 +432,7 @@
           <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Restore</button>
           <input type="file" id="importFile" style="display:none" onchange="importData(event)">
         </div>
-        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v6.0 • $0 Tank Manager</div>
+        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v6.1 • $0 Tank Manager</div>
       </div>
     </div>
 
@@ -546,10 +522,20 @@
       ]
     };
 
+    // PERMANENT STORAGE KEY (Never wipes data on code updates)
     let appData = defaultData;
     try {
-      const stored = localStorage.getItem("aquassist_v22");
-      if (stored) appData = JSON.parse(stored);
+      const stored = localStorage.getItem("aquassist_master_db");
+      if (stored) {
+        appData = JSON.parse(stored);
+      } else {
+        // Migrate legacy data if present
+        const legacy = localStorage.getItem("aquassist_v21") || localStorage.getItem("aquassist_v22");
+        if (legacy) {
+          appData = JSON.parse(legacy);
+          saveData();
+        }
+      }
     } catch(e) {
       appData = defaultData;
     }
@@ -559,7 +545,7 @@
     let editingItemContext = { type: null, index: null };
 
     function saveData() {
-      localStorage.setItem("aquassist_v22", JSON.stringify(appData));
+      localStorage.setItem("aquassist_master_db", JSON.stringify(appData));
     }
 
     function calculateAge(startDateStr) {
@@ -649,19 +635,14 @@
       if (greetingEl) greetingEl.innerText = `${timeGreeting}, Aquarist`;
 
       let totalTanks = appData.tanks.length;
-      let totalVol = appData.tanks.reduce((acc, t) => acc + (parseFloat(t.grossGal) || 0), 0);
-      let actionItems = appData.tanks.filter(t => t.status === "Cycling").length;
       
-      const tTot = document.getElementById("metric-total-tanks");
-      const tVol = document.getElementById("metric-total-vol");
-      const tTask = document.getElementById("metric-tasks-due");
-      if (tTot) tTot.innerText = totalTanks;
-      if (tVol) tVol.innerText = `${totalVol}G`;
-      if (tTask) tTask.innerText = actionItems;
-
       const summaryEl = document.getElementById("global-ai-summary");
       if (summaryEl) {
-        summaryEl.innerHTML = `Monitoring <b>${totalTanks}</b> active systems totaling <b>${totalVol} Gallons</b>. All biological filters are responding correctly.`;
+        let text = `Monitoring <b>${totalTanks}</b> active systems.<br>`;
+        appData.tanks.forEach(tank => {
+          text += `• <b>${tank.name}</b> — ${tank.summary || 'Systems stable.'}<br>`;
+        });
+        summaryEl.innerHTML = text;
       }
 
       appData.tanks.forEach((tank, idx) => {
@@ -691,7 +672,7 @@
               <div style="display: flex; justify-content: space-between; align-items: flex-end;">
                 <div>
                   <h3 class="card-title">${tank.name}</h3>
-                  <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${ageStr} • ${tank.grossGal} Gallons</div>
+                  <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${ageStr}</div>
                 </div>
                 ${badgeHtml}
               </div>
@@ -699,8 +680,6 @@
           </div>
           
           <div class="tank-card-body">
-            <div style="font-size:12px; color:var(--text-main); margin-bottom:8px; line-height: 1.4;">${tank.summary || 'Stable'}</div>
-            
             <div class="param-strip">
               <div class="param-chip">NH₃ <b>${t.nh3}</b></div>
               <div class="param-chip">NO₂ <b>${t.no2}</b></div>
