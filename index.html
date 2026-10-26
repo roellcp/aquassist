@@ -9,8 +9,8 @@
   <style>
     :root {
       --bg-dark: #070D18;
-      --card-bg: #0F172A;
-      --card-border: rgba(56, 189, 248, 0.15);
+      --card-bg: rgba(15, 23, 42, 0.85);
+      --card-border: rgba(56, 189, 248, 0.2);
       --cyan: #38BDF8;
       --neon-green: #00F5A0;
       --alert-yellow: #F59E0B;
@@ -23,28 +23,28 @@
       background-color: var(--bg-dark);
       color: var(--text-main);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      padding-bottom: 90px;
+      padding-bottom: 80px;
       min-height: 100vh;
       overflow-x: hidden;
       overscroll-behavior-x: none;
     }
 
-    /* Modern Glass Header */
+    /* Top Bar */
     header {
       position: sticky; top: 0; z-index: 50;
-      background: rgba(7, 13, 24, 0.85); backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06); padding: 12px 18px;
+      background: rgba(11, 19, 32, 0.85); backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--card-border); padding: 10px 16px;
       display: flex; align-items: center; justify-content: space-between;
     }
     .brand-wrap { display: flex; align-items: center; gap: 10px; cursor: pointer; }
     
     .header-logo-svg {
       width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
-      box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4); background: #080E1A;
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3); background: #080E1A;
     }
 
-    .brand-title { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+    .brand-title { font-size: 21px; font-weight: 700; letter-spacing: -0.5px; }
     .part-aqua { color: var(--cyan); }
     .part-assist { color: #fff; }
     .green-i { position: relative; display: inline-block; }
@@ -56,103 +56,111 @@
     }
     
     .menu-btn {
-      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
-      color: var(--text-main); border-radius: 12px; padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer;
+      background: rgba(255,255,255,0.06); border: 1px solid var(--card-border);
+      color: var(--text-main); border-radius: 10px; padding: 8px 14px; font-size: 14px; font-weight: 600; cursor: pointer;
     }
 
     /* Sidebar Drawer */
     .drawer {
       position: fixed; top: 0; left: -300px; width: 280px; height: 100%;
       background: #0B1320; border-right: 1px solid var(--card-border); z-index: 100;
-      transition: left 0.25s cubic-bezier(0.16, 1, 0.3, 1); padding: 24px 18px; display: flex; flex-direction: column; gap: 10px;
-      box-shadow: 10px 0 40px rgba(0,0,0,0.9); overflow-y: auto;
+      transition: left 0.25s ease; padding: 24px 18px; display: flex; flex-direction: column; gap: 10px;
+      box-shadow: 5px 0 30px rgba(0,0,0,0.85); overflow-y: auto;
     }
     .drawer.open { left: 0; }
-    .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 90; display: none; backdrop-filter: blur(4px); }
+    .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 90; display: none; }
     .drawer-overlay.open { display: block; }
     .nav-item {
-      padding: 12px 14px; border-radius: 12px; background: rgba(255,255,255,0.03);
-      color: var(--text-main); font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 12px; cursor: pointer;
+      padding: 12px 14px; border-radius: 12px; background: rgba(255,255,255,0.04);
+      color: var(--text-main); font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 10px; cursor: pointer;
     }
     .nav-item:active { background: rgba(56, 189, 248, 0.15); color: var(--cyan); }
 
     /* Container */
-    .container { padding: 18px; max-width: 560px; margin: 0 auto; }
+    .container { padding: 16px; max-width: 560px; margin: 0 auto; }
     .view-panel { display: none; }
     .view-panel.active { display: block; }
 
-    /* Modern Elevated Cards */
+    /* Modern Glassmorphism Cards */
     .card {
-      background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(11, 19, 32, 0.95));
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 22px;
-      padding: 20px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 18px;
       margin-bottom: 16px;
-      box-shadow: 0 15px 35px -12px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.7);
       position: relative;
       overflow: hidden;
-      transition: transform 0.2s ease, border-color 0.2s ease;
     }
-    .card:active { transform: scale(0.98); }
-    .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-    .card-title { font-size: 20px; font-weight: 700; color: #fff; letter-spacing: -0.4px; }
-    
-    .tank-thumb { 
-      width: 100%; height: 170px; border-radius: 14px; object-fit: cover; margin-bottom: 14px; 
-      border: 1px solid rgba(255, 255, 255, 0.1); background: #070D18; display: block;
-    }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .card-title { font-size: 19px; font-weight: 700; color: #fff; letter-spacing: -0.3px; text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
 
-    /* True Executive Command Center Hero Card */
-    .command-hero-card {
-      background: linear-gradient(135deg, #0F172A 0%, #07111F 100%);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      border-radius: 26px;
-      padding: 24px;
-      margin-bottom: 22px;
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      position: relative;
+    /* Modern Full-Bleed Tank Card Banner */
+    .tank-card-hero {
+      padding: 0 !important;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .command-hero-card::after {
-      content: ""; position: absolute; top: 0; right: 0; width: 150px; height: 150px;
-      background: radial-gradient(circle, rgba(0,245,160,0.08) 0%, transparent 70%); pointer-events: none;
+    .tank-card-hero:active {
+      transform: scale(0.98);
     }
+    .tank-banner-wrap {
+      width: 100%; height: 160px; position: relative; background-size: cover; background-position: center;
+      display: flex; flex-direction: column; justify-content: flex-end; padding: 16px;
+    }
+    .tank-banner-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(15,23,42,0.1) 0%, rgba(15,23,42,0.92) 85%);
+    }
+    .tank-banner-content { position: relative; z-index: 2; }
+    .tank-card-body { padding: 14px 18px 18px 18px; }
 
-    /* Metric Counters Strip inside Hero */
+    /* Executive Briefing Greeting Card */
+    .ai-greeting-card {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(0, 245, 160, 0.08));
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 22px;
+      padding: 22px;
+      margin-bottom: 20px;
+      box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6);
+    }
     .hero-metrics-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; padding-top: 16px;
-      border-top: 1px solid rgba(255, 255, 255, 0.08); text-align: center;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1); text-align: center;
     }
-    .hero-metric-box { background: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 10px 6px; border: 1px solid rgba(255,255,255,0.05); }
-    .hero-metric-val { font-size: 18px; font-weight: 700; color: var(--cyan); }
-    .hero-metric-lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+    .hero-metric-box { background: rgba(0, 0, 0, 0.2); border-radius: 10px; padding: 8px 4px; }
+    .hero-metric-val { font-size: 16px; font-weight: 700; color: var(--cyan); }
+    .hero-metric-lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; }
 
     /* Parameter Pill Chips */
     .param-strip {
-      display: flex; gap: 6px; margin-top: 14px; padding-top: 12px;
-      border-top: 1px solid rgba(255, 255, 255, 0.06); overflow-x: auto;
+      display: flex; gap: 6px; margin-top: 10px; padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
     }
     .param-chip {
-      background: rgba(8, 14, 26, 0.6);
+      background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 10px; padding: 6px 10px; font-size: 12px; color: var(--text-muted); white-space: nowrap;
+      border-radius: 8px; padding: 5px 8px; font-size: 11px; color: var(--text-muted); flex: 1; text-align: center;
     }
-    .param-chip b { color: var(--text-main); font-weight: 600; }
+    .param-chip b { color: var(--text-main); font-weight: 600; display: block; font-size: 12px; }
 
     /* Badges */
-    .badge { font-size: 11px; font-weight: 600; padding: 5px 12px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; }
-    .badge-stable { background: rgba(0, 245, 160, 0.15); color: var(--neon-green); border: 1px solid rgba(0, 245, 160, 0.35); }
-    .badge-cycling { background: rgba(245, 158, 11, 0.15); color: var(--alert-yellow); border: 1px solid rgba(245, 158, 11, 0.35); }
+    .badge { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; }
+    .badge-stable { background: rgba(0, 245, 160, 0.2); color: var(--neon-green); border: 1px solid rgba(0, 245, 160, 0.4); }
+    .badge-cycling { background: rgba(245, 158, 11, 0.2); color: var(--alert-yellow); border: 1px solid rgba(245, 158, 11, 0.4); }
 
     /* Sub Tabs */
     .tab-bar {
-      display: flex; overflow-x: auto; gap: 4px; margin-bottom: 16px;
-      background: rgba(15, 23, 42, 0.9); padding: 4px; border-radius: 14px; border: 1px solid var(--card-border);
+      display: flex; overflow-x: auto; gap: 4px; margin-bottom: 14px;
+      background: rgba(15, 23, 42, 0.8); padding: 4px; border-radius: 12px; border: 1px solid var(--card-border);
     }
     .tab-btn {
-      flex: 1; padding: 10px 12px; background: transparent; border: none; color: var(--text-muted);
-      font-size: 12px; font-weight: 600; border-radius: 10px; cursor: pointer; white-space: nowrap;
+      flex: 1; padding: 8px 10px; background: transparent; border: none; color: var(--text-muted);
+      font-size: 12px; font-weight: 600; border-radius: 8px; cursor: pointer; white-space: nowrap;
     }
-    .tab-btn.active { background: var(--cyan); color: #070D18; box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3); }
+    .tab-btn.active { background: var(--cyan); color: #070D18; }
 
     /* Color Palette Picker */
     .color-picker-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 6px; }
@@ -160,7 +168,7 @@
       width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 2px solid transparent;
       transition: transform 0.15s ease, border-color 0.15s ease;
     }
-    .color-circle.selected { border-color: #fff; transform: scale(1.15); box-shadow: 0 0 12px rgba(255,255,255,0.6); }
+    .color-circle.selected { border-color: #fff; transform: scale(1.15); box-shadow: 0 0 10px rgba(255,255,255,0.5); }
 
     /* Inputs & Buttons */
     .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
@@ -168,43 +176,231 @@
     label { font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px; font-weight: 500; }
     input, select, textarea {
       width: 100%; background: #080E1A; border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 12px; padding: 12px; color: #fff; font-size: 14px;
+      border-radius: 10px; padding: 10px; color: #fff; font-size: 14px;
     }
-    input:focus, select:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(56,189,248,0.2); }
     .btn {
-      width: 100%; background: var(--cyan); color: #070D18; border: none; border-radius: 14px;
-      padding: 14px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.25);
+      width: 100%; background: var(--cyan); color: #070D18; border: none; border-radius: 12px;
+      padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
     }
-    .btn-secondary { background: rgba(255,255,255,0.06); border: 1px solid var(--card-border); color: #fff; box-shadow: none; }
-    .btn-neon { background: var(--neon-green); color: #070D18; box-shadow: 0 4px 15px rgba(0, 245, 160, 0.25); }
+    .btn-secondary { background: rgba(255,255,255,0.06); border: 1px solid var(--card-border); color: #fff; }
+    .btn-neon { background: var(--neon-green); color: #070D18; }
 
     .ai-feedback {
       background: rgba(0, 245, 160, 0.08); border: 1px solid var(--neon-green);
-      border-radius: 14px; padding: 14px; margin-top: 14px; font-size: 13px; line-height: 1.5;
+      border-radius: 12px; padding: 12px; margin-top: 12px; font-size: 13px; line-height: 1.4;
     }
 
     .pill-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
     .pill {
-      background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px; padding: 8px 14px; font-size: 13px; display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 6px 12px; font-size: 13px; display: flex; align-items: center; gap: 8px;
     }
     .delete-x { color: var(--alert-red); cursor: pointer; font-weight: 700; font-size: 16px; padding: 0 4px; }
     .edit-pencil { color: var(--cyan); cursor: pointer; margin-right: 4px; font-size: 14px; }
 
-    .timeline-item { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 13px; }
-    .timeline-date { font-size: 11px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; }
+    .timeline-item { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 13px; }
+    .timeline-date { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; }
 
     /* Modal */
     .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200;
-      display: none; align-items: center; justify-content: center; padding: 18px; backdrop-filter: blur(6px);
+      position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200;
+      display: none; align-items: center; justify-content: center; padding: 18px;
     }
     .modal-overlay.open { display: flex; }
     .modal-box {
-      background: #0F172A; border: 1px solid var(--cyan); border-radius: 24px;
-      padding: 24px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto;
-      box-shadow: 0 25px 50px rgba(0,0,0,0.9);
+      background: #0F172A; border: 1px solid var(--cyan); border-radius: 20px;
+      padding: 22px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Drawer Overlay -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="toggleMenu(false)"></div>
+
+  <!-- Sidebar Drawer -->
+  <nav class="drawer" id="sidebarDrawer">
+    <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Navigation</div>
+    <div class="nav-item" onclick="showView('home')">🏠 All Tanks</div>
+    <div id="sidebar-tank-list" style="display:flex; flex-direction:column; gap:8px; margin: 4px 0;"></div>
+    <hr style="border:0; border-top:1px solid rgba(255,255,255,0.08); margin: 6px 0;">
+    <div class="nav-item" onclick="showView('closet')">🧴 Global Supply Closet</div>
+    <div class="nav-item" onclick="showView('settings')">⚙️ Settings & Backup</div>
+  </nav>
+
+  <!-- Top Bar -->
+  <header>
+    <div class="brand-wrap" onclick="showView('home')">
+      <!-- Native Inline Vector Logo -->
+      <svg class="header-logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#38BDF8"/>
+            <stop offset="60%" stop-color="#06B6D4"/>
+            <stop offset="100%" stop-color="#0D9488"/>
+          </linearGradient>
+          <linearGradient id="finDorsal" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#7DD3FC" stop-opacity="0.8"/>
+            <stop offset="100%" stop-color="#06B6D4" stop-opacity="0.2"/>
+          </linearGradient>
+          <radialGradient id="neonEyeSparkle" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#FFFFFF"/>
+            <stop offset="40%" stop-color="#00F5A0"/>
+            <stop offset="100%" stop-color="#059669"/>
+          </radialGradient>
+        </defs>
+        <rect width="100" height="100" rx="22" fill="#080E1A" stroke="#38BDF8" stroke-width="2.5"/>
+        <path d="M56 34C54 23 42 19 32 24C36 29 40 33 42 38C46 36 51 34 56 34Z" fill="url(#finDorsal)"/>
+        <path d="M48 64C44 73 33 78 26 76C29 70 33 66 38 63C41 64 45 64 48 64Z" fill="url(#finDorsal)"/>
+        <path d="M82 49C81 44 73 37 60 36C46 35 34 44 26 48C20 42 14 36 12 37C13 43 16 48 18 50C16 52 13 57 12 63C14 64 20 58 26 52C34 56 46 65 60 64C73 63 81 56 82 51C82.5 50.5 82.5 49.5 82 49Z" fill="url(#bodyGrad)"/>
+        <path d="M54 48C50 51 44 53 40 52C42 49 46 47 50 47C51.5 47 53 47.5 54 48Z" fill="#A7F3D0" opacity="0.6"/>
+        <circle cx="78" cy="28" r="2.2" fill="#38BDF8" opacity="0.4"/>
+        <circle cx="86" cy="35" r="1.4" fill="#00F5A0" opacity="0.6"/>
+        <path d="M72 45C72.3 47.8 73.2 48.7 76 49C73.2 49.3 72.3 50.2 72 53C71.7 50.2 70.8 49.3 68 49C70.8 48.7 71.7 47.8 72 45Z" fill="url(#neonEyeSparkle)" filter="drop-shadow(0 0 6px rgba(0, 245, 160, 0.9))"/>
+      </svg>
+      <div class="brand-title">
+        <span class="part-aqua">aqu</span><span class="part-assist">Ass<span class="green-i">&#305;</span>st</span>
+      </div>
+    </div>
+    <button class="menu-btn" onclick="toggleMenu(true)">☰ Menu</button>
+  </header>
+
+  <div class="container">
+
+    <!-- ==================== VIEW 1: HOME ==================== -->
+    <div id="view-home" class="view-panel active">
+      
+      <!-- Executive Briefing Hero Card -->
+      <div class="ai-greeting-card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+          <div id="dynamic-greeting" style="font-size: 19px; font-weight: 700; color: var(--cyan);">Good day</div>
+          <div class="badge badge-stable" style="font-size: 10px;">🟢 All Systems Nominal</div>
+        </div>
+        <div id="global-ai-summary" style="font-size: 13px; line-height: 1.5; color: var(--text-main); margin-bottom: 12px;">
+          Scanning telemetry across aquatic environments...
+        </div>
+        
+        <!-- Quick Metrics Grid -->
+        <div class="hero-metrics-grid">
+          <div class="hero-metric-box">
+            <div class="hero-metric-val" id="metric-total-tanks">2</div>
+            <div class="hero-metric-lbl">Active Tanks</div>
+          </div>
+          <div class="hero-metric-box">
+            <div class="hero-metric-val" id="metric-stable-pct">100%</div>
+            <div class="hero-metric-lbl">Stability Index</div>
+          </div>
+          <div class="hero-metric-box">
+            <div class="hero-metric-val" id="metric-tasks-due">0</div>
+            <div class="hero-metric-lbl">Action Items</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h2 style="font-size:18px; font-weight:700;">My Aquariums</h2>
+        <button class="btn btn-secondary" style="width:auto; padding:6px 12px; font-size:12px;" onclick="openTankModal()">+ Add Tank</button>
+      </div>
+
+      <div id="tank-card-list"></div>
+    </div>
+
+    <!-- ==================== VIEW 2: TANK HUB ==================== -->
+    <div id="view-tank" class="view-panel">
+      
+      <!-- Tank Hero Card -->
+      <div class="card" style="margin-bottom:12px;" id="tank-hero-card">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <h2 id="tank-view-title" class="card-title" style="font-size: 20px; margin-bottom: 4px;">Tank Name</h2>
+            <div id="tank-hero-meta" style="font-size: 12px; color: var(--text-muted);">Age: 0 days • Status: Established</div>
+          </div>
+          <div style="display:flex; gap: 6px;">
+            <button class="btn btn-secondary" style="width:auto; padding: 6px 10px; font-size: 12px;" onclick="copyGeminiDelta()" title="Copy Update for Gemini">📋</button>
+            <button class="btn btn-secondary" style="width:auto; padding: 6px 10px; font-size: 12px;" onclick="openEditTankModal()" title="Edit Tank">✏️</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Current Tank Status Card (AI Style Summary) -->
+      <div class="card" style="margin-bottom:14px; background: linear-gradient(135deg, rgba(0, 245, 160, 0.06), rgba(15, 23, 42, 0.9)); border-color: rgba(0, 245, 160, 0.25);">
+        <div style="font-size: 12px; font-weight: 700; color: var(--neon-green); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">🤖 AI Status Assessment</div>
+        <div id="tank-page-ai-summary" style="font-size: 13px; line-height: 1.4; color: var(--text-main);">
+          Evaluating latest water parameters and maintenance schedule...
+        </div>
+      </div>
+
+      <!-- Sub Tabs -->
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTankTab('overview', this)">Overview</button>
+        <button class="tab-btn" onclick="switchTankTab('water', this)">Water</button>
+        <button class="tab-btn" onclick="switchTankTab('livestock', this)">Livestock</button>
+        <button class="tab-btn" onclick="switchTankTab('plants', this)">Plants</button>
+        <button class="tab-btn" onclick="switchTankTab('equipment', this)">Equipment</button>
+        <button class="tab-btn" onclick="switchTankTab('decor', this)">Decor</button>
+      </div>
+
+      <!-- Tab 1: Overview -->
+      <div id="subtab-overview" class="subtab-content">
+        <div class="card">
+          <h3 style="font-size:15px; margin-bottom:8px;">Ask AI about this Tank</h3>
+          <div class="input-row">
+            <input type="text" id="ai-question" placeholder="e.g. Why is my nitrate high?">
+            <button class="btn" style="width:75px;" onclick="askTankAI()">Ask</button>
+          </div>
+          <div id="ai-response-box" class="ai-feedback" style="display:none;"></div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size:15px; margin-bottom:8px;">Activity Timeline</h3>
+          <div id="timeline-feed"></div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Water -->
+      <div id="subtab-water" class="subtab-content" style="display:none;">
+        <div class="card">
+          <h3 style="font-size:15px; margin-bottom:12px;">Log Water Test</h3>
+          <div style="margin-bottom:10px;">
+            <label>Test Date</label>
+            <input type="date" id="log-date">
+          </div>
+          <div class="input-grid">
+            <div><label>Ammonia (NH₃)</label><input type="number" id="log-nh3" step="0.25" placeholder="0"></div>
+            <div><label>Nitrite (NO₂)</label><input type="number" id="log-no2" step="0.25" placeholder="0"></div>
+            <div><label>Nitrate (NO₃)</label><input type="number" id="log-no3" step="5" placeholder="20"></div>
+            <div><label>pH</label><input type="number" id="log-ph" step="0.1" placeholder="7.2"></div>
+            <div><label>Water Change (%)</label><input type="number" id="log-wc" step="5" placeholder="25"></div>
+            <div><label>Dosed Product</label><input type="text" id="log-dose" placeholder="Prime 2ml"></div>
+          </div>
+          <button class="btn btn-neon" onclick="submitLog()">Save Test & Run Analysis</button>
+          <div id="log-feedback-box" class="ai-feedback" style="display:none;"></div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Livestock -->
+      <div id="subtab-livestock" class="subtab-content" style="display:none;">
+        <div class="card">
+          <h3 style="font-size:15px; margin-bottom:8px;">Livestock Inventory</h3>
+          <div class="input-row">
+            <input type="text" id="new-live-breed" placeholder="Species / Breed">
+            <input type="number" id="new-live-count" placeholder="Qty" style="width:65px;" value="1">
+            <button class="btn" style="width:65px;" onclick="addLivestock()">Add</button>
+          </div>
+          <div id="livestock-list" class="pill-list"></div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Plants -->
+      <div id="subtab-plants" class="subtab-content" style="display:none;">
+        <div class="card">
+          <h3 style="font-size:15px; margin-bottom:8px;">Plants</h3>
+          <div class="input-row">
+            <input type="text" id="new-plant" placeholder="e.g. Anubias Nana">
+            <button class="btn" style="width:70px;" onclick="addItem('plants', 'new-plant')">Add</button>
+          </div>
+          <div id="plants-list" class="pill-list"></div>
+   x 50px rgba(0,0,0,0.9);
     }
   </style>
 </head>
