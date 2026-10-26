@@ -76,10 +76,10 @@
     }
     .nav-item:active { background: rgba(56, 189, 248, 0.15); color: var(--cyan); }
 
-    /* Container */
+    /* Container & View Panels Routing */
     .container { padding: 16px; max-width: 560px; margin: 0 auto; }
-    .view-panel { display: none; }
-    .view-panel.active { display: block; }
+    .view-panel { display: none !important; }
+    .view-panel.active { display: block !important; }
 
     /* Modern Glassmorphism Cards */
     .card {
@@ -223,6 +223,7 @@
   <!-- Top Bar -->
   <header>
     <div class="brand-wrap" onclick="showView('home')">
+      <!-- Native Inline Vector Logo -->
       <svg class="header-logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -296,7 +297,6 @@
     <!-- ==================== VIEW 2: TANK HUB ==================== -->
     <div id="view-tank" class="view-panel">
       
-      <!-- Back to Home Bar -->
       <button class="btn btn-secondary" style="margin-bottom: 12px; padding: 8px; font-size: 13px;" onclick="showView('home')">← Back to All Tanks</button>
 
       <div class="card" style="margin-bottom:12px;" id="tank-hero-card">
@@ -454,7 +454,7 @@
           <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Restore</button>
           <input type="file" id="importFile" style="display:none" onchange="importData(event)">
         </div>
-        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v5.4 • $0 Tank Manager</div>
+        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v5.5 • $0 Tank Manager</div>
       </div>
     </div>
 
@@ -546,7 +546,7 @@
 
     let appData = defaultData;
     try {
-      const stored = localStorage.getItem("aquassist_v18");
+      const stored = localStorage.getItem("aquassist_v19");
       if (stored) appData = JSON.parse(stored);
     } catch(e) {
       appData = defaultData;
@@ -557,7 +557,7 @@
     let editingItemContext = { type: null, index: null };
 
     function saveData() {
-      localStorage.setItem("aquassist_v18", JSON.stringify(appData));
+      localStorage.setItem("aquassist_v19", JSON.stringify(appData));
     }
 
     function calculateAge(startDateStr) {
@@ -588,10 +588,18 @@
       });
     }
 
+    // Forceful View Router
     function showView(viewId) {
-      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      console.log("Switching view to: " + viewId);
+      document.querySelectorAll(".view-panel").forEach(p => {
+        p.classList.remove("active");
+        p.style.display = "none";
+      });
       const target = document.getElementById("view-" + viewId);
-      if (target) target.classList.add("active");
+      if (target) {
+        target.classList.add("active");
+        target.style.display = "block";
+      }
       if (viewId === "home") renderHomeCards();
       if (viewId === "closet") renderCloset();
       if (viewId === "settings") {
@@ -619,6 +627,7 @@
     }
 
     function openTank(idx) {
+      console.log("Opening tank index: " + idx);
       activeTankIndex = idx;
       renderTankView();
       showView("tank");
@@ -677,7 +686,7 @@
         cardDiv.style.borderLeft = `6px solid ${clr}`;
 
         cardDiv.innerHTML = `
-          <div class="tank-banner-wrap" style="${bannerStyle}">
+          <div class="tank-banner-wrap" style="${bannerStyle}" onclick="openTank(${idx})">
             ${bannerOverlay}
             <div class="tank-banner-content" style="width:100%;">
               <div style="display: flex; justify-content: space-between; align-items: flex-end;">
@@ -691,9 +700,9 @@
           </div>
           
           <div class="tank-card-body">
-            <div style="font-size:12px; color:var(--text-main); margin-bottom:8px; line-height: 1.4;"><b>AI Summary:</b> ${tank.summary || 'Stable'}</div>
+            <div style="font-size:12px; color:var(--text-main); margin-bottom:8px; line-height: 1.4;" onclick="openTank(${idx})"><b>AI Summary:</b> ${tank.summary || 'Stable'}</div>
             
-            <div class="param-strip">
+            <div class="param-strip" onclick="openTank(${idx})">
               <div class="param-chip">NH₃ <b>${t.nh3}</b></div>
               <div class="param-chip">NO₂ <b>${t.no2}</b></div>
               <div class="param-chip">NO₃ <b>${t.no3}p</b></div>
@@ -1042,7 +1051,7 @@
     }
 
     // Startup
-    renderHomeCards();
+    showView("home");
   </script>
 </body>
 </html>
