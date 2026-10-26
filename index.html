@@ -107,7 +107,7 @@
       transform: scale(0.98);
     }
     .tank-banner-wrap {
-      width: 100%; height: 160px; position: relative; background-size: cover; background-position: center;
+      width: 100%; height: 140px; position: relative; background-size: cover; background-position: center;
       display: flex; flex-direction: column; justify-content: flex-end; padding: 16px;
     }
     .tank-banner-overlay {
@@ -465,7 +465,7 @@
           <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Restore</button>
           <input type="file" id="importFile" style="display:none" onchange="importData(event)">
         </div>
-        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v5.1 • $0 Tank Manager</div>
+        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v5.2 • $0 Tank Manager</div>
       </div>
     </div>
 
@@ -555,13 +555,20 @@
       ]
     };
 
-    let appData = JSON.parse(localStorage.getItem("aquassist_v15")) || defaultData;
+    let appData = defaultData;
+    try {
+      const stored = localStorage.getItem("aquassist_v16");
+      if (stored) appData = JSON.parse(stored);
+    } catch(e) {
+      appData = defaultData;
+    }
+
     let activeTankIndex = 0;
     let isEditingTank = false;
     let editingItemContext = { type: null, index: null };
 
     function saveData() {
-      localStorage.setItem("aquassist_v15", JSON.stringify(appData));
+      localStorage.setItem("aquassist_v16", JSON.stringify(appData));
     }
 
     function calculateAge(startDateStr) {
@@ -577,6 +584,7 @@
 
     function buildColorCircles(selectedColor) {
       const container = document.getElementById("color-circles-container");
+      if (!container) return;
       container.innerHTML = "";
       availableColors.forEach(hex => {
         const div = document.createElement("div");
@@ -593,7 +601,8 @@
 
     function showView(viewId) {
       document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
-      document.getElementById("view-" + viewId).classList.add("active");
+      const target = document.getElementById("view-" + viewId);
+      if (target) target.classList.add("active");
       if (viewId === "home") renderHomeCards();
       if (viewId === "closet") renderCloset();
       if (viewId === "settings") {
@@ -612,6 +621,7 @@
 
     function renderSidebarTanks() {
       const list = document.getElementById("sidebar-tank-list");
+      if (!list) return;
       list.innerHTML = "";
       appData.tanks.forEach((tank, idx) => {
         const clr = tank.color || "#38BDF8";
@@ -628,6 +638,7 @@
     function renderHomeCards() {
       renderSidebarTanks();
       const container = document.getElementById("tank-card-list");
+      if (!container) return;
       container.innerHTML = "";
 
       // Time of day greeting
@@ -638,7 +649,8 @@
       else if (hour >= 17 && hour < 22) timeGreeting = "Good evening";
       else timeGreeting = "Good night";
 
-      document.getElementById("dynamic-greeting").innerText = `${timeGreeting}, Aquarist`;
+      const greetingEl = document.getElementById("dynamic-greeting");
+      if (greetingEl) greetingEl.innerText = `${timeGreeting}, Aquarist`;
 
       // Metrics
       let totalTanks = appData.tanks.length;
@@ -646,22 +658,42 @@
       let stabilityPct = totalTanks > 0 ? Math.round((establishedTanks / totalTanks) * 100) + "%" : "100%";
       let actionItems = appData.tanks.filter(t => t.status === "Cycling").length;
       
-      document.getElementById("metric-total-tanks").innerText = totalTanks;
-      document.getElementById("metric-stable-pct").innerText = stabilityPct;
-      document.getElementById("metric-tasks-due").innerText = actionItems;
+      const tTot = document.getElementById("metric-total-tanks");
+      const tStab = document.getElementById("metric-stable-pct");
+      const tTask = document.getElementById("metric-tasks-due");
+      if (tTot) tTot.innerText = totalTanks;
+      if (tStab) tStab.innerText = stabilityPct;
+      if (tTask) tTask.innerText = actionItems;
 
-      document.getElementById("global-ai-summary").innerHTML = `Monitoring <b>${totalTanks}</b> active ecosystems. All biological filters are responding correctly to routine maintenance schedules.`;
+      const summaryEl = document.getElementById("global-ai-summary");
+      if (summaryEl) {
+        summaryEl.innerHTML = `Monitoring <b>${totalTanks}</b> active ecosystems. All biological filters are responding correctly to routine maintenance schedules.`;
+      }
 
       appData.tanks.forEach((tank, idx) => {
-        // Hide badge if established, show if cycling
         const badgeHtml = tank.status === "Cycling" ? `<span class="badge badge-cycling">● Cycling</span>` : '';
-        const imgTag = tank.image ? `<div class="tank-banner-wrap" style="background-image: url('${tank.image}');"><div class="tank-banner-overlay"></div><div class="tank-banner-content">` : `<div class="tank-banner-wrap" style="background: linear-gradient(135deg, ${tank.color || '#38BDF8'}22, #0F172A);"><div class="tank-banner-content">`;
+        const clr = tank.color || "#38BDF8";
         const ageStr = calculateAge(tank.startDate);
         const t = tank.lastTest || { nh3: 0, no2: 0, no3: 0, ph: 7.2 };
         
-        container.innerHTML += `
-          <div class="card tank-card-hero" onclick="openTank(${idx})" style="border-left: 6px solid ${tank.color || '#38BDF8'};">
-            ${imgTag}
+        let bannerStyle = '';
+        let bannerOverlay = '';
+        if (tank.image) {
+          bannerStyle = `background-image: url('${tank.image}');`;
+          bannerOverlay = `<div class="tank-banner-overlay"></div>`;
+        } else {
+          bannerStyle = `background: linear-gradient(135deg, ${clr}33, #0F172A);`;
+        }
+
+        const cardDiv = document.createElement("div");
+        cardDiv.className = "card tank-card-hero";
+        cardDiv.style.borderLeft = `6px solid ${clr}`;
+        cardDiv.onclick = () => openTank(idx);
+
+        cardDiv.innerHTML = `
+          <div class="tank-banner-wrap" style="${bannerStyle}">
+            ${bannerOverlay}
+            <div class="tank-banner-content" style="width:100%;">
               <div style="display: flex; justify-content: space-between; align-items: flex-end;">
                 <div>
                   <h3 class="card-title">${tank.name}</h3>
@@ -669,26 +701,27 @@
                 </div>
                 ${badgeHtml}
               </div>
-            </div></div>
+            </div>
+          </div>
+          
+          <div class="tank-card-body">
+            <div style="font-size:12px; color:var(--text-main); margin-bottom:8px; line-height: 1.4;"><b>AI Summary:</b> ${tank.summary || 'Stable'}</div>
             
-            <div class="tank-card-body">
-              <div style="font-size:12px; color:var(--text-main); margin-bottom:8px; line-height: 1.4;"><b>AI Summary:</b> ${tank.summary || 'Stable'}</div>
-              
-              <!-- Parameter Micro-Pills -->
-              <div class="param-strip">
-                <div class="param-chip">NH₃ <b>${t.nh3}</b></div>
-                <div class="param-chip">NO₂ <b>${t.no2}</b></div>
-                <div class="param-chip">NO₃ <b>${t.no3}p</b></div>
-                <div class="param-chip">pH <b>${t.ph}</b></div>
-              </div>
+            <div class="param-strip">
+              <div class="param-chip">NH₃ <b>${t.nh3}</b></div>
+              <div class="param-chip">NO₂ <b>${t.no2}</b></div>
+              <div class="param-chip">NO₃ <b>${t.no3}p</b></div>
+              <div class="param-chip">pH <b>${t.ph}</b></div>
             </div>
           </div>
         `;
+        container.appendChild(cardDiv);
       });
     }
 
     function renderTankView() {
       const tank = appData.tanks[activeTankIndex];
+      if (!tank) return;
       const clr = tank.color || "#38BDF8";
       
       document.getElementById("tank-view-title").innerHTML = `<span style="width:12px;height:12px;border-radius:50%;background:${clr};display:inline-block;margin-right:6px;"></span> ${tank.name}`;
@@ -697,11 +730,14 @@
       document.getElementById("tank-page-ai-summary").innerText = tank.summary || "System parameters nominal. No immediate interventions flagged.";
 
       const badge = document.getElementById("tank-status-toggle");
-      badge.innerText = `● ${tank.status}`;
-      badge.className = `badge ${tank.status === "Established" ? "badge-stable" : "badge-cycling"}`;
+      if (badge) {
+        badge.innerText = `● ${tank.status}`;
+        badge.className = `badge ${tank.status === "Established" ? "badge-stable" : "badge-cycling"}`;
+      }
 
       document.getElementById("tank-summary-box").innerText = tank.summary || "No active warnings.";
-      document.getElementById("log-date").valueAsDate = new Date();
+      const dateInput = document.getElementById("log-date");
+      if (dateInput) dateInput.valueAsDate = new Date();
 
       renderTimeline();
       renderSubLists();
@@ -710,6 +746,7 @@
     function renderTimeline() {
       const tank = appData.tanks[activeTankIndex];
       const feed = document.getElementById("timeline-feed");
+      if (!feed) return;
       feed.innerHTML = "";
       (tank.timeline || []).forEach(item => {
         feed.innerHTML += `
@@ -725,7 +762,8 @@
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
       if(btn) btn.classList.add("active");
       document.querySelectorAll(".subtab-content").forEach(c => c.style.display = "none");
-      document.getElementById("subtab-" + tabName).style.display = "block";
+      const target = document.getElementById("subtab-" + tabName);
+      if (target) target.style.display = "block";
     }
 
     function renderSubLists() {
@@ -793,6 +831,7 @@
 
     function renderCloset() {
       const list = document.getElementById("supply-list");
+      if (!list) return;
       list.innerHTML = "";
       appData.closet.forEach((item, idx) => {
         list.innerHTML += `<div class="pill"><span>${item}</span><span class="delete-x" onclick="deleteSupply(${idx})">×</span></div>`;
@@ -849,8 +888,10 @@
       }
 
       const box = document.getElementById("log-feedback-box");
-      box.style.display = "block";
-      box.innerHTML = feedback;
+      if (box) {
+        box.style.display = "block";
+        box.innerHTML = feedback;
+      }
       renderTankView();
     }
 
@@ -860,13 +901,17 @@
       if(!q) return;
 
       if(!appData.apiKey) {
-        box.style.display = "block";
-        box.innerHTML = `<span style="color:var(--alert-yellow)">Please save your Gemini API Key in Settings first!</span>`;
+        if (box) {
+          box.style.display = "block";
+          box.innerHTML = `<span style="color:var(--alert-yellow)">Please save your Gemini API Key in Settings first!</span>`;
+        }
         return;
       }
 
-      box.style.display = "block";
-      box.innerHTML = "Thinking...";
+      if (box) {
+        box.style.display = "block";
+        box.innerHTML = "Thinking...";
+      }
 
       const tank = appData.tanks[activeTankIndex];
       const prompt = `You are aquAssist, an expert aquarist AI. Tank: ${tank.name} (${tank.grossGal}G, ${tank.status}). Latest Test: NH3:${tank.lastTest.nh3}, NO2:${tank.lastTest.no2}, NO3:${tank.lastTest.no3}, pH:${tank.lastTest.ph}. Closet: ${appData.closet.join(', ')}. Question: ${q}`;
@@ -879,10 +924,137 @@
         });
         const data = await res.json();
         const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
-        box.innerHTML = reply;
+        if (box) box.innerHTML = reply;
       } catch(err) {
-        box.innerHTML = "Error connecting to Gemini API.";
+        if (box) box.innerHTML = "Error connecting to Gemini API.";
       }
     }
 
-    function copyGemini
+    function copyGeminiDelta() {
+      const tank = appData.tanks[activeTankIndex];
+      const text = `Quick Update for ${tank.name} (${tank.status}):
+- Age: ${calculateAge(tank.startDate)}
+- Latest Test: NH3:${tank.lastTest.nh3}, NO2:${tank.lastTest.no2}, NO3:${tank.lastTest.no3}, pH:${tank.lastTest.ph}
+- Summary: ${tank.summary}
+- Available Supplies: ${appData.closet.join(', ')}
+- Question: `;
+      navigator.clipboard.writeText(text).then(() => alert("Copied Delta Update for Gemini Chat!"));
+    }
+
+    function openTankModal() {
+      isEditingTank = false;
+      document.getElementById("modal-tank-title").innerText = "Add New Aquarium";
+      document.getElementById("m-name").value = "";
+      document.getElementById("m-gal").value = "";
+      document.getElementById("m-date").valueAsDate = new Date();
+      document.getElementById("m-color").value = availableColors[0];
+      buildColorCircles(availableColors[0]);
+      document.getElementById("m-status").value = "Established";
+      document.getElementById("m-photo").value = "";
+      document.getElementById("tankModal").classList.add("open");
+    }
+
+    function openEditTankModal() {
+      isEditingTank = true;
+      const tank = appData.tanks[activeTankIndex];
+      document.getElementById("modal-tank-title").innerText = "Edit Aquarium";
+      document.getElementById("m-name").value = tank.name;
+      document.getElementById("m-gal").value = tank.grossGal;
+      document.getElementById("m-date").value = tank.startDate || "2025-01-01";
+      document.getElementById("m-color").value = tank.color || availableColors[0];
+      buildColorCircles(tank.color || availableColors[0]);
+      document.getElementById("m-status").value = tank.status;
+      document.getElementById("m-photo").value = "";
+      document.getElementById("tankModal").classList.add("open");
+    }
+
+    function closeTankModal() { document.getElementById("tankModal").classList.remove("open"); }
+
+    function saveTankModalData() {
+      const name = document.getElementById("m-name").value.trim() || "Aquarium";
+      const gal = parseFloat(document.getElementById("m-gal").value) || 20;
+      const startDate = document.getElementById("m-date").value || "2025-01-01";
+      const color = document.getElementById("m-color").value;
+      const status = document.getElementById("m-status").value;
+      const fileInput = document.getElementById("m-photo");
+
+      const processSave = (imgData) => {
+        if(isEditingTank) {
+          const tank = appData.tanks[activeTankIndex];
+          tank.name = name;
+          tank.grossGal = gal;
+          tank.startDate = startDate;
+          tank.color = color;
+          tank.status = status;
+          if(imgData) tank.image = imgData;
+        } else {
+          appData.tanks.push({
+            id: Date.now(), name, grossGal: gal, startDate, color, status, image: imgData || "",
+            summary: "Tank initialized.", lastTest: { nh3: 0, no2: 0, no3: 0, ph: 7.0 },
+            timeline: [{ date: "Today", text: "Tank created." }],
+            equipment: [], livestock: [], plants: [], decor: []
+          });
+        }
+        saveData();
+        closeTankModal();
+        renderHomeCards();
+        if(isEditingTank) renderTankView();
+      };
+
+      if(fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const maxW = 500;
+            const scale = maxW / img.width;
+            canvas.width = maxW;
+            canvas.height = img.height * scale;
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            processSave(canvas.toDataURL("image/jpeg", 0.7));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        processSave(isEditingTank ? appData.tanks[activeTankIndex].image : "");
+      }
+    }
+
+    function saveUnits() {
+      appData.units = document.getElementById("unit-select").value;
+      saveData();
+      renderHomeCards();
+    }
+
+    function saveApiKey() {
+      appData.apiKey = document.getElementById("gemini-key").value.trim();
+      saveData();
+      alert("API Key Saved!");
+    }
+
+    function exportData() {
+      const blob = new Blob([JSON.stringify(appData, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `aquassist_backup.json`;
+      a.click();
+    }
+
+    function importData(e) {
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        appData = JSON.parse(evt.target.result);
+        saveData();
+        location.reload();
+      };
+      reader.readAsText(e.target.files[0]);
+    }
+
+    // Startup
+    renderHomeCards();
+  </script>
+</body>
+</html>
