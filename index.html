@@ -9,8 +9,8 @@
   <style>
     :root {
       --bg-dark: #070D18;
-      --card-bg: #0F172A;
-      --card-border: rgba(56, 189, 248, 0.2);
+      --card-bg: rgba(15, 23, 42, 0.75);
+      --card-border: rgba(56, 189, 248, 0.18);
       --cyan: #38BDF8;
       --neon-green: #00F5A0;
       --alert-yellow: #F59E0B;
@@ -32,14 +32,15 @@
     /* Top Bar */
     header {
       position: sticky; top: 0; z-index: 50;
-      background: rgba(11, 19, 32, 0.95); backdrop-filter: blur(12px);
+      background: rgba(11, 19, 32, 0.85); backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--card-border); padding: 10px 16px;
       display: flex; align-items: center; justify-content: space-between;
     }
     .brand-wrap { display: flex; align-items: center; gap: 10px; cursor: pointer; }
     
     .header-logo-svg {
-      width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+      width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
       box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3); background: #080E1A;
     }
 
@@ -80,27 +81,52 @@
     .view-panel { display: none; }
     .view-panel.active { display: block; }
 
-    /* Cards */
+    /* Modern Glassmorphism Cards */
     .card {
-      background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px;
-      padding: 16px; margin-bottom: 14px; box-shadow: 0 10px 25px -10px rgba(0, 0, 0, 0.6);
-      position: relative; overflow: hidden;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.7);
+      position: relative;
+      overflow: hidden;
     }
-    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .card-title { font-size: 18px; font-weight: 700; color: #fff; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .card-title { font-size: 19px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
+    
+    .tank-thumb { 
+      width: 100%; height: 160px; border-radius: 12px; object-fit: cover; margin-bottom: 12px; 
+      border: 1px solid rgba(56, 189, 248, 0.25); background: #070D18; display: block;
+    }
 
-    /* Upgraded AI Greeting & Summary Banner */
+    /* Executive Briefing Greeting Card */
     .ai-greeting-card {
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.14), rgba(0, 245, 160, 0.07));
-      border: 1px solid rgba(56, 189, 248, 0.4);
-      border-radius: 24px;
-      padding: 22px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(0, 245, 160, 0.05));
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 22px;
+      padding: 20px;
       margin-bottom: 20px;
-      box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
     }
+
+    /* Parameter Pill Chips */
+    .param-strip {
+      display: flex; gap: 8px; margin-top: 12px; padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .param-chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px; padding: 4px 8px; font-size: 11px; color: var(--text-muted);
+    }
+    .param-chip b { color: var(--text-main); font-weight: 600; }
 
     /* Badges */
     .badge { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; }
+    .badge-stable { background: rgba(0, 245, 160, 0.15); color: var(--neon-green); border: 1px solid rgba(0, 245, 160, 0.35); }
     .badge-cycling { background: rgba(245, 158, 11, 0.15); color: var(--alert-yellow); border: 1px solid rgba(245, 158, 11, 0.35); }
 
     /* Sub Tabs */
@@ -222,11 +248,11 @@
     <!-- ==================== VIEW 1: HOME ==================== -->
     <div id="view-home" class="view-panel active">
       
-      <!-- AI Greeting & Global Status Summary -->
+      <!-- Executive Briefing Greeting Card -->
       <div class="ai-greeting-card">
-        <div id="dynamic-greeting" style="font-size: 19px; font-weight: 700; color: var(--cyan); margin-bottom: 8px;">Good day</div>
-        <div id="global-ai-summary" style="font-size: 13px; line-height: 1.6; color: var(--text-main);">
-          Analyzing tank telemetry across your aquariums...
+        <div id="dynamic-greeting" style="font-size: 18px; font-weight: 700; color: var(--cyan); margin-bottom: 6px;">Good day</div>
+        <div id="global-ai-summary" style="font-size: 13px; line-height: 1.5; color: var(--text-main);">
+          Scanning fish room telemetry...
         </div>
       </div>
 
@@ -255,10 +281,10 @@
         </div>
       </div>
 
-      <!-- Current Tank Status Card (AI Style Detailed Summary) -->
+      <!-- Current Tank Status Card (AI Style Summary) -->
       <div class="card" style="margin-bottom:14px; background: linear-gradient(135deg, rgba(0, 245, 160, 0.06), rgba(15, 23, 42, 0.9)); border-color: rgba(0, 245, 160, 0.25);">
         <div style="font-size: 12px; font-weight: 700; color: var(--neon-green); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">🤖 AI Status Assessment</div>
-        <div id="tank-page-ai-summary" style="font-size: 13px; line-height: 1.5; color: var(--text-main);">
+        <div id="tank-page-ai-summary" style="font-size: 13px; line-height: 1.4; color: var(--text-main);">
           Evaluating latest water parameters and maintenance schedule...
         </div>
       </div>
@@ -399,13 +425,13 @@
           <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Restore</button>
           <input type="file" id="importFile" style="display:none" onchange="importData(event)">
         </div>
-        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v3.6 • $0 Tank Manager</div>
+        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v4.0 • $0 Tank Manager</div>
       </div>
     </div>
 
   </div>
 
-  <!-- Tank Add/Edit Modal (Hero Image Dropped) -->
+  <!-- Tank Add/Edit Modal -->
   <div class="modal-overlay" id="tankModal">
     <div class="modal-box">
       <h3 id="modal-tank-title" style="margin-bottom:12px;">Add New Aquarium</h3>
@@ -415,11 +441,11 @@
       </div>
       <div class="input-grid" style="margin-bottom:10px;">
         <div>
-          <label>Volume (Gallons)</label>
+          <label>Volume</label>
           <input type="number" id="m-gal" placeholder="20">
         </div>
         <div>
-          <label>Start Date</label>
+          <label>Start Date (Cycling)</label>
           <input type="date" id="m-date">
         </div>
       </div>
@@ -428,12 +454,16 @@
         <input type="hidden" id="m-color" value="#38BDF8">
         <div class="color-picker-grid" id="color-circles-container"></div>
       </div>
-      <div style="margin-bottom:16px;">
+      <div style="margin-bottom:10px;">
         <label>Lifecycle Mode</label>
         <select id="m-status">
           <option value="Established">Established</option>
           <option value="Cycling">Cycling</option>
         </select>
+      </div>
+      <div style="margin-bottom:16px;">
+        <label>Tank Photo (Optional)</label>
+        <input type="file" id="m-photo" accept="image/*">
       </div>
       <div style="display:flex; gap:10px;">
         <button class="btn btn-secondary" onclick="closeTankModal()">Cancel</button>
@@ -469,15 +499,15 @@
       closet: ["Seachem Prime", "API Freshwater Master Test Kit", "Easy Green"],
       tanks: [
         {
-          id: 1, name: "Community", grossGal: 40, status: "Established", color: "#00F5A0", startDate: "2025-01-15",
-          summary: "All systems stable. Next water change in 3 days.",
+          id: 1, name: "40G Community", grossGal: 40, status: "Established", color: "#00F5A0", startDate: "2025-01-15",
+          image: "", summary: "All systems stable. Next water change in 3 days.",
           lastTest: { nh3: 0, no2: 0, no3: 15, ph: 7.2 },
           timeline: [{ date: "3 days ago", text: "Logged test: NO3 15ppm, pH 7.2" }],
           equipment: ["Fluval 407", "150W Heater"], livestock: ["12x Neon Tetra"], plants: ["Amazon Sword"], decor: ["Spider Wood"]
         },
         {
-          id: 2, name: "Betta", grossGal: 10, status: "Cycling", color: "#38BDF8", startDate: "2026-03-20",
-          summary: "In cycling stage phase 4. Expect nitrite to drop over the next few days. Test water again in 3 days.",
+          id: 2, name: "10G Betta", grossGal: 10, status: "Cycling", color: "#38BDF8", startDate: "2026-03-20",
+          image: "", summary: "In cycling stage phase 4. Expect nitrite to drop over the next few days. Test water again in 3 days.",
           lastTest: { nh3: 0, no2: 1.5, no3: 10, ph: 7.0 },
           timeline: [{ date: "Yesterday", text: "Logged test: NO2 1.5ppm" }],
           equipment: ["Sponge Filter", "50W Heater"], livestock: [], plants: ["Anubias"], decor: ["Slate Rock"]
@@ -545,7 +575,7 @@
       list.innerHTML = "";
       appData.tanks.forEach((tank, idx) => {
         const clr = tank.color || "#38BDF8";
-        list.innerHTML += `<div class="nav-item" onclick="openTank(${idx})"><span style="width:10px;height:10px;border-radius:50%;background:${clr};display:inline-block;"></span> ${tank.grossGal}G ${tank.name}</div>`;
+        list.innerHTML += `<div class="nav-item" onclick="openTank(${idx})"><span style="width:10px;height:10px;border-radius:50%;background:${clr};display:inline-block;"></span> ${tank.name}</div>`;
       });
     }
 
@@ -570,32 +600,37 @@
 
       document.getElementById("dynamic-greeting").innerText = `${timeGreeting}!`;
 
-      // Smart Aggregate Summary matching exact user format
+      // Executive Briefing Summary
       let totalTanks = appData.tanks.length;
-      let summaryText = `Monitoring ${totalTanks} active systems.<br><br>`;
-      
-      appData.tanks.forEach(tank => {
-        summaryText += `• <b>${tank.grossGal}G ${tank.name}</b> — ${tank.summary || 'Systems stable.'}<br>`;
-      });
-
-      document.getElementById("global-ai-summary").innerHTML = summaryText;
+      let summaryHtml = `Monitoring <b>${totalTanks}</b> active systems. `;
+      document.getElementById("global-ai-summary").innerHTML = summaryHtml;
 
       appData.tanks.forEach((tank, idx) => {
-        // Only show badge if cycling; hide if Established
-        const badgeHtml = tank.status === "Cycling" ? `<span class="badge badge-cycling">● Cycling</span>` : '';
+        const badge = tank.status === "Established" ? "badge-stable" : "badge-cycling";
+        const imgTag = tank.image ? `<img src="${tank.image}" class="tank-thumb">` : '';
         const clr = tank.color || "#38BDF8";
         const ageStr = calculateAge(tank.startDate);
+        const t = tank.lastTest || { nh3: 0, no2: 0, no3: 0, ph: 7.2 };
         
         container.innerHTML += `
           <div class="card" onclick="openTank(${idx})" style="cursor:pointer; border-left: 5px solid ${clr};">
+            ${imgTag}
             <div class="card-header">
               <div>
-                <h3 class="card-title">${tank.grossGal}G ${tank.name}</h3>
+                <h3 class="card-title">${tank.name}</h3>
                 <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Age: ${ageStr}</div>
               </div>
-              ${badgeHtml}
+              <span class="badge ${badge}">● ${tank.status}</span>
             </div>
-            <div style="font-size:12px; color:var(--cyan); margin-top:6px;">${tank.summary || 'Stable'}</div>
+            <div style="font-size:12px; color:var(--text-main); margin-top:4px; line-height: 1.4;">${tank.summary || 'Stable'}</div>
+            
+            <!-- Parameter Micro-Pills -->
+            <div class="param-strip">
+              <div class="param-chip">NH₃: <b>${t.nh3}</b></div>
+              <div class="param-chip">NO₂: <b>${t.no2}</b></div>
+              <div class="param-chip">NO₃: <b>${t.no3}ppm</b></div>
+              <div class="param-chip">pH: <b>${t.ph}</b></div>
+            </div>
           </div>
         `;
       });
@@ -605,11 +640,16 @@
       const tank = appData.tanks[activeTankIndex];
       const clr = tank.color || "#38BDF8";
       
-      document.getElementById("tank-view-title").innerHTML = `<span style="width:12px;height:12px;border-radius:50%;background:${clr};display:inline-block;margin-right:6px;"></span> ${tank.grossGal}G ${tank.name}`;
+      document.getElementById("tank-view-title").innerHTML = `<span style="width:12px;height:12px;border-radius:50%;background:${clr};display:inline-block;margin-right:6px;"></span> ${tank.name}`;
       const ageStr = calculateAge(tank.startDate);
-      document.getElementById("tank-hero-meta").innerText = `Age: ${ageStr} • Status: ${tank.status}`;
+      document.getElementById("tank-hero-meta").innerText = `Age: ${ageStr} • Status: ${tank.status} • Volume: ${tank.grossGal}G`;
       document.getElementById("tank-page-ai-summary").innerText = tank.summary || "System parameters nominal. No immediate interventions flagged.";
 
+      const badge = document.getElementById("tank-status-toggle");
+      badge.innerText = `● ${tank.status}`;
+      badge.className = `badge ${tank.status === "Established" ? "badge-stable" : "badge-cycling"}`;
+
+      document.getElementById("tank-summary-box").innerText = tank.summary || "No active warnings.";
       document.getElementById("log-date").valueAsDate = new Date();
 
       renderTimeline();
@@ -727,7 +767,6 @@
       const tank = appData.tanks[activeTankIndex];
       tank.status = tank.status === "Established" ? "Cycling" : "Established";
       saveData();
-      renderHomeCards();
       renderTankView();
     }
 
@@ -761,7 +800,6 @@
       const box = document.getElementById("log-feedback-box");
       box.style.display = "block";
       box.innerHTML = feedback;
-      renderHomeCards();
       renderTankView();
     }
 
@@ -798,7 +836,7 @@
 
     function copyGeminiDelta() {
       const tank = appData.tanks[activeTankIndex];
-      const text = `Quick Update for ${tank.grossGal}G ${tank.name} (${tank.status}):
+      const text = `Quick Update for ${tank.name} (${tank.status}):
 - Age: ${calculateAge(tank.startDate)}
 - Latest Test: NH3:${tank.lastTest.nh3}, NO2:${tank.lastTest.no2}, NO3:${tank.lastTest.no3}, pH:${tank.lastTest.ph}
 - Summary: ${tank.summary}
@@ -816,6 +854,7 @@
       document.getElementById("m-color").value = availableColors[0];
       buildColorCircles(availableColors[0]);
       document.getElementById("m-status").value = "Established";
+      document.getElementById("m-photo").value = "";
       document.getElementById("tankModal").classList.add("open");
     }
 
@@ -829,6 +868,7 @@
       document.getElementById("m-color").value = tank.color || availableColors[0];
       buildColorCircles(tank.color || availableColors[0]);
       document.getElementById("m-status").value = tank.status;
+      document.getElementById("m-photo").value = "";
       document.getElementById("tankModal").classList.add("open");
     }
 
@@ -840,26 +880,51 @@
       const startDate = document.getElementById("m-date").value || "2025-01-01";
       const color = document.getElementById("m-color").value;
       const status = document.getElementById("m-status").value;
+      const fileInput = document.getElementById("m-photo");
 
-      if(isEditingTank) {
-        const tank = appData.tanks[activeTankIndex];
-        tank.name = name;
-        tank.grossGal = gal;
-        tank.startDate = startDate;
-        tank.color = color;
-        tank.status = status;
+      const processSave = (imgData) => {
+        if(isEditingTank) {
+          const tank = appData.tanks[activeTankIndex];
+          tank.name = name;
+          tank.grossGal = gal;
+          tank.startDate = startDate;
+          tank.color = color;
+          tank.status = status;
+          if(imgData) tank.image = imgData;
+        } else {
+          appData.tanks.push({
+            id: Date.now(), name, grossGal: gal, startDate, color, status, image: imgData || "",
+            summary: "Tank initialized.", lastTest: { nh3: 0, no2: 0, no3: 0, ph: 7.0 },
+            timeline: [{ date: "Today", text: "Tank created." }],
+            equipment: [], livestock: [], plants: [], decor: []
+          });
+        }
+        saveData();
+        closeTankModal();
+        renderHomeCards();
+        if(isEditingTank) renderTankView();
+      };
+
+      if(fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const maxW = 500;
+            const scale = maxW / img.width;
+            canvas.width = maxW;
+            canvas.height = img.height * scale;
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            processSave(canvas.toDataURL("image/jpeg", 0.7));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(fileInput.files[0]);
       } else {
-        appData.tanks.push({
-          id: Date.now(), name, grossGal: gal, startDate, color, status,
-          summary: "Tank initialized.", lastTest: { nh3: 0, no2: 0, no3: 0, ph: 7.0 },
-          timeline: [{ date: "Today", text: "Tank created." }],
-          equipment: [], livestock: [], plants: [], decor: []
-        });
+        processSave(isEditingTank ? appData.tanks[activeTankIndex].image : "");
       }
-      saveData();
-      closeTankModal();
-      renderHomeCards();
-      if(isEditingTank) renderTankView();
     }
 
     function saveUnits() {
