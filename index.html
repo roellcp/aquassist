@@ -96,12 +96,12 @@
 
     /* Upgraded Larger AI Greeting & Summary Banner */
     .ai-greeting-card {
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(0, 245, 160, 0.06));
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      border-radius: 20px;
-      padding: 20px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.14), rgba(0, 245, 160, 0.07));
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 24px;
+      padding: 24px 22px;
       margin-bottom: 20px;
-      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6);
     }
 
     /* Badges */
@@ -230,8 +230,8 @@
       
       <!-- Upgraded Up-Sized AI Greeting & Summary Banner -->
       <div class="ai-greeting-card">
-        <div id="dynamic-greeting" style="font-size: 17px; font-weight: 700; color: var(--cyan); margin-bottom: 6px;">Good day</div>
-        <div id="global-ai-summary" style="font-size: 13px; line-height: 1.5; color: var(--text-main);">
+        <div id="dynamic-greeting" style="font-size: 20px; font-weight: 700; color: var(--cyan); margin-bottom: 8px;">Good day</div>
+        <div id="global-ai-summary" style="font-size: 14px; line-height: 1.6; color: var(--text-main);">
           Analyzing tank telemetry across your aquariums...
         </div>
       </div>
@@ -405,7 +405,7 @@
           <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Restore</button>
           <input type="file" id="importFile" style="display:none" onchange="importData(event)">
         </div>
-        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v3.3 • $0 Tank Manager</div>
+        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v3.4 • $0 Tank Manager</div>
       </div>
     </div>
 
@@ -495,13 +495,13 @@
       ]
     };
 
-    let appData = JSON.parse(localStorage.getItem("aquassist_v10")) || defaultData;
+    let appData = JSON.parse(localStorage.getItem("aquassist_v11")) || defaultData;
     let activeTankIndex = 0;
     let isEditingTank = false;
     let editingItemContext = { type: null, index: null };
 
     function saveData() {
-      localStorage.setItem("aquassist_v10", JSON.stringify(appData));
+      localStorage.setItem("aquassist_v11", JSON.stringify(appData));
     }
 
     function calculateAge(startDateStr) {
@@ -570,12 +570,13 @@
       const container = document.getElementById("tank-card-list");
       container.innerHTML = "";
 
-      // Dynamic Time of Day Greeting Calculation
+      // Precise Time of Day Greeting
       const hour = new Date().getHours();
       let timeGreeting = "Good day";
-      if (hour < 12) timeGreeting = "Good morning";
-      else if (hour < 18) timeGreeting = "Good afternoon";
-      else timeGreeting = "Good evening";
+      if (hour >= 4 && hour < 12) timeGreeting = "Good morning";
+      else if (hour >= 12 && hour < 17) timeGreeting = "Good afternoon";
+      else if (hour >= 17 && hour < 22) timeGreeting = "Good evening";
+      else timeGreeting = "Good night";
 
       document.getElementById("dynamic-greeting").innerText = timeGreeting;
 
@@ -584,9 +585,9 @@
       let establishedTanks = appData.tanks.filter(t => t.status === "Established").length;
       let cyclingTanks = appData.tanks.filter(t => t.status === "Cycling").length;
       
-      let summaryHtml = `Managing <b>${totalTanks}</b> active aquarium system(s) (${establishedTanks} established, ${cyclingTanks} in cycle phase). `;
+      let summaryHtml = `Monitoring <b>${totalTanks}</b> active aquarium system(s) (${establishedTanks} established, ${cyclingTanks} in cycle phase). `;
       if (cyclingTanks > 0) {
-        summaryHtml += `Active monitoring recommended for cycling tanks tracking nitrogen progression. `;
+        summaryHtml += `Active telemetry tracking nitrogen cycle progression for cycling systems. `;
       } else {
         summaryHtml += `All established biotopes are operating smoothly within target parameters. `;
       }
@@ -636,4 +637,307 @@
 
     function renderTimeline() {
       const tank = appData.tanks[activeTankIndex];
-      co
+      const feed = document.getElementById("timeline-feed");
+      feed.innerHTML = "";
+      (tank.timeline || []).forEach(item => {
+        feed.innerHTML += `
+          <div class="timeline-item">
+            <div class="timeline-date">${item.date}</div>
+            <div>${item.text}</div>
+          </div>
+        `;
+      });
+    }
+
+    function switchTankTab(tabName, btn) {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      if(btn) btn.classList.add("active");
+      document.querySelectorAll(".subtab-content").forEach(c => c.style.display = "none");
+      document.getElementById("subtab-" + tabName).style.display = "block";
+    }
+
+    function renderSubLists() {
+      const tank = appData.tanks[activeTankIndex];
+      ["livestock", "plants", "equipment", "decor"].forEach(type => {
+        const list = document.getElementById(type + "-list");
+        if(!list) return;
+        list.innerHTML = "";
+        (tank[type] || []).forEach((item, idx) => {
+          list.innerHTML += `
+            <div class="pill">
+              <span class="edit-pencil" onclick="openEditItemModal('${type}', ${idx})">✏️</span>
+              <span>${item}</span>
+              <span class="delete-x" onclick="deleteItem('${type}', ${idx})">×</span>
+            </div>`;
+        });
+      });
+    }
+
+    function openEditItemModal(type, idx) {
+      editingItemContext = { type, idx };
+      const tank = appData.tanks[activeTankIndex];
+      document.getElementById("edit-item-input").value = tank[type][idx];
+      document.getElementById("editItemModal").classList.add("open");
+    }
+
+    function saveEditedItem() {
+      const newVal = document.getElementById("edit-item-input").value.trim();
+      if (!newVal) return;
+      const { type, idx } = editingItemContext;
+      appData.tanks[activeTankIndex][type][idx] = newVal;
+      saveData();
+      document.getElementById("editItemModal").classList.remove("open");
+      renderSubLists();
+    }
+
+    function addLivestock() {
+      const breed = document.getElementById("new-live-breed").value.trim();
+      const count = document.getElementById("new-live-count").value || "1";
+      if(!breed) return;
+      const entry = `${count}x ${breed}`;
+      if(!appData.tanks[activeTankIndex].livestock) appData.tanks[activeTankIndex].livestock = [];
+      appData.tanks[activeTankIndex].livestock.push(entry);
+      document.getElementById("new-live-breed").value = "";
+      document.getElementById("new-live-count").value = "1";
+      saveData();
+      renderSubLists();
+    }
+
+    function addItem(type, inputId) {
+      const input = document.getElementById(inputId);
+      if(!input || !input.value.trim()) return;
+      if(!appData.tanks[activeTankIndex][type]) appData.tanks[activeTankIndex][type] = [];
+      appData.tanks[activeTankIndex][type].push(input.value.trim());
+      input.value = "";
+      saveData();
+      renderSubLists();
+    }
+
+    function deleteItem(type, idx) {
+      appData.tanks[activeTankIndex][type].splice(idx, 1);
+      saveData();
+      renderSubLists();
+    }
+
+    function renderCloset() {
+      const list = document.getElementById("supply-list");
+      list.innerHTML = "";
+      appData.closet.forEach((item, idx) => {
+        list.innerHTML += `<div class="pill"><span>${item}</span><span class="delete-x" onclick="deleteSupply(${idx})">×</span></div>`;
+      });
+    }
+
+    function addSupply() {
+      const input = document.getElementById("new-supply");
+      if(!input || !input.value.trim()) return;
+      appData.closet.push(input.value.trim());
+      input.value = "";
+      saveData();
+      renderCloset();
+    }
+
+    function deleteSupply(idx) {
+      appData.closet.splice(idx, 1);
+      saveData();
+      renderCloset();
+    }
+
+    function toggleTankLifecycle() {
+      const tank = appData.tanks[activeTankIndex];
+      tank.status = tank.status === "Established" ? "Cycling" : "Established";
+      saveData();
+      renderTankView();
+    }
+
+    function submitLog() {
+      const date = document.getElementById("log-date").value || "Today";
+      const nh3 = parseFloat(document.getElementById("log-nh3").value) || 0;
+      const no2 = parseFloat(document.getElementById("log-no2").value) || 0;
+      const no3 = parseFloat(document.getElementById("log-no3").value) || 0;
+      const ph = parseFloat(document.getElementById("log-ph").value) || 7.2;
+      const wc = parseFloat(document.getElementById("log-wc").value) || 0;
+      const dose = document.getElementById("log-dose").value.trim();
+
+      const tank = appData.tanks[activeTankIndex];
+      tank.lastTest = { nh3, no2, no3, ph };
+      
+      let summaryText = `[${date}] NH3:${nh3}, NO2:${no2}, NO3:${no3}, pH:${ph}`;
+      if(wc > 0) summaryText += ` | ${wc}% Water Change`;
+      if(dose) summaryText += ` | Dosed: ${dose}`;
+
+      tank.summary = summaryText;
+      tank.timeline.unshift({ date: date, text: summaryText });
+      saveData();
+
+      let feedback = `<b>✓ Log Saved & Analyzed.</b>`;
+      if(tank.status === "Established" && (nh3 > 0 || no2 > 0)) {
+        feedback += `<br><span style="color:var(--alert-red)">⚠️ Alert:</span> Ammonia/Nitrite present! Dose Seachem Prime.`;
+      } else {
+        feedback += `<br><span style="color:var(--neon-green)">● Stable:</span> Parameters look good.`;
+      }
+
+      const box = document.getElementById("log-feedback-box");
+      box.style.display = "block";
+      box.innerHTML = feedback;
+      renderTankView();
+    }
+
+    async function askTankAI() {
+      const q = document.getElementById("ai-question").value.trim();
+      const box = document.getElementById("ai-response-box");
+      if(!q) return;
+
+      if(!appData.apiKey) {
+        box.style.display = "block";
+        box.innerHTML = `<span style="color:var(--alert-yellow)">Please save your Gemini API Key in Settings first!</span>`;
+        return;
+      }
+
+      box.style.display = "block";
+      box.innerHTML = "Thinking...";
+
+      const tank = appData.tanks[activeTankIndex];
+      const prompt = `You are aquAssist, an expert aquarist AI. Tank: ${tank.name} (${tank.grossGal}G, ${tank.status}). Latest Test: NH3:${tank.lastTest.nh3}, NO2:${tank.lastTest.no2}, NO3:${tank.lastTest.no3}, pH:${tank.lastTest.ph}. Closet: ${appData.closet.join(', ')}. Question: ${q}`;
+
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${appData.apiKey}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        });
+        const data = await res.json();
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
+        box.innerHTML = reply;
+      } catch(err) {
+        box.innerHTML = "Error connecting to Gemini API.";
+      }
+    }
+
+    function copyGeminiDelta() {
+      const tank = appData.tanks[activeTankIndex];
+      const text = `Quick Update for ${tank.name} (${tank.status}):
+- Age: ${calculateAge(tank.startDate)}
+- Latest Test: NH3:${tank.lastTest.nh3}, NO2:${tank.lastTest.no2}, NO3:${tank.lastTest.no3}, pH:${tank.lastTest.ph}
+- Summary: ${tank.summary}
+- Available Supplies: ${appData.closet.join(', ')}
+- Question: `;
+      navigator.clipboard.writeText(text).then(() => alert("Copied Delta Update for Gemini Chat!"));
+    }
+
+    function openTankModal() {
+      isEditingTank = false;
+      document.getElementById("modal-tank-title").innerText = "Add New Aquarium";
+      document.getElementById("m-name").value = "";
+      document.getElementById("m-gal").value = "";
+      document.getElementById("m-date").valueAsDate = new Date();
+      document.getElementById("m-color").value = availableColors[0];
+      buildColorCircles(availableColors[0]);
+      document.getElementById("m-status").value = "Established";
+      document.getElementById("m-photo").value = "";
+      document.getElementById("tankModal").classList.add("open");
+    }
+
+    function openEditTankModal() {
+      isEditingTank = true;
+      const tank = appData.tanks[activeTankIndex];
+      document.getElementById("modal-tank-title").innerText = "Edit Aquarium";
+      document.getElementById("m-name").value = tank.name;
+      document.getElementById("m-gal").value = tank.grossGal;
+      document.getElementById("m-date").value = tank.startDate || "2025-01-01";
+      document.getElementById("m-color").value = tank.color || availableColors[0];
+      buildColorCircles(tank.color || availableColors[0]);
+      document.getElementById("m-status").value = tank.status;
+      document.getElementById("m-photo").value = "";
+      document.getElementById("tankModal").classList.add("open");
+    }
+
+    function closeTankModal() { document.getElementById("tankModal").classList.remove("open"); }
+
+    function saveTankModalData() {
+      const name = document.getElementById("m-name").value.trim() || "Aquarium";
+      const gal = parseFloat(document.getElementById("m-gal").value) || 20;
+      const startDate = document.getElementById("m-date").value || "2025-01-01";
+      const color = document.getElementById("m-color").value;
+      const status = document.getElementById("m-status").value;
+      const fileInput = document.getElementById("m-photo");
+
+      const processSave = (imgData) => {
+        if(isEditingTank) {
+          const tank = appData.tanks[activeTankIndex];
+          tank.name = name;
+          tank.grossGal = gal;
+          tank.startDate = startDate;
+          tank.color = color;
+          tank.status = status;
+          if(imgData) tank.image = imgData;
+        } else {
+          appData.tanks.push({
+            id: Date.now(), name, grossGal: gal, startDate, color, status, image: imgData || "",
+            summary: "Tank initialized.", lastTest: { nh3: 0, no2: 0, no3: 0, ph: 7.0 },
+            timeline: [{ date: "Today", text: "Tank created." }],
+            equipment: [], livestock: [], plants: [], decor: []
+          });
+        }
+        saveData();
+        closeTankModal();
+        renderHomeCards();
+        if(isEditingTank) renderTankView();
+      };
+
+      if(fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const maxW = 500;
+            const scale = maxW / img.width;
+            canvas.width = maxW;
+            canvas.height = img.height * scale;
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            processSave(canvas.toDataURL("image/jpeg", 0.7));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        processSave(isEditingTank ? appData.tanks[activeTankIndex].image : "");
+      }
+    }
+
+    function saveUnits() {
+      appData.units = document.getElementById("unit-select").value;
+      saveData();
+      renderHomeCards();
+    }
+
+    function saveApiKey() {
+      appData.apiKey = document.getElementById("gemini-key").value.trim();
+      saveData();
+      alert("API Key Saved!");
+    }
+
+    function exportData() {
+      const blob = new Blob([JSON.stringify(appData, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `aquassist_backup.json`;
+      a.click();
+    }
+
+    function importData(e) {
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        appData = JSON.parse(evt.target.result);
+        saveData();
+        location.reload();
+      };
+      reader.readAsText(e.target.files[0]);
+    }
+
+    // Startup
+    renderHomeCards();
+  </script>
+</body>
+</html>
