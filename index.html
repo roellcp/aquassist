@@ -358,6 +358,54 @@
       padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 13px;
     }
     .timeline-entry-date { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; }
+
+    /* Dashboard Tasks Checklist */
+    .task-item-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 10px 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px; margin-bottom: 8px; transition: background 0.15s ease;
+    }
+    .task-item-row.overdue {
+      border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.05);
+    }
+    .task-info-title { font-size: 13px; font-weight: 700; color: #fff; }
+    .task-info-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* Cycling Stepper Widget */
+    .cycling-stepper-box {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 12px 0;
+    }
+    .cycling-step-card {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 10px 8px; text-align: center; position: relative;
+    }
+    .cycling-step-card.active {
+      border-color: var(--alert-yellow); background: rgba(245, 158, 11, 0.12);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+    }
+    .cycling-step-card.completed {
+      border-color: var(--neon-green); background: rgba(0, 245, 160, 0.1);
+    }
+    .cycling-step-num {
+      width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 6px; font-size: 11px; font-weight: 700; background: rgba(255,255,255,0.1); color: var(--text-muted);
+    }
+    .cycling-step-card.active .cycling-step-num {
+      background: var(--alert-yellow); color: #070D18;
+    }
+    .cycling-step-card.completed .cycling-step-num {
+      background: var(--neon-green); color: #070D18;
+    }
+    .cycling-step-name { font-size: 11px; font-weight: 700; color: #fff; line-height: 1.2; }
+    .cycling-step-sub { font-size: 9px; color: var(--text-muted); margin-top: 3px; }
+
+    /* Quick Percentage Buttons */
+    .quick-pct-btn {
+      padding: 8px 4px !important; font-size: 12px !important; text-align: center;
+    }
+    .quick-pct-btn.active {
+      background: var(--cyan) !important; color: #070D18 !important; border-color: var(--cyan) !important;
+    }
   </style>
 </head>
 <body>
@@ -429,6 +477,18 @@
         <div id="global-ai-summary" style="font-size: 13px; line-height: 1.5; color: var(--text-main);">
           Scanning aquatic environments across your household...
         </div>
+      </div>
+
+      <!-- Actionable Upcoming Tasks & Routines Checklist -->
+      <div class="card" id="dashboard-tasks-card" style="margin-bottom: 18px; border-color: rgba(56, 189, 248, 0.35);">
+        <div class="card-header" style="margin-bottom: 10px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:16px;">📋</span>
+            <div class="card-title" style="font-size:15px;">Upcoming Tasks & Routines</div>
+          </div>
+          <span id="dashboard-tasks-badge" class="badge-cycling" style="background:rgba(56,189,248,0.15); color:var(--cyan); border-color:var(--cyan); font-size:10px;">Checking...</span>
+        </div>
+        <div id="dashboard-tasks-list"></div>
       </div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 14px;">
@@ -536,6 +596,9 @@
 
       <!-- TANK SUB-TAB 1: OVERVIEW & ACTIVITY LOG -->
       <div id="tanksub-overview" class="tanksub-content">
+        <!-- Nitrogen Cycling Roadmap (Rendered dynamically when tank is in Cycling status) -->
+        <div id="tank-cycling-roadmap-wrap"></div>
+
         <!-- Assessment Card -->
         <div class="card" style="background: linear-gradient(135deg, rgba(0, 245, 160, 0.07), rgba(15, 23, 42, 0.95)); border-color: rgba(0, 245, 160, 0.3);">
           <div style="font-size: 12px; font-weight: 700; color: var(--neon-green); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
@@ -548,7 +611,10 @@
         <div class="card">
           <div class="card-header">
             <div class="card-title">Latest Test Snapshot</div>
-            <button class="btn btn-secondary" style="width:auto; padding:4px 10px; font-size:11px;" onclick="switchTankTab('water')">Log New Test</button>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-secondary" style="width:auto; padding:4px 10px; font-size:11px; color:var(--cyan); border-color:rgba(56,189,248,0.4);" onclick="openQuickWcForActiveTank()">💧 Quick Water Change</button>
+              <button class="btn btn-secondary" style="width:auto; padding:4px 10px; font-size:11px;" onclick="switchTankTab('water')">🧪 Log Test</button>
+            </div>
           </div>
           <div class="param-strip" id="tank-overview-params"></div>
         </div>
@@ -564,6 +630,16 @@
 
       <!-- TANK SUB-TAB 2: WATER & TRENDS -->
       <div id="tanksub-water" class="tanksub-content" style="display:none;">
+        <!-- Quick Action Bar -->
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <button class="btn btn-secondary" style="font-size:12px; padding:10px 14px; flex:1; border-color:rgba(56,189,248,0.4); color:var(--cyan);" onclick="openQuickWcForActiveTank()">
+            💧 Quick Water Change (No Test)
+          </button>
+          <button class="btn btn-secondary" style="font-size:12px; padding:10px 14px; width:auto;" onclick="document.getElementById('w-log-date').scrollIntoView({behavior:'smooth'})">
+            🧪 Full Test Form
+          </button>
+        </div>
+
         <!-- Visual Parameter Trend Graph (F-12) -->
         <div class="card">
           <div class="card-header">
@@ -972,6 +1048,61 @@
     </div>
   </div>
 
+  <!-- ================= MODAL: QUICK WATER CHANGE ================= -->
+  <div class="modal-overlay" id="quickWcModal">
+    <div class="modal-box">
+      <div class="card-header" style="margin-bottom:12px;">
+        <h3 style="font-size:18px;">💧 Quick Water Change</h3>
+        <button class="icon-btn" style="width:28px;height:28px;" onclick="closeModalById('quickWcModal')">×</button>
+      </div>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">
+        Record a routine water change without needing to enter water test values.
+      </p>
+
+      <div style="margin-bottom:12px;">
+        <label>Aquarium</label>
+        <select id="qwc-tank-select" onchange="onQuickWcTankChange()"></select>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <label>Water Change Percentage</label>
+        <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:6px; margin-bottom:8px;">
+          <button type="button" class="btn btn-secondary quick-pct-btn" onclick="selectQuickWcPct(15, this)">15%</button>
+          <button type="button" class="btn btn-secondary quick-pct-btn" onclick="selectQuickWcPct(20, this)">20%</button>
+          <button type="button" class="btn btn-secondary quick-pct-btn active" onclick="selectQuickWcPct(25, this)">25%</button>
+          <button type="button" class="btn btn-secondary quick-pct-btn" onclick="selectQuickWcPct(30, this)">30%</button>
+          <button type="button" class="btn btn-secondary quick-pct-btn" onclick="selectQuickWcPct(50, this)">50%</button>
+        </div>
+        <div class="input-grid-2">
+          <div>
+            <label>Percent (%)</label>
+            <input type="number" id="qwc-pct-input" value="25" min="1" max="100" oninput="onQuickWcCustomInput()">
+          </div>
+          <div>
+            <label>Volume (<span class="unit-vol-label">Gal</span>)</label>
+            <input type="text" id="qwc-vol-calc" readonly style="background:rgba(255,255,255,0.04); font-weight:700; color:var(--cyan);">
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <label>Date Completed</label>
+        <input type="date" id="qwc-date-input">
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label>Water Conditioner / Dosed Product</label>
+        <input type="text" id="qwc-dose-input" placeholder="e.g. Seachem Prime 2ml">
+        <div id="qwc-dose-hint" style="font-size:11px; color:var(--cyan); margin-top:4px;"></div>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary" onclick="closeModalById('quickWcModal')">Cancel</button>
+        <button class="btn btn-neon" onclick="saveQuickWaterChange()">Save Water Change</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= MODAL: SETTINGS & HOUSEHOLD ================= -->
   <div class="modal-overlay" id="settingsModal">
     <div class="modal-box">
@@ -1030,10 +1161,23 @@
         <p style="font-size:11px; color:var(--text-muted);">Free at aistudio.google.com. Stored securely on your device.</p>
       </div>
 
-      <div style="display:flex; gap:10px; margin-bottom:14px;">
-        <button class="btn btn-secondary" onclick="exportDataJSON()">💾 Export JSON</button>
-        <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Restore Backup</button>
-        <input type="file" id="importFile" style="display:none;" onchange="importDataJSON(event)">
+      <!-- One-Click Data Safety & Backup (Zero Cloud Cost) -->
+      <div class="card" style="margin-bottom:18px; background:rgba(56,189,248,0.05); border-color:rgba(56,189,248,0.35);">
+        <div style="font-size:14px; font-weight:700; color:var(--cyan); margin-bottom:4px;">
+          💾 Data Safety & Local Backup
+        </div>
+        <p style="font-size:11px; color:var(--text-muted); margin-bottom:12px; line-height:1.4;">
+          Your aquariums, test history, and photos live 100% locally on your phone. Download a backup file regularly to ensure zero data loss when updating browsers or switching phones.
+        </p>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-neon" style="font-size:12px; padding:10px;" onclick="exportDataJSON()">
+            💾 Export Backup (.json)
+          </button>
+          <button class="btn btn-secondary" style="font-size:12px; padding:10px;" onclick="document.getElementById('importFile').click()">
+            📂 Restore Backup
+          </button>
+          <input type="file" id="importFile" accept=".json,application/json" style="display:none;" onchange="importDataJSON(event)">
+        </div>
       </div>
 
       <div style="text-align:center; font-size:11px; color:var(--text-muted); margin-top:10px;">
@@ -1365,6 +1509,7 @@
        ============================================================ */
     function renderGlobalDashboard() {
       updateDynamicUnitLabels();
+      renderDashboardTasks();
       const container = document.getElementById("tank-card-list");
       if (!container) return;
       container.innerHTML = "";
@@ -1433,6 +1578,271 @@
         `;
         container.appendChild(card);
       });
+    }
+
+    /* Actionable Upcoming Tasks & Maintenance Checklist (Recommendation 3) */
+    function renderDashboardTasks() {
+      const listEl = document.getElementById("dashboard-tasks-list");
+      const badgeEl = document.getElementById("dashboard-tasks-badge");
+      if (!listEl) return;
+      listEl.innerHTML = "";
+
+      const u = getUnitLabels();
+      const today = new Date();
+      const tasks = [];
+
+      appState.tanks.forEach((tank) => {
+        // 1. Water Change Task check
+        let lastWcDate = tank.lastWaterChange;
+        if (!lastWcDate && tank.history) {
+          const wcEntry = tank.history.find(h => h.wc && h.wc > 0);
+          if (wcEntry) lastWcDate = wcEntry.date;
+        }
+        if (!lastWcDate) lastWcDate = tank.startDate;
+
+        let daysSinceWc = 0;
+        if (lastWcDate) {
+          daysSinceWc = Math.floor((today - new Date(lastWcDate)) / (1000 * 60 * 60 * 24));
+        }
+
+        if (daysSinceWc >= 7) {
+          const isOverdue = daysSinceWc >= 10;
+          tasks.push({
+            type: "wc",
+            tankId: tank.id,
+            tankName: tank.name,
+            title: `💧 ${tank.name}: Weekly Water Change (~${Math.round(tank.vol * 0.25)} ${u.vol})`,
+            subtitle: `${daysSinceWc} days since last change${isOverdue ? ' • Overdue' : ''}`,
+            isOverdue: isOverdue,
+            actionLabel: "💧 Log Change",
+            actionFn: `openQuickWcModal(${tank.id})`
+          });
+        }
+
+        // 2. Filter Media Lifecycle check
+        (tank.filterMedia || []).forEach((media, mIdx) => {
+          if (media.interval > 0 && media.lastDate) {
+            const daysSince = Math.floor((today - new Date(media.lastDate)) / (1000 * 60 * 60 * 24));
+            const daysRemaining = media.interval - daysSince;
+            if (daysRemaining <= 3) {
+              const isOverdue = daysRemaining <= 0;
+              tasks.push({
+                type: "filter",
+                tankId: tank.id,
+                tankName: tank.name,
+                title: `🧽 ${tank.name}: Rinse ${media.name}`,
+                subtitle: isOverdue ? `Overdue by ${Math.abs(daysRemaining)} days` : `Due in ${daysRemaining} day(s)`,
+                isOverdue: isOverdue,
+                actionLabel: "✓ Done",
+                actionFn: `markFilterRinsedFromDashboard(${tank.id}, ${mIdx})`
+              });
+            }
+          }
+        });
+
+        // 3. Water Test check
+        const lastTestDate = tank.lastTest?.date || tank.startDate;
+        if (lastTestDate) {
+          const daysSinceTest = Math.floor((today - new Date(lastTestDate)) / (1000 * 60 * 60 * 24));
+          if (daysSinceTest >= 8) {
+            tasks.push({
+              type: "test",
+              tankId: tank.id,
+              tankName: tank.name,
+              title: `🧪 ${tank.name}: Chemical Water Test`,
+              subtitle: `${daysSinceTest} days since last test`,
+              isOverdue: daysSinceTest >= 12,
+              actionLabel: "🧪 Test",
+              actionFn: `enterTankHub(${tank.id}); switchTankTab('water');`
+            });
+          }
+        }
+      });
+
+      if (badgeEl) {
+        if (tasks.length === 0) {
+          badgeEl.innerText = "All Clear ✨";
+          badgeEl.style.background = "rgba(0, 245, 160, 0.15)";
+          badgeEl.style.color = "var(--neon-green)";
+          badgeEl.style.borderColor = "var(--neon-green)";
+        } else {
+          badgeEl.innerText = `${tasks.length} Action${tasks.length > 1 ? 's' : ''} Due`;
+          badgeEl.style.background = "rgba(245, 158, 11, 0.15)";
+          badgeEl.style.color = "var(--alert-yellow)";
+          badgeEl.style.borderColor = "var(--alert-yellow)";
+        }
+      }
+
+      if (tasks.length === 0) {
+        listEl.innerHTML = `
+          <div style="font-size:12px; color:var(--text-muted); padding:6px 2px; display:flex; align-items:center; gap:8px;">
+            <span style="color:var(--neon-green); font-size:16px;">✓</span>
+            All aquariums are maintained and up to date! Next routine scheduled in ~3-5 days.
+          </div>
+        `;
+        return;
+      }
+
+      tasks.forEach((t) => {
+        listEl.innerHTML += `
+          <div class="task-item-row ${t.isOverdue ? 'overdue' : ''}">
+            <div style="flex:1;">
+              <div class="task-info-title">${t.title}</div>
+              <div class="task-info-sub">${t.subtitle}</div>
+            </div>
+            <button class="btn btn-secondary" style="width:auto; padding:5px 12px; font-size:11px; white-space:nowrap; ${t.isOverdue ? 'border-color:var(--alert-red); color:#fff;' : 'color:var(--cyan);'}" onclick="${t.actionFn}">
+              ${t.actionLabel}
+            </button>
+          </div>
+        `;
+      });
+    }
+
+    function markFilterRinsedFromDashboard(tankId, mIdx) {
+      const tank = appState.tanks.find(t => t.id == tankId);
+      if (!tank || !tank.filterMedia || !tank.filterMedia[mIdx]) return;
+      const today = new Date().toISOString().split("T")[0];
+      const media = tank.filterMedia[mIdx];
+      media.lastDate = today;
+      if (!tank.timeline) tank.timeline = [];
+      tank.timeline.unshift({
+        date: today,
+        text: `🧽 Rinsed ${media.name} (Using dechlorinated/tank water)`
+      });
+      saveDataToStorage();
+      renderDashboardTasks();
+      showToast(`Rinsed ${media.name}!`);
+    }
+
+    /* Decoupled Quick Water Change Engine (Recommendation 1) */
+    function openQuickWcModal(presetTankId = null) {
+      const targetId = presetTankId || activeTankId || (appState.tanks[0] ? appState.tanks[0].id : 1);
+      const sel = document.getElementById("qwc-tank-select");
+      if (sel) {
+        sel.innerHTML = "";
+        appState.tanks.forEach(t => {
+          sel.innerHTML += `<option value="${t.id}" ${t.id == targetId ? 'selected' : ''}>${t.name} (${t.vol} ${getUnitLabels().vol})</option>`;
+        });
+      }
+
+      const dateInput = document.getElementById("qwc-date-input");
+      if (dateInput) dateInput.value = new Date().toISOString().split("T")[0];
+
+      // Default to 25%
+      const pctInput = document.getElementById("qwc-pct-input");
+      if (pctInput) pctInput.value = 25;
+      document.querySelectorAll(".quick-pct-btn").forEach((b, idx) => {
+        b.classList.toggle("active", idx === 2);
+      });
+
+      updateQuickWcCalculations();
+      openModalById("quickWcModal");
+    }
+
+    function openQuickWcForActiveTank() {
+      openQuickWcModal(activeTankId);
+    }
+
+    function onQuickWcTankChange() {
+      updateQuickWcCalculations();
+    }
+
+    function selectQuickWcPct(pct, btn) {
+      document.getElementById("qwc-pct-input").value = pct;
+      document.querySelectorAll(".quick-pct-btn").forEach(b => b.classList.remove("active"));
+      if (btn) btn.classList.add("active");
+      updateQuickWcCalculations();
+    }
+
+    function onQuickWcCustomInput() {
+      document.querySelectorAll(".quick-pct-btn").forEach(b => b.classList.remove("active"));
+      updateQuickWcCalculations();
+    }
+
+    function updateQuickWcCalculations() {
+      const tankId = document.getElementById("qwc-tank-select").value;
+      const tank = appState.tanks.find(t => t.id == tankId) || appState.tanks[0];
+      if (!tank) return;
+
+      const pct = parseFloat(document.getElementById("qwc-pct-input").value) || 0;
+      const u = getUnitLabels();
+      const volAmt = Math.round((tank.vol * (pct / 100)) * 10) / 10;
+      
+      const calcEl = document.getElementById("qwc-vol-calc");
+      if (calcEl) calcEl.value = `≈ ${volAmt} ${u.vol}`;
+
+      // Smart conditioner calculation based on supply closet
+      const doseInput = document.getElementById("qwc-dose-input");
+      const hintEl = document.getElementById("qwc-dose-hint");
+      const closet = (appState.closet || []).map(s => s.toLowerCase());
+
+      let hasPrime = closet.some(c => c.includes("prime"));
+      let recommendedDose = "";
+
+      if (hasPrime) {
+        if (appState.units === "metric") {
+          const ml = Math.max(0.2, Math.round((volAmt / 200 * 5) * 10) / 10);
+          recommendedDose = `Seachem Prime ${ml} ml (~2 drops per 4L)`;
+        } else {
+          const ml = Math.max(0.2, Math.round((volAmt / 50 * 5) * 10) / 10);
+          recommendedDose = `Seachem Prime ${ml} ml (~2 drops per gallon)`;
+        }
+      } else {
+        recommendedDose = "Standard dechlorinator dose";
+      }
+
+      if (doseInput && !doseInput.value) {
+        doseInput.value = recommendedDose;
+      }
+      if (hintEl) {
+        hintEl.innerText = `💡 Closet recommendation: ${recommendedDose}`;
+      }
+    }
+
+    function saveQuickWaterChange() {
+      const tankId = document.getElementById("qwc-tank-select").value;
+      const tank = appState.tanks.find(t => t.id == tankId);
+      if (!tank) return;
+
+      const pct = parseFloat(document.getElementById("qwc-pct-input").value) || 0;
+      const date = document.getElementById("qwc-date-input").value || new Date().toISOString().split("T")[0];
+      const dose = document.getElementById("qwc-dose-input").value.trim();
+      const u = getUnitLabels();
+      const volAmt = Math.round((tank.vol * (pct / 100)) * 10) / 10;
+
+      tank.lastWaterChange = date;
+
+      // Add timeline event
+      if (!tank.timeline) tank.timeline = [];
+      let eventText = `💧 ${pct}% Water Change (~${volAmt} ${u.vol})`;
+      if (dose) eventText += ` • Dosed: ${dose}`;
+      tank.timeline.unshift({ date, text: eventText });
+
+      // Add history record for charts
+      if (!tank.history) tank.history = [];
+      const prevTest = tank.lastTest || { nh3: 0, no2: 0, no3: 15, ph: 7.2, temp: 78 };
+      tank.history.unshift({
+        date,
+        temp: prevTest.temp,
+        nh3: prevTest.nh3,
+        no2: prevTest.no2,
+        no3: prevTest.no3,
+        ph: prevTest.ph,
+        wc: pct,
+        dose: dose || "Dechlorinator"
+      });
+
+      tank.summary = `Last activity: ${pct}% water change on ${date}.`;
+      saveDataToStorage();
+      closeModalById("quickWcModal");
+      showToast("Water Change Logged! 💧");
+
+      // Refresh screens
+      renderGlobalDashboard();
+      if (isInsideTank && activeTankId == tank.id) {
+        renderTankOverviewTab();
+        renderTankWaterTab();
+      }
     }
 
     function renderGlobalClosetScreen() {
@@ -1600,9 +2010,12 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       const u = getUnitLabels();
       const t = tank.lastTest || { nh3: 0, no2: 0, no3: 0, ph: 7.2, temp: 78 };
 
+      // Render Dedicated Cycling Roadmap if tank is Cycling
+      renderCyclingRoadmap(tank);
+
       // Summary Assessment Box
       document.getElementById("tank-overview-summary").innerText = 
-        tank.summary || "Biological parameters are stable and within nominal ranges.";
+        tank.summary || (tank.status === "Cycling" ? "Aquarium is currently cycling. Biological filtration is cultivating." : "Biological parameters are stable and within nominal ranges.");
 
       // Parameter Snapshot
       const paramContainer = document.getElementById("tank-overview-params");
@@ -1634,6 +2047,109 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
           });
         }
       }
+    }
+
+    /* Dedicated Cycling Roadmap (Recommendation 4) */
+    function renderCyclingRoadmap(tank) {
+      const wrap = document.getElementById("tank-cycling-roadmap-wrap");
+      if (!wrap) return;
+
+      if (tank.status !== "Cycling") {
+        wrap.innerHTML = "";
+        return;
+      }
+
+      const t = tank.lastTest || { nh3: 0, no2: 0, no3: 0 };
+      const nh3 = parseFloat(t.nh3) || 0;
+      const no2 = parseFloat(t.no2) || 0;
+      const no3 = parseFloat(t.no3) || 0;
+
+      let stage = 1;
+      let stageTitle = "";
+      let statusDesc = "";
+      let adviceAction = "";
+      let isFullyCycled = false;
+
+      if (nh3 === 0 && no2 === 0 && no3 > 0) {
+        stage = 3;
+        isFullyCycled = true;
+        stageTitle = "Stage 3: Nitrogen Cycle Complete! 🎉";
+        statusDesc = "Both ammonia and nitrite oxidizing bacteria are fully colonized. Nitrates are accumulating, proving robust biological filtration.";
+        adviceAction = "Perform a 40-50% water change to lower accumulated nitrates below 20 ppm, then tap below to mark this tank as Established!";
+      } else if (no2 > 0) {
+        stage = 2;
+        stageTitle = "Stage 2: Nitrite Spike (Active)";
+        statusDesc = `Ammonia is converting to Nitrite (NO₂: ${no2} ppm). Nitrobacter/Nitrospira bacteria are multiplying.`;
+        adviceAction = "Do NOT change water unless Nitrite exceeds 5 ppm. Keep temperature at 78-82°F to encourage bacteria multiplication.";
+      } else if (nh3 > 0) {
+        stage = 1;
+        stageTitle = "Stage 1: Ammonia Buildup (Active)";
+        statusDesc = `Ammonia source present (NH₃: ${nh3} ppm). Waiting for first-stage bacteria (Nitrosomonas) to colonize.`;
+        adviceAction = "Maintain ammonia between 2 - 4 ppm. If ghost feeding, continue daily pinch of flakes. Nitrites should appear in 5-10 days.";
+      } else {
+        stage = 1;
+        stageTitle = "Stage 1: Awaiting Ammonia Source";
+        statusDesc = "Ammonia is 0 ppm. The cycle cannot start without an initial ammonia source.";
+        adviceAction = "Add liquid ammonia (to 2 ppm) or ghost feed with a pinch of fish food daily to feed beneficial bacteria.";
+      }
+
+      wrap.innerHTML = `
+        <div class="card" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(15, 23, 42, 0.95)); border-color: rgba(245, 158, 11, 0.4); margin-bottom: 16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <div style="font-size:12px; font-weight:700; color:var(--alert-yellow); text-transform:uppercase; letter-spacing:0.5px;">
+              🔄 Nitrogen Cycle Roadmap
+            </div>
+            <span class="badge-cycling" style="font-size:10px;">${stageTitle}</span>
+          </div>
+
+          <!-- 3-Step Visual Stepper -->
+          <div class="cycling-stepper-box">
+            <div class="cycling-step-card ${stage > 1 ? 'completed' : (stage === 1 ? 'active' : '')}">
+              <div class="cycling-step-num">${stage > 1 ? '✓' : '1'}</div>
+              <div class="cycling-step-name">1. Ammonia</div>
+              <div class="cycling-step-sub">${stage > 1 ? 'Converted' : (nh3 > 0 ? nh3 + ' ppm' : 'Dosing')}</div>
+            </div>
+
+            <div class="cycling-step-card ${stage > 2 ? 'completed' : (stage === 2 ? 'active' : '')}">
+              <div class="cycling-step-num">${stage > 2 ? '✓' : '2'}</div>
+              <div class="cycling-step-name">2. Nitrite Peak</div>
+              <div class="cycling-step-sub">${stage > 2 ? 'Cleared' : (stage === 2 ? no2 + ' ppm' : 'Pending')}</div>
+            </div>
+
+            <div class="cycling-step-card ${isFullyCycled ? 'completed active' : ''}">
+              <div class="cycling-step-num">${isFullyCycled ? '🎉' : '3'}</div>
+              <div class="cycling-step-name">3. Safe & Cycled</div>
+              <div class="cycling-step-sub">${isFullyCycled ? 'Ready!' : 'Waiting'}</div>
+            </div>
+          </div>
+
+          <div style="font-size:13px; color:var(--text-main); margin-bottom:8px; line-height:1.45;">
+            ${statusDesc}
+          </div>
+
+          <div style="background:rgba(255,255,255,0.04); border-radius:10px; padding:10px; font-size:12px; color:#fff; line-height:1.4;">
+            <b style="color:var(--cyan);">Co-Pilot Next Step:</b> ${adviceAction}
+          </div>
+
+          ${isFullyCycled ? `
+            <div style="margin-top:12px;">
+              <button class="btn btn-neon" style="font-size:12px; padding:10px;" onclick="markActiveTankEstablished()">
+                🎉 Mark Aquarium as Established
+              </button>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function markActiveTankEstablished() {
+      const tank = getActiveTank();
+      if (!tank) return;
+      tank.status = "Established";
+      logTankTimelineEvent("🏆 Nitrogen cycle completed! Aquarium transitioned to Established status.");
+      saveDataToStorage();
+      renderTankHub();
+      showToast("Congratulations! Tank is Established 🎉");
     }
 
     function logTankTimelineEvent(text, date = new Date().toISOString().split("T")[0]) {
@@ -2627,25 +3143,49 @@ Provide clear, actionable steps for a beginner.`;
     }
 
     function exportDataJSON() {
-      const blob = new Blob([JSON.stringify(appState, null, 2)], { type: "application/json" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `aquassist_backup_${new Date().toISOString().split("T")[0]}.json`;
-      a.click();
+      try {
+        const exportObj = {
+          exportDate: new Date().toISOString(),
+          appState: appState
+        };
+        const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: "application/json" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `aquassist_backup_${new Date().toISOString().split("T")[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast("Backup Exported! 💾");
+      } catch (err) {
+        alert("Export failed: " + err.message);
+      }
     }
 
     function importDataJSON(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
       const reader = new FileReader();
       reader.onload = function(evt) {
         try {
-          appState = JSON.parse(evt.target.result);
-          saveDataToStorage();
-          location.reload();
+          const parsed = JSON.parse(evt.target.result);
+          const imported = parsed.appState || parsed;
+          if (!imported || !Array.isArray(imported.tanks)) {
+            throw new Error("Invalid backup format. Missing aquariums data.");
+          }
+          if (confirm(`Restore ${imported.tanks.length} aquarium(s)? This will replace your local state with this backup file.`)) {
+            appState = imported;
+            saveDataToStorage();
+            closeModalById("settingsModal");
+            renderGlobalDashboard();
+            showToast(`✓ Restored ${appState.tanks.length} Aquariums!`);
+          }
         } catch(err) {
-          alert("Invalid backup file format.");
+          alert("Backup Restore Failed: " + err.message);
         }
       };
-      reader.readAsText(e.target.files[0]);
+      reader.readAsText(file);
+      e.target.value = "";
     }
 
     function updateWcVolumePreview(percentVal) {
