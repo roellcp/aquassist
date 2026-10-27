@@ -19,6 +19,7 @@
       --neon-green: #00F5A0;
       --alert-yellow: #F59E0B;
       --alert-red: #EF4444;
+      --purple: #A78BFA;
       --text-main: #F8FAFC;
       --text-muted: #94A3B8;
       --input-bg: #0B1324;
@@ -133,7 +134,7 @@
       margin-bottom: 12px;
     }
     .card-title {
-      font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -0.3px;
+      font-size: 17px; font-weight: 700; color: #fff; letter-spacing: -0.3px;
     }
 
     /* Executive Hero Greeting Card */
@@ -150,6 +151,33 @@
     }
     .greeting-title {
       font-size: 18px; font-weight: 700; color: var(--cyan);
+    }
+
+    /* Action Co-Pilot Verdict Card */
+    .action-card {
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(7, 13, 24, 0.9));
+      border: 1px solid var(--card-border);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    .action-card.status-safe { border-color: rgba(0, 245, 160, 0.4); }
+    .action-card.status-caution { border-color: rgba(245, 158, 11, 0.4); }
+    .action-card.status-alert { border-color: rgba(239, 68, 68, 0.5); }
+
+    .action-plan-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px;
+    }
+    .action-plan-box {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px; padding: 12px;
+    }
+    .action-plan-title {
+      font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 4px; letter-spacing: 0.5px;
+    }
+    .action-plan-val {
+      font-size: 13px; font-weight: 700; color: #fff; line-height: 1.35;
     }
 
     /* Badges */
@@ -173,7 +201,7 @@
     /* Hero Tank Cards */
     .tank-card {
       padding: 0 !important; overflow: hidden; cursor: pointer;
-      transition: transform 0.15s ease, border-color 0.15s ease;
+      transition: transform 0.15s ease;
       margin-bottom: 16px;
     }
     .tank-card:active { transform: scale(0.985); }
@@ -201,6 +229,30 @@
     }
     .param-chip-label { font-size: 10px; color: var(--text-muted); margin-bottom: 2px; }
     .param-chip-val { font-size: 12px; font-weight: 700; color: #fff; }
+
+    /* Visual Parameter Chart (F-12) */
+    .chart-container {
+      width: 100%; position: relative; margin-top: 8px;
+    }
+    .chart-svg {
+      width: 100%; height: 210px; overflow: visible; display: block;
+    }
+    .chart-filter-bar {
+      display: flex; gap: 4px; overflow-x: auto; margin-bottom: 10px; padding-bottom: 2px;
+    }
+    .chart-pill-btn {
+      padding: 5px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px; font-size: 11px; font-weight: 600; color: var(--text-muted); cursor: pointer;
+      white-space: nowrap; transition: all 0.15s ease;
+    }
+    .chart-pill-btn.active {
+      background: rgba(56, 189, 248, 0.2); border-color: var(--cyan); color: #fff;
+    }
+    .chart-legend {
+      display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; font-size: 11px; color: var(--text-muted);
+    }
+    .chart-legend-item { display: flex; align-items: center; gap: 5px; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 
     /* Bottom Navigation Bar */
     .bottom-nav {
@@ -246,7 +298,7 @@
     .btn-neon { background: var(--neon-green); color: #070D18; }
     .btn-danger { background: rgba(239, 68, 68, 0.2); border: 1px solid var(--alert-red); color: var(--alert-red); }
 
-    /* Modals & Bottom Sheets */
+    /* Modals */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(0, 0, 0, 0.78); z-index: 200;
       display: none; align-items: center; justify-content: center; padding: 16px;
@@ -278,7 +330,6 @@
       border-radius: 12px; padding: 8px 12px; font-size: 13px; display: flex; align-items: center; gap: 8px;
     }
     .delete-x { color: var(--alert-red); cursor: pointer; font-weight: 700; font-size: 16px; padding: 0 4px; }
-    .edit-pencil { color: var(--cyan); cursor: pointer; font-size: 14px; }
 
     /* Toast Notification */
     .toast {
@@ -361,7 +412,7 @@
           <div id="global-status-badge" class="badge badge-stable">🟢 All Systems Stable</div>
         </div>
         <div id="global-ai-summary" style="font-size: 13px; line-height: 1.5; color: var(--text-main);">
-          Monitoring aquatic environments. Tap parameters set and biological filtration active.
+          Monitoring aquatic environments. All biological filtration active and nominal.
         </div>
       </div>
 
@@ -373,12 +424,68 @@
       <div id="tank-card-list"></div>
     </section>
 
-    <!-- ================= VIEW 2: WATER & LOGS ================= -->
+    <!-- ================= VIEW 2: WATER & LOGS (PHASE 2) ================= -->
     <section id="view-water" class="view-panel">
-      <div class="card" style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(15, 23, 42, 0.9));">
+
+      <!-- 1. PARAMETER TREND GRAPH (F-12) AT TOP -->
+      <div class="card">
         <div class="card-header">
-          <div class="card-title">Log Water Test</div>
-          <span id="water-active-tank-badge" class="badge badge-stable">Select Tank</span>
+          <div class="card-title">📈 Parameter Trends</div>
+          <span id="water-active-tank-badge" class="badge badge-stable">40G Community</span>
+        </div>
+
+        <!-- Filter Buttons: Combined & Individual -->
+        <div class="chart-filter-bar">
+          <button class="chart-pill-btn active" onclick="setChartFilter('all', this)">All Combined</button>
+          <button class="chart-pill-btn" onclick="setChartFilter('no3', this)">Nitrate (NO₃)</button>
+          <button class="chart-pill-btn" onclick="setChartFilter('nh3', this)">Ammonia (NH₃)</button>
+          <button class="chart-pill-btn" onclick="setChartFilter('no2', this)">Nitrite (NO₂)</button>
+          <button class="chart-pill-btn" onclick="setChartFilter('ph', this)">pH</button>
+          <button class="chart-pill-btn" onclick="setChartFilter('temp', this)">Temp</button>
+        </div>
+
+        <div class="chart-container">
+          <svg id="water-chart-svg" class="chart-svg" viewBox="0 0 500 210"></svg>
+        </div>
+
+        <div class="chart-legend" id="chart-legend-box">
+          <div class="chart-legend-item"><span class="legend-dot" style="background:var(--cyan);"></span> NO₃</div>
+          <div class="chart-legend-item"><span class="legend-dot" style="background:var(--alert-red);"></span> NH₃</div>
+          <div class="chart-legend-item"><span class="legend-dot" style="background:var(--alert-yellow);"></span> NO₂</div>
+          <div class="chart-legend-item"><span class="legend-dot" style="background:var(--purple);"></span> pH</div>
+          <div class="chart-legend-item"><span class="legend-dot" style="background:var(--neon-green);"></span> Temp</div>
+          <div class="chart-legend-item"><span>💧 Water Change</span></div>
+        </div>
+      </div>
+
+      <!-- 2. SMART CO-PILOT ACTION CARD (F-15 DILUTION & DOSING) -->
+      <div id="smart-action-card" class="action-card status-safe">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <div style="font-size:12px; font-weight:700; color:var(--neon-green); text-transform:uppercase; letter-spacing:0.5px;">
+            🤖 Co-Pilot Assessment
+          </div>
+          <span id="action-verdict-badge" class="badge badge-stable">🟢 All Systems Safe</span>
+        </div>
+        <div id="action-verdict-summary" style="font-size:13px; line-height:1.45; color:var(--text-main); margin-bottom:12px;">
+          Evaluating latest water parameters...
+        </div>
+
+        <div class="action-plan-grid">
+          <div class="action-plan-box">
+            <div class="action-plan-title">💧 Next Water Change</div>
+            <div id="action-wc-plan" class="action-plan-val">Saturday, Nov 1<br><span style="font-size:11px; color:var(--cyan); font-weight:normal;">25% (10 Gal)</span></div>
+          </div>
+          <div class="action-plan-box">
+            <div class="action-plan-title">🧴 Closet Dosing</div>
+            <div id="action-dose-plan" class="action-plan-val">Seachem Prime<br><span style="font-size:11px; color:var(--neon-green); font-weight:normal;">1.0 ml / 20 drops</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. LOG NEW WATER TEST FORM -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🧪 Log Water Test</div>
         </div>
         
         <div class="input-grid-2">
@@ -400,15 +507,20 @@
         </div>
 
         <div class="input-grid-2">
-          <div><label>Water Change (%)</label><input type="number" id="w-log-wc" step="5" placeholder="25"></div>
-          <div><label>Dosed Products</label><input type="text" id="w-log-dose" placeholder="Prime 2ml"></div>
+          <div>
+            <label>Water Change (%) <span id="wc-vol-preview" style="color:var(--cyan); font-size:11px;"></span></label>
+            <input type="number" id="w-log-wc" step="5" placeholder="25" oninput="updateWcVolumePreview(this.value)">
+          </div>
+          <div>
+            <label>Dosed Product</label>
+            <input type="text" id="w-log-dose" placeholder="Prime 2ml">
+          </div>
         </div>
 
-        <button class="btn btn-neon" onclick="saveWaterLog()">Save Test & Get Smart Advice</button>
-        <div id="w-log-feedback" class="card" style="display:none; margin-top:14px; background:rgba(0,245,160,0.06); border-color:var(--neon-green);"></div>
+        <button class="btn btn-neon" onclick="saveWaterLog()">Save Test & Run Analysis</button>
       </div>
 
-      <!-- Water History / Timeline -->
+      <!-- 4. WATER TEST HISTORY -->
       <div class="card">
         <div class="card-header">
           <div class="card-title">Test History</div>
@@ -572,7 +684,6 @@
         <button class="icon-btn" style="width:28px;height:28px;" onclick="closeSettingsModal()">×</button>
       </div>
 
-      <!-- Unit System Toggle -->
       <div style="margin-bottom:18px;">
         <label>Unit System</label>
         <select id="setting-units" onchange="onUnitsChange(this.value)">
@@ -581,7 +692,6 @@
         </select>
       </div>
 
-      <!-- Household Tap Water Profile -->
       <div class="card" style="margin-bottom:18px; background:rgba(255,255,255,0.03); border-color:var(--card-border-glow);">
         <div style="font-size:14px; font-weight:700; color:var(--cyan); margin-bottom:4px;">🚰 Household Tap Water Baseline</div>
         <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">
@@ -595,7 +705,6 @@
         </div>
       </div>
 
-      <!-- Gemini AI API Key -->
       <div style="margin-bottom:18px;">
         <label>Google AI Studio (Gemini) API Key</label>
         <div class="input-row">
@@ -604,7 +713,6 @@
         <p style="font-size:11px; color:var(--text-muted);">Free at aistudio.google.com. Stored securely on your device.</p>
       </div>
 
-      <!-- Backup & Restore -->
       <div style="display:flex; gap:10px; margin-bottom:14px;">
         <button class="btn btn-secondary" onclick="exportDataJSON()">💾 Export JSON</button>
         <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Restore Backup</button>
@@ -612,7 +720,7 @@
       </div>
 
       <div style="text-align:center; font-size:11px; color:var(--text-muted); margin-top:10px;">
-        aquAssist v7.0 • $0 Smart Tank Co-Pilot
+        aquAssist v7.2 • $0 Smart Tank Co-Pilot
       </div>
     </div>
   </div>
@@ -645,7 +753,10 @@
           summary: "Parameters balanced. Nitrogen cycle fully established.",
           lastTest: { nh3: 0, no2: 0, no3: 15, ph: 7.2, temp: 78.0, date: "2026-10-25" },
           history: [
-            { date: "2026-10-25", nh3: 0, no2: 0, no3: 15, ph: 7.2, temp: 78.0, wc: 25, dose: "Prime 4ml", note: "Routine Sunday 25% water change" }
+            { date: "2026-10-05", nh3: 0, no2: 0, no3: 25, ph: 7.4, temp: 78.0, wc: 25, dose: "Prime 4ml" },
+            { date: "2026-10-12", nh3: 0, no2: 0, no3: 30, ph: 7.3, temp: 78.5, wc: 30, dose: "Prime 4ml" },
+            { date: "2026-10-19", nh3: 0, no2: 0, no3: 20, ph: 7.2, temp: 78.0, wc: 20, dose: "Prime 4ml" },
+            { date: "2026-10-25", nh3: 0, no2: 0, no3: 15, ph: 7.2, temp: 78.0, wc: 25, dose: "Prime 4ml", note: "Routine 25% water change" }
           ],
           equipment: ["Fluval 407 Canister", "150W Eheim Heater", "Fluval Plant 3.0 LED"],
           livestock: ["12x Neon Tetra", "6x Harlequin Rasbora", "3x Otocinclus"],
@@ -663,7 +774,9 @@
           summary: "Cycle stage: Nitrite conversion in progress.",
           lastTest: { nh3: 0.25, no2: 1.0, no3: 10, ph: 7.0, temp: 79.0, date: "2026-10-26" },
           history: [
-            { date: "2026-10-26", nh3: 0.25, no2: 1.0, no3: 10, ph: 7.0, temp: 79.0, wc: 0, dose: "Prime 1ml", note: "Dosed Prime to detoxify ammonia & nitrite" }
+            { date: "2026-10-10", nh3: 1.5, no2: 0, no3: 0, ph: 7.2, temp: 79.0, wc: 0, dose: "TurboStart" },
+            { date: "2026-10-18", nh3: 0.5, no2: 2.0, no3: 5, ph: 7.0, temp: 79.0, wc: 25, dose: "Prime 1ml" },
+            { date: "2026-10-26", nh3: 0.25, no2: 1.0, no3: 10, ph: 7.0, temp: 79.0, wc: 0, dose: "Prime 1ml" }
           ],
           equipment: ["Aquaclear 20 HOB", "50W Preset Heater"],
           livestock: ["1x Halfmoon Betta", "1x Nerite Snail"],
@@ -676,9 +789,10 @@
     let appState = defaultState;
     let selectedTankId = "all";
     let isEditingTank = false;
+    let currentChartFilter = "all";
 
     /* ============================================================
-       2. INDEXEDDB PERSISTENCE LAYER (Zero 5MB Storage Limits)
+       2. INDEXEDDB PERSISTENCE LAYER
        ============================================================ */
     const DB_NAME = "aquassist_idb";
     const DB_VERSION = 1;
@@ -709,7 +823,6 @@
             if (req.result) {
               resolve(req.result);
             } else {
-              // Legacy localStorage migration check
               const legacy = localStorage.getItem("aquassist_v23");
               if (legacy) {
                 try {
@@ -726,7 +839,6 @@
           req.onerror = () => resolve(defaultState);
         });
       } catch (err) {
-        console.warn("IndexedDB not accessible, falling back to memory:", err);
         return defaultState;
       }
     }
@@ -754,7 +866,7 @@
     }
 
     /* ============================================================
-       3. NAVIGATION & TANK SELECTOR ENGINE
+       3. NAVIGATION & TANK SELECTOR
        ============================================================ */
     function navTo(viewName) {
       document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
@@ -821,7 +933,22 @@
       appState.units = val;
       updateDynamicUnitLabels();
       renderDashboard();
+      renderWaterView();
       saveDataToStorage();
+    }
+
+    function updateWcVolumePreview(percentVal) {
+      const activeTank = getActiveTank();
+      const previewEl = document.getElementById("wc-vol-preview");
+      if (!previewEl || !activeTank) return;
+      const pct = parseFloat(percentVal) || 0;
+      if (pct > 0) {
+        const u = getUnitLabels();
+        const volAmt = Math.round((activeTank.vol * (pct / 100)) * 10) / 10;
+        previewEl.innerText = `≈ ${volAmt} ${u.vol}`;
+      } else {
+        previewEl.innerText = "";
+      }
     }
 
     /* ============================================================
@@ -912,8 +1039,15 @@
     }
 
     /* ============================================================
-       6. WATER LOGGING & HISTORY VIEW
+       6. PHASE 2: VISUAL TREND CHARTS (F-12) & SMART DILUTION (F-15)
        ============================================================ */
+    function setChartFilter(paramName, btn) {
+      currentChartFilter = paramName;
+      document.querySelectorAll(".chart-pill-btn").forEach(b => b.classList.remove("active"));
+      if (btn) btn.classList.add("active");
+      renderTrendChart();
+    }
+
     function renderWaterView() {
       const activeTank = getActiveTank();
       const badge = document.getElementById("water-active-tank-badge");
@@ -927,7 +1061,221 @@
         dateInput.valueAsDate = new Date();
       }
 
+      renderTrendChart();
+      renderSmartActionCard();
       renderWaterHistory();
+      updateWcVolumePreview(document.getElementById("w-log-wc").value);
+    }
+
+    /* Visual SVG Chart Generator (F-12) */
+    function renderTrendChart() {
+      const svg = document.getElementById("water-chart-svg");
+      const activeTank = getActiveTank();
+      if (!svg || !activeTank) return;
+
+      const history = (activeTank.history || []).slice().reverse(); // Chronological: oldest to newest
+      if (history.length === 0) {
+        svg.innerHTML = `
+          <text x="250" y="105" text-anchor="middle" fill="#64748B" font-size="13">
+            No test data yet. Log your first test below to see curves!
+          </text>
+        `;
+        return;
+      }
+
+      const width = 500;
+      const height = 210;
+      const padL = 40;
+      const padR = 20;
+      const padT = 20;
+      const padB = 30;
+
+      const plotW = width - padL - padR;
+      const plotH = height - padT - padB;
+
+      // Determine min/max scales depending on filter
+      let maxY = 40;
+      let minY = 0;
+
+      if (currentChartFilter === "nh3" || currentChartFilter === "no2") {
+        maxY = 4;
+      } else if (currentChartFilter === "ph") {
+        minY = 6.0; maxY = 8.5;
+      } else if (currentChartFilter === "temp") {
+        minY = 65; maxY = 86;
+      } else {
+        // Combined or NO3
+        const maxNo3 = Math.max(...history.map(h => h.no3 || 0), 30);
+        maxY = Math.ceil(maxNo3 / 10) * 10;
+      }
+
+      const getX = (idx) => {
+        if (history.length === 1) return padL + plotW / 2;
+        return padL + (idx / (history.length - 1)) * plotW;
+      };
+
+      const getY = (val) => {
+        const clamped = Math.max(minY, Math.min(maxY, val));
+        return padT + plotH - ((clamped - minY) / (maxY - minY)) * plotH;
+      };
+
+      let svgHtml = `
+        <defs>
+          <linearGradient id="safeZoneGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#00F5A0" stop-opacity="0.12"/>
+            <stop offset="100%" stop-color="#00F5A0" stop-opacity="0.02"/>
+          </linearGradient>
+        </defs>
+      `;
+
+      // Safe Zone Green Band
+      if (currentChartFilter === "all" || currentChartFilter === "no3") {
+        const safeY1 = getY(20);
+        const safeY2 = getY(0);
+        svgHtml += `<rect x="${padL}" y="${safeY1}" width="${plotW}" height="${safeY2 - safeY1}" fill="url(#safeZoneGrad)" rx="4"/>`;
+      }
+
+      // Grid Lines
+      for (let i = 0; i <= 4; i++) {
+        const val = minY + (i / 4) * (maxY - minY);
+        const y = padT + plotH - (i / 4) * plotH;
+        svgHtml += `
+          <line x1="${padL}" y1="${y}" x2="${width - padR}" y2="${y}" stroke="rgba(255,255,255,0.08)" stroke-dasharray="3 3"/>
+          <text x="${padL - 8}" y="${y + 4}" fill="#64748B" font-size="9" text-anchor="end">${Math.round(val * 10) / 10}</text>
+        `;
+      }
+
+      // Parameter Lines Configuration
+      const seriesList = [
+        { key: "no3", label: "NO₃", color: "var(--cyan)", filter: "no3", mult: 1 },
+        { key: "nh3", label: "NH₃", color: "var(--alert-red)", filter: "nh3", mult: (currentChartFilter === "all" ? 10 : 1) },
+        { key: "no2", label: "NO₂", color: "var(--alert-yellow)", filter: "no2", mult: (currentChartFilter === "all" ? 10 : 1) },
+        { key: "ph", label: "pH", color: "var(--purple)", filter: "ph", mult: 1 },
+        { key: "temp", label: "Temp", color: "var(--neon-green)", filter: "temp", mult: 1 }
+      ];
+
+      seriesList.forEach(series => {
+        if (currentChartFilter !== "all" && currentChartFilter !== series.filter) return;
+
+        let points = [];
+        history.forEach((h, idx) => {
+          const val = (h[series.key] !== undefined) ? h[series.key] : 0;
+          const x = getX(idx);
+          const y = getY(val);
+          points.push(`${x},${y}`);
+        });
+
+        if (points.length > 1) {
+          svgHtml += `<polyline points="${points.join(" ")}" fill="none" stroke="${series.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+        }
+
+        // Draw Data Points
+        history.forEach((h, idx) => {
+          const val = (h[series.key] !== undefined) ? h[series.key] : 0;
+          const x = getX(idx);
+          const y = getY(val);
+          svgHtml += `<circle cx="${x}" cy="${y}" r="4" fill="#0B1324" stroke="${series.color}" stroke-width="2"/>`;
+        });
+      });
+
+      // Water Change Event Droplet Markers
+      history.forEach((h, idx) => {
+        if (h.wc && h.wc > 0) {
+          const x = getX(idx);
+          svgHtml += `
+            <g transform="translate(${x - 8}, ${height - 24})">
+              <text font-size="12" fill="#38BDF8">💧</text>
+            </g>
+          `;
+        }
+        // X-Axis Date Label
+        const dateShort = h.date ? h.date.substring(5) : "";
+        svgHtml += `
+          <text x="${getX(idx)}" y="${height - 8}" fill="#94A3B8" font-size="9" text-anchor="middle">${dateShort}</text>
+        `;
+      });
+
+      svg.innerHTML = svgHtml;
+    }
+
+    /* Smart Co-Pilot Action Engine & Dilution Math (F-15) */
+    function renderSmartActionCard() {
+      const activeTank = getActiveTank();
+      const card = document.getElementById("smart-action-card");
+      const badge = document.getElementById("action-verdict-badge");
+      const summary = document.getElementById("action-verdict-summary");
+      const wcPlan = document.getElementById("action-wc-plan");
+      const dosePlan = document.getElementById("action-dose-plan");
+      if (!card || !activeTank) return;
+
+      const t = activeTank.lastTest || { nh3: 0, no2: 0, no3: 15, ph: 7.2, temp: 78 };
+      const tap = appState.tapBaseline || { ph: 7.4, no3: 5 };
+      const u = getUnitLabels();
+      const isCycling = activeTank.status === "Cycling";
+
+      let statusClass = "status-safe";
+      let badgeHtml = "🟢 All Systems Safe";
+      let summaryText = "";
+      let nextWcText = "";
+      let doseText = "";
+
+      // 1. Water Condition / Toxicity Check
+      if (t.nh3 > 0 || t.no2 > 0) {
+        if (isCycling) {
+          statusClass = "status-caution";
+          badgeHtml = "🟡 Cycling Active";
+          summaryText = `Nitrogen cycle in progress! Ammonia (${t.nh3} ppm) and Nitrite (${t.no2} ppm) are being converted by beneficial bacteria. Keep aeration high.`;
+          nextWcText = `Only change water if NH₃ > 2.0 ppm<br><span style="font-size:11px; color:var(--text-muted);">Protect bacteria colonization</span>`;
+        } else {
+          statusClass = "status-alert";
+          badgeHtml = "🔴 Action Required";
+          summaryText = `⚠️ Spiked parameters in an established tank! Ammonia (${t.nh3} ppm) or Nitrite (${t.no2} ppm) detected. Perform an immediate water change to prevent fish stress.`;
+          const wcPct = 35;
+          const volAmt = Math.round(activeTank.vol * (wcPct / 100));
+          nextWcText = `Today / Immediately<br><span style="font-size:11px; color:var(--alert-red);">${wcPct}% (${volAmt} ${u.vol})</span>`;
+        }
+      } else if (t.no3 > 35) {
+        statusClass = "status-caution";
+        badgeHtml = "🟡 Nitrate Rising";
+        const targetWcPct = 30;
+        const volAmt = Math.round(activeTank.vol * (targetWcPct / 100));
+        // Dilution Math: newNO3 = oldNO3 * (1 - fraction) + tapNO3 * fraction
+        const expectedNo3 = Math.round((t.no3 * (1 - targetWcPct / 100)) + (tap.no3 * (targetWcPct / 100)));
+        summaryText = `Nitrate reached ${t.no3} ppm. With your tap water baseline at ${tap.no3} ppm, a ${targetWcPct}% change drops nitrate safely to ~${expectedNo3} ppm.`;
+        nextWcText = `Tomorrow or This Weekend<br><span style="font-size:11px; color:var(--cyan); font-weight:normal;">${targetWcPct}% (${volAmt} ${u.vol})</span>`;
+      } else {
+        statusClass = "status-safe";
+        badgeHtml = "🟢 All Systems Nominal";
+        summaryText = `Biological filtration is stable with zero Ammonia & Nitrite. Nitrates are in the safe zone (${t.no3} ppm).`;
+        const wcPct = 20;
+        const volAmt = Math.round(activeTank.vol * (wcPct / 100));
+        nextWcText = `Scheduled: Sunday<br><span style="font-size:11px; color:var(--cyan); font-weight:normal;">${wcPct}% (${volAmt} ${u.vol})</span>`;
+      }
+
+      // 2. Dosing Calculator from Closet
+      const closet = (appState.closet || []).map(c => c.toLowerCase());
+      const hasPrime = closet.some(c => c.includes("prime"));
+      const hasBacteria = closet.some(c => c.includes("turbostart") || c.includes("stability") || c.includes("quick start"));
+
+      if (hasPrime) {
+        // Seachem Prime: 5ml per 50 gallons = 0.1ml per gallon (approx 2 drops/gal)
+        const ml = Math.round((activeTank.vol * 0.1) * 10) / 10;
+        const drops = Math.round(activeTank.vol * 2);
+        doseText = `Seachem Prime (From Closet)<br><span style="font-size:11px; color:var(--neon-green); font-weight:normal;">${ml} ml (≈ ${drops} drops) in new water</span>`;
+      } else {
+        doseText = `Water Conditioner<br><span style="font-size:11px; color:var(--alert-yellow); font-weight:normal;">Dose standard tap dechlorinator</span>`;
+      }
+
+      if (isCycling && hasBacteria) {
+        doseText += `<br><span style="font-size:11px; color:var(--cyan);">+ Add 1 dose beneficial bacteria</span>`;
+      }
+
+      card.className = `action-card ${statusClass}`;
+      badge.className = `badge ${statusClass === "status-safe" ? "badge-stable" : statusClass === "status-caution" ? "badge-cycling" : "badge-alert"}`;
+      badge.innerHTML = badgeHtml;
+      summary.innerHTML = summaryText;
+      wcPlan.innerHTML = nextWcText;
+      dosePlan.innerHTML = doseText;
     }
 
     function saveWaterLog() {
@@ -948,33 +1296,26 @@
       if (!activeTank.history) activeTank.history = [];
       activeTank.history.unshift(newLog);
 
-      // Smart Co-Pilot Feedback Logic (Pre-AI Rule Base + Tap Integration)
-      const tap = appState.tapBaseline || { ph: 7.4, no3: 5 };
-      let verdict = "🟢 Safe";
-      let advice = "Parameters look great. No immediate water change required.";
-
-      if (activeTank.status === "Established" && (nh3 > 0 || no2 > 0)) {
-        verdict = "🔴 Action Required";
-        advice = `Ammonia or Nitrite detected in an established tank! Perform a 30% water change (${Math.round(activeTank.vol * 0.3)} ${getUnitLabels().vol}) and dose Seachem Prime to detoxify.`;
-      } else if (no3 > 35) {
-        verdict = "🟡 Caution";
-        advice = `Nitrate is creeping high (${no3} ppm). With your tap water baseline at ${tap.no3} ppm, a 25% water change will bring nitrates safely down to ~${Math.round(no3 * 0.75 + tap.no3 * 0.25)} ppm.`;
-      }
-
-      activeTank.summary = advice;
+      activeTank.summary = `Last logged ${date}: NO₃ ${no3} ppm, pH ${ph}, Temp ${temp}°`;
       saveDataToStorage();
 
-      const fb = document.getElementById("w-log-feedback");
-      if (fb) {
-        fb.style.display = "block";
-        fb.innerHTML = `
-          <div style="font-weight:700; margin-bottom:4px; font-size:14px;">${verdict}</div>
-          <div style="font-size:13px; color:var(--text-main);">${advice}</div>
-        `;
-      }
-
-      renderWaterHistory();
+      renderWaterView();
       renderDashboard();
+      showToast("Test Logged & Analyzed");
+    }
+
+    function deleteWaterLog(idx) {
+      const activeTank = getActiveTank();
+      if (!activeTank || !activeTank.history) return;
+      activeTank.history.splice(idx, 1);
+      if (activeTank.history.length > 0) {
+        const latest = activeTank.history[0];
+        activeTank.lastTest = { ...latest };
+      }
+      saveDataToStorage();
+      renderWaterView();
+      renderDashboard();
+      showToast("Log Deleted");
     }
 
     function renderWaterHistory() {
@@ -990,13 +1331,16 @@
       }
 
       const u = getUnitLabels();
-      history.forEach((h) => {
+      history.forEach((h, idx) => {
         const item = document.createElement("div");
         item.style.padding = "10px 0";
         item.style.borderBottom = "1px solid rgba(255,255,255,0.06)";
         item.style.fontSize = "13px";
         item.innerHTML = `
-          <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">${h.date}</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <span style="font-size:11px; color:var(--text-muted);">${h.date}</span>
+            <span class="delete-x" onclick="deleteWaterLog(${idx})" title="Delete this log">×</span>
+          </div>
           <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
             <span>NH₃: <b>${h.nh3}</b> • NO₂: <b>${h.no2}</b> • NO₃: <b>${h.no3}</b> • pH: <b>${h.ph}</b></span>
             <span><b>${h.temp || 78}${u.temp}</b></span>
@@ -1095,12 +1439,14 @@
       input.value = "";
       saveDataToStorage();
       renderClosetList();
+      renderSmartActionCard();
     }
 
     function deleteClosetItem(idx) {
       appState.closet.splice(idx, 1);
       saveDataToStorage();
       renderClosetList();
+      renderSmartActionCard();
     }
 
     /* ============================================================
@@ -1277,6 +1623,7 @@ Provide practical, plain-English instructions. If a water change or dosing is ne
         kh: parseFloat(document.getElementById("tap-kh").value) || 0
       };
       saveDataToStorage();
+      renderSmartActionCard();
     }
 
     function saveApiKey() {
