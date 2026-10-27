@@ -1,7 +1,7 @@
 {
-  "name": "aquAssist — AI Aquarium Assistant",
+  "name": "aquAssist — AI Aquarist",
   "short_name": "aquAssist",
-  "description": "Intelligent AI aquarium assistant for smart tank management and fish care.",
+  "description": "Intelligent AI Aquarist for smart tank management and fish care.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

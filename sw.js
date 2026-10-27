@@ -1,11 +1,12 @@
-const CACHE_NAME = "aquassist-cache-v10";
+const CACHE_NAME = "aquassist-cache-v11";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
   "./manifest.json",
   "./icon.png",
   "./icon.svg",
-  "./icon-header.png"
+  "./icon-header.png",
+  "./apple-touch-icon.png"
 ];
 
 // Install: Cache critical assets for 100% offline functionality
