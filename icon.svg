@@ -1,34 +1,120 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
   <defs>
+    <!-- Deep Obsidian Abyssal Canvas Background -->
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#080E1A"/>
-      <stop offset="100%" stop-color="#0F172A"/>
+      <stop offset="0%" stop-color="#040812"/>
+      <stop offset="50%" stop-color="#071120"/>
+      <stop offset="100%" stop-color="#0A182F"/>
     </linearGradient>
-    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#38BDF8"/>
-      <stop offset="60%" stop-color="#06B6D4"/>
-      <stop offset="100%" stop-color="#0D9488"/>
-    </linearGradient>
-    <linearGradient id="finDorsal" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#7DD3FC" stop-opacity="0.8"/>
-      <stop offset="100%" stop-color="#06B6D4" stop-opacity="0.2"/>
-    </linearGradient>
-    <radialGradient id="neonEyeSparkle" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#FFFFFF"/>
-      <stop offset="40%" stop-color="#00F5A0"/>
-      <stop offset="100%" stop-color="#059669"/>
+
+    <!-- Ambient Core Radial Glow -->
+    <radialGradient id="coreAura" cx="50%" cy="48%" r="48%">
+      <stop offset="0%" stop-color="#00D2FF" stop-opacity="0.18"/>
+      <stop offset="60%" stop-color="#00F5A0" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#040812" stop-opacity="0"/>
     </radialGradient>
+
+    <!-- Specular Squircle Border Gradient -->
+    <linearGradient id="borderSpecular" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00D2FF" stop-opacity="0.5"/>
+      <stop offset="50%" stop-color="#38BDF8" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#00F5A0" stop-opacity="0.3"/>
+    </linearGradient>
+
+    <!-- Primary Bio-Luminescent Flow Ribbon Gradient -->
+    <linearGradient id="bioFlowGrad" x1="10%" y1="20%" x2="90%" y2="80%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="35%" stop-color="#00D2FF"/>
+      <stop offset="70%" stop-color="#00F5A0"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+
+    <!-- Dorsal Fin Ethereal Translucency -->
+    <linearGradient id="dorsalGlow" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00D2FF" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#38BDF8" stop-opacity="0.1"/>
+    </linearGradient>
+
+    <!-- Caudal Tail Ribbon Gradient -->
+    <linearGradient id="tailGlow" x1="100%" y1="50%" x2="0%" y2="50%">
+      <stop offset="0%" stop-color="#00D2FF" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#00F5A0" stop-opacity="0.2"/>
+    </linearGradient>
+
+    <!-- Neural AI Spark Radial -->
+    <radialGradient id="neuralSparkRad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="30%" stop-color="#E0F2FE"/>
+      <stop offset="60%" stop-color="#00F5A0"/>
+      <stop offset="100%" stop-color="#059669" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Soft Ambient Glow Filter -->
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+
+    <filter id="sparkGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
-  <rect width="512" height="512" rx="115" fill="url(#bgGrad)"/>
-  <rect width="504" height="504" x="4" y="4" rx="112" fill="none" stroke="#38BDF8" stroke-width="8" stroke-opacity="0.4"/>
+
+  <!-- App Icon Squircle Base with Soft Shadow -->
+  <rect width="512" height="512" rx="124" fill="url(#bgGrad)"/>
+  <rect width="512" height="512" rx="124" fill="url(#coreAura)"/>
   
-  <g transform="translate(56, 56) scale(4)">
-    <path d="M56 34C54 23 42 19 32 24C36 29 40 33 42 38C46 36 51 34 56 34Z" fill="url(#finDorsal)"/>
-    <path d="M48 64C44 73 33 78 26 76C29 70 33 66 38 63C41 64 45 64 48 64Z" fill="url(#finDorsal)"/>
-    <path d="M82 49C81 44 73 37 60 36C46 35 34 44 26 48C20 42 14 36 12 37C13 43 16 48 18 50C16 52 13 57 12 63C14 64 20 58 26 52C34 56 46 65 60 64C73 63 81 56 82 51C82.5 50.5 82.5 49.5 82 49Z" fill="url(#bodyGrad)"/>
-    <path d="M54 48C50 51 44 53 40 52C42 49 46 47 50 47C51.5 47 53 47.5 54 48Z" fill="#A7F3D0" opacity="0.6"/>
-    <circle cx="78" cy="28" r="2.2" fill="#38BDF8" opacity="0.4"/>
-    <circle cx="86" cy="35" r="1.4" fill="#00F5A0" opacity="0.6"/>
-    <path d="M72 45C72.3 47.8 73.2 48.7 76 49C73.2 49.3 72.3 50.2 72 53C71.7 50.2 70.8 49.3 68 49C70.8 48.7 71.7 47.8 72 45Z" fill="url(#neonEyeSparkle)" filter="drop-shadow(0 0 6px rgba(0, 245, 160, 0.9))"/>
+  <!-- Subtle 1px Glass Edge Bevel -->
+  <rect x="3" y="3" width="506" height="506" rx="121" fill="none" stroke="url(#borderSpecular)" stroke-width="2.5"/>
+
+  <!-- Subtle Concentric Acoustic/Water Ripple Waves -->
+  <circle cx="260" cy="256" r="160" stroke="#00D2FF" stroke-opacity="0.05" stroke-width="1.5" stroke-dasharray="4 8"/>
+  <circle cx="260" cy="256" r="195" stroke="#00F5A0" stroke-opacity="0.04" stroke-width="1.5" stroke-dasharray="6 12"/>
+
+  <!-- ================= THE EMBLEM: BIO-LUMINESCENT FISH & NEURAL LOOP ================= -->
+  <g id="emblem-group" filter="url(#softGlow)">
+    
+    <!-- Dorsal Fin Sweep (Translucent Aerodynamic Wing) -->
+    <path d="M250 178 C240 125 185 105 138 126 C158 152 178 172 190 195 C210 186 232 180 250 178 Z" 
+          fill="url(#dorsalGlow)"/>
+
+    <!-- Ventral / Pelvic Fin Sweep -->
+    <path d="M215 328 C195 372 145 396 112 386 C126 358 144 338 168 322 C182 327 200 328 215 328 Z" 
+          fill="url(#dorsalGlow)" opacity="0.8"/>
+
+    <!-- Caudal / Tail Fin Ribbons (Fluid Flukes) -->
+    <path d="M110 252 C82 220 54 192 46 198 C52 226 66 248 76 256 C66 264 52 286 46 314 C54 320 82 292 110 260 C116 258 116 254 110 252 Z" 
+          fill="url(#tailGlow)"/>
+
+    <!-- Continuous Fluid Body (The Intelligent Swimming Flow) -->
+    <path d="M375 240 C370 216 332 184 270 180 C208 176 154 220 118 240 C92 210 64 182 54 186 C58 206 68 228 78 244 C68 260 58 282 54 302 C64 306 92 278 118 248 C154 268 208 312 270 308 C332 304 370 272 375 248 C377 245 377 243 375 240 Z" 
+          fill="url(#bioFlowGrad)"/>
+
+    <!-- Inner Ergonomic Contour Ribbon (Gives 3D Volume & Sleek Hydrodynamics) -->
+    <path d="M360 242 C345 222 312 200 262 198 C215 196 172 226 142 244 C172 262 215 292 262 290 C312 288 345 266 360 246 C362 244 362 243 360 242 Z" 
+          fill="#061224" opacity="0.6"/>
+
+    <!-- Bio-Luminescent Lateral Horizon Line -->
+    <path d="M142 244 C190 226 240 220 308 234 C335 239 350 244 360 244" 
+          stroke="url(#bioFlowGrad)" stroke-width="3" stroke-linecap="round" opacity="0.85"/>
+
+    <!-- Neural Spark / Eye: 4-Point AI Star with Radiance -->
+    <g transform="translate(325, 222)" filter="url(#sparkGlow)">
+      <!-- AI Radiance Orb -->
+      <circle cx="0" cy="0" r="14" fill="url(#neuralSparkRad)"/>
+      <!-- Crisp 4-Point Neural Spark (Star) -->
+      <path d="M0 -15 C0.8 -4 4 -0.8 15 0 C4 0.8 0.8 4 0 15 C-0.8 4 -4 0.8 -15 0 C-4 -0.8 -0.8 -4 0 -15 Z" 
+            fill="#FFFFFF"/>
+      <circle cx="0" cy="0" r="2.5" fill="#00F5A0"/>
+    </g>
+
+    <!-- Leading Hydrodynamic Micro-Sparkles -->
+    <circle cx="395" cy="180" r="3" fill="#00D2FF" opacity="0.7"/>
+    <circle cx="425" cy="205" r="2" fill="#00F5A0" opacity="0.8"/>
+    <circle cx="380" cy="295" r="2.5" fill="#38BDF8" opacity="0.5"/>
   </g>
 </svg>

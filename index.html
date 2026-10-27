@@ -14,20 +14,27 @@
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon.svg">
 
+  <!-- Modern Geometric Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
     :root {
-      --bg-dark: #070D18;
-      --card-bg: rgba(15, 23, 42, 0.85);
-      --card-border: rgba(56, 189, 248, 0.2);
-      --card-border-glow: rgba(56, 189, 248, 0.4);
-      --cyan: #38BDF8;
+      --bg-dark: #040812;
+      --card-bg: rgba(9, 18, 36, 0.78);
+      --card-border: rgba(56, 189, 248, 0.16);
+      --card-border-glow: rgba(0, 210, 255, 0.35);
+      --cyan: #00D2FF;
+      --cyan-bright: #38BDF8;
       --neon-green: #00F5A0;
       --alert-yellow: #F59E0B;
       --alert-red: #EF4444;
       --purple: #A78BFA;
       --text-main: #F8FAFC;
       --text-muted: #94A3B8;
-      --input-bg: #0B1324;
+      --text-dim: #64748B;
+      --input-bg: #070F1E;
       --bottom-nav-height: 66px;
     }
 
@@ -36,7 +43,7 @@
     html, body {
       background-color: var(--bg-dark);
       color: var(--text-main);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       min-height: 100vh;
       overflow-x: hidden;
       padding-bottom: calc(var(--bottom-nav-height) + 24px);
@@ -45,9 +52,9 @@
     /* Top Sticky Header */
     header {
       position: sticky; top: 0; z-index: 60;
-      background: rgba(7, 13, 24, 0.92);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(4, 8, 18, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--card-border);
       padding: 10px 16px;
       display: flex; align-items: center; justify-content: space-between;
@@ -55,23 +62,22 @@
     }
 
     .brand-wrap {
-      display: flex; align-items: center; gap: 8px; cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; gap: 10px; cursor: pointer; flex-shrink: 0;
     }
     .header-logo-svg {
-      width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0;
-      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.35); background: #080E1A;
+      width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+      box-shadow: 0 4px 16px rgba(0, 210, 255, 0.35); background: #040812;
+      border: 1px solid rgba(0, 210, 255, 0.3);
     }
     .brand-title {
-      font-size: 19px; font-weight: 700; letter-spacing: -0.4px;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      font-size: 20px; font-weight: 800; letter-spacing: -0.6px; display: flex; align-items: center;
     }
-    .part-aqua { color: var(--cyan); }
-    .part-assist { color: #fff; }
-    .green-i { position: relative; display: inline-block; }
-    .green-i::after {
-      content: ""; position: absolute; top: 2px; left: 50%;
-      transform: translateX(-50%); width: 4.5px; height: 4.5px;
-      background: var(--neon-green); border-radius: 50%;
-      box-shadow: 0 0 6px var(--neon-green);
+    .brand-title .part-aqua { color: #00D2FF; font-weight: 800; }
+    .brand-title .part-assist { color: #FFFFFF; font-weight: 600; }
+    .brand-title .ai-spark {
+      font-size: 13px; color: #00F5A0; margin-left: 3px; line-height: 1;
+      filter: drop-shadow(0 0 6px #00F5A0);
     }
 
     .icon-btn {
@@ -416,34 +422,9 @@
   <!-- Top Sticky Header -->
   <header>
     <div id="header-brand" class="brand-wrap" onclick="navToGlobal('dashboard')">
-      <svg class="header-logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#38BDF8"/>
-            <stop offset="60%" stop-color="#06B6D4"/>
-            <stop offset="100%" stop-color="#0D9488"/>
-          </linearGradient>
-          <linearGradient id="finDorsal" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#7DD3FC" stop-opacity="0.8"/>
-            <stop offset="100%" stop-color="#06B6D4" stop-opacity="0.2"/>
-          </linearGradient>
-          <radialGradient id="neonEyeSparkle" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="#FFFFFF"/>
-            <stop offset="40%" stop-color="#00F5A0"/>
-            <stop offset="100%" stop-color="#059669"/>
-          </radialGradient>
-        </defs>
-        <rect width="100" height="100" rx="22" fill="#080E1A" stroke="#38BDF8" stroke-width="2.5"/>
-        <path d="M56 34C54 23 42 19 32 24C36 29 40 33 42 38C46 36 51 34 56 34Z" fill="url(#finDorsal)"/>
-        <path d="M48 64C44 73 33 78 26 76C29 70 33 66 38 63C41 64 45 64 48 64Z" fill="url(#finDorsal)"/>
-        <path d="M82 49C81 44 73 37 60 36C46 35 34 44 26 48C20 42 14 36 12 37C13 43 16 48 18 50C16 52 13 57 12 63C14 64 20 58 26 52C34 56 46 65 60 64C73 63 81 56 82 51C82.5 50.5 82.5 49.5 82 49Z" fill="url(#bodyGrad)"/>
-        <path d="M54 48C50 51 44 53 40 52C42 49 46 47 50 47C51.5 47 53 47.5 54 48Z" fill="#A7F3D0" opacity="0.6"/>
-        <circle cx="78" cy="28" r="2.2" fill="#38BDF8" opacity="0.4"/>
-        <circle cx="86" cy="35" r="1.4" fill="#00F5A0" opacity="0.6"/>
-        <path d="M72 45C72.3 47.8 73.2 48.7 76 49C73.2 49.3 72.3 50.2 72 53C71.7 50.2 70.8 49.3 68 49C70.8 48.7 71.7 47.8 72 45Z" fill="url(#neonEyeSparkle)" filter="drop-shadow(0 0 6px rgba(0, 245, 160, 0.9))"/>
-      </svg>
+      <img src="icon.svg" class="header-logo-svg" alt="aquAssist Logo">
       <div class="brand-title">
-        <span class="part-aqua">aqu</span><span class="part-assist">Ass<span class="green-i">&#305;</span>st</span>
+        <span class="part-aqua">aqu</span><span class="part-assist">Assist</span><span class="ai-spark">✦</span>
       </div>
     </div>
 

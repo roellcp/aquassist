@@ -1,13 +1,13 @@
 {
-  "name": "aquAssist - Smart Aquarium Co-Pilot",
+  "name": "aquAssist — Intelligent Aquarium Co-Pilot",
   "short_name": "aquAssist",
-  "description": "Beginner-friendly smart aquarium tracker, water chemistry logger, and maintenance co-pilot.",
+  "description": "Intelligent, bio-luminescent aquarium co-pilot powered by AI.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#070D18",
-  "theme_color": "#070D18",
+  "background_color": "#040812",
+  "theme_color": "#040812",
   "icons": [
     {
       "src": "icon.svg",
