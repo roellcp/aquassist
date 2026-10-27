@@ -66,15 +66,17 @@
       display: flex; align-items: center; gap: 11px; cursor: pointer; flex-shrink: 0;
     }
     .header-logo-img {
-      width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
-      object-fit: cover;
-      box-shadow: 0 4px 18px rgba(0, 210, 255, 0.4);
+      width: 44px; height: 44px; flex-shrink: 0;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 14px rgba(0, 210, 255, 0.45));
       border: none;
+      border-radius: 0;
+      background: transparent;
       display: block;
     }
     .brand-title {
       font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-      font-size: 21px; font-weight: 800; letter-spacing: -0.5px; display: flex; align-items: baseline;
+      font-size: 21px; font-weight: 800; letter-spacing: -0.5px; display: flex; align-items: center;
       line-height: 1.1;
     }
     .brand-title .part-aqua {
@@ -84,11 +86,15 @@
     .brand-title .part-assist {
       color: #FFFFFF; font-weight: 600; letter-spacing: -0.4px;
     }
-    .brand-title .tetra-glow-dot {
-      display: inline-block; width: 6px; height: 6px; border-radius: 50%;
-      background: #00F5A0; margin-left: 3px; vertical-align: middle;
-      box-shadow: 0 0 8px #00F5A0, 0 0 14px rgba(0, 245, 160, 0.8);
-      animation: pulseNeon 2.4s infinite ease-in-out;
+    .brand-title .ai-spark {
+      font-size: 13px; color: #00F5A0; margin-left: 4px; line-height: 1;
+      filter: drop-shadow(0 0 8px #00F5A0);
+      animation: pulseSpark 2.2s infinite ease-in-out;
+    }
+
+    @keyframes pulseSpark {
+      0%, 100% { opacity: 0.85; transform: scale(1); filter: drop-shadow(0 0 6px #00F5A0); }
+      50% { opacity: 1; transform: scale(1.25); filter: drop-shadow(0 0 12px #00F5A0) drop-shadow(0 0 16px rgba(0,210,255,0.6)); }
     }
     .brand-subtext {
       font-size: 8.5px; font-weight: 700; color: #64748B;
@@ -487,10 +493,10 @@
       <img src="icon-header.png" class="header-logo-img" alt="aquAssist AI Fish Logo">
       <div>
         <div class="brand-title">
-          <span class="part-aqua">aqu</span><span class="part-assist">Assist</span><span class="tetra-glow-dot"></span>
+          <span class="part-aqua">aqu</span><span class="part-assist">Assist</span><span class="ai-spark">✦</span>
         </div>
         <div class="brand-subtext">
-          <span class="tetra-stripe"></span>AI Aquarist
+          <span class="tetra-stripe"></span>AI Aquarium Assistant
         </div>
       </div>
     </div>
