@@ -1,7 +1,7 @@
 {
   "name": "aquAssist — Intelligent Aquarium Co-Pilot",
   "short_name": "aquAssist",
-  "description": "Intelligent, bio-luminescent aquarium co-pilot powered by AI.",
+  "description": "Intelligent aquarium management and smart fish care co-pilot.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -10,10 +10,16 @@
   "theme_color": "#040812",
   "icons": [
     {
-      "src": "icon.svg",
-      "sizes": "192x192 512x512",
-      "type": "image/svg+xml",
+      "src": "icon.png",
+      "sizes": "512x512 1024x1024",
+      "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     }
   ]
 }
