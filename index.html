@@ -137,7 +137,7 @@
       font-size: 17px; font-weight: 700; color: #fff; letter-spacing: -0.3px;
     }
 
-    /* Executive Hero Greeting Card */
+    /* Greeting Card */
     .greeting-card {
       background: linear-gradient(135deg, rgba(56, 189, 248, 0.14), rgba(0, 245, 160, 0.08));
       border: 1px solid var(--card-border-glow);
@@ -253,6 +253,19 @@
     }
     .chart-legend-item { display: flex; align-items: center; gap: 5px; }
     .legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+    /* Filter Media Progress Cards (F-16) */
+    .media-card {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px; padding: 14px; margin-bottom: 10px;
+    }
+    .media-progress-bar {
+      width: 100%; height: 6px; background: rgba(255,255,255,0.1);
+      border-radius: 10px; margin: 8px 0; overflow: hidden;
+    }
+    .media-progress-fill {
+      height: 100%; border-radius: 10px; transition: width 0.3s ease;
+    }
 
     /* Bottom Navigation Bar */
     .bottom-nav {
@@ -397,7 +410,7 @@
       <select id="global-tank-select" class="tank-selector" onchange="onTankSelectChange(this.value)">
         <option value="all">🏠 All Tanks</option>
       </select>
-      <button class="icon-btn" onclick="openSettingsModal()" title="Settings & Global Tap Profile">⚙️</button>
+      <button class="icon-btn" onclick="openSettingsModal()" title="Settings & Global Household Baseline">⚙️</button>
     </div>
   </header>
 
@@ -434,7 +447,6 @@
           <span id="water-active-tank-badge" class="badge badge-stable">40G Community</span>
         </div>
 
-        <!-- Filter Buttons: Combined & Individual -->
         <div class="chart-filter-bar">
           <button class="chart-pill-btn active" onclick="setChartFilter('all', this)">All Combined</button>
           <button class="chart-pill-btn" onclick="setChartFilter('no3', this)">Nitrate (NO₃)</button>
@@ -529,13 +541,13 @@
       </div>
     </section>
 
-    <!-- ================= VIEW 3: ECOSYSTEM & HARDWARE ================= -->
+    <!-- ================= VIEW 3: ECOSYSTEM & HARDWARE (PHASE 3) ================= -->
     <section id="view-ecosystem" class="view-panel">
       <div class="subtabs">
         <button class="subtab-btn active" onclick="switchEcoTab('livestock', this)">Livestock</button>
         <button class="subtab-btn" onclick="switchEcoTab('plants', this)">Plants</button>
-        <button class="subtab-btn" onclick="switchEcoTab('equipment', this)">Equipment</button>
-        <button class="subtab-btn" onclick="switchEcoTab('closet', this)">Supply Closet</button>
+        <button class="subtab-btn" onclick="switchEcoTab('equipment', this)">Hardware & Filters</button>
+        <button class="subtab-btn" onclick="switchEcoTab('closet', this)">🧴 Global Closet</button>
       </div>
 
       <!-- Subtab 1: Livestock -->
@@ -543,13 +555,28 @@
         <div class="card">
           <div class="card-header">
             <div class="card-title">Livestock Roster</div>
+            <span id="live-active-tank-badge" class="badge badge-stable">40G Community</span>
           </div>
           <div class="input-row">
-            <input type="text" id="eco-live-name" placeholder="Species / Fish Name">
+            <input type="text" id="eco-live-name" placeholder="Species / Fish Name (e.g. Neon Tetra)">
             <input type="number" id="eco-live-count" placeholder="Qty" style="width:70px;" value="1">
             <button class="btn" style="width:70px;" onclick="addLivestockItem()">Add</button>
           </div>
           <div id="eco-livestock-list" class="pill-list"></div>
+
+          <!-- Subtle Loss Trigger at bottom (Hidden away as requested) -->
+          <div style="margin-top:20px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); display:flex; justify-content:flex-end;">
+            <button class="btn btn-secondary" style="width:auto; font-size:11px; padding:6px 14px; opacity:0.65; border-color:rgba(255,255,255,0.12);" onclick="openLossModal()">
+              Log Fauna Loss...
+            </button>
+          </div>
+        </div>
+
+        <div id="loss-history-card" class="card" style="display:none; background:rgba(15,23,42,0.6);">
+          <div class="card-header">
+            <div class="card-title" style="font-size:14px;">Loss Log & Health Records</div>
+          </div>
+          <div id="loss-history-list"></div>
         </div>
       </div>
 
@@ -567,29 +594,49 @@
         </div>
       </div>
 
-      <!-- Subtab 3: Equipment -->
+      <!-- Subtab 3: Hardware & Filter Media Lifecycles (F-16) -->
       <div id="ecotab-equipment" class="ecotab-content" style="display:none;">
+        
+        <!-- Filter Media Lifecycle Tracker (F-16) -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Filters, Heaters & Lighting</div>
+            <div>
+              <div class="card-title">🧽 Filter Media Lifecycles</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Track sponge rinse cycles and Purigen/carbon expiration</div>
+            </div>
+            <button class="btn btn-secondary" style="width:auto; font-size:11px; padding:4px 10px;" onclick="openAddMediaModal()">+ Add Media</button>
+          </div>
+
+          <div id="filter-media-list"></div>
+        </div>
+
+        <!-- General Equipment List -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Other Hardware & Lighting</div>
           </div>
           <div class="input-row">
-            <input type="text" id="eco-equip-name" placeholder="e.g. Fluval 307 Canister, 100W Heater">
+            <input type="text" id="eco-equip-name" placeholder="e.g. 150W Heater, CO2 Regulator, Plant 3.0 LED">
             <button class="btn" style="width:70px;" onclick="addEcosystemItem('equipment', 'eco-equip-name')">Add</button>
           </div>
           <div id="eco-equipment-list" class="pill-list"></div>
         </div>
       </div>
 
-      <!-- Subtab 4: Supply Closet -->
+      <!-- Subtab 4: Global Supply Closet (Global household inventory) -->
       <div id="ecotab-closet" class="ecotab-content" style="display:none;">
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Global Supply Closet</div>
+            <div>
+              <div class="card-title">🧴 Global Supply Closet</div>
+              <div style="font-size:11px; color:var(--cyan); margin-top:2px;">Shared Household Shelf (Available to all tanks)</div>
+            </div>
           </div>
-          <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Household shelf of chemicals, food, and test kits shared across all tanks.</p>
+          <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">
+            The AI scans this shelf to recommend dosages and treatments using what you already own.
+          </p>
           <div class="input-row">
-            <input type="text" id="eco-closet-name" placeholder="e.g. Seachem Prime, Fritz TurboStart">
+            <input type="text" id="eco-closet-name" placeholder="e.g. Seachem Prime, API Master Test Kit, Fritz TurboStart">
             <button class="btn" style="width:70px;" onclick="addClosetSupply()">Add</button>
           </div>
           <div id="eco-closet-list" class="pill-list"></div>
@@ -676,7 +723,90 @@
     </div>
   </div>
 
-  <!-- ================= MODAL: SETTINGS & GLOBAL TAP PROFILE ================= -->
+  <!-- ================= MODAL: LOG FAUNA LOSS (F-18) ================= -->
+  <div class="modal-overlay" id="lossModal">
+    <div class="modal-box">
+      <div class="card-header" style="margin-bottom:12px;">
+        <h3 style="font-size:17px; color:var(--text-main);">Log Fauna Loss</h3>
+        <button class="icon-btn" style="width:28px;height:28px;" onclick="closeLossModal()">×</button>
+      </div>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">
+        Recording losses automatically updates your roster count and checks tank parameters for safety.
+      </p>
+
+      <div style="margin-bottom:12px;">
+        <label>Select Affected Species</label>
+        <select id="loss-species-select"></select>
+      </div>
+
+      <div class="input-grid-2">
+        <div>
+          <label>Quantity Lost</label>
+          <input type="number" id="loss-qty" value="1" min="1">
+        </div>
+        <div>
+          <label>Date Observed</label>
+          <input type="date" id="loss-date">
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label>Symptoms Observed (Optional)</label>
+        <select id="loss-symptoms">
+          <option value="No visible symptoms / old age">No visible symptoms / Natural</option>
+          <option value="White spots on body / fins (Ich/Velvet)">White spots (Ich / Velvet)</option>
+          <option value="Frayed fins / tail rot">Frayed fins / Tail rot</option>
+          <option value="Bloat / Raised pinecone scales (Dropsy)">Bloat / Pineconing (Dropsy)</option>
+          <option value="Gasping at surface / lethargy">Gasping at surface / Lethargy</option>
+          <option value="Aggression / fin nipping from tank mates">Nipped by tank mates</option>
+        </select>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary" onclick="closeLossModal()">Cancel</button>
+        <button class="btn btn-danger" onclick="submitFaunaLoss()">Record Loss & Audit Health</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: ADD FILTER MEDIA (F-16) ================= -->
+  <div class="modal-overlay" id="addMediaModal">
+    <div class="modal-box">
+      <div class="card-header" style="margin-bottom:12px;">
+        <h3 style="font-size:17px;">Add Filter Media</h3>
+        <button class="icon-btn" style="width:28px;height:28px;" onclick="closeAddMediaModal()">×</button>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <label>Media Name & Type</label>
+        <input type="text" id="m-media-name" placeholder="e.g. Coarse Foam Sponge, Purigen, Matrix">
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <label>Media Category</label>
+        <select id="m-media-cat" onchange="onMediaCategoryChange(this.value)">
+          <option value="mechanical">🧽 Mechanical (Sponge / Floss) - Rinse timer</option>
+          <option value="chemical">💎 Chemical (Purigen / Carbon) - Replace timer</option>
+          <option value="biological">🧬 Biological (Ceramic Rings / Matrix) - Permanent</option>
+        </select>
+      </div>
+
+      <div style="margin-bottom:16px;" id="media-interval-group">
+        <label>Maintenance Interval (Days)</label>
+        <input type="number" id="m-media-interval" value="30">
+        <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">
+          e.g. 14-30 days for sponge rinse; 60-90 days for carbon/Purigen.
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary" onclick="closeAddMediaModal()">Cancel</button>
+        <button class="btn btn-neon" onclick="saveNewFilterMedia()">Save Media</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: SETTINGS & GLOBAL HOUSEHOLD ================= -->
   <div class="modal-overlay" id="settingsModal">
     <div class="modal-box">
       <div class="card-header" style="margin-bottom:14px;">
@@ -720,7 +850,7 @@
       </div>
 
       <div style="text-align:center; font-size:11px; color:var(--text-muted); margin-top:10px;">
-        aquAssist v7.2 • $0 Smart Tank Co-Pilot
+        aquAssist v7.3 • $0 Smart Tank Co-Pilot
       </div>
     </div>
   </div>
@@ -759,7 +889,13 @@
             { date: "2026-10-25", nh3: 0, no2: 0, no3: 15, ph: 7.2, temp: 78.0, wc: 25, dose: "Prime 4ml", note: "Routine 25% water change" }
           ],
           equipment: ["Fluval 407 Canister", "150W Eheim Heater", "Fluval Plant 3.0 LED"],
+          filterMedia: [
+            { id: 101, name: "Coarse Foam Sponge", cat: "mechanical", interval: 30, lastDate: "2026-10-10" },
+            { id: 102, name: "Seachem Purigen", cat: "chemical", interval: 90, lastDate: "2026-09-01" },
+            { id: 103, name: "Bio-Rings & Substrat Pro", cat: "biological", interval: 0, lastDate: "2025-01-15" }
+          ],
           livestock: ["12x Neon Tetra", "6x Harlequin Rasbora", "3x Otocinclus"],
+          losses: [],
           plants: ["Amazon Sword", "Java Fern", "Anubias Nana"],
           decor: ["Driftwood", "Dragon Stone"]
         },
@@ -779,7 +915,12 @@
             { date: "2026-10-26", nh3: 0.25, no2: 1.0, no3: 10, ph: 7.0, temp: 79.0, wc: 0, dose: "Prime 1ml" }
           ],
           equipment: ["Aquaclear 20 HOB", "50W Preset Heater"],
+          filterMedia: [
+            { id: 201, name: "Aquaclear Sponge", cat: "mechanical", interval: 21, lastDate: "2026-10-15" },
+            { id: 202, name: "Biomax Ceramic Rings", cat: "biological", interval: 0, lastDate: "2026-10-10" }
+          ],
           livestock: ["1x Halfmoon Betta", "1x Nerite Snail"],
+          losses: [],
           plants: ["Cryptocoryne Wendtii", "Floating Salvinia"],
           decor: ["Seiryu Stone", "Cholla Wood"]
         }
@@ -1067,13 +1208,12 @@
       updateWcVolumePreview(document.getElementById("w-log-wc").value);
     }
 
-    /* Visual SVG Chart Generator (F-12) */
     function renderTrendChart() {
       const svg = document.getElementById("water-chart-svg");
       const activeTank = getActiveTank();
       if (!svg || !activeTank) return;
 
-      const history = (activeTank.history || []).slice().reverse(); // Chronological: oldest to newest
+      const history = (activeTank.history || []).slice().reverse();
       if (history.length === 0) {
         svg.innerHTML = `
           <text x="250" y="105" text-anchor="middle" fill="#64748B" font-size="13">
@@ -1093,7 +1233,6 @@
       const plotW = width - padL - padR;
       const plotH = height - padT - padB;
 
-      // Determine min/max scales depending on filter
       let maxY = 40;
       let minY = 0;
 
@@ -1104,7 +1243,6 @@
       } else if (currentChartFilter === "temp") {
         minY = 65; maxY = 86;
       } else {
-        // Combined or NO3
         const maxNo3 = Math.max(...history.map(h => h.no3 || 0), 30);
         maxY = Math.ceil(maxNo3 / 10) * 10;
       }
@@ -1128,14 +1266,12 @@
         </defs>
       `;
 
-      // Safe Zone Green Band
       if (currentChartFilter === "all" || currentChartFilter === "no3") {
         const safeY1 = getY(20);
         const safeY2 = getY(0);
         svgHtml += `<rect x="${padL}" y="${safeY1}" width="${plotW}" height="${safeY2 - safeY1}" fill="url(#safeZoneGrad)" rx="4"/>`;
       }
 
-      // Grid Lines
       for (let i = 0; i <= 4; i++) {
         const val = minY + (i / 4) * (maxY - minY);
         const y = padT + plotH - (i / 4) * plotH;
@@ -1145,13 +1281,12 @@
         `;
       }
 
-      // Parameter Lines Configuration
       const seriesList = [
-        { key: "no3", label: "NO₃", color: "var(--cyan)", filter: "no3", mult: 1 },
-        { key: "nh3", label: "NH₃", color: "var(--alert-red)", filter: "nh3", mult: (currentChartFilter === "all" ? 10 : 1) },
-        { key: "no2", label: "NO₂", color: "var(--alert-yellow)", filter: "no2", mult: (currentChartFilter === "all" ? 10 : 1) },
-        { key: "ph", label: "pH", color: "var(--purple)", filter: "ph", mult: 1 },
-        { key: "temp", label: "Temp", color: "var(--neon-green)", filter: "temp", mult: 1 }
+        { key: "no3", label: "NO₃", color: "var(--cyan)", filter: "no3" },
+        { key: "nh3", label: "NH₃", color: "var(--alert-red)", filter: "nh3" },
+        { key: "no2", label: "NO₂", color: "var(--alert-yellow)", filter: "no2" },
+        { key: "ph", label: "pH", color: "var(--purple)", filter: "ph" },
+        { key: "temp", label: "Temp", color: "var(--neon-green)", filter: "temp" }
       ];
 
       seriesList.forEach(series => {
@@ -1169,7 +1304,6 @@
           svgHtml += `<polyline points="${points.join(" ")}" fill="none" stroke="${series.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
         }
 
-        // Draw Data Points
         history.forEach((h, idx) => {
           const val = (h[series.key] !== undefined) ? h[series.key] : 0;
           const x = getX(idx);
@@ -1178,7 +1312,6 @@
         });
       });
 
-      // Water Change Event Droplet Markers
       history.forEach((h, idx) => {
         if (h.wc && h.wc > 0) {
           const x = getX(idx);
@@ -1188,7 +1321,6 @@
             </g>
           `;
         }
-        // X-Axis Date Label
         const dateShort = h.date ? h.date.substring(5) : "";
         svgHtml += `
           <text x="${getX(idx)}" y="${height - 8}" fill="#94A3B8" font-size="9" text-anchor="middle">${dateShort}</text>
@@ -1198,7 +1330,6 @@
       svg.innerHTML = svgHtml;
     }
 
-    /* Smart Co-Pilot Action Engine & Dilution Math (F-15) */
     function renderSmartActionCard() {
       const activeTank = getActiveTank();
       const card = document.getElementById("smart-action-card");
@@ -1219,7 +1350,6 @@
       let nextWcText = "";
       let doseText = "";
 
-      // 1. Water Condition / Toxicity Check
       if (t.nh3 > 0 || t.no2 > 0) {
         if (isCycling) {
           statusClass = "status-caution";
@@ -1239,7 +1369,6 @@
         badgeHtml = "🟡 Nitrate Rising";
         const targetWcPct = 30;
         const volAmt = Math.round(activeTank.vol * (targetWcPct / 100));
-        // Dilution Math: newNO3 = oldNO3 * (1 - fraction) + tapNO3 * fraction
         const expectedNo3 = Math.round((t.no3 * (1 - targetWcPct / 100)) + (tap.no3 * (targetWcPct / 100)));
         summaryText = `Nitrate reached ${t.no3} ppm. With your tap water baseline at ${tap.no3} ppm, a ${targetWcPct}% change drops nitrate safely to ~${expectedNo3} ppm.`;
         nextWcText = `Tomorrow or This Weekend<br><span style="font-size:11px; color:var(--cyan); font-weight:normal;">${targetWcPct}% (${volAmt} ${u.vol})</span>`;
@@ -1252,13 +1381,11 @@
         nextWcText = `Scheduled: Sunday<br><span style="font-size:11px; color:var(--cyan); font-weight:normal;">${wcPct}% (${volAmt} ${u.vol})</span>`;
       }
 
-      // 2. Dosing Calculator from Closet
       const closet = (appState.closet || []).map(c => c.toLowerCase());
       const hasPrime = closet.some(c => c.includes("prime"));
       const hasBacteria = closet.some(c => c.includes("turbostart") || c.includes("stability") || c.includes("quick start"));
 
       if (hasPrime) {
-        // Seachem Prime: 5ml per 50 gallons = 0.1ml per gallon (approx 2 drops/gal)
         const ml = Math.round((activeTank.vol * 0.1) * 10) / 10;
         const drops = Math.round(activeTank.vol * 2);
         doseText = `Seachem Prime (From Closet)<br><span style="font-size:11px; color:var(--neon-green); font-weight:normal;">${ml} ml (≈ ${drops} drops) in new water</span>`;
@@ -1352,7 +1479,7 @@
     }
 
     /* ============================================================
-       7. ECOSYSTEM & INVENTORY VIEW
+       7. PHASE 3: ECOSYSTEM, FILTER LIFECYCLES (F-16) & LOSSES (F-18)
        ============================================================ */
     function switchEcoTab(tab, btn) {
       document.querySelectorAll(".subtab-btn").forEach(b => b.classList.remove("active"));
@@ -1366,9 +1493,17 @@
       const activeTank = getActiveTank();
       if (!activeTank) return;
 
+      const badge = document.getElementById("live-active-tank-badge");
+      if (badge) {
+        badge.innerText = activeTank.name;
+        badge.style.borderColor = activeTank.color || "var(--cyan)";
+      }
+
       renderPillList("livestock", "eco-livestock-list", activeTank.livestock || []);
       renderPillList("plants", "eco-plants-list", activeTank.plants || []);
       renderPillList("equipment", "eco-equipment-list", activeTank.equipment || []);
+      renderFilterMediaList();
+      renderLossHistory();
       renderClosetList();
     }
 
@@ -1388,7 +1523,7 @@
 
     function addLivestockItem() {
       const name = document.getElementById("eco-live-name").value.trim();
-      const count = document.getElementById("eco-live-count").value || 1;
+      const count = parseInt(document.getElementById("eco-live-count").value) || 1;
       if (!name) return;
       const activeTank = getActiveTank();
       if (!activeTank.livestock) activeTank.livestock = [];
@@ -1417,6 +1552,7 @@
       renderEcosystemView();
     }
 
+    /* Global Supply Closet */
     function renderClosetList() {
       const el = document.getElementById("eco-closet-list");
       if (!el) return;
@@ -1447,6 +1583,242 @@
       saveDataToStorage();
       renderClosetList();
       renderSmartActionCard();
+    }
+
+    /* Filter Media Lifecycle Tracker (F-16) */
+    function renderFilterMediaList() {
+      const activeTank = getActiveTank();
+      const listEl = document.getElementById("filter-media-list");
+      if (!listEl || !activeTank) return;
+      listEl.innerHTML = "";
+
+      const mediaItems = activeTank.filterMedia || [];
+      if (mediaItems.length === 0) {
+        listEl.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:6px 0;">No media tracked yet. Tap "+ Add Media" to set up rinse timers.</div>`;
+        return;
+      }
+
+      const today = new Date();
+
+      mediaItems.forEach((m, idx) => {
+        const last = m.lastDate ? new Date(m.lastDate) : today;
+        const diffDays = Math.floor((today - last) / (1000 * 60 * 60 * 24));
+        const interval = m.interval || 30;
+
+        let statusText = "";
+        let fillPct = 100;
+        let barColor = "var(--neon-green)";
+        let actionBtnText = "🔄 Log Rinsed";
+
+        if (m.cat === "biological") {
+          statusText = "🟢 Colonized & Active • Permanent Biological Filter";
+          fillPct = 100;
+          barColor = "var(--neon-green)";
+          actionBtnText = "";
+        } else {
+          const daysLeft = interval - diffDays;
+          fillPct = Math.max(5, Math.min(100, Math.round(((interval - diffDays) / interval) * 100)));
+          if (daysLeft < 0) {
+            statusText = `🔴 Overdue by ${Math.abs(daysLeft)} days!`;
+            barColor = "var(--alert-red)";
+          } else if (daysLeft <= 5) {
+            statusText = `🟡 Maintenance due in ${daysLeft} days`;
+            barColor = "var(--alert-yellow)";
+          } else {
+            statusText = `🟢 Good condition • Due in ${daysLeft} days (Every ${interval}d)`;
+            barColor = "var(--neon-green)";
+          }
+          if (m.cat === "chemical") actionBtnText = "🔄 Log Replaced/Recharged";
+        }
+
+        const div = document.createElement("div");
+        div.className = "media-card";
+        div.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-weight:700; font-size:14px; color:#fff;">${m.name}</div>
+            <span class="delete-x" onclick="deleteFilterMedia(${idx})" title="Remove media">×</span>
+          </div>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+            ${statusText}
+          </div>
+          <div class="media-progress-bar">
+            <div class="media-progress-fill" style="width:${fillPct}%; background:${barColor};"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+            <span style="font-size:11px; color:var(--text-muted);">Last serviced: ${m.lastDate || 'Recently'}</span>
+            ${actionBtnText ? `<button class="btn btn-secondary" style="width:auto; padding:4px 10px; font-size:11px;" onclick="resetMediaTimer(${idx})">${actionBtnText}</button>` : `<span style="font-size:10px; color:var(--alert-yellow);">⚠️ Never rinse with tap water!</span>`}
+          </div>
+        `;
+        listEl.appendChild(div);
+      });
+    }
+
+    function resetMediaTimer(idx) {
+      const activeTank = getActiveTank();
+      if (!activeTank || !activeTank.filterMedia) return;
+      activeTank.filterMedia[idx].lastDate = new Date().toISOString().split("T")[0];
+      saveDataToStorage();
+      renderFilterMediaList();
+      showToast("Media Timer Reset");
+    }
+
+    function deleteFilterMedia(idx) {
+      const activeTank = getActiveTank();
+      if (!activeTank || !activeTank.filterMedia) return;
+      activeTank.filterMedia.splice(idx, 1);
+      saveDataToStorage();
+      renderFilterMediaList();
+    }
+
+    function openAddMediaModal() {
+      document.getElementById("m-media-name").value = "";
+      document.getElementById("m-media-cat").value = "mechanical";
+      document.getElementById("m-media-interval").value = "30";
+      document.getElementById("media-interval-group").style.display = "block";
+      document.getElementById("addMediaModal").classList.add("open");
+    }
+
+    function closeAddMediaModal() {
+      document.getElementById("addMediaModal").classList.remove("open");
+    }
+
+    function onMediaCategoryChange(val) {
+      const grp = document.getElementById("media-interval-group");
+      if (val === "biological") {
+        grp.style.display = "none";
+      } else {
+        grp.style.display = "block";
+        document.getElementById("m-media-interval").value = val === "chemical" ? "60" : "30";
+      }
+    }
+
+    function saveNewFilterMedia() {
+      const name = document.getElementById("m-media-name").value.trim() || "Filter Media";
+      const cat = document.getElementById("m-media-cat").value;
+      const interval = parseInt(document.getElementById("m-media-interval").value) || 30;
+      const activeTank = getActiveTank();
+      if (!activeTank.filterMedia) activeTank.filterMedia = [];
+
+      activeTank.filterMedia.push({
+        id: Date.now(),
+        name,
+        cat,
+        interval: cat === "biological" ? 0 : interval,
+        lastDate: new Date().toISOString().split("T")[0]
+      });
+
+      saveDataToStorage();
+      closeAddMediaModal();
+      renderFilterMediaList();
+      showToast("Media Added");
+    }
+
+    /* Discreet Fauna Loss Tracker (F-18) */
+    function openLossModal() {
+      const activeTank = getActiveTank();
+      const sel = document.getElementById("loss-species-select");
+      if (!activeTank || !sel) return;
+      sel.innerHTML = "";
+
+      const live = activeTank.livestock || [];
+      if (live.length === 0) {
+        sel.innerHTML = `<option value="Other / Fish">Other Fauna</option>`;
+      } else {
+        live.forEach((entry) => {
+          sel.innerHTML += `<option value="${entry}">${entry}</option>`;
+        });
+      }
+
+      document.getElementById("loss-date").valueAsDate = new Date();
+      document.getElementById("loss-qty").value = 1;
+      document.getElementById("lossModal").classList.add("open");
+    }
+
+    function closeLossModal() {
+      document.getElementById("lossModal").classList.remove("open");
+    }
+
+    function submitFaunaLoss() {
+      const activeTank = getActiveTank();
+      if (!activeTank) return;
+
+      const rawSpecies = document.getElementById("loss-species-select").value;
+      const qty = parseInt(document.getElementById("loss-qty").value) || 1;
+      const date = document.getElementById("loss-date").value || new Date().toISOString().split("T")[0];
+      const symptoms = document.getElementById("loss-symptoms").value;
+
+      // Extract species name (e.g. "12x Neon Tetra" -> "Neon Tetra")
+      let cleanSpecies = rawSpecies.replace(/^\d+x\s*/i, "").trim();
+
+      // Decrement or remove from livestock roster
+      if (activeTank.livestock) {
+        for (let i = 0; i < activeTank.livestock.length; i++) {
+          if (activeTank.livestock[i] === rawSpecies) {
+            const match = rawSpecies.match(/^(\d+)x\s*(.*)$/i);
+            if (match) {
+              const currentCount = parseInt(match[1]);
+              const speciesTitle = match[2];
+              const remaining = currentCount - qty;
+              if (remaining > 0) {
+                activeTank.livestock[i] = `${remaining}x ${speciesTitle}`;
+              } else {
+                activeTank.livestock.splice(i, 1);
+              }
+            } else {
+              activeTank.livestock.splice(i, 1);
+            }
+            break;
+          }
+        }
+      }
+
+      // Record in Loss History
+      if (!activeTank.losses) activeTank.losses = [];
+      const lossRecord = { date, species: cleanSpecies, qty, symptoms };
+      activeTank.losses.unshift(lossRecord);
+
+      // Trigger instant Co-Pilot health audit
+      const t = activeTank.lastTest || { nh3: 0, no2: 0, no3: 0, temp: 78 };
+      let auditFeedback = `Recorded loss of ${qty}x ${cleanSpecies}. `;
+      if (t.nh3 > 0 || t.no2 > 0) {
+        auditFeedback += `⚠️ High Alert: Recent ammonia (${t.nh3}) or nitrite (${t.no2}) may be the cause. Check water parameters immediately!`;
+      } else {
+        auditFeedback += `Recent water parameters were nominal. Observed: ${symptoms}.`;
+      }
+      activeTank.summary = auditFeedback;
+
+      saveDataToStorage();
+      closeLossModal();
+      renderEcosystemView();
+      renderDashboard();
+      showToast("Loss Recorded & Health Audited");
+    }
+
+    function renderLossHistory() {
+      const activeTank = getActiveTank();
+      const card = document.getElementById("loss-history-card");
+      const list = document.getElementById("loss-history-list");
+      if (!card || !list || !activeTank) return;
+
+      const losses = activeTank.losses || [];
+      if (losses.length === 0) {
+        card.style.display = "none";
+        return;
+      }
+
+      card.style.display = "block";
+      list.innerHTML = "";
+      losses.slice(0, 5).forEach(l => {
+        list.innerHTML += `
+          <div style="font-size:12px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between;">
+            <div>
+              <span style="color:var(--text-muted);">${l.date}:</span>
+              <b>${l.qty}x ${l.species}</b>
+              <div style="font-size:11px; color:var(--alert-yellow);">${l.symptoms}</div>
+            </div>
+          </div>
+        `;
+      });
     }
 
     /* ============================================================
@@ -1567,7 +1939,12 @@ Provide practical, plain-English instructions. If a water change or dosing is ne
           lastTest: { nh3: 0, no2: 0, no3: 0, ph: 7.2, temp: 78.0, date: startDate },
           history: [],
           equipment: [],
+          filterMedia: [
+            { id: Date.now() + 1, name: "Mechanical Sponge", cat: "mechanical", interval: 30, lastDate: startDate },
+            { id: Date.now() + 2, name: "Biological Media", cat: "biological", interval: 0, lastDate: startDate }
+          ],
           livestock: [],
+          losses: [],
           plants: [],
           decor: []
         };
