@@ -1135,9 +1135,14 @@
     }
 
     /* ============================================================
-       3. NAVIGATION & TANK SELECTOR
+       3. NAVIGATION & ANDROID BACK GESTURE ENGINE
        ============================================================ */
-    function navTo(viewName) {
+    let currentView = "dashboard";
+
+    function navTo(viewName, pushHistory = true) {
+      // Close any open modals first
+      closeAllModals(false);
+
       document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
       document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
 
@@ -1147,6 +1152,12 @@
       if (targetView) targetView.classList.add("active");
       if (targetBtn) targetBtn.classList.add("active");
 
+      currentView = viewName;
+
+      if (pushHistory) {
+        history.pushState({ view: viewName }, "");
+      }
+
       if (viewName === "dashboard") renderDashboard();
       if (viewName === "water") renderWaterView();
       if (viewName === "ecosystem") renderEcosystemView();
@@ -1154,6 +1165,44 @@
 
       window.scrollTo(0, 0);
     }
+
+    function openModalById(modalId) {
+      const el = document.getElementById(modalId);
+      if (el) {
+        el.classList.add("open");
+        history.pushState({ modal: modalId }, "");
+      }
+    }
+
+    function closeModalById(modalId) {
+      const el = document.getElementById(modalId);
+      if (el) el.classList.remove("open");
+      if (history.state && history.state.modal === modalId) {
+        history.back();
+      }
+    }
+
+    function closeAllModals(triggerBack = false) {
+      const openModals = document.querySelectorAll(".modal-overlay.open");
+      openModals.forEach(m => m.classList.remove("open"));
+    }
+
+    // Android Gesture & Browser Back Button Listener
+    window.addEventListener("popstate", (e) => {
+      // 1. If any modal is open, close it and stay in the app!
+      const openModals = document.querySelectorAll(".modal-overlay.open");
+      if (openModals.length > 0) {
+        openModals.forEach(m => m.classList.remove("open"));
+        return;
+      }
+
+      // 2. If navigating back between views
+      if (e.state && e.state.view) {
+        navTo(e.state.view, false);
+      } else if (currentView !== "dashboard") {
+        navTo("dashboard", false);
+      }
+    });
 
     function populateTankSelector() {
       const sel = document.getElementById("global-tank-select");
@@ -1801,11 +1850,11 @@
       document.getElementById("m-media-cat").value = "mechanical";
       document.getElementById("m-media-interval").value = "30";
       document.getElementById("media-interval-group").style.display = "block";
-      document.getElementById("addMediaModal").classList.add("open");
+      openModalById("addMediaModal");
     }
 
     function closeAddMediaModal() {
-      document.getElementById("addMediaModal").classList.remove("open");
+      closeModalById("addMediaModal");
     }
 
     function onMediaCategoryChange(val) {
@@ -1856,11 +1905,11 @@
 
       document.getElementById("loss-date").valueAsDate = new Date();
       document.getElementById("loss-qty").value = 1;
-      document.getElementById("lossModal").classList.add("open");
+      openModalById("lossModal");
     }
 
     function closeLossModal() {
-      document.getElementById("lossModal").classList.remove("open");
+      closeModalById("lossModal");
     }
 
     function submitFaunaLoss() {
@@ -2325,11 +2374,11 @@ Evaluate:
       buildColorCircles(availableColors[0]);
       document.getElementById("m-status").value = "Established";
       document.getElementById("m-photo").value = "";
-      document.getElementById("tankModal").classList.add("open");
+      openModalById("tankModal");
     }
 
     function closeTankModal() {
-      document.getElementById("tankModal").classList.remove("open");
+      closeModalById("tankModal");
     }
 
     function saveTankModalData() {
@@ -2400,11 +2449,11 @@ Evaluate:
       document.getElementById("tap-kh").value = tap.kh || "";
       document.getElementById("setting-api-key").value = appState.apiKey || "";
       updateNotificationStatusDisplay();
-      document.getElementById("settingsModal").classList.add("open");
+      openModalById("settingsModal");
     }
 
     function closeSettingsModal() {
-      document.getElementById("settingsModal").classList.remove("open");
+      closeModalById("settingsModal");
     }
 
     function saveTapBaseline() {
@@ -2449,6 +2498,7 @@ Evaluate:
        11. SERVICE WORKER & APP INITIALIZATION
        ============================================================ */
     async function initApp() {
+      history.replaceState({ view: "dashboard" }, "");
       appState = await loadDataFromStorage();
       renderDashboard();
 
