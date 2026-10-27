@@ -99,8 +99,10 @@
 
     .tank-card-hero { padding: 0 !important; cursor: pointer; }
     .tank-card-hero:active { transform: scale(0.98); }
+    
+    /* Responsive Uncropped Aspect Ratio Banner */
     .tank-banner-wrap {
-      width: 100%; height: 130px; position: relative; background-size: cover; background-position: center;
+      width: 100%; aspect-ratio: 16 / 9; position: relative; background-size: cover; background-position: center;
       display: flex; flex-direction: column; justify-content: flex-end; padding: 16px;
     }
     .tank-banner-overlay {
@@ -110,15 +112,22 @@
     .tank-banner-content { position: relative; z-index: 2; pointer-events: none; }
     .tank-card-body { padding: 14px 18px 18px 18px; }
 
-    /* Clean Option B Greeting Card */
+    /* Executive Briefing Greeting Card */
     .ai-greeting-card {
       background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(0, 245, 160, 0.08));
       border: 1px solid rgba(56, 189, 248, 0.4);
       border-radius: 22px;
-      padding: 24px;
+      padding: 22px;
       margin-bottom: 20px;
       box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6);
     }
+    .hero-metrics-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1); text-align: center;
+    }
+    .hero-metric-box { background: rgba(0, 0, 0, 0.2); border-radius: 10px; padding: 8px 4px; }
+    .hero-metric-val { font-size: 16px; font-weight: 700; color: var(--cyan); }
+    .hero-metric-lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; }
 
     /* Parameter Pill Chips */
     .param-strip {
@@ -133,7 +142,7 @@
     .param-chip b { color: var(--text-main); font-weight: 600; display: block; font-size: 12px; }
 
     /* Badges */
-    .badge { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; }
+    .badge { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
     .badge-cycling { background: rgba(245, 158, 11, 0.2); color: var(--alert-yellow); border: 1px solid rgba(245, 158, 11, 0.4); }
 
     /* Sub Tabs */
@@ -253,14 +262,28 @@
 
     <!-- ==================== VIEW 1: HOME ==================== -->
     <div id="view-home" class="view-panel active">
-      <!-- Clean Option B Executive Greeting Banner -->
       <div class="ai-greeting-card">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-          <div id="dynamic-greeting" style="font-size: 20px; font-weight: 700; color: var(--cyan);">Good day</div>
-          <div class="badge badge-stable" style="font-size: 10px;">🟢 All Systems Nominal</div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+          <div id="dynamic-greeting" style="font-size: 19px; font-weight: 700; color: var(--cyan);">Good day!</div>
+          <div class="badge badge-stable" style="font-size: 10px; white-space: nowrap;">🟢 All Systems Nominal</div>
         </div>
-        <div id="global-ai-summary" style="font-size: 14px; line-height: 1.6; color: var(--text-main);">
+        <div id="global-ai-summary" style="font-size: 13px; line-height: 1.5; color: var(--text-main); margin-bottom: 12px;">
           Scanning telemetry across aquatic environments...
+        </div>
+        
+        <div class="hero-metrics-grid">
+          <div class="hero-metric-box">
+            <div class="hero-metric-val" id="metric-total-tanks">2</div>
+            <div class="hero-metric-lbl">Active Tanks</div>
+          </div>
+          <div class="hero-metric-box">
+            <div class="hero-metric-val" id="metric-total-vol">50G</div>
+            <div class="hero-metric-lbl">Total Volume</div>
+          </div>
+          <div class="hero-metric-box">
+            <div class="hero-metric-val" id="metric-tasks-due">0</div>
+            <div class="hero-metric-lbl">Action Items</div>
+          </div>
         </div>
       </div>
 
@@ -372,678 +395,4 @@
       <!-- Tab 5: Equipment -->
       <div id="subtab-equipment" class="subtab-content" style="display:none;">
         <div class="card">
-          <h3 style="font-size:15px; margin-bottom:8px;">Equipment</h3>
-          <div class="input-row">
-            <input type="text" id="new-equip" placeholder="e.g. Aquaclear 50 Filter">
-            <button class="btn" style="width:70px;" onclick="addItem('equipment', 'new-equip')">Add</button>
-          </div>
-          <div id="equipment-list" class="pill-list"></div>
-        </div>
-      </div>
-
-      <!-- Tab 6: Decor -->
-      <div id="subtab-decor" class="subtab-content" style="display:none;">
-        <div class="card">
-          <h3 style="font-size:15px; margin-bottom:8px;">Decor & Hardscape</h3>
-          <div class="input-row">
-            <input type="text" id="new-decor" placeholder="e.g. Seiryu Stone">
-            <button class="btn" style="width:70px;" onclick="addItem('decor', 'new-decor')">Add</button>
-          </div>
-          <div id="decor-list" class="pill-list"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ==================== VIEW 3: SUPPLY CLOSET ==================== -->
-    <div id="view-closet" class="view-panel">
-      <div class="card">
-        <h2 class="card-title" style="margin-bottom:6px;">Global Supply Closet</h2>
-        <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Shared household shelf of chemicals, foods, and test kits.</p>
-        <div class="input-row">
-          <input type="text" id="new-supply" placeholder="e.g. Seachem Prime">
-          <button class="btn" style="width:80px;" onclick="addSupply()">Add</button>
-        </div>
-        <div id="supply-list" class="pill-list"></div>
-      </div>
-    </div>
-
-    <!-- ==================== VIEW 4: SETTINGS ==================== -->
-    <div id="view-settings" class="view-panel">
-      <div class="card">
-        <h2 class="card-title" style="margin-bottom:14px;">Settings & Info</h2>
-        
-        <div style="margin-bottom:14px;">
-          <label>Unit System</label>
-          <select id="unit-select" onchange="saveUnits()">
-            <option value="us">US Imperial (Gallons, °F, Inches)</option>
-            <option value="metric">Metric (Liters, °C, Centimeters)</option>
-          </select>
-        </div>
-
-        <div style="margin-bottom:14px;">
-          <label>Google AI Studio (Gemini) API Key</label>
-          <input type="password" id="gemini-key" placeholder="AIza...">
-          <button class="btn btn-secondary" style="margin-top:6px; font-size:12px; padding:8px;" onclick="saveApiKey()">Save API Key</button>
-        </div>
-
-        <hr style="border:0; border-top:1px solid rgba(255,255,255,0.08); margin:16px 0;">
-        <div style="display:flex; gap:10px;">
-          <button class="btn btn-secondary" onclick="exportData()">💾 Export JSON</button>
-          <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Restore</button>
-          <input type="file" id="importFile" style="display:none" onchange="importData(event)">
-        </div>
-        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:16px;">aquAssist v6.1 • $0 Tank Manager</div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Tank Add/Edit Modal -->
-  <div class="modal-overlay" id="tankModal">
-    <div class="modal-box">
-      <h3 id="modal-tank-title" style="margin-bottom:12px;">Add New Aquarium</h3>
-      <div style="margin-bottom:10px;">
-        <label>Tank Name</label>
-        <input type="text" id="m-name" placeholder="e.g. 55G Community">
-      </div>
-      <div class="input-grid" style="margin-bottom:10px;">
-        <div>
-          <label>Volume</label>
-          <input type="number" id="m-gal" placeholder="20">
-        </div>
-        <div>
-          <label>Start Date (Cycling)</label>
-          <input type="date" id="m-date">
-        </div>
-      </div>
-      <div style="margin-bottom:12px;">
-        <label>Theme Color (Select 1 of 10)</label>
-        <input type="hidden" id="m-color" value="#38BDF8">
-        <div class="color-picker-grid" id="color-circles-container"></div>
-      </div>
-      <div style="margin-bottom:10px;">
-        <label>Lifecycle Mode</label>
-        <select id="m-status">
-          <option value="Established">Established</option>
-          <option value="Cycling">Cycling</option>
-        </select>
-      </div>
-      <div style="margin-bottom:16px;">
-        <label>Tank Photo (Optional)</label>
-        <input type="file" id="m-photo" accept="image/*">
-      </div>
-      <div style="display:flex; gap:10px;">
-        <button class="btn btn-secondary" onclick="closeTankModal()">Cancel</button>
-        <button class="btn btn-neon" onclick="saveTankModalData()">Save Tank</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Edit Item Modal -->
-  <div class="modal-overlay" id="editItemModal">
-    <div class="modal-box">
-      <h3 style="margin-bottom:12px;">Edit Item</h3>
-      <div style="margin-bottom:16px;">
-        <label>Item Name / Details</label>
-        <input type="text" id="edit-item-input">
-      </div>
-      <div style="display:flex; gap:10px;">
-        <button class="btn btn-secondary" onclick="document.getElementById('editItemModal').classList.remove('open')">Cancel</button>
-        <button class="btn btn-neon" onclick="saveEditedItem()">Update Item</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const availableColors = [
-      "#38BDF8", "#00F5A0", "#A78BFA", "#F59E0B", "#EC4899",
-      "#34D399", "#60A5FA", "#F43F5E", "#FBBF24", "#818CF8"
-    ];
-
-    const defaultData = {
-      apiKey: "",
-      units: "us",
-      closet: ["Seachem Prime", "API Freshwater Master Test Kit", "Easy Green"],
-      tanks: [
-        {
-          id: 1, name: "40G Community", grossGal: 40, status: "Established", color: "#00F5A0", startDate: "2025-01-15",
-          image: "", summary: "All systems stable. Next water change in 3 days.",
-          lastTest: { nh3: 0, no2: 0, no3: 15, ph: 7.2 },
-          timeline: [{ date: "3 days ago", text: "Logged test: NO3 15ppm, pH 7.2" }],
-          equipment: ["Fluval 407", "150W Heater"], livestock: ["12x Neon Tetra"], plants: ["Amazon Sword"], decor: ["Spider Wood"]
-        },
-        {
-          id: 2, name: "10G Betta", grossGal: 10, status: "Cycling", color: "#38BDF8", startDate: "2026-03-20",
-          image: "", summary: "In cycling stage phase 4. Expect nitrite to drop over the next few days.",
-          lastTest: { nh3: 0, no2: 1.5, no3: 10, ph: 7.0 },
-          timeline: [{ date: "Yesterday", text: "Logged test: NO2 1.5ppm" }],
-          equipment: ["Sponge Filter", "50W Heater"], livestock: [], plants: ["Anubias"], decor: ["Slate Rock"]
-        }
-      ]
-    };
-
-    // PERMANENT STORAGE KEY (Never wipes data on code updates)
-    let appData = defaultData;
-    try {
-      const stored = localStorage.getItem("aquassist_master_db");
-      if (stored) {
-        appData = JSON.parse(stored);
-      } else {
-        // Migrate legacy data if present
-        const legacy = localStorage.getItem("aquassist_v21") || localStorage.getItem("aquassist_v22");
-        if (legacy) {
-          appData = JSON.parse(legacy);
-          saveData();
-        }
-      }
-    } catch(e) {
-      appData = defaultData;
-    }
-
-    let activeTankIndex = 0;
-    let isEditingTank = false;
-    let editingItemContext = { type: null, index: null };
-
-    function saveData() {
-      localStorage.setItem("aquassist_master_db", JSON.stringify(appData));
-    }
-
-    function calculateAge(startDateStr) {
-      if (!startDateStr) return "Unknown age";
-      const start = new Date(startDateStr);
-      const now = new Date();
-      const diffTime = Math.abs(now - start);
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-      if (diffDays < 30) return `${diffDays} days old`;
-      if (diffDays < 365) return `${(diffDays / 30).toFixed(1)} months old`;
-      return `${(diffDays / 365).toFixed(1)} years old`;
-    }
-
-    function buildColorCircles(selectedColor) {
-      const container = document.getElementById("color-circles-container");
-      if (!container) return;
-      container.innerHTML = "";
-      availableColors.forEach(hex => {
-        const div = document.createElement("div");
-        div.className = `color-circle ${hex === selectedColor ? 'selected' : ''}`;
-        div.style.backgroundColor = hex;
-        div.onclick = () => {
-          document.getElementById("m-color").value = hex;
-          document.querySelectorAll(".color-circle").forEach(c => c.classList.remove("selected"));
-          div.classList.add("selected");
-        };
-        container.appendChild(div);
-      });
-    }
-
-    function showView(viewId) {
-      document.querySelectorAll(".view-panel").forEach(p => {
-        p.classList.remove("active");
-        p.style.display = "none";
-      });
-      const target = document.getElementById("view-" + viewId);
-      if (target) {
-        target.classList.add("active");
-        target.style.display = "block";
-      }
-      if (viewId === "home") renderHomeCards();
-      if (viewId === "closet") renderCloset();
-      if (viewId === "settings") {
-        document.getElementById("unit-select").value = appData.units || "us";
-        document.getElementById("gemini-key").value = appData.apiKey || "";
-      }
-      toggleMenu(false);
-      window.scrollTo(0, 0);
-    }
-
-    function toggleMenu(isOpen) {
-      document.getElementById("sidebarDrawer").classList.toggle("open", isOpen);
-      document.getElementById("drawerOverlay").classList.toggle("open", isOpen);
-      renderSidebarTanks();
-    }
-
-    function renderSidebarTanks() {
-      const list = document.getElementById("sidebar-tank-list");
-      if (!list) return;
-      list.innerHTML = "";
-      appData.tanks.forEach((tank, idx) => {
-        const clr = tank.color || "#38BDF8";
-        list.innerHTML += `<div class="nav-item" onclick="openTank(${idx})"><span style="width:10px;height:10px;border-radius:50%;background:${clr};display:inline-block;"></span> ${tank.name}</div>`;
-      });
-    }
-
-    function openTank(idx) {
-      activeTankIndex = idx;
-      renderTankView();
-      showView("tank");
-    }
-
-    function renderHomeCards() {
-      renderSidebarTanks();
-      const container = document.getElementById("tank-card-list");
-      if (!container) return;
-      container.innerHTML = "";
-
-      const hour = new Date().getHours();
-      let timeGreeting = "Good day";
-      if (hour >= 4 && hour < 12) timeGreeting = "Good morning";
-      else if (hour >= 12 && hour < 17) timeGreeting = "Good afternoon";
-      else if (hour >= 17 && hour < 22) timeGreeting = "Good evening";
-      else timeGreeting = "Good night";
-
-      const greetingEl = document.getElementById("dynamic-greeting");
-      if (greetingEl) greetingEl.innerText = `${timeGreeting}, Aquarist`;
-
-      let totalTanks = appData.tanks.length;
-      
-      const summaryEl = document.getElementById("global-ai-summary");
-      if (summaryEl) {
-        let text = `Monitoring <b>${totalTanks}</b> active systems.<br>`;
-        appData.tanks.forEach(tank => {
-          text += `• <b>${tank.name}</b> — ${tank.summary || 'Systems stable.'}<br>`;
-        });
-        summaryEl.innerHTML = text;
-      }
-
-      appData.tanks.forEach((tank, idx) => {
-        const badgeHtml = tank.status === "Cycling" ? `<span class="badge badge-cycling">● Cycling</span>` : '';
-        const clr = tank.color || "#38BDF8";
-        const ageStr = calculateAge(tank.startDate);
-        const t = tank.lastTest || { nh3: 0, no2: 0, no3: 0, ph: 7.2 };
-        
-        let bannerStyle = '';
-        let bannerOverlay = '';
-        if (tank.image) {
-          bannerStyle = `background-image: url('${tank.image}');`;
-          bannerOverlay = `<div class="tank-banner-overlay"></div>`;
-        } else {
-          bannerStyle = `background: linear-gradient(135deg, ${clr}44, #0F172A);`;
-        }
-
-        const cardDiv = document.createElement("div");
-        cardDiv.className = "card tank-card-hero";
-        cardDiv.style.borderLeft = `6px solid ${clr}`;
-        cardDiv.onclick = () => openTank(idx);
-
-        cardDiv.innerHTML = `
-          <div class="tank-banner-wrap" style="${bannerStyle}">
-            ${bannerOverlay}
-            <div class="tank-banner-content" style="width:100%;">
-              <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-                <div>
-                  <h3 class="card-title">${tank.name}</h3>
-                  <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${ageStr}</div>
-                </div>
-                ${badgeHtml}
-              </div>
-            </div>
-          </div>
-          
-          <div class="tank-card-body">
-            <div class="param-strip">
-              <div class="param-chip">NH₃ <b>${t.nh3}</b></div>
-              <div class="param-chip">NO₂ <b>${t.no2}</b></div>
-              <div class="param-chip">NO₃ <b>${t.no3}p</b></div>
-              <div class="param-chip">pH <b>${t.ph}</b></div>
-            </div>
-          </div>
-        `;
-        container.appendChild(cardDiv);
-      });
-    }
-
-    function renderTankView() {
-      const tank = appData.tanks[activeTankIndex];
-      if (!tank) return;
-      const clr = tank.color || "#38BDF8";
-      
-      const titleEl = document.getElementById("tank-view-title");
-      if (titleEl) {
-        titleEl.innerHTML = `<span style="width:12px;height:12px;border-radius:50%;background:${clr};display:inline-block;margin-right:6px;"></span> ${tank.name}`;
-      }
-      
-      const ageStr = calculateAge(tank.startDate);
-      const metaEl = document.getElementById("tank-hero-meta");
-      if (metaEl) {
-        metaEl.innerText = `${ageStr} • Status: ${tank.status} • Volume: ${tank.grossGal}G`;
-      }
-
-      const aiSumEl = document.getElementById("tank-page-ai-summary");
-      if (aiSumEl) {
-        aiSumEl.innerText = tank.summary || "System parameters nominal. No immediate interventions flagged.";
-      }
-
-      const badge = document.getElementById("tank-status-toggle");
-      if (badge) {
-        badge.innerText = `● ${tank.status}`;
-        badge.className = `badge ${tank.status === "Established" ? "badge-stable" : "badge-cycling"}`;
-      }
-
-      const sumBox = document.getElementById("tank-summary-box");
-      if (sumBox) {
-        sumBox.innerText = tank.summary || "No active warnings.";
-      }
-
-      const dateInput = document.getElementById("log-date");
-      if (dateInput) dateInput.valueAsDate = new Date();
-
-      renderTimeline();
-      renderSubLists();
-    }
-
-    function renderTimeline() {
-      const tank = appData.tanks[activeTankIndex];
-      const feed = document.getElementById("timeline-feed");
-      if (!feed) return;
-      feed.innerHTML = "";
-      (tank.timeline || []).forEach(item => {
-        feed.innerHTML += `
-          <div class="timeline-item">
-            <div class="timeline-date">${item.date}</div>
-            <div>${item.text}</div>
-          </div>
-        `;
-      });
-    }
-
-    function switchTankTab(tabName, btn) {
-      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-      if(btn) btn.classList.add("active");
-      document.querySelectorAll(".subtab-content").forEach(c => c.style.display = "none");
-      const target = document.getElementById("subtab-" + tabName);
-      if (target) target.style.display = "block";
-    }
-
-    function renderSubLists() {
-      const tank = appData.tanks[activeTankIndex];
-      if (!tank) return;
-      ["livestock", "plants", "equipment", "decor"].forEach(type => {
-        const list = document.getElementById(type + "-list");
-        if(!list) return;
-        list.innerHTML = "";
-        (tank[type] || []).forEach((item, idx) => {
-          list.innerHTML += `
-            <div class="pill">
-              <span class="edit-pencil" onclick="openEditItemModal('${type}', ${idx})">✏️</span>
-              <span>${item}</span>
-              <span class="delete-x" onclick="deleteItem('${type}', ${idx})">×</span>
-            </div>`;
-        });
-      });
-    }
-
-    function openEditItemModal(type, idx) {
-      editingItemContext = { type, idx };
-      const tank = appData.tanks[activeTankIndex];
-      document.getElementById("edit-item-input").value = tank[type][idx];
-      document.getElementById("editItemModal").classList.add("open");
-    }
-
-    function saveEditedItem() {
-      const newVal = document.getElementById("edit-item-input").value.trim();
-      if (!newVal) return;
-      const { type, idx } = editingItemContext;
-      appData.tanks[activeTankIndex][type][idx] = newVal;
-      saveData();
-      document.getElementById("editItemModal").classList.remove("open");
-      renderSubLists();
-    }
-
-    function addLivestock() {
-      const breed = document.getElementById("new-live-breed").value.trim();
-      const count = document.getElementById("new-live-count").value || "1";
-      if(!breed) return;
-      const entry = `${count}x ${breed}`;
-      if(!appData.tanks[activeTankIndex].livestock) appData.tanks[activeTankIndex].livestock = [];
-      appData.tanks[activeTankIndex].livestock.push(entry);
-      document.getElementById("new-live-breed").value = "";
-      document.getElementById("new-live-count").value = "1";
-      saveData();
-      renderSubLists();
-    }
-
-    function addItem(type, inputId) {
-      const input = document.getElementById(inputId);
-      if(!input || !input.value.trim()) return;
-      if(!appData.tanks[activeTankIndex][type]) appData.tanks[activeTankIndex][type] = [];
-      appData.tanks[activeTankIndex][type].push(input.value.trim());
-      input.value = "";
-      saveData();
-      renderSubLists();
-    }
-
-    function deleteItem(type, idx) {
-      appData.tanks[activeTankIndex][type].splice(idx, 1);
-      saveData();
-      renderSubLists();
-    }
-
-    function renderCloset() {
-      const list = document.getElementById("supply-list");
-      if (!list) return;
-      list.innerHTML = "";
-      appData.closet.forEach((item, idx) => {
-        list.innerHTML += `<div class="pill"><span>${item}</span><span class="delete-x" onclick="deleteSupply(${idx})">×</span></div>`;
-      });
-    }
-
-    function addSupply() {
-      const input = document.getElementById("new-supply");
-      if(!input || !input.value.trim()) return;
-      appData.closet.push(input.value.trim());
-      input.value = "";
-      saveData();
-      renderCloset();
-    }
-
-    function deleteSupply(idx) {
-      appData.closet.splice(idx, 1);
-      saveData();
-      renderCloset();
-    }
-
-    function toggleTankLifecycle() {
-      const tank = appData.tanks[activeTankIndex];
-      tank.status = tank.status === "Established" ? "Cycling" : "Established";
-      saveData();
-      renderTankView();
-    }
-
-    function submitLog() {
-      const date = document.getElementById("log-date").value || "Today";
-      const nh3 = parseFloat(document.getElementById("log-nh3").value) || 0;
-      const no2 = parseFloat(document.getElementById("log-no2").value) || 0;
-      const no3 = parseFloat(document.getElementById("log-no3").value) || 0;
-      const ph = parseFloat(document.getElementById("log-ph").value) || 7.2;
-      const wc = parseFloat(document.getElementById("log-wc").value) || 0;
-      const dose = document.getElementById("log-dose").value.trim();
-
-      const tank = appData.tanks[activeTankIndex];
-      tank.lastTest = { nh3, no2, no3, ph };
-      
-      let summaryText = `[${date}] NH3:${nh3}, NO2:${no2}, NO3:${no3}, pH:${ph}`;
-      if(wc > 0) summaryText += ` | ${wc}% Water Change`;
-      if(dose) summaryText += ` | Dosed: ${dose}`;
-
-      tank.summary = summaryText;
-      tank.timeline.unshift({ date: date, text: summaryText });
-      saveData();
-
-      let feedback = `<b>✓ Log Saved & Analyzed.</b>`;
-      if(tank.status === "Established" && (nh3 > 0 || no2 > 0)) {
-        feedback += `<br><span style="color:var(--alert-red)">⚠️ Alert:</span> Ammonia/Nitrite present! Dose Seachem Prime.`;
-      } else {
-        feedback += `<br><span style="color:var(--neon-green)">● Stable:</span> Parameters look good.`;
-      }
-
-      const box = document.getElementById("log-feedback-box");
-      if (box) {
-        box.style.display = "block";
-        box.innerHTML = feedback;
-      }
-      renderTankView();
-    }
-
-    async function askTankAI() {
-      const q = document.getElementById("ai-question").value.trim();
-      const box = document.getElementById("ai-response-box");
-      if(!q) return;
-
-      if(!appData.apiKey) {
-        if (box) {
-          box.style.display = "block";
-          box.innerHTML = `<span style="color:var(--alert-yellow)">Please save your Gemini API Key in Settings first!</span>`;
-        }
-        return;
-      }
-
-      if (box) {
-        box.style.display = "block";
-        box.innerHTML = "Thinking...";
-      }
-
-      const tank = appData.tanks[activeTankIndex];
-      const prompt = `You are aquAssist, an expert aquarist AI. Tank: ${tank.name} (${tank.grossGal}G, ${tank.status}). Latest Test: NH3:${tank.lastTest.nh3}, NO2:${tank.lastTest.no2}, NO3:${tank.lastTest.no3}, pH:${tank.lastTest.ph}. Closet: ${appData.closet.join(', ')}. Question: ${q}`;
-
-      try {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${appData.apiKey}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-        });
-        const data = await res.json();
-        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
-        if (box) box.innerHTML = reply;
-      } catch(err) {
-        if (box) box.innerHTML = "Error connecting to Gemini API.";
-      }
-    }
-
-    function copyGeminiDelta() {
-      const tank = appData.tanks[activeTankIndex];
-      const text = `Quick Update for ${tank.name} (${tank.status}):
-- Age: ${calculateAge(tank.startDate)}
-- Latest Test: NH3:${tank.lastTest.nh3}, NO2:${tank.lastTest.no2}, NO3:${tank.lastTest.no3}, pH:${tank.lastTest.ph}
-- Summary: ${tank.summary}
-- Available Supplies: ${appData.closet.join(', ')}
-- Question: `;
-      navigator.clipboard.writeText(text).then(() => alert("Copied Delta Update for Gemini Chat!"));
-    }
-
-    function openTankModal() {
-      isEditingTank = false;
-      document.getElementById("modal-tank-title").innerText = "Add New Aquarium";
-      document.getElementById("m-name").value = "";
-      document.getElementById("m-gal").value = "";
-      document.getElementById("m-date").valueAsDate = new Date();
-      document.getElementById("m-color").value = availableColors[0];
-      buildColorCircles(availableColors[0]);
-      document.getElementById("m-status").value = "Established";
-      document.getElementById("m-photo").value = "";
-      document.getElementById("tankModal").classList.add("open");
-    }
-
-    function openEditTankModal() {
-      isEditingTank = true;
-      const tank = appData.tanks[activeTankIndex];
-      document.getElementById("modal-tank-title").innerText = "Edit Aquarium";
-      document.getElementById("m-name").value = tank.name;
-      document.getElementById("m-gal").value = tank.grossGal;
-      document.getElementById("m-date").value = tank.startDate || "2025-01-01";
-      document.getElementById("m-color").value = tank.color || availableColors[0];
-      buildColorCircles(tank.color || availableColors[0]);
-      document.getElementById("m-status").value = tank.status;
-      document.getElementById("m-photo").value = "";
-      document.getElementById("tankModal").classList.add("open");
-    }
-
-    function closeTankModal() { document.getElementById("tankModal").classList.remove("open"); }
-
-    function saveTankModalData() {
-      const name = document.getElementById("m-name").value.trim() || "Aquarium";
-      const gal = parseFloat(document.getElementById("m-gal").value) || 20;
-      const startDate = document.getElementById("m-date").value || "2025-01-01";
-      const color = document.getElementById("m-color").value;
-      const status = document.getElementById("m-status").value;
-      const fileInput = document.getElementById("m-photo");
-
-      const processSave = (imgData) => {
-        if(isEditingTank) {
-          const tank = appData.tanks[activeTankIndex];
-          tank.name = name;
-          tank.grossGal = gal;
-          tank.startDate = startDate;
-          tank.color = color;
-          tank.status = status;
-          if(imgData) tank.image = imgData;
-        } else {
-          appData.tanks.push({
-            id: Date.now(), name, grossGal: gal, startDate, color, status, image: imgData || "",
-            summary: "Tank initialized.", lastTest: { nh3: 0, no2: 0, no3: 0, ph: 7.0 },
-            timeline: [{ date: "Today", text: "Tank created." }],
-            equipment: [], livestock: [], plants: [], decor: []
-          });
-        }
-        saveData();
-        closeTankModal();
-        renderHomeCards();
-        if(isEditingTank) renderTankView();
-      };
-
-      if(fileInput.files && fileInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const img = new Image();
-          img.onload = function() {
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            const maxW = 500;
-            const scale = maxW / img.width;
-            canvas.width = maxW;
-            canvas.height = img.height * scale;
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            processSave(canvas.toDataURL("image/jpeg", 0.7));
-          };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(fileInput.files[0]);
-      } else {
-        processSave(isEditingTank ? appData.tanks[activeTankIndex].image : "");
-      }
-    }
-
-    function saveUnits() {
-      appData.units = document.getElementById("unit-select").value;
-      saveData();
-      renderHomeCards();
-    }
-
-    function saveApiKey() {
-      appData.apiKey = document.getElementById("gemini-key").value.trim();
-      saveData();
-      alert("API Key Saved!");
-    }
-
-    function exportData() {
-      const blob = new Blob([JSON.stringify(appData, null, 2)], { type: "application/json" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `aquassist_backup.json`;
-      a.click();
-    }
-
-    function importData(e) {
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        appData = JSON.parse(evt.target.result);
-        saveData();
-        location.reload();
-      };
-      reader.readAsText(e.target.files[0]);
-    }
-
-    // Startup
-    showView("home");
-  </script>
-</body>
-</html>
+          <h3 style="font-size:15
