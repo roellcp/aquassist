@@ -9,6 +9,11 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="description" content="Beginner-friendly, smart AI aquarium tracker and maintenance co-pilot.">
 
+  <!-- PWA Manifest & App Icon -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon.svg">
+
   <style>
     :root {
       --bg-dark: #070D18;
@@ -291,7 +296,7 @@
     }
     .nav-tab {
       flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      height: 100%; color: var(--text-muted); cursor: pointer; border: none; background: transparent;
+      height: 100%; color: var(--text-muted); cursor: border; border: none; background: transparent;
       transition: color 0.15s ease, transform 0.15s ease;
       font-size: 11px; font-weight: 600; gap: 3px;
     }
@@ -686,7 +691,6 @@
             </div>
           </div>
 
-          <!-- Camera Trigger Preview -->
           <div class="vision-preview-box" onclick="document.getElementById('vision-file-input').click()">
             <img id="vision-preview-img" class="vision-preview-img" style="display:none;">
             <div id="vision-placeholder-content" style="text-align:center; padding:16px;">
@@ -907,12 +911,33 @@
     </div>
   </div>
 
-  <!-- ================= MODAL: SETTINGS & GLOBAL HOUSEHOLD ================= -->
+  <!-- ================= MODAL: SETTINGS & GLOBAL HOUSEHOLD (PHASE 5) ================= -->
   <div class="modal-overlay" id="settingsModal">
     <div class="modal-box">
       <div class="card-header" style="margin-bottom:14px;">
-        <h3 style="font-size:18px;">⚙️ Settings & Household</h3>
+        <h3 style="font-size:18px;">⚙️ Settings & Device</h3>
         <button class="icon-btn" style="width:28px;height:28px;" onclick="closeSettingsModal()">×</button>
+      </div>
+
+      <!-- Android System Notification Settings (F-19) -->
+      <div class="card" style="margin-bottom:18px; background:rgba(0,245,160,0.04); border-color:rgba(0,245,160,0.3);">
+        <div style="font-size:14px; font-weight:700; color:var(--neon-green); margin-bottom:4px;">
+          🔔 Android Pop-Up Alerts (F-19)
+        </div>
+        <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">
+          Receive native Android system banner alerts for scheduled water changes and overdue filter media rinses.
+        </p>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-neon" style="font-size:12px; padding:8px 12px;" onclick="requestNotificationPermission()">
+            Enable Phone Alerts
+          </button>
+          <button class="btn btn-secondary" style="font-size:12px; padding:8px 12px; width:auto;" onclick="sendTestNotification()">
+            🔔 Test Pop-Up
+          </button>
+        </div>
+        <div id="notification-status-text" style="font-size:11px; color:var(--text-muted); margin-top:6px;">
+          Status: Checking...
+        </div>
       </div>
 
       <div style="margin-bottom:18px;">
@@ -951,7 +976,7 @@
       </div>
 
       <div style="text-align:center; font-size:11px; color:var(--text-muted); margin-top:10px;">
-        aquAssist v7.4 • $0 Smart Tank Co-Pilot
+        aquAssist v7.5 • $0 Smart Tank Co-Pilot • PWA Ready
       </div>
     </div>
   </div>
@@ -1033,6 +1058,7 @@
     let isEditingTank = false;
     let currentChartFilter = "all";
     let activeVisionBase64 = null;
+    let swRegistration = null;
 
     /* ============================================================
        2. INDEXEDDB PERSISTENCE LAYER
@@ -1929,7 +1955,6 @@
 
     function renderAIView() {}
 
-    /* Conversational Co-Pilot */
     async function askGeminiCoPilot() {
       const q = document.getElementById("ai-chat-prompt").value.trim();
       const box = document.getElementById("ai-chat-response");
@@ -1982,7 +2007,6 @@ Provide practical, plain-English instructions. If a water change or dosing is ne
       return html;
     }
 
-    /* Multimodal Camera Vision Diagnostics (F-17) */
     function handleVisionImageSelected(e) {
       const file = e.target.files && e.target.files[0];
       if (!file) return;
@@ -2041,7 +2065,6 @@ Provide practical, plain-English instructions. If a water change or dosing is ne
       runBtn.disabled = true;
       runBtn.innerText = "Analyzing Image...";
 
-      // Check for invertebrates in current livestock
       const liveStr = (activeTank.livestock || []).join(", ");
       const inverts = (activeTank.livestock || []).filter(l => /snail|shrimp|crab|crayfish/i.test(l));
       const invertWarning = inverts.length > 0 
@@ -2088,7 +2111,6 @@ Please provide:
       }
     }
 
-    /* Pre-Purchase Stocking Compatibility Advisor (F-09) */
     function onStockingPresetChanged(val) {
       if (val) {
         document.getElementById("stocking-custom-name").value = val;
@@ -2115,7 +2137,6 @@ Please provide:
       const currentLivestock = (activeTank.livestock || []).join(", ");
       const t = activeTank.lastTest || { ph: 7.2, temp: 78 };
 
-      // Pre-calculated rule heuristic for instant feedback
       let ruleHighlights = [];
       const lower = targetSpecies.toLowerCase();
 
@@ -2158,7 +2179,6 @@ Evaluate:
         } catch(err) {}
       }
 
-      // Offline Fallback Heuristic
       let fallbackText = `<b>Compatibility Check for ${qty}x ${targetSpecies}:</b><br>`;
       if (ruleHighlights.length > 0) {
         fallbackText += ruleHighlights.join("<br>") + "<br>";
@@ -2184,7 +2204,99 @@ Evaluate:
     }
 
     /* ============================================================
-       9. MODALS: TANK MANAGEMENT & SETTINGS
+       9. PHASE 5: ANDROID POP-UP NOTIFICATION ENGINE (F-19)
+       ============================================================ */
+    function updateNotificationStatusDisplay() {
+      const el = document.getElementById("notification-status-text");
+      if (!el) return;
+      if (!("Notification" in window)) {
+        el.innerText = "Status: Notifications not supported on this browser.";
+        el.style.color = "var(--alert-yellow)";
+      } else if (Notification.permission === "granted") {
+        el.innerText = "Status: 🟢 Enabled! Native pop-up alerts will display.";
+        el.style.color = "var(--neon-green)";
+      } else if (Notification.permission === "denied") {
+        el.innerText = "Status: 🔴 Blocked in Android Chrome site settings.";
+        el.style.color = "var(--alert-red)";
+      } else {
+        el.innerText = "Status: ⚪ Not enabled yet. Tap 'Enable Phone Alerts' above.";
+        el.style.color = "var(--text-muted)";
+      }
+    }
+
+    async function requestNotificationPermission() {
+      if (!("Notification" in window)) {
+        alert("This browser does not support pop-up notifications.");
+        return;
+      }
+      try {
+        const permission = await Notification.requestPermission();
+        updateNotificationStatusDisplay();
+        if (permission === "granted") {
+          sendSystemNotification("aquAssist: Alerts Enabled! 🐠", {
+            body: "You will now receive native pop-up reminders for scheduled water changes and filter care.",
+            icon: "icon.svg"
+          });
+        }
+      } catch (err) {
+        console.error("Permission error:", err);
+      }
+    }
+
+    function sendSystemNotification(title, options = {}) {
+      if (!("Notification" in window) || Notification.permission !== "granted") {
+        return;
+      }
+      const notifOptions = {
+        icon: "icon.svg",
+        badge: "icon.svg",
+        vibrate: [200, 100, 200],
+        ...options
+      };
+
+      if (swRegistration && "showNotification" in swRegistration) {
+        swRegistration.showNotification(title, notifOptions);
+      } else {
+        new Notification(title, notifOptions);
+      }
+    }
+
+    function sendTestNotification() {
+      if (!("Notification" in window) || Notification.permission !== "granted") {
+        requestNotificationPermission();
+        return;
+      }
+      const activeTank = getActiveTank();
+      sendSystemNotification("aquAssist: Water Change Due! 💧", {
+        body: `${activeTank.name}: 25% water change scheduled today. Dose 1ml Seachem Prime to tap water.`,
+        icon: "icon.svg"
+      });
+      showToast("Test Notification Sent!");
+    }
+
+    function checkMaintenanceReminders() {
+      if (!("Notification" in window) || Notification.permission !== "granted") return;
+
+      const today = new Date();
+      appState.tanks.forEach((tank) => {
+        // Check filter media overdue
+        (tank.filterMedia || []).forEach((m) => {
+          if (m.interval > 0 && m.lastDate) {
+            const last = new Date(m.lastDate);
+            const diff = Math.floor((today - last) / (1000 * 60 * 60 * 24));
+            if (diff >= m.interval) {
+              sendSystemNotification(`aquAssist: Filter Maintenance Overdue! 🧽`, {
+                body: `${tank.name}: ${m.name} is due for a rinse. Remember to use tank water!`,
+                icon: "icon.svg"
+              });
+            }
+          }
+        });
+      });
+    }
+
+    /* ============================================================
+       10. MODALS: TANK MANAGEMENT & SETTINGS
        ============================================================ */
     function buildColorCircles(selectedHex) {
       const container = document.getElementById("color-circles-container");
@@ -2287,6 +2399,7 @@ Evaluate:
       document.getElementById("tap-gh").value = tap.gh || "";
       document.getElementById("tap-kh").value = tap.kh || "";
       document.getElementById("setting-api-key").value = appState.apiKey || "";
+      updateNotificationStatusDisplay();
       document.getElementById("settingsModal").classList.add("open");
     }
 
@@ -2333,11 +2446,24 @@ Evaluate:
     }
 
     /* ============================================================
-       10. APP STARTUP INITIALIZATION
+       11. SERVICE WORKER & APP INITIALIZATION
        ============================================================ */
     async function initApp() {
       appState = await loadDataFromStorage();
       renderDashboard();
+
+      // Register Service Worker for PWA & Android Notifications
+      if ("serviceWorker" in navigator) {
+        try {
+          swRegistration = await navigator.serviceWorker.register("sw.js");
+          console.log("PWA Service Worker registered:", swRegistration);
+        } catch (err) {
+          console.warn("Service Worker registration failed:", err);
+        }
+      }
+
+      // Check maintenance notifications on launch
+      setTimeout(checkMaintenanceReminders, 2500);
     }
 
     initApp();
