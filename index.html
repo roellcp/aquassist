@@ -267,6 +267,17 @@
       height: 100%; border-radius: 10px; transition: width 0.3s ease;
     }
 
+    /* AI Vision Photo Box (F-17) */
+    .vision-preview-box {
+      width: 100%; height: 190px; border-radius: 14px; background: #080E1A;
+      border: 1px dashed var(--card-border); display: flex; flex-direction: column;
+      align-items: center; justify-content: center; cursor: pointer; position: relative;
+      overflow: hidden; margin-bottom: 12px;
+    }
+    .vision-preview-img {
+      width: 100%; height: 100%; object-fit: contain; position: absolute; inset: 0;
+    }
+
     /* Bottom Navigation Bar */
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-nav-height);
@@ -564,7 +575,6 @@
           </div>
           <div id="eco-livestock-list" class="pill-list"></div>
 
-          <!-- Subtle Loss Trigger at bottom (Hidden away as requested) -->
           <div style="margin-top:20px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); display:flex; justify-content:flex-end;">
             <button class="btn btn-secondary" style="width:auto; font-size:11px; padding:6px 14px; opacity:0.65; border-color:rgba(255,255,255,0.12);" onclick="openLossModal()">
               Log Fauna Loss...
@@ -597,7 +607,6 @@
       <!-- Subtab 3: Hardware & Filter Media Lifecycles (F-16) -->
       <div id="ecotab-equipment" class="ecotab-content" style="display:none;">
         
-        <!-- Filter Media Lifecycle Tracker (F-16) -->
         <div class="card">
           <div class="card-header">
             <div>
@@ -610,7 +619,6 @@
           <div id="filter-media-list"></div>
         </div>
 
-        <!-- General Equipment List -->
         <div class="card">
           <div class="card-header">
             <div class="card-title">Other Hardware & Lighting</div>
@@ -623,7 +631,7 @@
         </div>
       </div>
 
-      <!-- Subtab 4: Global Supply Closet (Global household inventory) -->
+      <!-- Subtab 4: Global Supply Closet -->
       <div id="ecotab-closet" class="ecotab-content" style="display:none;">
         <div class="card">
           <div class="card-header">
@@ -644,19 +652,112 @@
       </div>
     </section>
 
-    <!-- ================= VIEW 4: AI CO-PILOT ================= -->
+    <!-- ================= VIEW 4: AI CO-PILOT (PHASE 4: VISION & STOCKING) ================= -->
     <section id="view-ai" class="view-panel">
-      <div class="card" style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(0, 245, 160, 0.08)); border-color: rgba(56, 189, 248, 0.35);">
-        <div class="card-header">
-          <div class="card-title">🤖 Ask AI Co-Pilot</div>
-          <button class="btn btn-secondary" style="width:auto; padding:4px 10px; font-size:11px;" onclick="copyActiveDelta()">📋 Copy Delta</button>
+      <div class="subtabs">
+        <button class="subtab-btn active" onclick="switchAITab('advisor', this)">💬 Ask AI</button>
+        <button class="subtab-btn" onclick="switchAITab('vision', this)">📸 Vision Camera</button>
+        <button class="subtab-btn" onclick="switchAITab('stocking', this)">⚖️ Stocking Sandbox</button>
+      </div>
+
+      <!-- Subtab 1: Conversational AI Co-Pilot -->
+      <div id="aitab-advisor" class="aitab-content">
+        <div class="card" style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(0, 245, 160, 0.08)); border-color: rgba(56, 189, 248, 0.35);">
+          <div class="card-header">
+            <div class="card-title">🤖 Ask AI Co-Pilot</div>
+            <button class="btn btn-secondary" style="width:auto; padding:4px 10px; font-size:11px;" onclick="copyActiveDelta()">📋 Copy Delta</button>
+          </div>
+          <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Ask anything about water chemistry, cycling, disease symptoms, or dosing.</p>
+          <div class="input-row">
+            <input type="text" id="ai-chat-prompt" placeholder="e.g. When should I do my next water change?">
+            <button class="btn" style="width:75px;" onclick="askGeminiCoPilot()">Ask</button>
+          </div>
+          <div id="ai-chat-response" class="card" style="display:none; margin-top:12px; background:#080E1A; border-color:var(--cyan); font-size:13px; line-height:1.5;"></div>
         </div>
-        <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Ask anything about water chemistry, cycling, disease symptoms, or dosing.</p>
-        <div class="input-row">
-          <input type="text" id="ai-chat-prompt" placeholder="e.g. When should I do my next water change?">
-          <button class="btn" style="width:75px;" onclick="askGeminiCoPilot()">Ask</button>
+      </div>
+
+      <!-- Subtab 2: Multimodal Camera Vision Diagnostics (F-17) -->
+      <div id="aitab-vision" class="aitab-content" style="display:none;">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">📸 AI Vision Diagnostics</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Snap a photo of sick fish, algae outbreak, or mystery pest</div>
+            </div>
+          </div>
+
+          <!-- Camera Trigger Preview -->
+          <div class="vision-preview-box" onclick="document.getElementById('vision-file-input').click()">
+            <img id="vision-preview-img" class="vision-preview-img" style="display:none;">
+            <div id="vision-placeholder-content" style="text-align:center; padding:16px;">
+              <div style="font-size:32px; margin-bottom:6px;">📷</div>
+              <div style="font-size:13px; font-weight:700; color:var(--cyan);">Tap to Open Camera or Upload</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Works natively with your Android camera</div>
+            </div>
+          </div>
+          <input type="file" id="vision-file-input" accept="image/*" capture="environment" style="display:none;" onchange="handleVisionImageSelected(event)">
+
+          <div style="margin-bottom:12px;">
+            <label>Additional Notes (Optional)</label>
+            <input type="text" id="vision-user-notes" placeholder="e.g. White spots appeared yesterday on my tetras">
+          </div>
+
+          <button class="btn btn-neon" id="run-vision-btn" onclick="runVisionDiagnostics()">Run Multimodal AI Diagnosis</button>
+
+          <div id="vision-response-card" class="card" style="display:none; margin-top:14px; background:#080E1A; border-color:var(--neon-green);">
+            <div style="font-size:13px; font-weight:700; color:var(--neon-green); margin-bottom:6px;">🤖 Diagnosis & Safe Treatment Plan</div>
+            <div id="vision-response-text" style="font-size:13px; line-height:1.5; color:var(--text-main);"></div>
+          </div>
         </div>
-        <div id="ai-chat-response" class="card" style="display:none; margin-top:12px; background:#080E1A; border-color:var(--cyan); font-size:13px; line-height:1.5;"></div>
+      </div>
+
+      <!-- Subtab 3: Stocking & Compatibility Advisor Sandbox (F-09) -->
+      <div id="aitab-stocking" class="aitab-content" style="display:none;">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">⚖️ Stocking & Compatibility Advisor</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Pre-purchase sanity check for your active tank</div>
+            </div>
+          </div>
+          <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">
+            Check temperament, temperature/pH overlap, and bioload before purchasing at the store!
+          </p>
+
+          <div class="input-grid-2">
+            <div>
+              <label>Candidate Species</label>
+              <select id="stocking-preset-select" onchange="onStockingPresetChanged(this.value)">
+                <option value="">-- Choose or Type Below --</option>
+                <option value="Neon Tetra">Neon Tetra (Peaceful)</option>
+                <option value="Tiger Barb">Tiger Barb (Semi-aggressive nipper)</option>
+                <option value="Angelfish">Angelfish (May eat small shrimp)</option>
+                <option value="Betta Splendens">Betta (Solitary / Slow swimmer)</option>
+                <option value="Corydoras Catfish">Corydoras (Peaceful bottom schooler)</option>
+                <option value="Cherry Shrimp">Cherry Shrimp (Peaceful invert)</option>
+                <option value="Nerite Snail">Nerite Snail (Algae eater)</option>
+                <option value="Bristlenose Pleco">Bristlenose Pleco (Medium bioload)</option>
+                <option value="Goldfish">Goldfish (Coldwater / High bioload)</option>
+              </select>
+            </div>
+            <div>
+              <label>Quantity</label>
+              <input type="number" id="stocking-qty" value="6" min="1">
+            </div>
+          </div>
+
+          <div style="margin-bottom:12px;">
+            <label>Or Custom Species Name</label>
+            <input type="text" id="stocking-custom-name" placeholder="e.g. Celestial Pearl Danio">
+          </div>
+
+          <button class="btn btn-neon" onclick="runStockingAdvisor()">Test Compatibility in Sandbox</button>
+
+          <div id="stocking-result-box" class="card" style="display:none; margin-top:14px; background:#080E1A; border-color:var(--cyan);">
+            <div style="font-size:13px; font-weight:700; color:var(--cyan); margin-bottom:6px;">📊 Sandbox Evaluation</div>
+            <div id="stocking-result-content" style="font-size:13px; line-height:1.5;"></div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -850,7 +951,7 @@
       </div>
 
       <div style="text-align:center; font-size:11px; color:var(--text-muted); margin-top:10px;">
-        aquAssist v7.3 • $0 Smart Tank Co-Pilot
+        aquAssist v7.4 • $0 Smart Tank Co-Pilot
       </div>
     </div>
   </div>
@@ -931,6 +1032,7 @@
     let selectedTankId = "all";
     let isEditingTank = false;
     let currentChartFilter = "all";
+    let activeVisionBase64 = null;
 
     /* ============================================================
        2. INDEXEDDB PERSISTENCE LAYER
@@ -1552,7 +1654,6 @@
       renderEcosystemView();
     }
 
-    /* Global Supply Closet */
     function renderClosetList() {
       const el = document.getElementById("eco-closet-list");
       if (!el) return;
@@ -1585,7 +1686,6 @@
       renderSmartActionCard();
     }
 
-    /* Filter Media Lifecycle Tracker (F-16) */
     function renderFilterMediaList() {
       const activeTank = getActiveTank();
       const listEl = document.getElementById("filter-media-list");
@@ -1713,7 +1813,6 @@
       showToast("Media Added");
     }
 
-    /* Discreet Fauna Loss Tracker (F-18) */
     function openLossModal() {
       const activeTank = getActiveTank();
       const sel = document.getElementById("loss-species-select");
@@ -1747,10 +1846,8 @@
       const date = document.getElementById("loss-date").value || new Date().toISOString().split("T")[0];
       const symptoms = document.getElementById("loss-symptoms").value;
 
-      // Extract species name (e.g. "12x Neon Tetra" -> "Neon Tetra")
       let cleanSpecies = rawSpecies.replace(/^\d+x\s*/i, "").trim();
 
-      // Decrement or remove from livestock roster
       if (activeTank.livestock) {
         for (let i = 0; i < activeTank.livestock.length; i++) {
           if (activeTank.livestock[i] === rawSpecies) {
@@ -1772,12 +1869,10 @@
         }
       }
 
-      // Record in Loss History
       if (!activeTank.losses) activeTank.losses = [];
       const lossRecord = { date, species: cleanSpecies, qty, symptoms };
       activeTank.losses.unshift(lossRecord);
 
-      // Trigger instant Co-Pilot health audit
       const t = activeTank.lastTest || { nh3: 0, no2: 0, no3: 0, temp: 78 };
       let auditFeedback = `Recorded loss of ${qty}x ${cleanSpecies}. `;
       if (t.nh3 > 0 || t.no2 > 0) {
@@ -1822,10 +1917,19 @@
     }
 
     /* ============================================================
-       8. AI CO-PILOT VIEW
+       8. PHASE 4: AI CO-PILOT, MULTIMODAL VISION (F-17) & STOCKING (F-09)
        ============================================================ */
+    function switchAITab(tab, btn) {
+      document.querySelectorAll(".subtab-btn").forEach(b => b.classList.remove("active"));
+      if (btn) btn.classList.add("active");
+      document.querySelectorAll(".aitab-content").forEach(c => c.style.display = "none");
+      const target = document.getElementById("aitab-" + tab);
+      if (target) target.style.display = "block";
+    }
+
     function renderAIView() {}
 
+    /* Conversational Co-Pilot */
     async function askGeminiCoPilot() {
       const q = document.getElementById("ai-chat-prompt").value.trim();
       const box = document.getElementById("ai-chat-response");
@@ -1862,10 +1966,208 @@ Provide practical, plain-English instructions. If a water change or dosing is ne
         });
         const data = await res.json();
         const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
-        box.innerHTML = reply.replace(/\n/g, "<br>");
+        box.innerHTML = renderMarkdownToHtml(reply);
       } catch (err) {
         box.innerHTML = `<span style="color:var(--alert-red)">Error connecting to Gemini API. Check your API key.</span>`;
       }
+    }
+
+    function renderMarkdownToHtml(text) {
+      if (!text) return "";
+      let html = text
+        .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
+        .replace(/\*(.*?)\*/g, "<i>$1</i>")
+        .replace(/\n- /g, "<br>• ")
+        .replace(/\n/g, "<br>");
+      return html;
+    }
+
+    /* Multimodal Camera Vision Diagnostics (F-17) */
+    function handleVisionImageSelected(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          const maxDim = 700;
+          let w = img.width;
+          let h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) { h = (h / w) * maxDim; w = maxDim; }
+            else { w = (w / h) * maxDim; h = maxDim; }
+          }
+          canvas.width = w;
+          canvas.height = h;
+          ctx.drawImage(img, 0, 0, w, h);
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
+          activeVisionBase64 = dataUrl.split(",")[1];
+
+          const previewEl = document.getElementById("vision-preview-img");
+          const placeholder = document.getElementById("vision-placeholder-content");
+          if (previewEl && placeholder) {
+            previewEl.src = dataUrl;
+            previewEl.style.display = "block";
+            placeholder.style.display = "none";
+          }
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function runVisionDiagnostics() {
+      if (!activeVisionBase64) {
+        alert("Please tap to take or select a photo first!");
+        return;
+      }
+      if (!appState.apiKey) {
+        alert("Please save your Google Gemini API Key in Settings (⚙️) first!");
+        return;
+      }
+
+      const activeTank = getActiveTank();
+      const u = getUnitLabels();
+      const notes = document.getElementById("vision-user-notes").value.trim();
+      const respCard = document.getElementById("vision-response-card");
+      const respText = document.getElementById("vision-response-text");
+      const runBtn = document.getElementById("run-vision-btn");
+
+      respCard.style.display = "block";
+      respText.innerHTML = "🔍 Multimodal AI analyzing photo and cross-referencing tank biology...";
+      runBtn.disabled = true;
+      runBtn.innerText = "Analyzing Image...";
+
+      // Check for invertebrates in current livestock
+      const liveStr = (activeTank.livestock || []).join(", ");
+      const inverts = (activeTank.livestock || []).filter(l => /snail|shrimp|crab|crayfish/i.test(l));
+      const invertWarning = inverts.length > 0 
+        ? `CRITICAL SAFETY NOTE: Tank contains invertebrates (${inverts.join(", ")}). You MUST explicitly warn against any copper-based medications or treatments harmful to snails/shrimp!`
+        : `No invertebrates noted in livestock roster.`;
+
+      const promptText = `You are aquAssist AI Vision, an expert veterinary and botanical aquarist.
+Analyze this aquarium photo carefully.
+User's Tank Context:
+- Aquarium: ${activeTank.name} (${activeTank.vol} ${u.vol}, ${activeTank.status})
+- Livestock: ${liveStr}
+- Latest Parameters: NH3:${activeTank.lastTest.nh3}, NO2:${activeTank.lastTest.no2}, NO3:${activeTank.lastTest.no3}, pH:${activeTank.lastTest.ph}, Temp:${activeTank.lastTest.temp}${u.temp}
+- User's Supply Closet: ${(appState.closet || []).join(", ")}
+- User Observation Notes: ${notes || "None provided"}
+${invertWarning}
+
+Please provide:
+1. Diagnosis / Identification: Identify any fish disease symptoms (Ich, velvet, fin rot, epistylis, dropsy, etc.), nuisance algae (Black Beard, Hair, Cyanobacteria, Diatoms), or pest (Hydra, Planaria, etc.). Include confidence level.
+2. Root Cause Analysis: What likely triggered this condition in light of the water parameters or tank conditions?
+3. Step-by-Step Treatment Protocol: Prioritize items in the user's Supply Closet if applicable.
+4. Invertebrate & Plant Safety: Explicitly state if any treatment is dangerous for shrimp, snails, or plants.`;
+
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${appState.apiKey}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{
+              parts: [
+                { text: promptText },
+                { inlineData: { mimeType: "image/jpeg", data: activeVisionBase64 } }
+              ]
+            }]
+          })
+        });
+        const data = await res.json();
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "No diagnosis generated.";
+        respText.innerHTML = renderMarkdownToHtml(reply);
+      } catch (err) {
+        respText.innerHTML = `<span style="color:var(--alert-red)">Diagnosis failed. Check network or API key.</span>`;
+      } finally {
+        runBtn.disabled = false;
+        runBtn.innerText = "Run Multimodal AI Diagnosis";
+      }
+    }
+
+    /* Pre-Purchase Stocking Compatibility Advisor (F-09) */
+    function onStockingPresetChanged(val) {
+      if (val) {
+        document.getElementById("stocking-custom-name").value = val;
+      }
+    }
+
+    async function runStockingAdvisor() {
+      const activeTank = getActiveTank();
+      const customName = document.getElementById("stocking-custom-name").value.trim();
+      const qty = parseInt(document.getElementById("stocking-qty").value) || 1;
+      const targetSpecies = customName || document.getElementById("stocking-preset-select").value;
+
+      if (!targetSpecies) {
+        alert("Please select or type a prospective fish or invertebrate species!");
+        return;
+      }
+
+      const resultBox = document.getElementById("stocking-result-box");
+      const resultContent = document.getElementById("stocking-result-content");
+      resultBox.style.display = "block";
+      resultContent.innerHTML = "Running compatibility analysis...";
+
+      const u = getUnitLabels();
+      const currentLivestock = (activeTank.livestock || []).join(", ");
+      const t = activeTank.lastTest || { ph: 7.2, temp: 78 };
+
+      // Pre-calculated rule heuristic for instant feedback
+      let ruleHighlights = [];
+      const lower = targetSpecies.toLowerCase();
+
+      if (lower.includes("barb") && activeTank.livestock.some(l => /betta|guppy|angelfish/i.test(l))) {
+        ruleHighlights.push(`⚠️ <b>Fin-Nipping Alert:</b> ${targetSpecies} may harass long-finned tank mates.`);
+      }
+      if (lower.includes("goldfish") && activeTank.livestock.some(l => /tetra|betta|rasbora|angelfish/i.test(l))) {
+        ruleHighlights.push(`⚠️ <b>Temperature Incompatibility:</b> Goldfish are temperate/coldwater, whereas your tank has tropical fish.`);
+      }
+      if (lower.includes("angelfish") && activeTank.livestock.some(l => /shrimp/i.test(l))) {
+        ruleHighlights.push(`⚠️ <b>Predation Risk:</b> Adult Angelfish frequently hunt dwarf shrimp.`);
+      }
+
+      if (appState.apiKey) {
+        const prompt = `You are aquAssist Stocking Advisor, an expert aquarium compatibility engine.
+Candidate Addition: ${qty}x ${targetSpecies}
+Current Tank: ${activeTank.name} (${activeTank.vol} ${u.vol}, Status: ${activeTank.status})
+Current Parameters: Temperature ${t.temp}${u.temp}, pH ${t.ph}
+Existing Livestock Roster: ${currentLivestock || "Empty Tank"}
+
+Evaluate:
+1. Water Compatibility: (Temp & pH range overlap)
+2. Temperament & Interspecies Dynamics: (Aggression, fin-nipping, invert safety)
+3. Bioload Impact: (Will adding ${qty}x ${targetSpecies} exceed the capacity of this ${activeTank.vol} ${u.vol} tank?)
+4. Final Verdict: Clear recommendation (✅ Great Match / ⚠️ Proceed with Caution / ❌ Incompatible).`;
+
+        try {
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${appState.apiKey}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+          });
+          const data = await res.json();
+          const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+          resultContent.innerHTML = `
+            ${ruleHighlights.length > 0 ? `<div style="padding:8px; background:rgba(245,158,11,0.1); border-radius:8px; margin-bottom:10px;">${ruleHighlights.join("<br>")}</div>` : ""}
+            ${renderMarkdownToHtml(reply)}
+          `;
+          return;
+        } catch(err) {}
+      }
+
+      // Offline Fallback Heuristic
+      let fallbackText = `<b>Compatibility Check for ${qty}x ${targetSpecies}:</b><br>`;
+      if (ruleHighlights.length > 0) {
+        fallbackText += ruleHighlights.join("<br>") + "<br>";
+      }
+      fallbackText += `• Current Tank Size: ${activeTank.vol} ${u.vol}<br>`;
+      fallbackText += `• Current Livestock: ${currentLivestock || 'None'}<br>`;
+      fallbackText += `• Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>`;
+      fallbackText += `<span style="font-size:11px; color:var(--text-muted);">(Save your Gemini API key in Settings for automated AI bioload and temperament calculation.)</span>`;
+      resultContent.innerHTML = fallbackText;
     }
 
     function copyActiveDelta() {
