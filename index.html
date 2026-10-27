@@ -87,14 +87,29 @@
       color: #FFFFFF; font-weight: 600; letter-spacing: -0.4px;
     }
     .brand-title .ai-spark {
-      font-size: 13px; color: #00F5A0; margin-left: 4px; line-height: 1;
-      filter: drop-shadow(0 0 8px #00F5A0);
-      animation: pulseSpark 2.2s infinite ease-in-out;
+      font-size: 9px;
+      color: #00F5A0;
+      margin-left: 3px;
+      vertical-align: super;
+      display: inline-block;
+      line-height: 1;
+      text-shadow: 0 0 6px #00F5A0, 0 0 12px #00F5A0, 0 0 20px rgba(0, 245, 160, 0.8), 0 0 28px rgba(0, 210, 255, 0.6);
+      filter: drop-shadow(0 0 4px #00F5A0);
+      animation: pulseSpark 2.4s infinite ease-in-out;
     }
 
     @keyframes pulseSpark {
-      0%, 100% { opacity: 0.85; transform: scale(1); filter: drop-shadow(0 0 6px #00F5A0); }
-      50% { opacity: 1; transform: scale(1.25); filter: drop-shadow(0 0 12px #00F5A0) drop-shadow(0 0 16px rgba(0,210,255,0.6)); }
+      0%, 100% {
+        opacity: 0.9;
+        transform: scale(1);
+        text-shadow: 0 0 6px #00F5A0, 0 0 12px #00F5A0, 0 0 18px rgba(0, 245, 160, 0.7);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.35);
+        text-shadow: 0 0 8px #00F5A0, 0 0 16px #00F5A0, 0 0 26px #00F5A0, 0 0 34px rgba(0, 210, 255, 0.9);
+        filter: drop-shadow(0 0 8px #00F5A0);
+      }
     }
     .brand-subtext {
       font-size: 8.5px; font-weight: 700; color: #64748B;
