@@ -137,14 +137,14 @@
 
     /* Cards */
     .card {
-      background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--card-border);
+      background: linear-gradient(145deg, rgba(12, 22, 44, 0.72) 0%, rgba(5, 10, 22, 0.88) 100%);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(56, 189, 248, 0.14);
       border-radius: 20px;
       padding: 18px;
       margin-bottom: 16px;
-      box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.7);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 16px 36px -10px rgba(0, 0, 0, 0.75);
       position: relative;
     }
 
@@ -153,23 +153,30 @@
       margin-bottom: 12px;
     }
     .card-title {
-      font-size: 17px; font-weight: 700; color: #fff; letter-spacing: -0.3px;
+      font-size: 16px; font-weight: 700; color: #fff; letter-spacing: -0.3px;
+      display: flex; align-items: center; gap: 7px;
     }
 
     /* Greeting Hero Card */
     .greeting-card {
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.14), rgba(0, 245, 160, 0.08));
-      border: 1px solid var(--card-border-glow);
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.12) 0%, rgba(0, 245, 160, 0.06) 50%, rgba(5, 10, 22, 0.9) 100%);
+      border: 1px solid rgba(0, 210, 255, 0.28);
       border-radius: 22px;
-      padding: 18px;
+      padding: 20px;
       margin-bottom: 18px;
-      box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.12), 0 18px 40px -10px rgba(0, 0, 0, 0.8);
     }
     .greeting-header {
       display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
     }
     .greeting-title {
-      font-size: 18px; font-weight: 700; color: var(--cyan);
+      font-size: 19px; font-weight: 800; color: #FFFFFF; letter-spacing: -0.4px;
+    }
+    .live-pulse-dot {
+      display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+      background: var(--neon-green); margin-right: 5px;
+      box-shadow: 0 0 8px var(--neon-green);
+      animation: pulseNeon 2s infinite ease-in-out;
     }
 
     /* Action Co-Pilot Verdict Card */
@@ -177,23 +184,23 @@
       border-radius: 20px;
       padding: 18px;
       margin-bottom: 16px;
-      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(7, 13, 24, 0.9));
+      background: linear-gradient(135deg, rgba(14, 24, 46, 0.95), rgba(6, 12, 24, 0.92));
       border: 1px solid var(--card-border);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06), 0 14px 30px rgba(0,0,0,0.6);
     }
-    .action-card.status-safe { border-color: rgba(0, 245, 160, 0.4); }
-    .action-card.status-caution { border-color: rgba(245, 158, 11, 0.4); }
-    .action-card.status-alert { border-color: rgba(239, 68, 68, 0.5); }
+    .action-card.status-safe { border-color: rgba(0, 245, 160, 0.35); }
+    .action-card.status-caution { border-color: rgba(245, 158, 11, 0.45); }
+    .action-card.status-alert { border-color: rgba(239, 68, 68, 0.55); }
 
     .action-plan-grid {
       display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px;
     }
     .action-plan-box {
-      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
       border-radius: 12px; padding: 12px;
     }
     .action-plan-title {
-      font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 4px; letter-spacing: 0.5px;
+      font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 4px; letter-spacing: 0.6px;
     }
     .action-plan-val {
       font-size: 13px; font-weight: 700; color: #fff; line-height: 1.35;
@@ -203,14 +210,15 @@
     .badge-cycling {
       font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
       display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
-      background: rgba(245, 158, 11, 0.2); color: var(--alert-yellow);
+      background: rgba(245, 158, 11, 0.16); color: var(--alert-yellow);
       border: 1px solid rgba(245, 158, 11, 0.45);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.15);
     }
 
     /* Hero Tank Cards (Dashboard) */
     .tank-card {
       padding: 0 !important; overflow: hidden; cursor: pointer;
-      transition: transform 0.15s ease; margin-bottom: 16px;
+      transition: transform 0.15s ease, border-color 0.15s ease; margin-bottom: 16px;
     }
     .tank-card:active { transform: scale(0.985); }
     .tank-banner {
@@ -219,24 +227,37 @@
     }
     .tank-banner-overlay {
       position: absolute; inset: 0; pointer-events: none;
-      background: linear-gradient(180deg, rgba(15,23,42,0.1) 20%, rgba(15,23,42,0.92) 90%);
+      background: linear-gradient(180deg, rgba(4,8,18,0.08) 15%, rgba(5,10,22,0.94) 92%);
     }
     .tank-banner-content { position: relative; z-index: 2; width: 100%; }
     .tank-card-body { padding: 14px 16px 16px; }
 
-    /* Parameter Strip */
+    /* High-Tech Visual Micro-Telemetry Gauges */
     .param-strip {
       display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;
-      margin-top: 10px; padding-top: 10px;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      margin-top: 12px; padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
     }
     .param-chip {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 8px; padding: 6px 4px; text-align: center;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 10px; padding: 7px 4px; text-align: center;
+      transition: border-color 0.15s ease;
     }
-    .param-chip-label { font-size: 10px; color: var(--text-muted); margin-bottom: 2px; }
-    .param-chip-val { font-size: 12px; font-weight: 700; color: #fff; }
+    .param-chip.status-safe { border-color: rgba(0, 245, 160, 0.25); }
+    .param-chip.status-caution { border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.04); }
+    .param-chip.status-alert { border-color: rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.06); }
+    .param-chip-header {
+      display: flex; align-items: center; justify-content: center; gap: 3px; margin-bottom: 3px;
+    }
+    .param-chip-label { font-size: 10px; font-weight: 700; color: var(--text-muted); }
+    .param-chip-dot {
+      width: 5px; height: 5px; border-radius: 50%; display: inline-block;
+    }
+    .param-chip-dot.safe { background: var(--neon-green); box-shadow: 0 0 5px var(--neon-green); }
+    .param-chip-dot.caution { background: var(--alert-yellow); box-shadow: 0 0 5px var(--alert-yellow); }
+    .param-chip-dot.alert { background: var(--alert-red); box-shadow: 0 0 5px var(--alert-red); }
+    .param-chip-val { font-size: 12px; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
 
     /* Visual Parameter Chart (F-12) */
     .chart-container {
@@ -246,18 +267,21 @@
       width: 100%; height: 210px; overflow: visible; display: block;
     }
     .chart-filter-bar {
-      display: flex; gap: 4px; overflow-x: auto; margin-bottom: 10px; padding-bottom: 2px;
+      display: flex; gap: 5px; overflow-x: auto; margin-bottom: 12px; padding-bottom: 2px;
+      scrollbar-width: none;
     }
+    .chart-filter-bar::-webkit-scrollbar { display: none; }
     .chart-pill-btn {
-      padding: 5px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      padding: 6px 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
       border-radius: 20px; font-size: 11px; font-weight: 600; color: var(--text-muted); cursor: pointer;
       white-space: nowrap; transition: all 0.15s ease;
     }
     .chart-pill-btn.active {
-      background: rgba(56, 189, 248, 0.2); border-color: var(--cyan); color: #fff;
+      background: rgba(0, 210, 255, 0.18); border-color: var(--cyan); color: #fff;
+      box-shadow: 0 0 10px rgba(0, 210, 255, 0.25);
     }
     .chart-legend {
-      display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; font-size: 11px; color: var(--text-muted);
+      display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; font-size: 11px; color: var(--text-muted);
     }
     .chart-legend-item { display: flex; align-items: center; gap: 5px; }
     .legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
@@ -268,7 +292,7 @@
       border-radius: 14px; padding: 14px; margin-bottom: 10px;
     }
     .media-progress-bar {
-      width: 100%; height: 6px; background: rgba(255,255,255,0.1);
+      width: 100%; height: 6px; background: rgba(255,255,255,0.08);
       border-radius: 10px; margin: 8px 0; overflow: hidden;
     }
     .media-progress-fill {
@@ -277,47 +301,59 @@
 
     /* AI Vision Photo Box (F-17) */
     .vision-preview-box {
-      width: 100%; height: 180px; border-radius: 14px; background: #080E1A;
-      border: 1px dashed var(--card-border); display: flex; flex-direction: column;
+      width: 100%; height: 180px; border-radius: 16px; background: #060D1A;
+      border: 1px dashed rgba(0, 210, 255, 0.3); display: flex; flex-direction: column;
       align-items: center; justify-content: center; cursor: pointer; position: relative;
-      overflow: hidden; margin-bottom: 12px;
+      overflow: hidden; margin-bottom: 12px; transition: border-color 0.15s ease;
     }
+    .vision-preview-box:hover { border-color: var(--cyan); }
     .vision-preview-img {
       width: 100%; height: 100%; object-fit: contain; position: absolute; inset: 0;
     }
 
-    /* Global Bottom Navigation Bar */
+    /* Modern Floating Glass Bottom Navigation Bar */
     .bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-nav-height);
-      background: rgba(11, 19, 36, 0.94);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-top: 1px solid var(--card-border);
+      position: fixed; bottom: 12px; left: 16px; right: 16px; height: 60px;
+      max-width: 568px; margin: 0 auto;
+      background: rgba(6, 12, 26, 0.92);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 24px;
       display: flex; align-items: center; justify-content: space-around;
       z-index: 100;
-      padding-bottom: env(safe-area-inset-bottom, 0px);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.8), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+      padding: 0 8px;
     }
     .nav-tab {
       flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
       height: 100%; color: var(--text-muted); cursor: pointer; border: none; background: transparent;
-      transition: color 0.15s ease, transform 0.15s ease;
-      font-size: 11px; font-weight: 600; gap: 3px;
+      transition: all 0.15s ease;
+      font-size: 10.5px; font-weight: 600; gap: 3px; border-radius: 16px;
     }
-    .nav-tab svg { width: 22px; height: 22px; stroke-width: 2; transition: stroke 0.15s ease; }
+    .nav-tab svg { width: 20px; height: 20px; stroke-width: 2; transition: stroke 0.15s ease; }
     .nav-tab.active { color: var(--cyan); }
-    .nav-tab.active svg { stroke: var(--cyan); }
+    .nav-tab.active svg { stroke: var(--cyan); filter: drop-shadow(0 0 6px rgba(0, 210, 255, 0.6)); }
     .nav-tab:active { transform: scale(0.92); }
 
     /* Sub Tabs (Inside Tank Hub) */
     .tab-bar-tank {
       display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto;
-      background: rgba(15, 23, 42, 0.85); padding: 4px; border-radius: 14px; border: 1px solid var(--card-border);
+      background: rgba(8, 16, 32, 0.85); padding: 5px; border-radius: 16px;
+      border: 1px solid rgba(56, 189, 248, 0.15);
+      scrollbar-width: none;
     }
+    .tab-bar-tank::-webkit-scrollbar { display: none; }
     .tab-btn-tank {
       flex: 1; padding: 9px 12px; background: transparent; border: none; color: var(--text-muted);
-      font-size: 12px; font-weight: 600; border-radius: 10px; cursor: pointer; white-space: nowrap; text-align: center;
+      font-size: 12px; font-weight: 600; border-radius: 12px; cursor: pointer; white-space: nowrap; text-align: center;
+      transition: all 0.15s ease;
     }
-    .tab-btn-tank.active { background: var(--cyan); color: #070D18; font-weight: 700; }
+    .tab-btn-tank.active {
+      background: linear-gradient(135deg, #00D2FF, #00B4D8);
+      color: #040812; font-weight: 700;
+      box-shadow: 0 2px 10px rgba(0, 210, 255, 0.35);
+    }
 
     /* Form Controls & Buttons */
     label { font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px; font-weight: 600; }
@@ -484,19 +520,18 @@
       <div class="greeting-card">
         <div class="greeting-header">
           <div id="dynamic-greeting" class="greeting-title">Good day!</div>
-          <div id="global-status-badge" style="font-size:11px; color:var(--neon-green); font-weight:700;">🟢 All Systems Monitored</div>
+          <div id="global-status-badge" style="font-size:11px; color:var(--neon-green); font-weight:700;"><span class="live-pulse-dot"></span> Live Telemetry Active</div>
         </div>
         <div id="global-ai-summary" style="font-size: 13px; line-height: 1.5; color: var(--text-main);">
-          Scanning aquatic environments across your household...
+          Live biological monitoring active across your household.
         </div>
       </div>
 
       <!-- Actionable Upcoming Tasks & Routines Checklist -->
       <div class="card" id="dashboard-tasks-card" style="margin-bottom: 18px; border-color: rgba(56, 189, 248, 0.35);">
         <div class="card-header" style="margin-bottom: 10px;">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:16px;">📋</span>
-            <div class="card-title" style="font-size:15px;">Upcoming Tasks & Routines</div>
+          <div class="card-title">
+            <span>📋</span> Daily Care & Maintenance Routine
           </div>
           <span id="dashboard-tasks-badge" class="badge-cycling" style="background:rgba(56,189,248,0.15); color:var(--cyan); border-color:var(--cyan); font-size:10px;">Checking...</span>
         </div>
@@ -504,8 +539,8 @@
       </div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 14px;">
-        <h2 style="font-size:17px; font-weight:700;">My Aquariums</h2>
-        <button class="btn btn-secondary" style="width:auto; padding:6px 14px; font-size:12px;" onclick="openAddTankModal()">+ Add Aquarium</button>
+        <h2 style="font-size:17px; font-weight:800; letter-spacing:-0.3px;">My Aquariums</h2>
+        <button class="btn btn-secondary" style="width:auto; padding:7px 16px; font-size:12px;" onclick="openAddTankModal()">+ Add Aquarium</button>
       </div>
 
       <!-- List of Tank Cards (Tap to Enter Tank) -->
@@ -517,12 +552,12 @@
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">🧴 Global Supply Closet</div>
-            <div style="font-size:11px; color:var(--cyan); margin-top:2px;">Shared Household Shelf (Available to all aquariums)</div>
+            <div class="card-title">🧴 Household Supplies & Treatments</div>
+            <div style="font-size:11px; color:var(--cyan); margin-top:2px;">Shared inventory across all aquariums</div>
           </div>
         </div>
-        <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">
-          The AI co-pilot cross-references this household shelf to recommend dosages and treatments using what you already own.
+        <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px; line-height:1.45;">
+          The AI assistant cross-references your shelf to provide exact, zero-guesswork dosage calculations using products you already own.
         </p>
         <div class="input-row">
           <input type="text" id="global-closet-input" placeholder="e.g. Seachem Prime, API Master Test Kit, Fritz TurboStart">
@@ -534,15 +569,15 @@
 
     <!-- SCREEN 3: GLOBAL AI ADVISOR (Pet Store Sandbox & General Co-Pilot) -->
     <section id="screen-global-ai" class="view-screen">
-      <div class="card" style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(0, 245, 160, 0.08)); border-color: rgba(56, 189, 248, 0.35);">
+      <div class="card" style="background: linear-gradient(135deg, rgba(0, 210, 255, 0.12), rgba(0, 245, 160, 0.08)); border-color: rgba(56, 189, 248, 0.35);">
         <div class="card-header">
-          <div class="card-title">🤖 Ask AI Assistant</div>
+          <div class="card-title">🤖 Aquatic AI Intelligence</div>
         </div>
-        <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">
-          Ask any general fishkeeping, cycling, or plant care question.
+        <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px; line-height:1.45;">
+          Instant, scientifically backed fishkeeping, water chemistry, and disease guidance tailored to your setup.
         </p>
         <div class="input-row">
-          <input type="text" id="global-ai-input" placeholder="e.g. How do I lower nitrate in tap water?">
+          <input type="text" id="global-ai-input" placeholder="e.g. How do I lower nitrate without stressing sensitive cherry shrimp?">
           <button class="btn" style="width:75px;" onclick="askGlobalAI()">Ask</button>
         </div>
         <div id="global-ai-response" class="card" style="display:none; margin-top:12px; background:#080E1A; border-color:var(--cyan); font-size:13px; line-height:1.5;"></div>
@@ -552,8 +587,8 @@
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">⚖️ Pet Store Stocking Sandbox</div>
-            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Pre-purchase check before buying at the store</div>
+            <div class="card-title">⚖️ Fish Store Compatibility Lab</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Pre-purchase temperament, water parameter, and bioload check</div>
           </div>
         </div>
         <div class="input-grid-2">
@@ -587,7 +622,7 @@
           <div class="tank-banner-content">
             <div style="display:flex; justify-content:space-between; align-items:flex-end;">
               <div>
-                <h2 id="tank-hub-title" style="font-size:20px; font-weight:700; color:#fff;"></h2>
+                <h2 id="tank-hub-title" style="font-size:20px; font-weight:800; color:#fff; letter-spacing:-0.4px;"></h2>
                 <div id="tank-hub-meta" style="font-size:11px; color:var(--text-muted); margin-top:3px;"></div>
               </div>
               <div id="tank-hub-badge-wrap"></div>
@@ -598,12 +633,12 @@
 
       <!-- Tank Sub-Tabs -->
       <div class="tab-bar-tank">
-        <button class="tab-btn-tank active" onclick="switchTankTab('overview', this)">Overview</button>
-        <button class="tab-btn-tank" onclick="switchTankTab('water', this)">Water & Trends</button>
+        <button class="tab-btn-tank active" onclick="switchTankTab('overview', this)">Overview & Status</button>
+        <button class="tab-btn-tank" onclick="switchTankTab('water', this)">Water Chemistry</button>
         <button class="tab-btn-tank" onclick="switchTankTab('livestock', this)">Livestock</button>
-        <button class="tab-btn-tank" onclick="switchTankTab('hardware', this)">Filters & Hardware</button>
-        <button class="tab-btn-tank" onclick="switchTankTab('plants', this)">Plants & Decor</button>
-        <button class="tab-btn-tank" onclick="switchTankTab('ai', this)">AI & Camera</button>
+        <button class="tab-btn-tank" onclick="switchTankTab('hardware', this)">Filtration & Gear</button>
+        <button class="tab-btn-tank" onclick="switchTankTab('plants', this)">Plants & Aquascape</button>
+        <button class="tab-btn-tank" onclick="switchTankTab('ai', this)">AI Diagnostics</button>
       </div>
 
       <!-- TANK SUB-TAB 1: OVERVIEW & ACTIVITY LOG -->
@@ -612,20 +647,20 @@
         <div id="tank-cycling-roadmap-wrap"></div>
 
         <!-- Assessment Card -->
-        <div class="card" style="background: linear-gradient(135deg, rgba(0, 245, 160, 0.07), rgba(15, 23, 42, 0.95)); border-color: rgba(0, 245, 160, 0.3);">
-          <div style="font-size: 12px; font-weight: 700; color: var(--neon-green); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
-            🤖 Co-Pilot Status Assessment
+        <div class="card" style="background: linear-gradient(135deg, rgba(0, 245, 160, 0.08), rgba(6, 12, 24, 0.95)); border-color: rgba(0, 245, 160, 0.35);">
+          <div style="font-size: 11px; font-weight: 700; color: var(--neon-green); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px;">
+            🤖 AI Ecosystem Assessment
           </div>
-          <div id="tank-overview-summary" style="font-size: 13px; line-height: 1.45; color: var(--text-main);"></div>
+          <div id="tank-overview-summary" style="font-size: 13.5px; line-height: 1.5; color: var(--text-main);"></div>
         </div>
 
         <!-- Latest Parameter Snapshot -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Latest Test Snapshot</div>
+            <div class="card-title">Current Water Balance</div>
             <div style="display:flex; gap:6px;">
-              <button class="btn btn-secondary" style="width:auto; padding:4px 10px; font-size:11px; color:var(--cyan); border-color:rgba(56,189,248,0.4);" onclick="openQuickWcForActiveTank()">💧 Quick Water Change</button>
-              <button class="btn btn-secondary" style="width:auto; padding:4px 10px; font-size:11px;" onclick="switchTankTab('water')">🧪 Log Test</button>
+              <button class="btn btn-secondary" style="width:auto; padding:5px 12px; font-size:11px; color:var(--cyan); border-color:rgba(0,210,255,0.35);" onclick="openQuickWcForActiveTank()">💧 Quick Water Change</button>
+              <button class="btn btn-secondary" style="width:auto; padding:5px 12px; font-size:11px;" onclick="switchTankTab('water')">🧪 Log Chemistry</button>
             </div>
           </div>
           <div class="param-strip" id="tank-overview-params"></div>
@@ -634,7 +669,7 @@
         <!-- Unified Activity Timeline -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title">📜 Tank Activity Log</div>
+            <div class="card-title">📜 Care & Activity Timeline</div>
           </div>
           <div id="tank-overview-timeline"></div>
         </div>
@@ -644,7 +679,7 @@
       <div id="tanksub-water" class="tanksub-content" style="display:none;">
         <!-- Quick Action Bar -->
         <div style="display:flex; gap:8px; margin-bottom:12px;">
-          <button class="btn btn-secondary" style="font-size:12px; padding:10px 14px; flex:1; border-color:rgba(56,189,248,0.4); color:var(--cyan);" onclick="openQuickWcForActiveTank()">
+          <button class="btn btn-secondary" style="font-size:12px; padding:10px 14px; flex:1; border-color:rgba(0,210,255,0.4); color:var(--cyan);" onclick="openQuickWcForActiveTank()">
             💧 Quick Water Change (No Test)
           </button>
           <button class="btn btn-secondary" style="font-size:12px; padding:10px 14px; width:auto;" onclick="document.getElementById('w-log-date').scrollIntoView({behavior:'smooth'})">
@@ -655,7 +690,7 @@
         <!-- Visual Parameter Trend Graph (F-12) -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title">📈 Parameter Trends</div>
+            <div class="card-title">📈 Multi-Week Chemistry Curves</div>
           </div>
 
           <div class="chart-filter-bar">
@@ -683,18 +718,18 @@
 
         <!-- Smart Action Card (F-15) -->
         <div id="smart-action-card" class="action-card status-safe">
-          <div style="font-size:12px; font-weight:700; color:var(--neon-green); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">
-            🤖 Co-Pilot Prescription
+          <div style="font-size:11px; font-weight:700; color:var(--neon-green); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px;">
+            🤖 Ecosystem Diagnostics & Care Plan
           </div>
-          <div id="action-verdict-summary" style="font-size:13px; line-height:1.45; color:var(--text-main); margin-bottom:12px;"></div>
+          <div id="action-verdict-summary" style="font-size:13.5px; line-height:1.5; color:var(--text-main); margin-bottom:12px;"></div>
 
           <div class="action-plan-grid">
             <div class="action-plan-box">
-              <div class="action-plan-title">💧 Next Water Change</div>
+              <div class="action-plan-title">💧 Scheduled Water Change</div>
               <div id="action-wc-plan" class="action-plan-val"></div>
             </div>
             <div class="action-plan-box">
-              <div class="action-plan-title">🧴 Closet Dosing</div>
+              <div class="action-plan-title">🧴 Prescribed Conditioning & Dosing</div>
               <div id="action-dose-plan" class="action-plan-val"></div>
             </div>
           </div>
@@ -703,7 +738,7 @@
         <!-- Log Test Form -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title">🧪 Log Water Test</div>
+            <div class="card-title">🧪 Record Water Chemistry Test</div>
           </div>
           
           <div class="input-grid-2">
@@ -735,13 +770,13 @@
             </div>
           </div>
 
-          <button class="btn btn-neon" onclick="saveWaterLog()">Save Test & Run Analysis</button>
+          <button class="btn btn-neon" onclick="saveWaterLog()">Analyze Parameters & Save Record</button>
         </div>
 
         <!-- History -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Test History</div>
+            <div class="card-title">Historical Test Logs</div>
           </div>
           <div id="water-history-list"></div>
         </div>
@@ -762,15 +797,15 @@
 
           <!-- Subtle Loss Trigger at bottom -->
           <div style="margin-top:20px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); display:flex; justify-content:flex-end;">
-            <button class="btn btn-secondary" style="width:auto; font-size:11px; padding:6px 14px; opacity:0.65;" onclick="openLossModal()">
-              Log Fauna Loss...
+            <button class="btn btn-secondary" style="width:auto; font-size:11px; padding:6px 14px; opacity:0.8; color:var(--text-muted);" onclick="openLossModal()">
+              ❤️ Record Health Event or Loss...
             </button>
           </div>
         </div>
 
         <div id="loss-history-card" class="card" style="display:none; background:rgba(15,23,42,0.6);">
           <div class="card-header">
-            <div class="card-title" style="font-size:14px;">Loss Records</div>
+            <div class="card-title" style="font-size:14px;">Health & Loss Records</div>
           </div>
           <div id="loss-history-list"></div>
         </div>
@@ -781,17 +816,17 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">🧽 Filter Media Lifecycles</div>
-              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Track sponge rinse cycles and Purigen/carbon expiration</div>
+              <div class="card-title">🧽 Filter Media & Care Lifecycles</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Track sponge rinse timers and chemical media exhaustion</div>
             </div>
-            <button class="btn btn-secondary" style="width:auto; font-size:11px; padding:4px 10px;" onclick="openAddMediaModal()">+ Add Media</button>
+            <button class="btn btn-secondary" style="width:auto; font-size:11px; padding:4px 10px;" onclick="openAddMediaModal()">+ Add Filter Media</button>
           </div>
           <div id="tank-media-list"></div>
         </div>
 
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Hardware, Heaters & Lighting</div>
+            <div class="card-title">Hardware, Heaters & Aeration</div>
           </div>
           <div class="input-row">
             <input type="text" id="tank-equip-input" placeholder="e.g. Fluval 407, 150W Eheim Heater">
@@ -804,7 +839,7 @@
       <!-- TANK SUB-TAB 5: PLANTS & DECOR -->
       <div id="tanksub-plants" class="tanksub-content" style="display:none;">
         <div class="card">
-          <div class="card-header"><div class="card-title">Aquatic Plants</div></div>
+          <div class="card-header"><div class="card-title">🌿 Aquatic Flora & Plants</div></div>
           <div class="input-row">
             <input type="text" id="tank-plant-input" placeholder="e.g. Amazon Sword, Anubias">
             <button class="btn" style="width:70px;" onclick="addTankPlant()">Add</button>
@@ -813,7 +848,7 @@
         </div>
 
         <div class="card">
-          <div class="card-header"><div class="card-title">Hardscape & Decor</div></div>
+          <div class="card-header"><div class="card-title">🪨 Hardscape & Aquascape</div></div>
           <div class="input-row">
             <input type="text" id="tank-decor-input" placeholder="e.g. Driftwood, Dragon Stone">
             <button class="btn" style="width:70px;" onclick="addTankDecor()">Add</button>
@@ -827,8 +862,8 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">📸 AI Vision Diagnostics (F-17)</div>
-              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Snap photo of sick fish or algae in this aquarium</div>
+              <div class="card-title">📸 AI Vision Diagnostic Lab</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Snap or upload a photo of sick fish, unusual symptoms, or algae blooms</div>
             </div>
           </div>
 
@@ -837,7 +872,7 @@
             <div id="vision-placeholder-content" style="text-align:center; padding:16px;">
               <div style="font-size:32px; margin-bottom:6px;">📷</div>
               <div style="font-size:13px; font-weight:700; color:var(--cyan);">Tap to Open Camera or Upload</div>
-              <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Native camera capture on Android</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Native camera capture on mobile & desktop</div>
             </div>
           </div>
           <input type="file" id="vision-file-input" accept="image/*" capture="environment" style="display:none;" onchange="handleVisionImageSelected(event)">
@@ -858,8 +893,8 @@
         <!-- Chat about this Tank -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Ask AI About This Tank</div>
-            <button class="btn btn-secondary" style="width:auto; padding:4px 10px; font-size:11px;" onclick="copyTankDelta()">📋 Copy Delta</button>
+            <div class="card-title">Consult AI Assistant on This Aquarium</div>
+            <button class="btn btn-secondary" style="width:auto; padding:4px 10px; font-size:11px;" onclick="copyTankDelta()">📋 Copy Telemetry Delta</button>
           </div>
           <div class="input-row">
             <input type="text" id="tank-ai-chat-input" placeholder="e.g. Why is nitrate rising faster this week?">
@@ -877,11 +912,11 @@
   <nav class="bottom-nav" id="global-bottom-nav">
     <button class="nav-tab active" onclick="navToGlobal('dashboard')" id="nav-btn-dashboard">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-      All Tanks
+      Aquariums
     </button>
     <button class="nav-tab" onclick="navToGlobal('closet')" id="nav-btn-closet">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-      Supply Closet
+      Supplies
     </button>
     <button class="nav-tab" onclick="navToGlobal('global-ai')" id="nav-btn-global-ai">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
@@ -981,11 +1016,11 @@
   <div class="modal-overlay" id="lossModal">
     <div class="modal-box">
       <div class="card-header" style="margin-bottom:12px;">
-        <h3 style="font-size:17px; color:var(--text-main);">Log Fauna Loss</h3>
+        <h3 style="font-size:17px; color:var(--text-main);">❤️ Fish Health & Loss Record</h3>
         <button class="icon-btn" style="width:28px;height:28px;" onclick="closeModalById('lossModal')">×</button>
       </div>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">
-        Recording losses automatically updates your roster count and audits tank parameters.
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px; line-height:1.45;">
+        Recording losses automatically updates your roster count and audits tank parameters for underlying causes.
       </p>
 
       <div style="margin-bottom:12px;">
@@ -1018,7 +1053,7 @@
 
       <div style="display:flex; gap:10px;">
         <button class="btn btn-secondary" onclick="closeModalById('lossModal')">Cancel</button>
-        <button class="btn btn-danger" onclick="submitFaunaLoss()">Record Loss & Audit Health</button>
+        <button class="btn btn-danger" onclick="submitFaunaLoss()">Record Health Event & Audit Tank</button>
       </div>
     </div>
   </div>
@@ -1119,7 +1154,7 @@
   <div class="modal-overlay" id="settingsModal">
     <div class="modal-box">
       <div class="card-header" style="margin-bottom:14px;">
-        <h3 style="font-size:18px;">⚙️ Settings & Device</h3>
+        <h3 style="font-size:18px;">⚙️ Preferences & Device Integration</h3>
         <button class="icon-btn" style="width:28px;height:28px;" onclick="closeModalById('settingsModal')">×</button>
       </div>
 
@@ -1153,9 +1188,9 @@
       </div>
 
       <div class="card" style="margin-bottom:18px; background:rgba(255,255,255,0.03); border-color:var(--card-border-glow);">
-        <div style="font-size:14px; font-weight:700; color:var(--cyan); margin-bottom:4px;">🚰 Household Tap Water Baseline</div>
+        <div style="font-size:14px; font-weight:700; color:var(--cyan); margin-bottom:4px;">🚰 Tap Water Source Profile</div>
         <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">
-          Tested straight from the faucet. Inherited by all tanks for water change dilution calculations.
+          Tested straight from the faucet. Inherited by all aquariums for water change dilution & buffering calculations.
         </p>
         <div class="input-grid-2">
           <div><label>Tap pH</label><input type="number" id="tap-ph" step="0.1" placeholder="7.4" onchange="saveTapBaseline()"></div>
@@ -1516,6 +1551,66 @@
       return `${(diffDays / 365).toFixed(1)} years old`;
     }
 
+    /* High-Tech Telemetry Gauge Builders */
+    function buildParamGaugeInnerHtml(t, u) {
+      const nh3 = parseFloat(t.nh3) || 0;
+      const no2 = parseFloat(t.no2) || 0;
+      const no3 = parseFloat(t.no3) || 0;
+      const ph = parseFloat(t.ph) || 7.2;
+      const temp = parseFloat(t.temp) || 78;
+
+      const nh3Status = nh3 > 0.25 ? "alert" : (nh3 > 0 ? "caution" : "safe");
+      const no2Status = no2 > 0.25 ? "alert" : (no2 > 0 ? "caution" : "safe");
+      const no3Status = no3 > 40 ? "alert" : (no3 > 25 ? "caution" : "safe");
+      const phStatus = (ph < 6.4 || ph > 8.2) ? "caution" : "safe";
+      const isMetric = appState.units === "metric";
+      const tempStatus = isMetric 
+        ? ((temp < 22 || temp > 28) ? "caution" : "safe")
+        : ((temp < 72 || temp > 82) ? "caution" : "safe");
+
+      return `
+        <div class="param-chip status-${nh3Status}">
+          <div class="param-chip-header">
+            <span class="param-chip-dot ${nh3Status}"></span>
+            <span class="param-chip-label">NH₃</span>
+          </div>
+          <div class="param-chip-val">${t.nh3 ?? 0}</div>
+        </div>
+        <div class="param-chip status-${no2Status}">
+          <div class="param-chip-header">
+            <span class="param-chip-dot ${no2Status}"></span>
+            <span class="param-chip-label">NO₂</span>
+          </div>
+          <div class="param-chip-val">${t.no2 ?? 0}</div>
+        </div>
+        <div class="param-chip status-${no3Status}">
+          <div class="param-chip-header">
+            <span class="param-chip-dot ${no3Status}"></span>
+            <span class="param-chip-label">NO₃</span>
+          </div>
+          <div class="param-chip-val">${t.no3 ?? 0}</div>
+        </div>
+        <div class="param-chip status-${phStatus}">
+          <div class="param-chip-header">
+            <span class="param-chip-dot ${phStatus}"></span>
+            <span class="param-chip-label">pH</span>
+          </div>
+          <div class="param-chip-val">${t.ph ?? 7.2}</div>
+        </div>
+        <div class="param-chip status-${tempStatus}">
+          <div class="param-chip-header">
+            <span class="param-chip-dot ${tempStatus}"></span>
+            <span class="param-chip-label">Temp</span>
+          </div>
+          <div class="param-chip-val">${t.temp || 78}${u.temp}</div>
+        </div>
+      `;
+    }
+
+    function buildParamGaugeStripHtml(t, u) {
+      return `<div class="param-strip">${buildParamGaugeInnerHtml(t, u)}</div>`;
+    }
+
     /* ============================================================
        4. LEVEL 1: GLOBAL SCREENS (Dashboard, Closet, AI)
        ============================================================ */
@@ -1579,13 +1674,7 @@
             <div style="font-size:12px; color:var(--text-main); margin-bottom:8px; line-height:1.4;">
               ${tank.summary || "All systems nominal."}
             </div>
-            <div class="param-strip">
-              <div class="param-chip"><div class="param-chip-label">NH₃</div><div class="param-chip-val">${t.nh3}</div></div>
-              <div class="param-chip"><div class="param-chip-label">NO₂</div><div class="param-chip-val">${t.no2}</div></div>
-              <div class="param-chip"><div class="param-chip-label">NO₃</div><div class="param-chip-val">${t.no3}p</div></div>
-              <div class="param-chip"><div class="param-chip-label">pH</div><div class="param-chip-val">${t.ph}</div></div>
-              <div class="param-chip"><div class="param-chip-label">Temp</div><div class="param-chip-val">${t.temp || 78}${u.temp}</div></div>
-            </div>
+            ${buildParamGaugeStripHtml(t, u)}
           </div>
         `;
         container.appendChild(card);
@@ -2032,13 +2121,7 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       // Parameter Snapshot
       const paramContainer = document.getElementById("tank-overview-params");
       if (paramContainer) {
-        paramContainer.innerHTML = `
-          <div class="param-chip"><div class="param-chip-label">NH₃</div><div class="param-chip-val">${t.nh3}</div></div>
-          <div class="param-chip"><div class="param-chip-label">NO₂</div><div class="param-chip-val">${t.no2}</div></div>
-          <div class="param-chip"><div class="param-chip-label">NO₃</div><div class="param-chip-val">${t.no3}p</div></div>
-          <div class="param-chip"><div class="param-chip-label">pH</div><div class="param-chip-val">${t.ph}</div></div>
-          <div class="param-chip"><div class="param-chip-label">Temp</div><div class="param-chip-val">${t.temp || 78}${u.temp}</div></div>
-        `;
+        paramContainer.innerHTML = buildParamGaugeInnerHtml(t, u);
       }
 
       // Unified Timeline

@@ -1,10 +1,11 @@
-const CACHE_NAME = "aquassist-cache-v9";
+const CACHE_NAME = "aquassist-cache-v10";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
   "./manifest.json",
   "./icon.png",
-  "./icon.svg"
+  "./icon.svg",
+  "./icon-header.png"
 ];
 
 // Install: Cache critical assets for 100% offline functionality
