@@ -1,9 +1,13 @@
-const CACHE_NAME = "aquassist-cache-v13";
+const CACHE_NAME = "aquassist-cache-v14";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
   "./manifest.json",
   "./icon.png",
+  "./icon-512.png",
+  "./icon-192.png",
+  "./icon-maskable-512.png",
+  "./icon-maskable-192.png",
   "./icon.svg",
   "./icon-header.png",
   "./apple-touch-icon.png"
