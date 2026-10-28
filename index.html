@@ -538,12 +538,34 @@
 
     <!-- SCREEN 1: GLOBAL DASHBOARD (All Tanks Overview) -->
     <section id="screen-dashboard" class="view-screen active">
-      <div class="greeting-card">
-        <div class="greeting-header">
-          <div id="dynamic-greeting" class="greeting-title">Good day!</div>
-          <div id="global-status-badge" style="font-size:11px; color:var(--neon-green); font-weight:700;"><span class="live-pulse-dot"></span> Live Telemetry Active</div>
+      <!-- Executive Ecosystem Assessment Hero -->
+      <div class="greeting-card" style="padding:18px 20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div style="font-size:11px; font-weight:800; color:var(--cyan); text-transform:uppercase; letter-spacing:0.8px;">
+            Ecosystem Overview
+          </div>
+          <div id="global-status-badge" style="font-size:11px; color:var(--neon-green); font-weight:700;">
+            <span class="live-pulse-dot"></span> Live Telemetry Active
+          </div>
         </div>
-        <div id="global-ai-summary" style="font-size: 13px; line-height: 1.5; color: var(--text-main);">
+        
+        <!-- Summary Stat Badges -->
+        <div id="global-stats-row" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin-bottom:14px;">
+          <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:10px 8px; text-align:center;">
+            <div style="font-size:10px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Aquariums</div>
+            <div id="stat-total-tanks" style="font-size:18px; font-weight:800; color:#fff; margin-top:2px;">--</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:10px 8px; text-align:center;">
+            <div style="font-size:10px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Total Volume</div>
+            <div id="stat-total-vol" style="font-size:18px; font-weight:800; color:var(--cyan); margin-top:2px;">--</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:10px 8px; text-align:center;">
+            <div style="font-size:10px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Biostability</div>
+            <div id="stat-stability" style="font-size:18px; font-weight:800; color:var(--neon-green); margin-top:2px;">100%</div>
+          </div>
+        </div>
+
+        <div id="global-ai-summary" style="font-size: 13.5px; line-height: 1.55; color: var(--text-main);">
           Live biological monitoring active across your household.
         </div>
       </div>
@@ -552,7 +574,7 @@
       <div class="card" id="dashboard-tasks-card" style="margin-bottom: 18px; border-color: rgba(56, 189, 248, 0.35);">
         <div class="card-header" style="margin-bottom: 10px;">
           <div class="card-title">
-            Daily Care & Maintenance Routine
+            Upcoming Tasks
           </div>
           <span id="dashboard-tasks-badge" class="badge-cycling" style="background:rgba(56,189,248,0.15); color:var(--cyan); border-color:var(--cyan); font-size:10px;">Checking...</span>
         </div>
@@ -652,27 +674,27 @@
         </div>
       </div>
 
-      <!-- Tank Sub-Tabs -->
+      <!-- Tank Sub-Tabs (Clean 1-word titles) -->
       <div class="tab-bar-tank">
-        <button class="tab-btn-tank active" onclick="switchTankTab('overview', this)">Overview & Status</button>
-        <button class="tab-btn-tank" onclick="switchTankTab('water', this)">Water Chemistry</button>
+        <button class="tab-btn-tank active" onclick="switchTankTab('overview', this)">Overview</button>
+        <button class="tab-btn-tank" onclick="switchTankTab('water', this)">Water</button>
+        <button class="tab-btn-tank" onclick="switchTankTab('plan', this)">Plan</button>
         <button class="tab-btn-tank" onclick="switchTankTab('livestock', this)">Livestock</button>
-        <button class="tab-btn-tank" onclick="switchTankTab('hardware', this)">Filtration & Gear</button>
-        <button class="tab-btn-tank" onclick="switchTankTab('plants', this)">Plants & Aquascape</button>
-        <button class="tab-btn-tank" onclick="switchTankTab('ai', this)">AI Diagnostics</button>
+        <button class="tab-btn-tank" onclick="switchTankTab('hardware', this)">Gear</button>
+        <button class="tab-btn-tank" onclick="switchTankTab('plants', this)">Flora</button>
       </div>
 
-      <!-- TANK SUB-TAB 1: OVERVIEW & ACTIVITY LOG -->
+      <!-- TANK SUB-TAB 1: OVERVIEW -->
       <div id="tanksub-overview" class="tanksub-content">
         <!-- Nitrogen Cycling Roadmap (Rendered dynamically when tank is in Cycling status) -->
         <div id="tank-cycling-roadmap-wrap"></div>
 
-        <!-- Assessment Card -->
+        <!-- Holistic Ecosystem Assessment Card -->
         <div class="card" style="background: linear-gradient(135deg, rgba(0, 245, 160, 0.08), rgba(6, 12, 24, 0.95)); border-color: rgba(0, 245, 160, 0.35);">
-          <div style="font-size: 11px; font-weight: 700; color: var(--neon-green); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px;">
-            Aquarist AI Assessment
+          <div style="font-size: 11px; font-weight: 800; color: var(--neon-green); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;">
+            Aquarist AI Ecosystem Assessment
           </div>
-          <div id="tank-overview-summary" style="font-size: 13.5px; line-height: 1.5; color: var(--text-main);"></div>
+          <div id="tank-overview-summary" style="font-size: 13.5px; line-height: 1.55; color: var(--text-main);"></div>
         </div>
 
         <!-- Latest Parameter Snapshot -->
@@ -680,11 +702,42 @@
           <div class="card-header">
             <div class="card-title">Current Water Balance</div>
             <div style="display:flex; gap:6px;">
-              <button class="btn btn-secondary" style="width:auto; padding:5px 12px; font-size:11px; color:var(--cyan); border-color:rgba(0,210,255,0.35);" onclick="openQuickWcForActiveTank()">Quick Water Change</button>
-              <button class="btn btn-secondary" style="width:auto; padding:5px 12px; font-size:11px;" onclick="switchTankTab('water')">Log Chemistry</button>
+              <button class="btn btn-secondary" style="width:auto; padding:5px 12px; font-size:11px; color:var(--cyan); border-color:rgba(0,210,255,0.35);" onclick="openQuickWcForActiveTank()">Log Water Change</button>
+              <button class="btn btn-secondary" style="width:auto; padding:5px 12px; font-size:11px;" onclick="openTestModalForActiveTank()">Log Chemistry</button>
             </div>
           </div>
           <div class="param-strip" id="tank-overview-params"></div>
+        </div>
+
+        <!-- Integrated Aquarist AI Lab (Consult AI + Inline Camera Vision) -->
+        <div class="card" style="background: linear-gradient(135deg, rgba(0, 210, 255, 0.08), rgba(9, 18, 36, 0.95)); border-color: rgba(56, 189, 248, 0.35);">
+          <div class="card-header">
+            <div>
+              <div class="card-title" style="font-size:15px;">Aquarist AI Lab</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Holistic tank diagnostics, biology queries & camera analysis</div>
+            </div>
+            <button class="btn btn-secondary" style="width:auto; padding:4px 8px; font-size:10px;" onclick="copyTankDelta()">Copy Delta</button>
+          </div>
+          
+          <!-- Unified Question Input with Inline Camera Icon Button -->
+          <div style="display:flex; gap:6px; align-items:center;">
+            <input type="text" id="tank-ai-chat-input" placeholder="Ask about parameters, fish symptoms, dosing..." style="flex:1;">
+            <button class="icon-btn" id="ai-vision-camera-btn" onclick="document.getElementById('vision-file-input').click()" title="Attach photo of fish or water for AI Vision analysis" style="background:rgba(0,210,255,0.12); border-color:var(--cyan); color:var(--cyan);">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </button>
+            <button class="btn btn-neon" style="width:auto; padding:10px 16px; font-size:13px;" onclick="runUnifiedTankAI()">Ask</button>
+          </div>
+          
+          <input type="file" id="vision-file-input" accept="image/*" capture="environment" style="display:none;" onchange="handleVisionImageSelected(event)">
+          
+          <!-- Selected Image Chip Preview -->
+          <div id="ai-vision-preview-chip" style="display:none; align-items:center; gap:8px; margin-top:10px; background:rgba(0,210,255,0.1); border:1px solid rgba(0,210,255,0.3); border-radius:10px; padding:6px 10px;">
+            <img id="vision-preview-thumb" style="width:28px; height:28px; border-radius:6px; object-fit:cover;">
+            <span style="font-size:11px; color:var(--cyan); font-weight:600; flex:1;">Photo attached for visual analysis</span>
+            <span class="delete-x" onclick="clearVisionAttachment()" style="font-size:16px;">×</span>
+          </div>
+
+          <div id="tank-ai-chat-box" class="card" style="display:none; margin-top:12px; background:#080E1A; border-color:var(--cyan); font-size:13px; line-height:1.55;"></div>
         </div>
 
         <!-- Unified Activity Timeline -->
@@ -696,15 +749,17 @@
         </div>
       </div>
 
-      <!-- TANK SUB-TAB 2: WATER & TRENDS -->
+      <!-- TANK SUB-TAB 2: WATER -->
       <div id="tanksub-water" class="tanksub-content" style="display:none;">
-        <!-- Quick Action Bar -->
-        <div style="display:flex; gap:8px; margin-bottom:12px;">
-          <button class="btn btn-secondary" style="font-size:12px; padding:10px 14px; flex:1; border-color:rgba(0,210,255,0.4); color:var(--cyan);" onclick="openQuickWcForActiveTank()">
-            Quick Water Change (No Test)
+        <!-- Separate Water Actions -->
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:14px;">
+          <button class="btn btn-secondary" style="font-size:12px; padding:11px 12px; border-color:rgba(0,210,255,0.4); color:var(--cyan); justify-content:center;" onclick="openQuickWcForActiveTank()">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+            Log Water Change
           </button>
-          <button class="btn btn-secondary" style="font-size:12px; padding:10px 14px; width:auto;" onclick="document.getElementById('w-log-date').scrollIntoView({behavior:'smooth'})">
-            Full Chemistry Test
+          <button class="btn btn-neon" style="font-size:12px; padding:11px 12px; justify-content:center;" onclick="openTestModalForActiveTank()">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2v6h.01L10 13v7a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2v-7l3.99-5H18V2H6z"/></svg>
+            Record Chemistry Test
           </button>
         </div>
 
@@ -716,11 +771,11 @@
 
           <div class="chart-filter-bar">
             <button class="chart-pill-btn active" onclick="setChartFilter('all', this)">All Combined</button>
-            <button class="chart-pill-btn" onclick="setChartFilter('no3', this)">Nitrate (NO₃)</button>
+            <button class="chart-pill-btn" onclick="setChartFilter('temp', this)">Temp</button>
+            <button class="chart-pill-btn" onclick="setChartFilter('ph', this)">pH</button>
             <button class="chart-pill-btn" onclick="setChartFilter('nh3', this)">Ammonia (NH₃)</button>
             <button class="chart-pill-btn" onclick="setChartFilter('no2', this)">Nitrite (NO₂)</button>
-            <button class="chart-pill-btn" onclick="setChartFilter('ph', this)">pH</button>
-            <button class="chart-pill-btn" onclick="setChartFilter('temp', this)">Temp</button>
+            <button class="chart-pill-btn" onclick="setChartFilter('no3', this)">Nitrate (NO₃)</button>
           </div>
 
           <div class="chart-container">
@@ -728,21 +783,32 @@
           </div>
 
           <div class="chart-legend">
-            <div class="chart-legend-item"><span class="legend-dot" style="background:var(--cyan);"></span> NO₃</div>
+            <div class="chart-legend-item"><span class="legend-dot" style="background:var(--neon-green);"></span> Temp</div>
+            <div class="chart-legend-item"><span class="legend-dot" style="background:var(--purple);"></span> pH</div>
             <div class="chart-legend-item"><span class="legend-dot" style="background:var(--alert-red);"></span> NH₃</div>
             <div class="chart-legend-item"><span class="legend-dot" style="background:var(--alert-yellow);"></span> NO₂</div>
-            <div class="chart-legend-item"><span class="legend-dot" style="background:var(--purple);"></span> pH</div>
-            <div class="chart-legend-item"><span class="legend-dot" style="background:var(--neon-green);"></span> Temp</div>
+            <div class="chart-legend-item"><span class="legend-dot" style="background:var(--cyan);"></span> NO₃</div>
             <div class="chart-legend-item"><span>Water Change</span></div>
           </div>
         </div>
 
+        <!-- Test Log History with Edit/Delete Actions -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Historical Test Logs</div>
+          </div>
+          <div id="water-history-list"></div>
+        </div>
+      </div>
+
+      <!-- TANK SUB-TAB 3: PLAN (Dedicated Care Plan & Scheduled Tasks) -->
+      <div id="tanksub-plan" class="tanksub-content" style="display:none;">
         <!-- Smart Action Card (F-15) -->
-        <div id="smart-action-card" class="action-card status-safe">
-          <div style="font-size:11px; font-weight:700; color:var(--neon-green); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px;">
+        <div id="smart-action-card" class="action-card status-safe" style="margin-bottom:16px;">
+          <div style="font-size:11px; font-weight:800; color:var(--neon-green); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px;">
             Aquarist AI Care Plan
           </div>
-          <div id="action-verdict-summary" style="font-size:13.5px; line-height:1.5; color:var(--text-main); margin-bottom:12px;"></div>
+          <div id="action-verdict-summary" style="font-size:13.5px; line-height:1.55; color:var(--text-main); margin-bottom:12px;"></div>
 
           <div class="action-plan-grid">
             <div class="action-plan-box">
@@ -756,54 +822,16 @@
           </div>
         </div>
 
-        <!-- Log Test Form -->
+        <!-- Upcoming Maintenance Checklist for this tank -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Record Water Chemistry Test</div>
+            <div class="card-title">Upcoming Routine Tasks</div>
           </div>
-          
-          <div class="input-grid-2">
-            <div>
-              <label>Test Date</label>
-              <input type="date" id="w-log-date">
-            </div>
-            <div>
-              <label>Water Temp (<span class="unit-temp-label">°F</span>)</label>
-              <input type="number" id="w-log-temp" step="0.5" placeholder="78.0">
-            </div>
-          </div>
-
-          <div class="input-grid-2">
-            <div><label>Ammonia (NH₃ ppm)</label><input type="number" id="w-log-nh3" step="0.25" placeholder="0"></div>
-            <div><label>Nitrite (NO₂ ppm)</label><input type="number" id="w-log-no2" step="0.25" placeholder="0"></div>
-            <div><label>Nitrate (NO₃ ppm)</label><input type="number" id="w-log-no3" step="5" placeholder="20"></div>
-            <div><label>pH</label><input type="number" id="w-log-ph" step="0.1" placeholder="7.2"></div>
-          </div>
-
-          <div class="input-grid-2">
-            <div>
-              <label>Water Change (%) <span id="wc-vol-preview" style="color:var(--cyan); font-size:11px;"></span></label>
-              <input type="number" id="w-log-wc" step="5" placeholder="25" oninput="updateWcVolumePreview(this.value)">
-            </div>
-            <div>
-              <label>Dosed Product</label>
-              <input type="text" id="w-log-dose" placeholder="Prime 2ml">
-            </div>
-          </div>
-
-          <button class="btn btn-neon" onclick="saveWaterLog()">Analyze Parameters & Save Record</button>
-        </div>
-
-        <!-- History -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">Historical Test Logs</div>
-          </div>
-          <div id="water-history-list"></div>
+          <div id="tank-plan-tasks-list"></div>
         </div>
       </div>
 
-      <!-- TANK SUB-TAB 3: LIVESTOCK -->
+      <!-- TANK SUB-TAB 4: LIVESTOCK -->
       <div id="tanksub-livestock" class="tanksub-content" style="display:none;">
         <div class="card">
           <div class="card-header">
@@ -816,10 +844,10 @@
           </div>
           <div id="tank-live-list" class="pill-list"></div>
 
-          <!-- Subtle Loss Trigger at bottom -->
+          <!-- Health Event Trigger -->
           <div style="margin-top:20px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); display:flex; justify-content:flex-end;">
-            <button class="btn btn-secondary" style="width:auto; font-size:11px; padding:6px 14px; opacity:0.8; color:var(--text-muted);" onclick="openLossModal()">
-              Record Health Event or Loss...
+            <button class="btn btn-secondary" style="width:auto; font-size:11px; padding:6px 14px; opacity:0.9; color:var(--text-muted);" onclick="openLossModal()">
+              Record Health Event...
             </button>
           </div>
         </div>
@@ -832,15 +860,15 @@
         </div>
       </div>
 
-      <!-- TANK SUB-TAB 4: HARDWARE & FILTERS -->
+      <!-- TANK SUB-TAB 5: GEAR (Filtration & Hardware) -->
       <div id="tanksub-hardware" class="tanksub-content" style="display:none;">
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">Filter Media & Care Lifecycles</div>
-              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Track sponge rinse timers and chemical media exhaustion</div>
+              <div class="card-title">Filter Media & Automated Care</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Automated rinse schedules & cartridge replacement tracking</div>
             </div>
-            <button class="btn btn-secondary" style="width:auto; font-size:11px; padding:4px 10px;" onclick="openAddMediaModal()">+ Add Filter Media</button>
+            <button class="btn btn-secondary" style="width:auto; font-size:11px; padding:4px 10px;" onclick="openAddMediaModal()">+ Add Media</button>
           </div>
           <div id="tank-media-list"></div>
         </div>
@@ -857,7 +885,7 @@
         </div>
       </div>
 
-      <!-- TANK SUB-TAB 5: PLANTS & DECOR -->
+      <!-- TANK SUB-TAB 6: PLANTS & DECOR -->
       <div id="tanksub-plants" class="tanksub-content" style="display:none;">
         <div class="card">
           <div class="card-header"><div class="card-title">Aquatic Flora & Plants</div></div>
@@ -875,53 +903,6 @@
             <button class="btn" style="width:70px;" onclick="addTankDecor()">Add</button>
           </div>
           <div id="tank-decor-list" class="pill-list"></div>
-        </div>
-      </div>
-
-      <!-- TANK SUB-TAB 6: TANK AI & CAMERA VISION -->
-      <div id="tanksub-ai" class="tanksub-content" style="display:none;">
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <div class="card-title">AI Vision Diagnostic Lab</div>
-              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Snap or upload a photo of sick fish, unusual symptoms, or algae blooms</div>
-            </div>
-          </div>
-
-          <div class="vision-preview-box" onclick="document.getElementById('vision-file-input').click()">
-            <img id="vision-preview-img" class="vision-preview-img" style="display:none;">
-            <div id="vision-placeholder-content" style="text-align:center; padding:16px;">
-              <div style="margin-bottom:8px;"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="var(--cyan)" stroke-width="1.75"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
-              <div style="font-size:13px; font-weight:700; color:var(--cyan);">Tap to Open Camera or Upload</div>
-              <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Native camera capture on mobile & desktop</div>
-            </div>
-          </div>
-          <input type="file" id="vision-file-input" accept="image/*" capture="environment" style="display:none;" onchange="handleVisionImageSelected(event)">
-
-          <div style="margin-bottom:12px;">
-            <label>Observed Symptoms / Notes</label>
-            <input type="text" id="vision-user-notes" placeholder="e.g. White spots on tetras, occurred after water change">
-          </div>
-
-          <button class="btn btn-neon" id="run-vision-btn" onclick="runTankVisionDiagnostics()">Run Multimodal AI Diagnosis</button>
-
-          <div id="vision-response-card" class="card" style="display:none; margin-top:14px; background:#080E1A; border-color:var(--neon-green);">
-            <div style="font-size:13px; font-weight:700; color:var(--neon-green); margin-bottom:6px;">Diagnosis & Safe Treatment Plan</div>
-            <div id="vision-response-text" style="font-size:13px; line-height:1.5;"></div>
-          </div>
-        </div>
-
-        <!-- Chat about this Tank -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">Consult AI Assistant on This Aquarium</div>
-            <button class="btn btn-secondary" style="width:auto; padding:4px 10px; font-size:11px;" onclick="copyTankDelta()">Copy Telemetry Delta</button>
-          </div>
-          <div class="input-row">
-            <input type="text" id="tank-ai-chat-input" placeholder="e.g. Why is nitrate rising faster this week?">
-            <button class="btn" style="width:75px;" onclick="askTankAI()">Ask</button>
-          </div>
-          <div id="tank-ai-chat-box" class="card" style="display:none; margin-top:12px; background:#080E1A; border-color:var(--cyan); font-size:13px; line-height:1.5;"></div>
         </div>
       </div>
 
@@ -964,16 +945,28 @@
         </div>
       </div>
       <div style="margin-bottom:12px;">
-        <label>Theme Color</label>
-        <input type="hidden" id="add-m-color" value="#38BDF8">
-        <div class="color-picker-grid" id="add-color-container"></div>
-      </div>
-      <div style="margin-bottom:12px;">
         <label>Lifecycle Mode</label>
         <select id="add-m-status">
           <option value="Established">Established Tank</option>
-          <option value="Cycling">🟡 Cycling in Progress</option>
+          <option value="Cycling">Cycling in Progress</option>
         </select>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label>Theme Color</label>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div id="add-color-preview" style="width:28px; height:28px; border-radius:50%; background:#00D2FF; flex-shrink:0; box-shadow:0 0 10px rgba(0,210,255,0.4); border:2px solid #fff;"></div>
+          <select id="add-m-color" onchange="document.getElementById('add-color-preview').style.background=this.value; document.getElementById('add-color-preview').style.boxShadow='0 0 10px ' + this.value;" style="flex:1;">
+            <option value="#00D2FF" selected>● Electric Cyan</option>
+            <option value="#00F5A0">● Bio-Emerald</option>
+            <option value="#38BDF8">● Sky Blue</option>
+            <option value="#A78BFA">● Lavender Purple</option>
+            <option value="#F59E0B">● Amber Gold</option>
+            <option value="#EC4899">● Neon Coral</option>
+            <option value="#34D399">● Mint Green</option>
+            <option value="#60A5FA">● Deep Ocean</option>
+            <option value="#F43F5E">● Crimson Red</option>
+          </select>
+        </div>
       </div>
       <div style="margin-bottom:16px;">
         <label>Tank Photo (Optional)</label>
@@ -1008,16 +1001,28 @@
         </div>
       </div>
       <div style="margin-bottom:12px;">
-        <label>Theme Color</label>
-        <input type="hidden" id="edit-m-color">
-        <div class="color-picker-grid" id="edit-color-container"></div>
-      </div>
-      <div style="margin-bottom:12px;">
         <label>Lifecycle Status</label>
         <select id="edit-m-status">
           <option value="Established">Established Tank</option>
-          <option value="Cycling">🟡 Cycling in Progress</option>
+          <option value="Cycling">Cycling in Progress</option>
         </select>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label>Theme Color</label>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div id="edit-color-preview" style="width:28px; height:28px; border-radius:50%; background:#00D2FF; flex-shrink:0; box-shadow:0 0 10px rgba(0,210,255,0.4); border:2px solid #fff;"></div>
+          <select id="edit-m-color" onchange="document.getElementById('edit-color-preview').style.background=this.value; document.getElementById('edit-color-preview').style.boxShadow='0 0 10px ' + this.value;" style="flex:1;">
+            <option value="#00D2FF">● Electric Cyan</option>
+            <option value="#00F5A0">● Bio-Emerald</option>
+            <option value="#38BDF8">● Sky Blue</option>
+            <option value="#A78BFA">● Lavender Purple</option>
+            <option value="#F59E0B">● Amber Gold</option>
+            <option value="#EC4899">● Neon Coral</option>
+            <option value="#34D399">● Mint Green</option>
+            <option value="#60A5FA">● Deep Ocean</option>
+            <option value="#F43F5E">● Crimson Red</option>
+          </select>
+        </div>
       </div>
       <div style="margin-bottom:16px;">
         <label>Update Photo</label>
@@ -1033,15 +1038,15 @@
     </div>
   </div>
 
-  <!-- ================= MODAL: LOG FAUNA LOSS (F-18) ================= -->
+  <!-- ================= MODAL: LOG FAUNA LOSS & HEALTH EVENT ================= -->
   <div class="modal-overlay" id="lossModal">
     <div class="modal-box">
       <div class="card-header" style="margin-bottom:12px;">
-        <h3 style="font-size:17px; color:var(--text-main);">Fish Health & Loss Record</h3>
+        <h3 style="font-size:17px; color:var(--text-main);">Record Health Event</h3>
         <button class="icon-btn" style="width:28px;height:28px;" onclick="closeModalById('lossModal')">×</button>
       </div>
       <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px; line-height:1.45;">
-        Recording losses automatically updates your roster count and audits tank parameters for underlying causes.
+        Recording health events automatically updates your roster count and alerts Aquarist AI to audit tank biology.
       </p>
 
       <div style="margin-bottom:12px;">
@@ -1051,7 +1056,7 @@
 
       <div class="input-grid-2">
         <div>
-          <label>Quantity Lost</label>
+          <label>Quantity</label>
           <input type="number" id="loss-qty" value="1" min="1">
         </div>
         <div>
@@ -1060,21 +1065,28 @@
         </div>
       </div>
 
-      <div style="margin-bottom:16px;">
-        <label>Observed Symptoms (Optional)</label>
-        <select id="loss-symptoms">
+      <div style="margin-bottom:12px;">
+        <label>Observed Symptoms</label>
+        <select id="loss-symptoms" onchange="onSymptomSelectChange(this.value)">
           <option value="No visible symptoms / Natural">No visible symptoms / Natural</option>
-          <option value="White spots on body/fins (Ich/Velvet)">White spots (Ich / Velvet)</option>
+          <option value="White spots on body/fins (Ich / Velvet)">White spots on body/fins (Ich / Velvet)</option>
           <option value="Frayed fins / Tail rot">Frayed fins / Tail rot</option>
-          <option value="Bloat / Pinecone scales (Dropsy)">Bloat / Pineconing (Dropsy)</option>
+          <option value="Bloat / Pinecone scales (Dropsy)">Bloat / Pinecone scales (Dropsy)</option>
           <option value="Gasping at surface / Lethargy">Gasping at surface / Lethargy</option>
-          <option value="Aggression / Nipped by tank mates">Nipped by tank mates</option>
+          <option value="Aggression / Nipped by tank mates">Aggression / Nipped by tank mates</option>
+          <option value="__CUSTOM__">Other / Custom symptom...</option>
         </select>
+      </div>
+
+      <!-- Custom Symptom Input (Revealed if custom chosen) -->
+      <div id="loss-symptoms-custom-wrap" style="display:none; margin-bottom:16px;">
+        <label>Describe Custom Symptom</label>
+        <input type="text" id="loss-symptoms-custom" placeholder="e.g. Swollen eye, flashing against rocks, clamped fins">
       </div>
 
       <div style="display:flex; gap:10px;">
         <button class="btn btn-secondary" onclick="closeModalById('lossModal')">Cancel</button>
-        <button class="btn btn-danger" onclick="submitFaunaLoss()">Record Health Event & Audit Tank</button>
+        <button class="btn btn-danger" onclick="submitFaunaLoss()">Record Health Event</button>
       </div>
     </div>
   </div>
@@ -1089,24 +1101,22 @@
 
       <div style="margin-bottom:12px;">
         <label>Media Name & Type</label>
-        <input type="text" id="m-media-name" placeholder="e.g. Coarse Foam Sponge, Purigen, Matrix">
+        <input type="text" id="m-media-name" placeholder="e.g. Coarse Foam Sponge, TopFin Cartridge, Purigen">
       </div>
 
-      <div style="margin-bottom:12px;">
+      <div style="margin-bottom:14px;">
         <label>Media Category</label>
         <select id="m-media-cat" onchange="onMediaCategoryChange(this.value)">
-          <option value="mechanical">Mechanical (Sponge / Floss) - Rinse timer</option>
-          <option value="chemical">Chemical (Purigen / Carbon) - Replace timer</option>
-          <option value="biological">Biological (Ceramic Rings / Matrix) - Permanent</option>
+          <option value="mechanical">🧽 Mechanical Sponge / Floss (Auto-schedule 21d rinse)</option>
+          <option value="cartridge">📦 Filter Cartridge (All-in-One Floss & Carbon, Auto-schedule 28d replacement)</option>
+          <option value="chemical">💎 Chemical (Purigen / Activated Carbon, Auto-schedule 60d replacement)</option>
+          <option value="biological">🧬 Biological (Ceramic Rings / Matrix, Permanent 90d inspection)</option>
         </select>
       </div>
 
-      <div style="margin-bottom:16px;" id="media-interval-group">
-        <label>Maintenance Interval (Days)</label>
-        <input type="number" id="m-media-interval" value="30">
-        <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">
-          e.g. 14-30 days for sponge rinse; 60-90 days for carbon/Purigen.
-        </div>
+      <!-- Auto-Schedule Expert Explanation Box -->
+      <div id="media-schedule-explanation" style="background:rgba(0,210,255,0.06); border:1px solid rgba(0,210,255,0.2); border-radius:12px; padding:10px 12px; font-size:11.5px; color:var(--text-main); margin-bottom:16px; line-height:1.45;">
+        <b>Aquarist AI Auto-Schedule:</b> Mechanical sponge will automatically be queued for gentle rinse in tank water every <b>21 days</b> to prevent filter bypass.
       </div>
 
       <div style="display:flex; gap:10px;">
@@ -1116,11 +1126,127 @@
     </div>
   </div>
 
+  <!-- ================= MODAL: EDIT FILTER MEDIA ================= -->
+  <div class="modal-overlay" id="editMediaModal">
+    <div class="modal-box">
+      <div class="card-header" style="margin-bottom:12px;">
+        <h3 style="font-size:17px;">Edit Filter Media</h3>
+        <button class="icon-btn" style="width:28px;height:28px;" onclick="closeModalById('editMediaModal')">×</button>
+      </div>
+      <input type="hidden" id="edit-m-media-idx">
+      <div style="margin-bottom:12px;">
+        <label>Media Name & Type</label>
+        <input type="text" id="edit-m-media-name" placeholder="e.g. Coarse Foam Sponge, TopFin Cartridge, Purigen">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label>Media Category</label>
+        <select id="edit-m-media-cat" onchange="onEditMediaCategoryChange(this.value)">
+          <option value="mechanical">🧽 Mechanical Sponge / Floss (Auto-schedule 21d rinse)</option>
+          <option value="cartridge">📦 Filter Cartridge (All-in-One Floss & Carbon, Auto-schedule 28d replacement)</option>
+          <option value="chemical">💎 Chemical (Purigen / Activated Carbon, Auto-schedule 60d replacement)</option>
+          <option value="biological">🧬 Biological (Ceramic Rings / Matrix, Permanent 90d inspection)</option>
+        </select>
+      </div>
+      <div id="edit-media-schedule-explanation" style="background:rgba(0,210,255,0.06); border:1px solid rgba(0,210,255,0.2); border-radius:12px; padding:10px 12px; font-size:11.5px; color:var(--text-main); margin-bottom:16px; line-height:1.45;">
+      </div>
+      <div style="display:flex; gap:10px; margin-bottom:12px;">
+        <button class="btn btn-secondary" onclick="closeModalById('editMediaModal')">Cancel</button>
+        <button class="btn btn-neon" onclick="saveEditedFilterMedia()">Save Changes</button>
+      </div>
+      <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:10px; display:flex; justify-content:flex-end;">
+        <button class="btn btn-danger" style="width:auto; font-size:11px; padding:6px 12px;" onclick="deleteActiveFilterMediaFromModal()">Remove Media</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: EDIT LIVESTOCK ITEM ================= -->
+  <div class="modal-overlay" id="editLivestockModal">
+    <div class="modal-box">
+      <div class="card-header" style="margin-bottom:12px;">
+        <h3 style="font-size:17px;">Edit Livestock</h3>
+        <button class="icon-btn" style="width:28px;height:28px;" onclick="closeModalById('editLivestockModal')">×</button>
+      </div>
+      <input type="hidden" id="edit-live-idx">
+      <div style="margin-bottom:12px;">
+        <label>Species Name</label>
+        <input type="text" id="edit-live-species" placeholder="e.g. Neon Tetra, Harlequin Rasbora">
+      </div>
+      <div style="margin-bottom:16px;">
+        <label>Count / Quantity</label>
+        <input type="number" id="edit-live-count" min="1">
+      </div>
+      <div style="display:flex; gap:10px; margin-bottom:12px;">
+        <button class="btn btn-secondary" onclick="closeModalById('editLivestockModal')">Cancel</button>
+        <button class="btn btn-neon" onclick="saveEditedLivestock()">Save Changes</button>
+      </div>
+      <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:10px; display:flex; justify-content:flex-end;">
+        <button class="btn btn-danger" style="width:auto; font-size:11px; padding:6px 12px;" onclick="deleteActiveLivestockFromModal()">Remove from Tank</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: RECORD CHEMISTRY TEST ================= -->
+  <div class="modal-overlay" id="recordTestModal">
+    <div class="modal-box">
+      <div class="card-header" style="margin-bottom:12px;">
+        <h3 style="font-size:18px;">Record Water Chemistry Test</h3>
+        <button class="icon-btn" style="width:28px;height:28px;" onclick="closeModalById('recordTestModal')">×</button>
+      </div>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">
+        Enter current test tube or digital readings. Aquarist AI will audit bio-filtration balance.
+      </p>
+
+      <div class="input-grid-2">
+        <div>
+          <label>Test Date</label>
+          <input type="date" id="m-test-date">
+        </div>
+        <div>
+          <label>Water Temp (<span class="unit-temp-label">°F</span>)</label>
+          <input type="number" id="m-test-temp" step="0.5" placeholder="78.0">
+        </div>
+      </div>
+
+      <!-- Water Chemistry Order: Temp, pH, Ammonia, Nitrite, Nitrate -->
+      <div class="input-grid-2">
+        <div>
+          <label>pH</label>
+          <input type="number" id="m-test-ph" step="0.1" placeholder="7.2">
+        </div>
+        <div>
+          <label>Ammonia (NH₃ ppm)</label>
+          <input type="number" id="m-test-nh3" step="0.25" placeholder="0">
+        </div>
+      </div>
+
+      <div class="input-grid-2">
+        <div>
+          <label>Nitrite (NO₂ ppm)</label>
+          <input type="number" id="m-test-no2" step="0.25" placeholder="0">
+        </div>
+        <div>
+          <label>Nitrate (NO₃ ppm)</label>
+          <input type="number" id="m-test-no3" step="5" placeholder="20">
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label>Notes / Observations (Optional)</label>
+        <input type="text" id="m-test-notes" placeholder="e.g. Clearest reading this month, feeding frozen brine shrimp">
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary" onclick="closeModalById('recordTestModal')">Cancel</button>
+        <button class="btn btn-neon" onclick="saveModalWaterLog()">Analyze & Save Test</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= MODAL: QUICK WATER CHANGE ================= -->
   <div class="modal-overlay" id="quickWcModal">
     <div class="modal-box">
       <div class="card-header" style="margin-bottom:12px;">
-        <h3 style="font-size:18px;">Quick Water Change</h3>
+        <h3 style="font-size:18px;">Log Water Change</h3>
         <button class="icon-btn" style="width:28px;height:28px;" onclick="closeModalById('quickWcModal')">×</button>
       </div>
       <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">
@@ -1166,7 +1292,7 @@
 
       <div style="display:flex; gap:10px;">
         <button class="btn btn-secondary" onclick="closeModalById('quickWcModal')">Cancel</button>
-        <button class="btn btn-neon" onclick="saveQuickWaterChange()">Save Water Change</button>
+        <button class="btn btn-neon" onclick="saveQuickWaterChange()">Log Water Change</button>
       </div>
     </div>
   </div>
@@ -1179,28 +1305,29 @@
         <button class="icon-btn" style="width:28px;height:28px;" onclick="closeModalById('settingsModal')">×</button>
       </div>
 
-      <!-- Android System Notification Settings (F-19) -->
-      <div class="card" style="margin-bottom:18px; background:rgba(0,245,160,0.04); border-color:rgba(0,245,160,0.3);">
-        <div style="font-size:14px; font-weight:700; color:var(--neon-green); margin-bottom:4px;">
-          Android System Alerts (F-19)
+      <!-- Android System Notification Settings (Compact & Contextual) -->
+      <div class="card" style="margin-bottom:14px; background:rgba(0,245,160,0.04); border-color:rgba(0,245,160,0.3); padding:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:13px; font-weight:700; color:var(--neon-green);">System Phone Alerts</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Pop-up reminders for water changes & filter care</div>
+          </div>
+          <div id="notification-badge-wrap">
+            <button id="notif-enable-btn" class="btn btn-neon" style="width:auto; font-size:11px; padding:6px 12px;" onclick="requestNotificationPermission()">
+              Enable Alerts
+            </button>
+            <div id="notif-active-pill" style="display:none; font-size:11px; color:var(--neon-green); font-weight:700; background:rgba(0,245,160,0.12); padding:4px 8px; border-radius:12px; border:1px solid rgba(0,245,160,0.3);">
+              ● Alerts Active
+            </div>
+          </div>
         </div>
-        <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">
-          Receive native Android system banner alerts for scheduled water changes and overdue filter media rinses.
-        </p>
-        <div style="display:flex; gap:8px;">
-          <button class="btn btn-neon" style="font-size:12px; padding:8px 12px;" onclick="requestNotificationPermission()">
-            Enable Phone Alerts
-          </button>
-          <button class="btn btn-secondary" style="font-size:12px; padding:8px 12px; width:auto;" onclick="sendTestNotification()">
-            Test Notification
-          </button>
-        </div>
-        <div id="notification-status-text" style="font-size:11px; color:var(--text-muted); margin-top:6px;">
-          Status: Checking...
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.06);">
+          <div id="notification-status-text" style="font-size:10.5px; color:var(--text-muted);">Status: Checking...</div>
+          <button id="notif-test-link" class="btn btn-secondary" style="width:auto; font-size:10px; padding:3px 8px;" onclick="sendTestNotification()">Test Pop-Up</button>
         </div>
       </div>
 
-      <div style="margin-bottom:18px;">
+      <div style="margin-bottom:14px;">
         <label>Unit System</label>
         <select id="setting-units" onchange="onUnitsChange(this.value)">
           <option value="us">US Imperial (Gallons, °F, Inches)</option>
@@ -1208,40 +1335,67 @@
         </select>
       </div>
 
-      <div class="card" style="margin-bottom:18px; background:rgba(255,255,255,0.03); border-color:var(--card-border-glow);">
-        <div style="font-size:14px; font-weight:700; color:var(--cyan); margin-bottom:4px;">Tap Water Source Profile</div>
-        <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">
-          Tested straight from the faucet. Inherited by all aquariums for water change dilution & buffering calculations.
-        </p>
-        <div class="input-grid-2">
-          <div><label>Tap pH</label><input type="number" id="tap-ph" step="0.1" placeholder="7.4" onchange="saveTapBaseline()"></div>
-          <div><label>Tap Nitrate (NO₃)</label><input type="number" id="tap-no3" step="1" placeholder="5" onchange="saveTapBaseline()"></div>
-          <div><label>Tap GH (dGH)</label><input type="number" id="tap-gh" step="1" placeholder="8" onchange="saveTapBaseline()"></div>
-          <div><label>Tap KH (dKH)</label><input type="number" id="tap-kh" step="1" placeholder="4" onchange="saveTapBaseline()"></div>
+      <!-- Tap Water Source Profile (Telemetry Card Style with Quick Edit) -->
+      <div class="card" style="margin-bottom:14px; background:rgba(255,255,255,0.03); border-color:var(--card-border-glow); padding:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <div>
+            <div style="font-size:13px; font-weight:700; color:var(--cyan);">Tap Water Source Profile</div>
+            <div style="font-size:10.5px; color:var(--text-muted);">Tested straight from faucet for dilution math</div>
+          </div>
         </div>
+        
+        <div class="param-strip" style="margin-top:4px; padding-top:8px;">
+          <div class="param-chip">
+            <div class="param-chip-label">pH</div>
+            <div class="param-chip-val" id="disp-tap-ph">7.4</div>
+          </div>
+          <div class="param-chip">
+            <div class="param-chip-label">NO₃</div>
+            <div class="param-chip-val" id="disp-tap-no3">5 ppm</div>
+          </div>
+          <div class="param-chip">
+            <div class="param-chip-label">GH</div>
+            <div class="param-chip-val" id="disp-tap-gh">8 dGH</div>
+          </div>
+          <div class="param-chip">
+            <div class="param-chip-label">KH</div>
+            <div class="param-chip-val" id="disp-tap-kh">4 dKH</div>
+          </div>
+        </div>
+
+        <!-- Editable inputs in drawer -->
+        <details style="margin-top:10px;">
+          <summary style="font-size:11px; color:var(--cyan); cursor:pointer; font-weight:600;">Edit Tap Profile Values...</summary>
+          <div class="input-grid-2" style="margin-top:10px;">
+            <div><label>Tap pH</label><input type="number" id="tap-ph" step="0.1" placeholder="7.4" onchange="saveTapBaseline()"></div>
+            <div><label>Tap Nitrate (NO₃)</label><input type="number" id="tap-no3" step="1" placeholder="5" onchange="saveTapBaseline()"></div>
+            <div><label>Tap GH (dGH)</label><input type="number" id="tap-gh" step="1" placeholder="8" onchange="saveTapBaseline()"></div>
+            <div><label>Tap KH (dKH)</label><input type="number" id="tap-kh" step="1" placeholder="4" onchange="saveTapBaseline()"></div>
+          </div>
+        </details>
       </div>
 
-      <div style="margin-bottom:18px;">
+      <div style="margin-bottom:14px;">
         <label>Google AI Studio (Gemini) API Key</label>
         <div class="input-row">
           <input type="password" id="setting-api-key" placeholder="AIzaSy..." onchange="saveApiKey()">
         </div>
-        <p style="font-size:11px; color:var(--text-muted);">Free at aistudio.google.com. Stored securely on your device.</p>
+        <p style="font-size:10.5px; color:var(--text-muted); margin-top:2px;">Free at aistudio.google.com. Stored locally on this phone.</p>
       </div>
 
-      <!-- One-Click Data Safety & Backup (Zero Cloud Cost) -->
-      <div class="card" style="margin-bottom:18px; background:rgba(56,189,248,0.05); border-color:rgba(56,189,248,0.35);">
-        <div style="font-size:14px; font-weight:700; color:var(--cyan); margin-bottom:4px;">
-          Data Safety & Local Backup
+      <!-- Compact One-Click Data Safety & Backup -->
+      <div class="card" style="margin-bottom:14px; background:rgba(56,189,248,0.04); border-color:rgba(56,189,248,0.25); padding:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <div>
+            <div style="font-size:13px; font-weight:700; color:var(--cyan);">Data Safety & Local Backup</div>
+            <div style="font-size:10.5px; color:var(--text-muted);">100% private to device storage</div>
+          </div>
         </div>
-        <p style="font-size:11px; color:var(--text-muted); margin-bottom:12px; line-height:1.4;">
-          Your aquariums, test history, and photos live 100% locally on your phone. Download a backup file regularly to ensure zero data loss when updating browsers or switching phones.
-        </p>
-        <div style="display:flex; gap:10px;">
-          <button class="btn btn-neon" style="font-size:12px; padding:10px;" onclick="exportDataJSON()">
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-secondary" style="font-size:11px; padding:8px 12px; flex:1;" onclick="exportDataJSON()">
             Export Backup (.json)
           </button>
-          <button class="btn btn-secondary" style="font-size:12px; padding:10px;" onclick="document.getElementById('importFile').click()">
+          <button class="btn btn-secondary" style="font-size:11px; padding:8px 12px; flex:1;" onclick="document.getElementById('importFile').click()">
             Restore Backup
           </button>
           <input type="file" id="importFile" accept=".json,application/json" style="display:none;" onchange="importDataJSON(event)">
@@ -1476,17 +1630,26 @@
     function switchTankTab(tabName, btn) {
       currentTankSubtab = tabName;
       document.querySelectorAll(".tab-btn-tank").forEach(b => b.classList.remove("active"));
-      if (btn) btn.classList.add("active");
+      if (btn) {
+        btn.classList.add("active");
+      } else {
+        document.querySelectorAll(".tab-btn-tank").forEach(b => {
+          const onclickAttr = b.getAttribute("onclick") || "";
+          if (onclickAttr.includes(`'${tabName}'`)) {
+            b.classList.add("active");
+          }
+        });
+      }
       document.querySelectorAll(".tanksub-content").forEach(c => c.style.display = "none");
       const target = document.getElementById("tanksub-" + tabName);
       if (target) target.style.display = "block";
 
       if (tabName === "overview") renderTankOverviewTab();
       if (tabName === "water") renderTankWaterTab();
+      if (tabName === "plan") renderTankPlanTab();
       if (tabName === "livestock") renderTankLivestockTab();
       if (tabName === "hardware") renderTankHardwareTab();
       if (tabName === "plants") renderTankPlantsTab();
-      if (tabName === "ai") renderTankAITab();
 
       window.scrollTo(0, 0);
     }
@@ -1572,7 +1735,7 @@
       return `${(diffDays / 365).toFixed(1)} years old`;
     }
 
-    /* High-Tech Telemetry Gauge Builders */
+    /* High-Tech Telemetry Gauge Builders - Ordered: Temp, pH, NH3, NO2, NO3 */
     function buildParamGaugeInnerHtml(t, u) {
       const nh3 = parseFloat(t.nh3) || 0;
       const no2 = parseFloat(t.no2) || 0;
@@ -1590,6 +1753,20 @@
         : ((temp < 72 || temp > 82) ? "caution" : "safe");
 
       return `
+        <div class="param-chip status-${tempStatus}">
+          <div class="param-chip-header">
+            <span class="param-chip-dot ${tempStatus}"></span>
+            <span class="param-chip-label">Temp</span>
+          </div>
+          <div class="param-chip-val">${t.temp || 78}${u.temp}</div>
+        </div>
+        <div class="param-chip status-${phStatus}">
+          <div class="param-chip-header">
+            <span class="param-chip-dot ${phStatus}"></span>
+            <span class="param-chip-label">pH</span>
+          </div>
+          <div class="param-chip-val">${t.ph ?? 7.2}</div>
+        </div>
         <div class="param-chip status-${nh3Status}">
           <div class="param-chip-header">
             <span class="param-chip-dot ${nh3Status}"></span>
@@ -1611,20 +1788,6 @@
           </div>
           <div class="param-chip-val">${t.no3 ?? 0}</div>
         </div>
-        <div class="param-chip status-${phStatus}">
-          <div class="param-chip-header">
-            <span class="param-chip-dot ${phStatus}"></span>
-            <span class="param-chip-label">pH</span>
-          </div>
-          <div class="param-chip-val">${t.ph ?? 7.2}</div>
-        </div>
-        <div class="param-chip status-${tempStatus}">
-          <div class="param-chip-header">
-            <span class="param-chip-dot ${tempStatus}"></span>
-            <span class="param-chip-label">Temp</span>
-          </div>
-          <div class="param-chip-val">${t.temp || 78}${u.temp}</div>
-        </div>
       `;
     }
 
@@ -1643,29 +1806,75 @@
       container.innerHTML = "";
 
       const u = getUnitLabels();
-      const hour = new Date().getHours();
-      let greeting = "Good day!";
-      if (hour >= 4 && hour < 12) greeting = "Good morning!";
-      else if (hour >= 12 && hour < 17) greeting = "Good afternoon!";
-      else if (hour >= 17 && hour < 22) greeting = "Good evening!";
-      const greetingEl = document.getElementById("dynamic-greeting");
-      if (greetingEl) greetingEl.innerText = greeting;
-
       const totalTanks = appState.tanks.length;
       const totalVol = appState.tanks.reduce((acc, t) => acc + (parseFloat(t.vol) || 0), 0);
       const cyclingTanks = appState.tanks.filter(t => t.status === "Cycling").length;
 
+      // Update Executive Overview Stat Widgets
+      const statTanksEl = document.getElementById("stat-total-tanks");
+      const statVolEl = document.getElementById("stat-total-vol");
+      const statStabEl = document.getElementById("stat-stability");
+      if (statTanksEl) statTanksEl.innerText = totalTanks;
+      if (statVolEl) statVolEl.innerText = `${totalVol} ${u.vol}`;
+      if (statStabEl) {
+        // Stability score based on parameters and cycling
+        let stableCount = appState.tanks.filter(t => {
+          const p = t.lastTest || {};
+          const nh3 = parseFloat(p.nh3) || 0;
+          const no2 = parseFloat(p.no2) || 0;
+          return t.status !== "Cycling" && nh3 === 0 && no2 === 0;
+        }).length;
+        let score = totalTanks > 0 ? Math.round((stableCount / totalTanks) * 100) : 100;
+        statStabEl.innerText = `${score}%`;
+        statStabEl.style.color = score >= 90 ? "var(--neon-green)" : (score >= 60 ? "var(--alert-yellow)" : "var(--alert-red)");
+      }
+
       const sumEl = document.getElementById("global-ai-summary");
       if (sumEl) {
-        sumEl.innerHTML = `Monitoring <b>${totalTanks}</b> active systems totaling <b>${totalVol} ${u.vol}</b>. ${cyclingTanks > 0 ? `🟡 ${cyclingTanks} tank(s) in active cycling.` : '🟢 All biological filtration established & nominal.'}`;
+        if (totalTanks === 0) {
+          sumEl.innerHTML = `No active aquariums registered. Tap <b>+ Add Aquarium</b> to start monitoring your biological ecosystems.`;
+        } else if (cyclingTanks > 0) {
+          sumEl.innerHTML = `Aquarist AI is actively monitoring <b>${totalTanks} systems</b> (${totalVol} ${u.vol}). <b>${cyclingTanks} aquarium(s)</b> currently cultivating biological filtration.`;
+        } else {
+          sumEl.innerHTML = `All <b>${totalTanks} aquatic systems</b> (${totalVol} ${u.vol}) are biologically established with nominal water chemistry.`;
+        }
       }
 
       appState.tanks.forEach((tank) => {
         const clr = tank.color || "#38BDF8";
         const isCycling = tank.status === "Cycling";
-        // User rule: ONLY show badge if tank is Cycling!
         const badgeHtml = isCycling ? `<span class="badge-cycling">● Cycling</span>` : ``;
         const t = tank.lastTest || { nh3: 0, no2: 0, no3: 0, ph: 7.2, temp: 78 };
+
+        // Calculate 1-line actionable telemetry status
+        let actionableOverview = "All systems nominal • Next water change in 4 days";
+        const nh3 = parseFloat(t.nh3) || 0;
+        const no2 = parseFloat(t.no2) || 0;
+        const no3 = parseFloat(t.no3) || 0;
+
+        if (isCycling) {
+          actionableOverview = `Cultivating bio-filter • NH₃: ${nh3} | NO₂: ${no2} ppm`;
+        } else if (nh3 > 0.25 || no2 > 0.25) {
+          actionableOverview = `⚠️ Toxin spike detected • Dose conditioner & retest in 24 hrs`;
+        } else if (no3 > 40) {
+          actionableOverview = `Elevated Nitrate (${no3} ppm) • Water change recommended today`;
+        } else {
+          // Check last water change
+          let lastWcDate = tank.lastWaterChange;
+          if (!lastWcDate && tank.history) {
+            const wcEntry = tank.history.find(h => h.wc && h.wc > 0);
+            if (wcEntry) lastWcDate = wcEntry.date;
+          }
+          if (lastWcDate) {
+            const daysSince = Math.floor((new Date() - new Date(lastWcDate)) / (1000 * 60 * 60 * 24));
+            const daysUntil = Math.max(0, 7 - daysSince);
+            if (daysUntil === 0) {
+              actionableOverview = `Water change due today (~${Math.round(tank.vol * 0.25)} ${u.vol})`;
+            } else {
+              actionableOverview = `All systems nominal • Next water change in ${daysUntil} day${daysUntil > 1 ? 's' : ''}`;
+            }
+          }
+        }
 
         let bannerStyle = tank.image 
           ? `background-image: url('${tank.image}');`
@@ -1692,8 +1901,8 @@
             </div>
           </div>
           <div class="tank-card-body">
-            <div style="font-size:12px; color:var(--text-main); margin-bottom:8px; line-height:1.4;">
-              ${tank.summary || "All systems nominal."}
+            <div style="font-size:12px; font-weight:600; color:${(nh3 > 0.25 || no2 > 0.25) ? 'var(--alert-yellow)' : 'var(--text-main)'}; margin-bottom:8px; line-height:1.4;">
+              ${actionableOverview}
             </div>
             ${buildParamGaugeStripHtml(t, u)}
           </div>
@@ -1964,6 +2173,7 @@
       if (isInsideTank && activeTankId == tank.id) {
         renderTankOverviewTab();
         renderTankWaterTab();
+        renderTankPlanTab();
       }
     }
 
@@ -2153,15 +2363,43 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
         if (events.length === 0) {
           timelineEl.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:6px 0;">No activities recorded yet.</div>`;
         } else {
-          events.slice(0, 8).forEach(e => {
+          events.slice(0, 8).forEach((e, idx) => {
             timelineEl.innerHTML += `
               <div class="timeline-entry">
-                <div class="timeline-entry-date">${e.date}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <div class="timeline-entry-date">${e.date}</div>
+                  <div style="display:flex; gap:8px; align-items:center;">
+                    <span style="font-size:11px; color:var(--cyan); cursor:pointer;" onclick="editTimelineEvent(${idx})">Edit</span>
+                    <span class="delete-x" onclick="deleteTimelineEvent(${idx})" title="Delete event">×</span>
+                  </div>
+                </div>
                 <div>${e.text}</div>
               </div>
             `;
           });
         }
+      }
+    }
+
+    function deleteTimelineEvent(idx) {
+      const activeTank = getActiveTank();
+      if (!activeTank || !activeTank.timeline) return;
+      activeTank.timeline.splice(idx, 1);
+      saveDataToStorage();
+      renderTankOverviewTab();
+      showToast("Activity Event Deleted");
+    }
+
+    function editTimelineEvent(idx) {
+      const activeTank = getActiveTank();
+      if (!activeTank || !activeTank.timeline || !activeTank.timeline[idx]) return;
+      const current = activeTank.timeline[idx];
+      const updated = prompt("Edit activity log description:", current.text);
+      if (updated !== null && updated.trim()) {
+        current.text = updated.trim();
+        saveDataToStorage();
+        renderTankOverviewTab();
+        showToast("Activity Log Updated");
       }
     }
 
@@ -2483,36 +2721,97 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       dosePlan.innerHTML = doseText;
     }
 
-    function saveWaterLog() {
+    function openTestModalForActiveTank(editIdx = -1) {
+      const activeTank = getActiveTank();
+      if (!activeTank) return;
+      window.editingWaterLogIdx = editIdx;
+      const modalTitle = document.querySelector("#recordTestModal h3");
+      const modalBtn = document.querySelector("#recordTestModal .btn-neon");
+
+      if (editIdx >= 0 && activeTank.history && activeTank.history[editIdx]) {
+        const item = activeTank.history[editIdx];
+        if (modalTitle) modalTitle.innerText = "Edit Water Chemistry Test";
+        if (modalBtn) modalBtn.innerText = "Update Test Log";
+        document.getElementById("m-test-date").value = item.date || new Date().toISOString().split("T")[0];
+        document.getElementById("m-test-temp").value = item.temp !== undefined ? item.temp : 78;
+        document.getElementById("m-test-ph").value = item.ph !== undefined ? item.ph : 7.2;
+        document.getElementById("m-test-nh3").value = item.nh3 !== undefined ? item.nh3 : 0;
+        document.getElementById("m-test-no2").value = item.no2 !== undefined ? item.no2 : 0;
+        document.getElementById("m-test-no3").value = item.no3 !== undefined ? item.no3 : 10;
+        document.getElementById("m-test-notes").value = item.notes || "";
+      } else {
+        if (modalTitle) modalTitle.innerText = "Record Water Chemistry Test";
+        if (modalBtn) modalBtn.innerText = "Analyze & Save Test";
+        const last = activeTank.lastTest || { temp: 78, ph: 7.2, nh3: 0, no2: 0, no3: 10 };
+        document.getElementById("m-test-date").valueAsDate = new Date();
+        document.getElementById("m-test-temp").value = last.temp || 78;
+        document.getElementById("m-test-ph").value = last.ph || 7.2;
+        document.getElementById("m-test-nh3").value = last.nh3 ?? 0;
+        document.getElementById("m-test-no2").value = last.no2 ?? 0;
+        document.getElementById("m-test-no3").value = last.no3 ?? 10;
+        document.getElementById("m-test-notes").value = "";
+      }
+      openModalById("recordTestModal");
+    }
+
+    function saveModalWaterLog() {
       const activeTank = getActiveTank();
       if (!activeTank) return;
 
-      const date = document.getElementById("w-log-date").value || new Date().toISOString().split("T")[0];
-      const temp = parseFloat(document.getElementById("w-log-temp").value) || 78.0;
-      const nh3 = parseFloat(document.getElementById("w-log-nh3").value) || 0;
-      const no2 = parseFloat(document.getElementById("w-log-no2").value) || 0;
-      const no3 = parseFloat(document.getElementById("w-log-no3").value) || 0;
-      const ph = parseFloat(document.getElementById("w-log-ph").value) || 7.2;
-      const wc = parseFloat(document.getElementById("w-log-wc").value) || 0;
-      const dose = document.getElementById("w-log-dose").value.trim();
+      const date = document.getElementById("m-test-date").value || new Date().toISOString().split("T")[0];
+      const temp = parseFloat(document.getElementById("m-test-temp").value) || 78.0;
+      const ph = parseFloat(document.getElementById("m-test-ph").value) || 7.2;
+      const nh3 = parseFloat(document.getElementById("m-test-nh3").value) || 0;
+      const no2 = parseFloat(document.getElementById("m-test-no2").value) || 0;
+      const no3 = parseFloat(document.getElementById("m-test-no3").value) || 0;
+      const notes = document.getElementById("m-test-notes").value.trim();
 
-      const newLog = { date, temp, nh3, no2, no3, ph, wc, dose };
-      activeTank.lastTest = { nh3, no2, no3, ph, temp, date };
-      if (!activeTank.history) activeTank.history = [];
-      activeTank.history.unshift(newLog);
+      const editIdx = window.editingWaterLogIdx !== undefined ? window.editingWaterLogIdx : -1;
 
-      // Log event to activity timeline
-      let eventText = `🧪 Logged Test: NO₃ ${no3} ppm, pH ${ph}, Temp ${temp}°`;
-      if (wc > 0) eventText += ` (💧 ${wc}% Water Change)`;
-      if (dose) eventText += ` • Dosed: ${dose}`;
-      logTankTimelineEvent(eventText, date);
+      if (editIdx >= 0 && activeTank.history && activeTank.history[editIdx]) {
+        const existing = activeTank.history[editIdx];
+        existing.date = date;
+        existing.temp = temp;
+        existing.ph = ph;
+        existing.nh3 = nh3;
+        existing.no2 = no2;
+        existing.no3 = no3;
+        existing.notes = notes;
+        if (editIdx === 0) {
+          activeTank.lastTest = { nh3, no2, no3, ph, temp, date };
+        }
+      } else {
+        const newLog = { date, temp, nh3, no2, no3, ph, wc: 0, dose: "", notes };
+        activeTank.lastTest = { nh3, no2, no3, ph, temp, date };
+        if (!activeTank.history) activeTank.history = [];
+        activeTank.history.unshift(newLog);
 
-      activeTank.summary = `Last test ${date}: NO₃ ${no3} ppm, pH ${ph}, Temp ${temp}°`;
+        // Log event to activity timeline
+        let eventText = `Logged Chemistry: Temp ${temp}°, pH ${ph}, NH₃ ${nh3}, NO₂ ${no2}, NO₃ ${no3} ppm`;
+        if (notes) eventText += ` • ${notes}`;
+        logTankTimelineEvent(eventText, date);
+      }
+
+      // Update AI holistic summary
+      let holisticSummary = "";
+      if (activeTank.status === "Cycling") {
+        holisticSummary = `Cycling in progress: Ammonia at ${nh3} ppm, Nitrite at ${no2} ppm. Biofilter is cultivating.`;
+      } else if (nh3 > 0.25 || no2 > 0.25) {
+        holisticSummary = `⚠️ Toxin alert: NH₃ (${nh3} ppm) or NO₂ (${no2} ppm) detected. Emergency water change required.`;
+      } else if (no3 > 40) {
+        holisticSummary = `Nitrate elevated at ${no3} ppm. Schedule a 25-30% water change to protect livestock.`;
+      } else {
+        holisticSummary = `Ecosystem healthy and stable. Ammonia and Nitrite at 0, Nitrate at nominal ${no3} ppm.`;
+      }
+      activeTank.summary = holisticSummary;
+
+      window.editingWaterLogIdx = -1;
       saveDataToStorage();
-
+      closeModalById("recordTestModal");
       renderTankWaterTab();
       renderTankOverviewTab();
-      showToast("Test Logged & Analyzed");
+      renderTankPlanTab();
+      showToast(editIdx >= 0 ? "Test Log Updated" : "Chemistry Logged & Analyzed");
     }
 
     function deleteWaterLog(idx) {
@@ -2526,6 +2825,7 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       saveDataToStorage();
       renderTankWaterTab();
       renderTankOverviewTab();
+      renderTankPlanTab();
       showToast("Log Deleted");
     }
 
@@ -2537,7 +2837,7 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
 
       const history = activeTank.history || [];
       if (history.length === 0) {
-        list.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:10px 0;">No tests recorded yet. Log your first test above!</div>`;
+        list.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:10px 0;">No tests recorded yet. Tap "Record Chemistry Test" above to log readings.</div>`;
         return;
       }
 
@@ -2550,15 +2850,82 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
         item.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
             <span style="font-size:11px; color:var(--text-muted);">${h.date}</span>
-            <span class="delete-x" onclick="deleteWaterLog(${idx})" title="Delete this log">×</span>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <span style="font-size:11px; color:var(--cyan); cursor:pointer;" onclick="openTestModalForActiveTank(${idx})">Edit</span>
+              <span class="delete-x" onclick="deleteWaterLog(${idx})" title="Delete this log">×</span>
+            </div>
           </div>
           <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-            <span>NH₃: <b>${h.nh3}</b> • NO₂: <b>${h.no2}</b> • NO₃: <b>${h.no3}</b> • pH: <b>${h.ph}</b></span>
-            <span><b>${h.temp || 78}${u.temp}</b></span>
+            <span>Temp: <b>${h.temp || 78}${u.temp}</b> • pH: <b>${h.ph}</b> • NH₃: <b>${h.nh3}</b> • NO₂: <b>${h.no2}</b> • NO₃: <b>${h.no3}</b></span>
           </div>
-          ${h.wc ? `<div style="font-size:11px; color:var(--cyan);">💧 ${h.wc}% Water Change ${h.dose ? `• Dosed: ${h.dose}` : ''}</div>` : ''}
+          ${h.notes ? `<div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${h.notes}</div>` : ''}
+          ${h.wc ? `<div style="font-size:11px; color:var(--cyan); margin-top:2px;">Water Change: ${h.wc}% ${h.dose ? `• Dosed: ${h.dose}` : ''}</div>` : ''}
         `;
         list.appendChild(item);
+      });
+    }
+
+    /* Dedicated Plan Tab Renderer */
+    function renderTankPlanTab() {
+      renderSmartActionCard();
+      const listEl = document.getElementById("tank-plan-tasks-list");
+      if (!listEl) return;
+      listEl.innerHTML = "";
+
+      const activeTank = getActiveTank();
+      if (!activeTank) return;
+      const u = getUnitLabels();
+      const today = new Date();
+      const tasks = [];
+
+      // 1. Water change check
+      let lastWcDate = activeTank.lastWaterChange;
+      if (!lastWcDate && activeTank.history) {
+        const wcEntry = activeTank.history.find(h => h.wc && h.wc > 0);
+        if (wcEntry) lastWcDate = wcEntry.date;
+      }
+      if (!lastWcDate) lastWcDate = activeTank.startDate;
+      let daysSinceWc = 0;
+      if (lastWcDate) {
+        daysSinceWc = Math.floor((today - new Date(lastWcDate)) / (1000 * 60 * 60 * 24));
+      }
+      const daysUntilWc = Math.max(0, 7 - daysSinceWc);
+      tasks.push({
+        title: `Routine Water Change (~${Math.round(activeTank.vol * 0.25)} ${u.vol})`,
+        sub: daysUntilWc === 0 ? "Due today" : `Scheduled in ${daysUntilWc} day${daysUntilWc > 1 ? 's' : ''}`,
+        isOverdue: daysSinceWc >= 10,
+        action: () => openQuickWcForActiveTank(),
+        btnText: "Log Change"
+      });
+
+      // 2. Filter media checks
+      (activeTank.filterMedia || []).forEach((m, idx) => {
+        if (m.interval > 0 && m.lastDate) {
+          const diff = Math.floor((today - new Date(m.lastDate)) / (1000 * 60 * 60 * 24));
+          const left = m.interval - diff;
+          tasks.push({
+            title: `${m.cat === 'cartridge' || m.cat === 'chemical' ? 'Replace' : 'Rinse'} ${m.name}`,
+            sub: left <= 0 ? `Overdue by ${Math.abs(left)} days` : `Due in ${left} days`,
+            isOverdue: left < 0,
+            action: () => resetMediaTimer(idx),
+            btnText: "Done"
+          });
+        }
+      });
+
+      // Render tasks
+      tasks.forEach(t => {
+        const row = document.createElement("div");
+        row.className = `task-item-row ${t.isOverdue ? 'overdue' : ''}`;
+        row.innerHTML = `
+          <div>
+            <div class="task-info-title">${t.title}</div>
+            <div class="task-info-sub">${t.sub}</div>
+          </div>
+          <button class="btn btn-secondary" style="width:auto; font-size:11px; padding:6px 12px;">${t.btnText}</button>
+        `;
+        row.querySelector("button").onclick = t.action;
+        listEl.appendChild(row);
       });
     }
 
@@ -2592,6 +2959,66 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       activeTank.livestock.splice(idx, 1);
       saveDataToStorage();
       renderTankLivestockTab();
+    }
+
+    function renderLossHistory() {
+      const activeTank = getActiveTank();
+      const card = document.getElementById("loss-history-card");
+      const list = document.getElementById("loss-history-list");
+      if (!card || !list || !activeTank) return;
+      const losses = activeTank.losses || [];
+      if (losses.length === 0) {
+        card.style.display = "none";
+        return;
+      }
+      card.style.display = "block";
+      list.innerHTML = "";
+      losses.forEach((l, idx) => {
+        const item = document.createElement("div");
+        item.style.padding = "10px 0";
+        item.style.borderBottom = "1px solid rgba(255,255,255,0.06)";
+        item.style.fontSize = "12.5px";
+        item.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:11px; color:var(--text-muted);">${l.date}</span>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <span style="font-size:11px; color:var(--cyan); cursor:pointer;" onclick="editLossRecordPrompt(${idx})">Edit</span>
+              <span class="delete-x" onclick="deleteLossRecord(${idx})" title="Delete record">×</span>
+            </div>
+          </div>
+          <div style="color:var(--text-main); font-weight:600; margin-top:2px;">
+            ${l.qty || 1}x ${l.species}
+          </div>
+          <div style="font-size:11px; color:var(--alert-yellow); margin-top:2px;">
+            Symptoms: ${l.symptoms || "Unspecified"}
+          </div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function deleteLossRecord(idx) {
+      const activeTank = getActiveTank();
+      if (!activeTank || !activeTank.losses) return;
+      activeTank.losses.splice(idx, 1);
+      saveDataToStorage();
+      renderLossHistory();
+      renderTankOverviewTab();
+      showToast("Health Record Deleted");
+    }
+
+    function editLossRecordPrompt(idx) {
+      const activeTank = getActiveTank();
+      if (!activeTank || !activeTank.losses || !activeTank.losses[idx]) return;
+      const l = activeTank.losses[idx];
+      const newSym = prompt("Update symptoms / clinical notes for " + l.species + ":", l.symptoms || "");
+      if (newSym !== null) {
+        l.symptoms = newSym.trim();
+        saveDataToStorage();
+        renderLossHistory();
+        renderTankOverviewTab();
+        showToast("Health Record Updated");
+      }
     }
 
     /* TANK SUB-TAB 4: HARDWARE & FILTERS */
@@ -2631,7 +3058,7 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
 
       const mediaItems = activeTank.filterMedia || [];
       if (mediaItems.length === 0) {
-        listEl.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:6px 0;">No media tracked yet. Tap "+ Add Media" to set up rinse timers.</div>`;
+        listEl.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:6px 0;">No media tracked yet. Tap "+ Add Media" to auto-schedule maintenance.</div>`;
         return;
       }
 
@@ -2640,7 +3067,7 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       mediaItems.forEach((m, idx) => {
         const last = m.lastDate ? new Date(m.lastDate) : today;
         const diffDays = Math.floor((today - last) / (1000 * 60 * 60 * 24));
-        const interval = m.interval || 30;
+        const interval = m.interval || 21;
 
         let statusText = "";
         let fillPct = 100;
@@ -2648,31 +3075,63 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
         let actionBtnText = "Log Rinsed";
 
         if (m.cat === "biological") {
-          statusText = "🟢 Colonized & Active • Permanent Biological Filter";
+          statusText = "Permanent Biological Filter • 90d inspection";
           fillPct = 100;
           barColor = "var(--neon-green)";
-          actionBtnText = "";
-        } else {
+          actionBtnText = "Log Inspected";
+        } else if (m.cat === "cartridge") {
           const daysLeft = interval - diffDays;
           fillPct = Math.max(5, Math.min(100, Math.round(((interval - diffDays) / interval) * 100)));
           if (daysLeft < 0) {
-            statusText = `🔴 Overdue by ${Math.abs(daysLeft)} days!`;
+            statusText = `Exhausted • Overdue by ${Math.abs(daysLeft)} days!`;
             barColor = "var(--alert-red)";
           } else if (daysLeft <= 5) {
-            statusText = `🟡 Maintenance due in ${daysLeft} days`;
+            statusText = `Replace cartridge in ${daysLeft} days`;
             barColor = "var(--alert-yellow)";
           } else {
-            statusText = `🟢 Good condition • Due in ${daysLeft} days (Every ${interval}d)`;
+            statusText = `Active • Replace in ${daysLeft} days (28-day schedule)`;
             barColor = "var(--neon-green)";
           }
-          if (m.cat === "chemical") actionBtnText = "Log Replaced / Recharged";
+          actionBtnText = "Log Replaced";
+        } else if (m.cat === "chemical") {
+          const daysLeft = interval - diffDays;
+          fillPct = Math.max(5, Math.min(100, Math.round(((interval - diffDays) / interval) * 100)));
+          if (daysLeft < 0) {
+            statusText = `Exhausted • Overdue by ${Math.abs(daysLeft)} days!`;
+            barColor = "var(--alert-red)";
+          } else if (daysLeft <= 7) {
+            statusText = `Replace / Recharge in ${daysLeft} days`;
+            barColor = "var(--alert-yellow)";
+          } else {
+            statusText = `Active • Replace in ${daysLeft} days (60-day schedule)`;
+            barColor = "var(--neon-green)";
+          }
+          actionBtnText = "Log Replaced";
+        } else {
+          // Mechanical sponge / floss
+          const daysLeft = interval - diffDays;
+          fillPct = Math.max(5, Math.min(100, Math.round(((interval - diffDays) / interval) * 100)));
+          if (daysLeft < 0) {
+            statusText = `Rinse Overdue by ${Math.abs(daysLeft)} days!`;
+            barColor = "var(--alert-red)";
+          } else if (daysLeft <= 4) {
+            statusText = `Rinse in tank water due in ${daysLeft} days`;
+            barColor = "var(--alert-yellow)";
+          } else {
+            statusText = `Optimal flow • Rinse in ${daysLeft} days (21-day schedule)`;
+            barColor = "var(--neon-green)";
+          }
+          actionBtnText = "Log Rinsed";
         }
 
         const div = document.createElement("div");
         div.className = "media-card";
         div.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div style="font-weight:700; font-size:14px; color:#fff;">${m.name}</div>
+            <div style="font-weight:700; font-size:14px; color:#fff; display:flex; align-items:center; gap:8px;">
+              <span>${m.name}</span>
+              <span style="font-size:11px; color:var(--cyan); cursor:pointer; font-weight:normal;" onclick="openEditMediaModal(${idx})">Edit</span>
+            </div>
             <span class="delete-x" onclick="deleteFilterMedia(${idx})" title="Remove media">×</span>
           </div>
           <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
@@ -2683,23 +3142,11 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
             <span style="font-size:11px; color:var(--text-muted);">Last serviced: ${m.lastDate || 'Recently'}</span>
-            ${actionBtnText ? `<button class="btn btn-secondary" style="width:auto; padding:4px 10px; font-size:11px;" onclick="resetMediaTimer(${idx})">${actionBtnText}</button>` : `<span style="font-size:10px; color:var(--alert-yellow);">⚠️ Never rinse with tap water!</span>`}
+            ${actionBtnText ? `<button class="btn btn-secondary" style="width:auto; padding:4px 10px; font-size:11px;" onclick="resetMediaTimer(${idx})">${actionBtnText}</button>` : `<span style="font-size:10px; color:var(--alert-yellow);">Never rinse in tap water!</span>`}
           </div>
         `;
         listEl.appendChild(div);
       });
-    }
-
-    function resetMediaTimer(idx) {
-      const activeTank = getActiveTank();
-      if (!activeTank || !activeTank.filterMedia) return;
-      const m = activeTank.filterMedia[idx];
-      m.lastDate = new Date().toISOString().split("T")[0];
-      logTankTimelineEvent(`🧽 Serviced ${m.name} (${m.cat === 'chemical' ? 'Replaced/Recharged' : 'Rinsed'})`);
-      saveDataToStorage();
-      renderFilterMediaList();
-      renderTankOverviewTab();
-      showToast("Media Timer Reset");
     }
 
     function deleteFilterMedia(idx) {
@@ -2708,45 +3155,130 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       activeTank.filterMedia.splice(idx, 1);
       saveDataToStorage();
       renderFilterMediaList();
+      renderTankPlanTab();
+      showToast("Media Removed");
+    }
+
+    function resetMediaTimer(idx) {
+      const activeTank = getActiveTank();
+      if (!activeTank || !activeTank.filterMedia) return;
+      const m = activeTank.filterMedia[idx];
+      m.lastDate = new Date().toISOString().split("T")[0];
+      logTankTimelineEvent(`Serviced ${m.name} (${m.cat === 'chemical' || m.cat === 'cartridge' ? 'Replaced' : 'Rinsed'})`);
+      saveDataToStorage();
+      renderFilterMediaList();
+      renderTankOverviewTab();
+      renderTankPlanTab();
+      showToast("Media Reset & Rescheduled");
     }
 
     function openAddMediaModal() {
       document.getElementById("m-media-name").value = "";
       document.getElementById("m-media-cat").value = "mechanical";
-      document.getElementById("m-media-interval").value = "30";
-      document.getElementById("media-interval-group").style.display = "block";
+      onMediaCategoryChange("mechanical");
       openModalById("addMediaModal");
     }
 
     function onMediaCategoryChange(val) {
-      const grp = document.getElementById("media-interval-group");
-      if (val === "biological") {
-        grp.style.display = "none";
-      } else {
-        grp.style.display = "block";
-        document.getElementById("m-media-interval").value = val === "chemical" ? "60" : "30";
+      const exp = document.getElementById("media-schedule-explanation");
+      if (!exp) return;
+      if (val === "mechanical") {
+        exp.innerHTML = `<b>Aquarist AI Auto-Schedule:</b> Mechanical sponge will automatically be queued for gentle rinse in tank water every <b>21 days</b> to prevent filter bypass.`;
+      } else if (val === "cartridge") {
+        exp.innerHTML = `<b>Aquarist AI Auto-Schedule:</b> All-in-one cartridge floss and carbon exhausts within 4 weeks. Queued for replacement every <b>28 days</b>.`;
+      } else if (val === "chemical") {
+        exp.innerHTML = `<b>Aquarist AI Auto-Schedule:</b> Chemical resins/carbon absorb organics for 2 months. Queued for recharge/replacement every <b>60 days</b>.`;
+      } else if (val === "biological") {
+        exp.innerHTML = `<b>Aquarist AI Auto-Schedule:</b> Biological media holds your beneficial nitrifying colonies permanently. Gentle inspection scheduled every <b>90 days</b> (never replace!).`;
       }
+    }
+
+    function openEditMediaModal(idx) {
+      const activeTank = getActiveTank();
+      if (!activeTank || !activeTank.filterMedia || !activeTank.filterMedia[idx]) return;
+      const m = activeTank.filterMedia[idx];
+      document.getElementById("edit-m-media-idx").value = idx;
+      document.getElementById("edit-m-media-name").value = m.name || "";
+      document.getElementById("edit-m-media-cat").value = m.cat || "mechanical";
+      onEditMediaCategoryChange(m.cat || "mechanical");
+      openModalById("editMediaModal");
+    }
+
+    function onEditMediaCategoryChange(val) {
+      const exp = document.getElementById("edit-media-schedule-explanation");
+      if (!exp) return;
+      if (val === "mechanical") {
+        exp.innerHTML = `<b>Aquarist AI Auto-Schedule:</b> Mechanical sponge will automatically be queued for gentle rinse in tank water every <b>21 days</b>.`;
+      } else if (val === "cartridge") {
+        exp.innerHTML = `<b>Aquarist AI Auto-Schedule:</b> Cartridge floss and carbon exhausts within 4 weeks. Queued for replacement every <b>28 days</b>.`;
+      } else if (val === "chemical") {
+        exp.innerHTML = `<b>Aquarist AI Auto-Schedule:</b> Chemical resins/carbon absorb organics for 2 months. Queued for recharge/replacement every <b>60 days</b>.`;
+      } else if (val === "biological") {
+        exp.innerHTML = `<b>Aquarist AI Auto-Schedule:</b> Biological media holds your beneficial nitrifying colonies permanently. Gentle inspection scheduled every <b>90 days</b>.`;
+      }
+    }
+
+    function saveEditedFilterMedia() {
+      const activeTank = getActiveTank();
+      const idx = parseInt(document.getElementById("edit-m-media-idx").value);
+      if (!activeTank || !activeTank.filterMedia || isNaN(idx) || !activeTank.filterMedia[idx]) return;
+      const name = document.getElementById("edit-m-media-name").value.trim() || "Filter Media";
+      const cat = document.getElementById("edit-m-media-cat").value;
+      let interval = 21;
+      if (cat === "cartridge") interval = 28;
+      else if (cat === "chemical") interval = 60;
+      else if (cat === "biological") interval = 90;
+
+      activeTank.filterMedia[idx].name = name;
+      activeTank.filterMedia[idx].cat = cat;
+      activeTank.filterMedia[idx].interval = interval;
+
+      saveDataToStorage();
+      closeModalById("editMediaModal");
+      renderFilterMediaList();
+      renderTankPlanTab();
+      showToast("Media Updated");
+    }
+
+    function deleteActiveFilterMediaFromModal() {
+      const activeTank = getActiveTank();
+      const idx = parseInt(document.getElementById("edit-m-media-idx").value);
+      if (!activeTank || !activeTank.filterMedia || isNaN(idx)) return;
+      activeTank.filterMedia.splice(idx, 1);
+      saveDataToStorage();
+      closeModalById("editMediaModal");
+      renderFilterMediaList();
+      renderTankPlanTab();
+      showToast("Media Removed");
     }
 
     function saveNewFilterMedia() {
       const name = document.getElementById("m-media-name").value.trim() || "Filter Media";
       const cat = document.getElementById("m-media-cat").value;
-      const interval = parseInt(document.getElementById("m-media-interval").value) || 30;
+      
+      // Automatic Expert Scheduling based on media science
+      let interval = 21;
+      if (cat === "cartridge") interval = 28;
+      else if (cat === "chemical") interval = 60;
+      else if (cat === "biological") interval = 90;
+
       const activeTank = getActiveTank();
+      if (!activeTank) return;
       if (!activeTank.filterMedia) activeTank.filterMedia = [];
 
       activeTank.filterMedia.push({
         id: Date.now(),
         name,
         cat,
-        interval: cat === "biological" ? 0 : interval,
+        interval,
         lastDate: new Date().toISOString().split("T")[0]
       });
 
       saveDataToStorage();
       closeModalById("addMediaModal");
       renderFilterMediaList();
-      showToast("Media Added");
+      renderTankPlanTab();
+      showToast("Media Added & Auto-Scheduled");
     }
 
     /* TANK SUB-TAB 5: PLANTS & DECOR */
@@ -2799,9 +3331,7 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       renderTankPlantsTab();
     }
 
-    /* TANK SUB-TAB 6: TANK AI & CAMERA VISION */
-    function renderTankAITab() {}
-
+    /* Integrated Aquarist AI Lab (Vision + Prompt) */
     function handleVisionImageSelected(e) {
       const file = e.target.files && e.target.files[0];
       if (!file) return;
@@ -2812,7 +3342,7 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
         img.onload = function() {
           const canvas = document.createElement("canvas");
           const ctx = canvas.getContext("2d");
-          const maxDim = 700;
+          const maxDim = 800;
           let w = img.width;
           let h = img.height;
           if (w > maxDim || h > maxDim) {
@@ -2825,125 +3355,91 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
           const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
           activeVisionBase64 = dataUrl.split(",")[1];
 
-          const previewEl = document.getElementById("vision-preview-img");
-          const placeholder = document.getElementById("vision-placeholder-content");
-          if (previewEl && placeholder) {
-            previewEl.src = dataUrl;
-            previewEl.style.display = "block";
-            placeholder.style.display = "none";
+          // Show inline chip preview
+          const chip = document.getElementById("ai-vision-preview-chip");
+          const thumb = document.getElementById("vision-preview-thumb");
+          if (chip && thumb) {
+            thumb.src = dataUrl;
+            chip.style.display = "flex";
           }
+          showToast("Photo Attached to AI Prompt");
         };
         img.src = evt.target.result;
       };
       reader.readAsDataURL(file);
     }
 
-    async function runTankVisionDiagnostics() {
-      if (!activeVisionBase64) {
-        alert("Please tap to take or select a photo first!");
-        return;
-      }
-      if (!appState.apiKey) {
-        alert("Please save your Google Gemini API Key in Settings (⚙️) first!");
-        return;
-      }
-
-      const activeTank = getActiveTank();
-      const u = getUnitLabels();
-      const notes = document.getElementById("vision-user-notes").value.trim();
-      const respCard = document.getElementById("vision-response-card");
-      const respText = document.getElementById("vision-response-text");
-      const runBtn = document.getElementById("run-vision-btn");
-
-      respCard.style.display = "block";
-      respText.innerHTML = "🔍 Multimodal AI analyzing photo and cross-referencing tank biology...";
-      runBtn.disabled = true;
-      runBtn.innerText = "Analyzing Image...";
-
-      const liveStr = (activeTank.livestock || []).join(", ");
-      const inverts = (activeTank.livestock || []).filter(l => /snail|shrimp|crab|crayfish/i.test(l));
-      const invertWarning = inverts.length > 0 
-        ? `CRITICAL SAFETY NOTE: Tank contains invertebrates (${inverts.join(", ")}). You MUST explicitly warn against any copper-based medications or treatments harmful to snails/shrimp!`
-        : `No invertebrates noted in livestock roster.`;
-
-      const promptText = `You are aquAssist AI Vision, an expert veterinary and botanical aquarist.
-Analyze this aquarium photo carefully.
-User's Tank Context:
-- Aquarium: ${activeTank.name} (${activeTank.vol} ${u.vol}, ${activeTank.status})
-- Livestock: ${liveStr}
-- Latest Parameters: NH3:${activeTank.lastTest.nh3}, NO2:${activeTank.lastTest.no2}, NO3:${activeTank.lastTest.no3}, pH:${activeTank.lastTest.ph}, Temp:${activeTank.lastTest.temp}${u.temp}
-- User's Supply Closet: ${(appState.closet || []).join(", ")}
-- User Observation Notes: ${notes || "None provided"}
-${invertWarning}
-
-Please provide:
-1. Diagnosis / Identification: Identify any fish disease symptoms (Ich, velvet, fin rot, epistylis, dropsy, etc.), nuisance algae (Black Beard, Hair, Cyanobacteria, Diatoms), or pest (Hydra, Planaria, etc.). Include confidence level.
-2. Root Cause Analysis: What likely triggered this condition in light of the water parameters or tank conditions?
-3. Step-by-Step Treatment Protocol: Prioritize items in the user's Supply Closet if applicable.
-4. Invertebrate & Plant Safety: Explicitly state if any treatment is dangerous for shrimp, snails, or plants.`;
-
-      try {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${appState.apiKey}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{
-              parts: [
-                { text: promptText },
-                { inlineData: { mimeType: "image/jpeg", data: activeVisionBase64 } }
-              ]
-            }]
-          })
-        });
-        const data = await res.json();
-        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "No diagnosis generated.";
-        respText.innerHTML = renderMarkdownToHtml(reply);
-      } catch (err) {
-        respText.innerHTML = `<span style="color:var(--alert-red)">Diagnosis failed. Check network or API key.</span>`;
-      } finally {
-        runBtn.disabled = false;
-        runBtn.innerText = "Run Multimodal AI Diagnosis";
-      }
+    function clearVisionAttachment() {
+      activeVisionBase64 = null;
+      document.getElementById("vision-file-input").value = "";
+      const chip = document.getElementById("ai-vision-preview-chip");
+      if (chip) chip.style.display = "none";
     }
 
-    async function askTankAI() {
-      const q = document.getElementById("tank-ai-chat-input").value.trim();
+    async function runUnifiedTankAI() {
+      const qInput = document.getElementById("tank-ai-chat-input");
+      const q = qInput.value.trim();
       const box = document.getElementById("tank-ai-chat-box");
-      if (!q) return;
+      if (!q && !activeVisionBase64) {
+        alert("Please type a question or attach a photo first!");
+        return;
+      }
 
       if (!appState.apiKey) {
         box.style.display = "block";
-        box.innerHTML = `<span style="color:var(--alert-yellow)">Please save your Google Gemini API Key in Settings (⚙️) first!</span>`;
+        box.innerHTML = `<span style="color:var(--alert-yellow)">Please save your Google Gemini API Key in Settings first!</span>`;
         return;
       }
 
       box.style.display = "block";
-      box.innerHTML = "Thinking...";
+      box.innerHTML = "Aquarist AI is analyzing...";
 
       const activeTank = getActiveTank();
       const tap = appState.tapBaseline || {};
       const u = getUnitLabels();
+      const last = activeTank.lastTest || { temp: 78, ph: 7.2, nh3: 0, no2: 0, no3: 0 };
+      const liveStr = (activeTank.livestock || []).join(", ") || "None";
+      const equipStr = (activeTank.equipment || []).join(", ") || "Standard";
+      const mediaStr = (activeTank.filterMedia || []).map(m => m.name).join(", ") || "Standard";
+      const plantsStr = (activeTank.plants || []).join(", ") || "None";
+      const decorStr = (activeTank.decor || []).join(", ") || "None";
+      const closetStr = (appState.closet || []).join(", ") || "None";
 
-      const prompt = `You are aquAssist, expert Aquarist AI for ${activeTank.name} (${activeTank.vol} ${u.vol}, ${activeTank.status}).
-Age: ${calculateAge(activeTank.startDate)}.
-Latest Parameters: NH3:${activeTank.lastTest.nh3}, NO2:${activeTank.lastTest.no2}, NO3:${activeTank.lastTest.no3}, pH:${activeTank.lastTest.ph}, Temp:${activeTank.lastTest.temp}${u.temp}.
-Household Tap Baseline: pH ${tap.ph}, NO3 ${tap.no3} ppm.
-User's Supply Closet: ${(appState.closet || []).join(", ")}.
-Livestock: ${(activeTank.livestock || []).join(", ")}.
-Question: ${q}
-Provide clear, actionable steps for a beginner.`;
+      const promptText = `You are aquAssist, expert Aquarist AI analyzing aquarium '${activeTank.name}' (${activeTank.vol} ${u.vol}, ${activeTank.status}).
+Holistic Tank Blueprint:
+- Age: ${calculateAge(activeTank.startDate)}
+- Current Water Balance: Temp ${last.temp || 78}${u.temp}, pH ${last.ph || 7.2}, NH₃ ${last.nh3 ?? 0} ppm, NO₂ ${last.no2 ?? 0} ppm, NO₃ ${last.no3 ?? 0} ppm
+- Tap Water Baseline: pH ${tap.ph || 7.4}, NO₃ ${tap.no3 || 0} ppm, GH ${tap.gh || 8} dGH, KH ${tap.kh || 4} dKH
+- Filtration & Gear: Equipment: ${equipStr} | Media: ${mediaStr}
+- Ecosystem Biota: Livestock: ${liveStr} | Flora: ${plantsStr} | Hardscape: ${decorStr}
+- Household Supplies & Treatments Available: ${closetStr}
+
+User Query / Symptom Description: ${q || "Please analyze the attached image in the context of this aquarium."}
+
+Instructions:
+1. Provide a scientifically grounded, holistic assessment taking into account water parameters, filtration, bioload, and flora.
+2. If disease symptoms or water problems are identified, provide exact dosage instructions utilizing products from the user's Household Supplies first.
+3. Explicitly note invertebrate/plant safety if recommending any treatments.
+4. Keep the explanation concise, actionable, and encouraging for a beginner aquarist.`;
 
       try {
+        const parts = [{ text: promptText }];
+        if (activeVisionBase64) {
+          parts.push({
+            inlineData: { mimeType: "image/jpeg", data: activeVisionBase64 }
+          });
+        }
+
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${appState.apiKey}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+          body: JSON.stringify({ contents: [{ parts }] })
         });
         const data = await res.json();
         const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
         box.innerHTML = renderMarkdownToHtml(reply);
       } catch (err) {
-        box.innerHTML = `<span style="color:var(--alert-red)">Error connecting to Gemini API.</span>`;
+        box.innerHTML = `<span style="color:var(--alert-red)">Error communicating with Gemini API. Check your connection or API key.</span>`;
       }
     }
 
@@ -2960,7 +3456,19 @@ Provide clear, actionable steps for a beginner.`;
       navigator.clipboard.writeText(text).then(() => showToast("Copied to Clipboard!"));
     }
 
-    /* Discreet Fauna Loss Tracker */
+    /* Health Event & Hybrid Symptoms Handler */
+    function onSymptomSelectChange(val) {
+      const wrap = document.getElementById("loss-symptoms-custom-wrap");
+      if (!wrap) return;
+      if (val === "__CUSTOM__") {
+        wrap.style.display = "block";
+        document.getElementById("loss-symptoms-custom").focus();
+      } else {
+        wrap.style.display = "none";
+      }
+    }
+
+    /* Discreet Fauna Loss & Health Event Tracker */
     function openLossModal() {
       const activeTank = getActiveTank();
       const sel = document.getElementById("loss-species-select");
@@ -2969,7 +3477,7 @@ Provide clear, actionable steps for a beginner.`;
 
       const live = activeTank.livestock || [];
       if (live.length === 0) {
-        sel.innerHTML = `<option value="Other / Fish">Other Fauna</option>`;
+        sel.innerHTML = `<option value="Other / Fish">General Fauna</option>`;
       } else {
         live.forEach((entry) => {
           sel.innerHTML += `<option value="${entry}">${entry}</option>`;
@@ -2978,6 +3486,9 @@ Provide clear, actionable steps for a beginner.`;
 
       document.getElementById("loss-date").valueAsDate = new Date();
       document.getElementById("loss-qty").value = 1;
+      document.getElementById("loss-symptoms").value = "No visible symptoms / Natural";
+      document.getElementById("loss-symptoms-custom-wrap").style.display = "none";
+      document.getElementById("loss-symptoms-custom").value = "";
       openModalById("lossModal");
     }
 
@@ -2988,7 +3499,9 @@ Provide clear, actionable steps for a beginner.`;
       const rawSpecies = document.getElementById("loss-species-select").value;
       const qty = parseInt(document.getElementById("loss-qty").value) || 1;
       const date = document.getElementById("loss-date").value || new Date().toISOString().split("T")[0];
-      const symptoms = document.getElementById("loss-symptoms").value;
+      const symptomSel = document.getElementById("loss-symptoms").value;
+      const customSymptom = document.getElementById("loss-symptoms-custom").value.trim();
+      const symptoms = symptomSel === "__CUSTOM__" ? (customSymptom || "Unspecified custom symptom") : symptomSel;
 
       let cleanSpecies = rawSpecies.replace(/^\d+x\s*/i, "").trim();
 
@@ -3017,39 +3530,54 @@ Provide clear, actionable steps for a beginner.`;
       const lossRecord = { date, species: cleanSpecies, qty, symptoms };
       activeTank.losses.unshift(lossRecord);
 
-      logTankTimelineEvent(`💀 Lost ${qty}x ${cleanSpecies} (${symptoms})`, date);
+      logTankTimelineEvent(`Health event: ${qty}x ${cleanSpecies} (${symptoms})`, date);
       saveDataToStorage();
       closeModalById("lossModal");
       renderTankLivestockTab();
       renderTankOverviewTab();
-      showToast("Loss Recorded");
+      showToast("Health Event Recorded");
     }
 
-    function renderLossHistory() {
+    /* Editable Livestock Management */
+    function openEditLivestockModal(idx) {
       const activeTank = getActiveTank();
-      const card = document.getElementById("loss-history-card");
-      const list = document.getElementById("loss-history-list");
-      if (!card || !list || !activeTank) return;
+      if (!activeTank || !activeTank.livestock || !activeTank.livestock[idx]) return;
+      const item = activeTank.livestock[idx];
+      const match = item.match(/^(\d+)x\s*(.*)$/i);
+      const count = match ? match[1] : 1;
+      const species = match ? match[2] : item;
 
-      const losses = activeTank.losses || [];
-      if (losses.length === 0) {
-        card.style.display = "none";
-        return;
-      }
+      document.getElementById("edit-live-idx").value = idx;
+      document.getElementById("edit-live-count").value = count;
+      document.getElementById("edit-live-species").value = species;
+      openModalById("editLivestockModal");
+    }
 
-      card.style.display = "block";
-      list.innerHTML = "";
-      losses.slice(0, 5).forEach(l => {
-        list.innerHTML += `
-          <div style="font-size:12px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between;">
-            <div>
-              <span style="color:var(--text-muted);">${l.date}:</span>
-              <b>${l.qty}x ${l.species}</b>
-              <div style="font-size:11px; color:var(--alert-yellow);">${l.symptoms}</div>
-            </div>
-          </div>
-        `;
-      });
+    function saveEditedLivestock() {
+      const activeTank = getActiveTank();
+      const idx = parseInt(document.getElementById("edit-live-idx").value);
+      const count = parseInt(document.getElementById("edit-live-count").value) || 1;
+      const species = document.getElementById("edit-live-species").value.trim();
+      if (!species || !activeTank || isNaN(idx)) return;
+
+      activeTank.livestock[idx] = `${count}x ${species}`;
+      saveDataToStorage();
+      closeModalById("editLivestockModal");
+      renderTankLivestockTab();
+      renderTankOverviewTab();
+      showToast("Livestock Updated");
+    }
+
+    function deleteActiveLivestockFromModal() {
+      const activeTank = getActiveTank();
+      const idx = parseInt(document.getElementById("edit-live-idx").value);
+      if (!activeTank || isNaN(idx)) return;
+      activeTank.livestock.splice(idx, 1);
+      saveDataToStorage();
+      closeModalById("editLivestockModal");
+      renderTankLivestockTab();
+      renderTankOverviewTab();
+      showToast("Livestock Removed");
     }
 
     function renderPillList(type, containerId, items, deleteFnName) {
@@ -3057,13 +3585,63 @@ Provide clear, actionable steps for a beginner.`;
       if (!el) return;
       el.innerHTML = "";
       items.forEach((item, idx) => {
+        const isLive = type === "livestock";
+        const isEquip = type === "equipment";
+        const isPlant = type === "plants";
+        const isDecor = type === "decor";
+        const isEditable = isLive || isEquip || isPlant || isDecor;
+        let clickHandler = "";
+        if (isLive) clickHandler = `openEditLivestockModal(${idx})`;
+        else if (isEquip) clickHandler = `editTankHardwarePrompt(${idx})`;
+        else if (isPlant) clickHandler = `editTankPlantPrompt(${idx})`;
+        else if (isDecor) clickHandler = `editTankDecorPrompt(${idx})`;
+
         el.innerHTML += `
-          <div class="pill">
+          <div class="pill" style="cursor:${isEditable ? 'pointer' : 'default'};" ${isEditable ? `onclick="${clickHandler}"` : ''}>
             <span>${item}</span>
-            <span class="delete-x" onclick="${deleteFnName}(${idx})">×</span>
+            <span class="delete-x" onclick="event.stopPropagation(); ${deleteFnName}(${idx})">×</span>
           </div>
         `;
       });
+    }
+
+    function editTankHardwarePrompt(idx) {
+      const activeTank = getActiveTank();
+      if (!activeTank || !activeTank.equipment || !activeTank.equipment[idx]) return;
+      const current = activeTank.equipment[idx];
+      const updated = prompt("Edit hardware / equipment item:", current);
+      if (updated !== null && updated.trim()) {
+        activeTank.equipment[idx] = updated.trim();
+        saveDataToStorage();
+        renderTankHardwareTab();
+        showToast("Hardware Updated");
+      }
+    }
+
+    function editTankPlantPrompt(idx) {
+      const activeTank = getActiveTank();
+      if (!activeTank || !activeTank.plants || !activeTank.plants[idx]) return;
+      const current = activeTank.plants[idx];
+      const updated = prompt("Edit plant species / name:", current);
+      if (updated !== null && updated.trim()) {
+        activeTank.plants[idx] = updated.trim();
+        saveDataToStorage();
+        renderTankPlantsTab();
+        showToast("Plant Updated");
+      }
+    }
+
+    function editTankDecorPrompt(idx) {
+      const activeTank = getActiveTank();
+      if (!activeTank || !activeTank.decor || !activeTank.decor[idx]) return;
+      const current = activeTank.decor[idx];
+      const updated = prompt("Edit hardscape / decor item:", current);
+      if (updated !== null && updated.trim()) {
+        activeTank.decor[idx] = updated.trim();
+        saveDataToStorage();
+        renderTankPlantsTab();
+        showToast("Decor Updated");
+      }
     }
 
     function renderMarkdownToHtml(text) {
@@ -3099,11 +3677,30 @@ Provide clear, actionable steps for a beginner.`;
       document.getElementById("add-m-name").value = "";
       document.getElementById("add-m-vol").value = "";
       document.getElementById("add-m-date").valueAsDate = new Date();
-      document.getElementById("add-m-color").value = availableColors[0];
-      buildColorCirclesFor("add-color-container", "add-m-color", availableColors[0]);
+      document.getElementById("add-m-color").value = "#00D2FF";
+      document.getElementById("add-color-preview").style.background = "#00D2FF";
       document.getElementById("add-m-status").value = "Established";
       document.getElementById("add-m-photo").value = "";
       openModalById("addTankModal");
+    }
+
+    function openEditActiveTankModal() {
+      const tank = getActiveTank();
+      if (!tank) return;
+
+      document.getElementById("edit-m-name").value = tank.name;
+      document.getElementById("edit-m-vol").value = tank.vol;
+      document.getElementById("edit-m-date").value = tank.startDate || "2025-01-01";
+      document.getElementById("edit-m-status").value = tank.status;
+      const clr = tank.color || "#00D2FF";
+      document.getElementById("edit-m-color").value = clr;
+      const preview = document.getElementById("edit-color-preview");
+      if (preview) {
+        preview.style.background = clr;
+        preview.style.boxShadow = `0 0 10px ${clr}`;
+      }
+      document.getElementById("edit-m-photo").value = "";
+      openModalById("editTankModal");
     }
 
     function saveNewTankData() {
@@ -3123,13 +3720,15 @@ Provide clear, actionable steps for a beginner.`;
           color,
           status,
           image: imgData || "",
-          summary: "Tank initialized. Ready for parameter logging.",
+          summary: status === "Cycling" 
+            ? "Biological filtration cultivating. Ammonia converting to Nitrite." 
+            : "Biological parameters established and balanced.",
           lastTest: { nh3: 0, no2: 0, no3: 0, ph: 7.2, temp: 78.0, date: startDate },
           history: [],
-          timeline: [{ date: startDate, text: "🚀 Aquarium setup & initialized" }],
+          timeline: [{ date: startDate, text: "Aquarium setup & initialized" }],
           equipment: [],
           filterMedia: [
-            { id: Date.now() + 1, name: "Mechanical Sponge", cat: "mechanical", interval: 30, lastDate: startDate },
+            { id: Date.now() + 1, name: "Mechanical Sponge", cat: "mechanical", interval: 21, lastDate: startDate },
             { id: Date.now() + 2, name: "Biological Media", cat: "biological", interval: 0, lastDate: startDate }
           ],
           livestock: [],
@@ -3150,19 +3749,7 @@ Provide clear, actionable steps for a beginner.`;
       }
     }
 
-    function openEditActiveTankModal() {
-      const tank = getActiveTank();
-      if (!tank) return;
-
-      document.getElementById("edit-m-name").value = tank.name;
-      document.getElementById("edit-m-vol").value = tank.vol;
-      document.getElementById("edit-m-date").value = tank.startDate || "2025-01-01";
-      document.getElementById("edit-m-status").value = tank.status;
-      document.getElementById("edit-m-color").value = tank.color || availableColors[0];
-      buildColorCirclesFor("edit-color-container", "edit-m-color", tank.color || availableColors[0]);
-      document.getElementById("edit-m-photo").value = "";
-      openModalById("editTankModal");
-    }
+    // Redundant duplicate openEditActiveTankModal removed
 
     function saveEditedTankData() {
       const tank = getActiveTank();
@@ -3233,23 +3820,42 @@ Provide clear, actionable steps for a beginner.`;
 
     function openSettingsModal() {
       document.getElementById("setting-units").value = appState.units || "us";
-      const tap = appState.tapBaseline || {};
-      document.getElementById("tap-ph").value = tap.ph || "";
-      document.getElementById("tap-no3").value = tap.no3 || "";
-      document.getElementById("tap-gh").value = tap.gh || "";
-      document.getElementById("tap-kh").value = tap.kh || "";
+      const tap = appState.tapBaseline || { ph: 7.4, no3: 5, gh: 8, kh: 4 };
+      document.getElementById("tap-ph").value = tap.ph !== undefined ? tap.ph : "";
+      document.getElementById("tap-no3").value = tap.no3 !== undefined ? tap.no3 : "";
+      document.getElementById("tap-gh").value = tap.gh !== undefined ? tap.gh : "";
+      document.getElementById("tap-kh").value = tap.kh !== undefined ? tap.kh : "";
+
+      const dispPh = document.getElementById("disp-tap-ph");
+      const dispNo3 = document.getElementById("disp-tap-no3");
+      const dispGh = document.getElementById("disp-tap-gh");
+      const dispKh = document.getElementById("disp-tap-kh");
+      if (dispPh) dispPh.innerText = tap.ph !== undefined ? tap.ph : "7.4";
+      if (dispNo3) dispNo3.innerText = (tap.no3 !== undefined ? tap.no3 : "5") + " ppm";
+      if (dispGh) dispGh.innerText = (tap.gh !== undefined ? tap.gh : "8") + " dGH";
+      if (dispKh) dispKh.innerText = (tap.kh !== undefined ? tap.kh : "4") + " dKH";
+
       document.getElementById("setting-api-key").value = appState.apiKey || "";
       updateNotificationStatusDisplay();
       openModalById("settingsModal");
     }
 
     function saveTapBaseline() {
-      appState.tapBaseline = {
-        ph: parseFloat(document.getElementById("tap-ph").value) || 7.4,
-        no3: parseFloat(document.getElementById("tap-no3").value) || 0,
-        gh: parseFloat(document.getElementById("tap-gh").value) || 0,
-        kh: parseFloat(document.getElementById("tap-kh").value) || 0
-      };
+      const ph = parseFloat(document.getElementById("tap-ph").value) || 7.4;
+      const no3 = parseFloat(document.getElementById("tap-no3").value) || 0;
+      const gh = parseFloat(document.getElementById("tap-gh").value) || 0;
+      const kh = parseFloat(document.getElementById("tap-kh").value) || 0;
+      appState.tapBaseline = { ph, no3, gh, kh };
+
+      const dispPh = document.getElementById("disp-tap-ph");
+      const dispNo3 = document.getElementById("disp-tap-no3");
+      const dispGh = document.getElementById("disp-tap-gh");
+      const dispKh = document.getElementById("disp-tap-kh");
+      if (dispPh) dispPh.innerText = ph;
+      if (dispNo3) dispNo3.innerText = no3 + " ppm";
+      if (dispGh) dispGh.innerText = gh + " dGH";
+      if (dispKh) dispKh.innerText = kh + " dKH";
+
       saveDataToStorage();
     }
 
@@ -3323,19 +3929,42 @@ Provide clear, actionable steps for a beginner.`;
        ============================================================ */
     function updateNotificationStatusDisplay() {
       const el = document.getElementById("notification-status-text");
-      if (!el) return;
+      const enableBtn = document.getElementById("notif-enable-btn");
+      const activePill = document.getElementById("notif-active-pill");
+      const testLink = document.getElementById("notif-test-link");
+
       if (!("Notification" in window)) {
-        el.innerText = "Status: Notifications not supported on this browser.";
-        el.style.color = "var(--alert-yellow)";
+        if (el) {
+          el.innerText = "Status: Pop-ups not supported in this browser.";
+          el.style.color = "var(--alert-yellow)";
+        }
+        if (enableBtn) enableBtn.style.display = "none";
+        if (activePill) activePill.style.display = "none";
+        if (testLink) testLink.style.display = "none";
       } else if (Notification.permission === "granted") {
-        el.innerText = "Status: 🟢 Enabled! Native pop-up alerts will display.";
-        el.style.color = "var(--neon-green)";
+        if (el) {
+          el.innerText = "Status: Alerts active for scheduled tank care.";
+          el.style.color = "var(--neon-green)";
+        }
+        if (enableBtn) enableBtn.style.display = "none";
+        if (activePill) activePill.style.display = "inline-block";
+        if (testLink) testLink.style.display = "inline-block";
       } else if (Notification.permission === "denied") {
-        el.innerText = "Status: 🔴 Blocked in Android Chrome site settings.";
-        el.style.color = "var(--alert-red)";
+        if (el) {
+          el.innerText = "Status: Blocked in Android site permissions.";
+          el.style.color = "var(--alert-red)";
+        }
+        if (enableBtn) enableBtn.style.display = "none";
+        if (activePill) activePill.style.display = "none";
+        if (testLink) testLink.style.display = "none";
       } else {
-        el.innerText = "Status: ⚪ Not enabled yet. Tap 'Enable Phone Alerts' above.";
-        el.style.color = "var(--text-muted)";
+        if (el) {
+          el.innerText = "Status: Tap Enable Alerts for scheduled reminders.";
+          el.style.color = "var(--text-muted)";
+        }
+        if (enableBtn) enableBtn.style.display = "inline-block";
+        if (activePill) activePill.style.display = "none";
+        if (testLink) testLink.style.display = "none";
       }
     }
 
