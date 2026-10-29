@@ -572,9 +572,13 @@
 
       <!-- Actionable Upcoming Tasks & Routines Checklist -->
       <div class="card" id="dashboard-tasks-card" style="margin-bottom: 18px; border-color: rgba(56, 189, 248, 0.35);">
-        <div class="card-header" style="margin-bottom: 10px;">
-          <div class="card-title">
-            Upcoming Tasks
+        <div class="card-header" style="margin-bottom: 10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div class="card-title">Upcoming Tasks</div>
+            <div style="display:inline-flex; background:rgba(255,255,255,0.06); border-radius:20px; padding:2px; border:1px solid rgba(255,255,255,0.08);">
+              <button id="task-filter-today" onclick="setDashboardTaskFilter('today')" style="background:transparent; border:none; color:var(--text-muted); font-size:10px; font-weight:700; padding:3px 9px; border-radius:16px; cursor:pointer; transition:all 0.15s ease;">Today</button>
+              <button id="task-filter-3days" onclick="setDashboardTaskFilter('3days')" style="background:rgba(0,210,255,0.2); border:none; color:var(--cyan); font-size:10px; font-weight:700; padding:3px 9px; border-radius:16px; cursor:pointer; transition:all 0.15s ease;">3 Days</button>
+            </div>
           </div>
           <span id="dashboard-tasks-badge" class="badge-cycling" style="background:rgba(56,189,248,0.15); color:var(--cyan); border-color:var(--cyan); font-size:10px;">Checking...</span>
         </div>
@@ -1509,6 +1513,12 @@
     let currentChartFilter = "all";
     let activeVisionBase64 = null;
     let swRegistration = null;
+    let dashboardTaskFilter = "3days"; // "today" or "3days"
+
+    function setDashboardTaskFilter(filter) {
+      dashboardTaskFilter = filter;
+      renderDashboardTasks();
+    }
 
     /* ============================================================
        2. INDEXEDDB PERSISTENCE LAYER
@@ -1734,15 +1744,36 @@
       saveDataToStorage();
     }
 
+    function formatTankAgeLine(startDateStr, vol, volUnit) {
+      if (!startDateStr) return vol ? `${vol} ${volUnit}` : "";
+      const start = new Date(startDateStr);
+      const now = new Date();
+      const diffDays = Math.max(1, Math.floor((now - start) / (1000 * 60 * 60 * 24)));
+      let ageStr = "";
+      if (diffDays < 30) {
+        ageStr = `${diffDays} day${diffDays > 1 ? 's' : ''} old`;
+      } else if (diffDays < 365) {
+        const months = (diffDays / 30.4375).toFixed(1).replace(/\.0$/, "");
+        ageStr = `${months} month${months === "1" ? "" : "s"} old`;
+      } else {
+        const years = (diffDays / 365.25).toFixed(1).replace(/\.0$/, "");
+        ageStr = `${years} year${years === "1" ? "" : "s"} old`;
+      }
+      return `Day ${diffDays} | ${ageStr} | ${vol} ${volUnit}`;
+    }
+
     function calculateAge(startDateStr) {
       if (!startDateStr) return "Unknown age";
       const start = new Date(startDateStr);
       const now = new Date();
-      const diffTime = Math.abs(now - start);
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      const diffDays = Math.max(1, Math.floor((now - start) / (1000 * 60 * 60 * 24)));
       if (diffDays < 30) return `${diffDays} days old`;
-      if (diffDays < 365) return `${(diffDays / 30).toFixed(1)} months old`;
-      return `${(diffDays / 365).toFixed(1)} years old`;
+      if (diffDays < 365) {
+        const months = (diffDays / 30.4375).toFixed(1).replace(/\.0$/, "");
+        return `${months} month${months === "1" ? "" : "s"} old`;
+      }
+      const years = (diffDays / 365.25).toFixed(1).replace(/\.0$/, "");
+      return `${years} year${years === "1" ? "" : "s"} old`;
     }
 
     /* High-Tech Telemetry Gauge Builders - Ordered: Temp, pH, NH3, NO2, NO3 */
@@ -1900,7 +1931,7 @@
 
       // Tasks stat on hero card
       const allUpcomingTasks = [];
-      appState.tanks.forEach(tank => allUpcomingTasks.push(...generateTankTasks(tank, 7)));
+      appState.tanks.forEach(tank => allUpcomingTasks.push(...generateTankTasks(tank, 3)));
       const dueNowCount = allUpcomingTasks.filter(t => t.daysRemaining <= 0).length;
 
       if (statTasksEl) {
@@ -1911,7 +1942,7 @@
           statTasksEl.innerText = `${dueNowCount} Due`;
           statTasksEl.style.color = "var(--alert-yellow)";
         } else {
-          statTasksEl.innerText = `${allUpcomingTasks.length} in 7d`;
+          statTasksEl.innerText = `${allUpcomingTasks.length} in 3d`;
           statTasksEl.style.color = "var(--neon-green)";
         }
       }
@@ -1943,34 +1974,30 @@
         const isCycling = tank.status === "Cycling";
         const badgeHtml = isCycling ? `<span class="badge-cycling">● Cycling</span>` : ``;
         const t = tank.lastTest || { nh3: 0, no2: 0, no3: 0, ph: 7.2, temp: 78 };
-
-        // Calculate 1-line actionable telemetry status
-        let actionableOverview = "Healthy & stable • Next water change in 4 days";
         const nh3 = parseFloat(t.nh3) || 0;
         const no2 = parseFloat(t.no2) || 0;
         const no3 = parseFloat(t.no3) || 0;
 
+        // Calculate 1-line actionable status based on generated tasks & water parameters
+        const tankTasks = generateTankTasks(tank, 7);
+        let actionableOverview = "All parameters healthy • Next routine care on schedule";
+
         if (isCycling) {
-          actionableOverview = `Cultivating bio-filter • NH₃: ${nh3} | NO₂: ${no2} ppm`;
+          const testTask = tankTasks.find(tk => tk.type === "test");
+          const testMsg = testTask ? ` • ${testTask.subtitle}` : "";
+          actionableOverview = `Cultivating bio-filter • NH₃: ${nh3} | NO₂: ${no2} ppm${testMsg}`;
         } else if (nh3 > 0.25 || no2 > 0.25) {
           actionableOverview = `⚠️ Toxin spike detected • Dose conditioner & retest in 24 hrs`;
         } else if (no3 > 40) {
           actionableOverview = `Elevated Nitrate (${no3} ppm) • Water change recommended today`;
-        } else {
-          // Check last water change
-          let lastWcDate = tank.lastWaterChange;
-          if (!lastWcDate && tank.history) {
-            const wcEntry = tank.history.find(h => h.wc && h.wc > 0);
-            if (wcEntry) lastWcDate = wcEntry.date;
-          }
-          if (lastWcDate) {
-            const daysSince = Math.floor((new Date() - new Date(lastWcDate)) / (1000 * 60 * 60 * 24));
-            const daysUntil = Math.max(0, 7 - daysSince);
-            if (daysUntil === 0) {
-              actionableOverview = `Water change due today (~${Math.round(tank.vol * 0.25)} ${u.vol})`;
-            } else {
-              actionableOverview = `Healthy & stable • Next water change in ${daysUntil} day${daysUntil > 1 ? 's' : ''}`;
-            }
+        } else if (tankTasks.length > 0) {
+          const urgentTask = tankTasks[0];
+          if (urgentTask.isOverdue) {
+            actionableOverview = `⚠️ ${urgentTask.planTabTitle.replace(/^[^\s]+\s*/, '')} (${urgentTask.subtitle})`;
+          } else if (urgentTask.isToday) {
+            actionableOverview = `🔔 ${urgentTask.planTabTitle.replace(/^[^\s]+\s*/, '')} due today`;
+          } else {
+            actionableOverview = `Healthy & balanced • Next care ${urgentTask.subtitle.toLowerCase()}`;
           }
         }
 
@@ -1990,8 +2017,8 @@
               <div style="display:flex; justify-content:space-between; align-items:flex-end;">
                 <div>
                   <h3 class="card-title">${tank.name}</h3>
-                  <div style="font-size:11px; color:var(--text-muted); margin-top:3px;">
-                    ${calculateAge(tank.startDate)} • ${tank.vol} ${u.vol}
+                  <div style="font-size:11px; color:var(--text-muted); margin-top:3px; font-weight:600; letter-spacing:0.1px;">
+                    ${formatTankAgeLine(tank.startDate, tank.vol, u.vol)}
                   </div>
                 </div>
                 ${badgeHtml}
@@ -2031,17 +2058,50 @@
       if (!tank) return [];
       const u = getUnitLabels();
       const today = new Date();
+      const todayStr = today.toISOString().split("T")[0];
       const tasks = [];
       const isCycling = tank.status === "Cycling";
 
-      // 1. Chemical Water Test
-      const testInterval = isCycling ? 2 : 7;
-      const lastTestDate = tank.lastTest?.date || tank.startDate;
-      let daysSinceTest = 0;
-      if (lastTestDate) {
-        daysSinceTest = Math.floor((today - new Date(lastTestDate)) / (1000 * 60 * 60 * 24));
+      // Calculate Water Change timing first as anchor for weekly routines
+      let daysUntilWc = 999;
+      let daysSinceWc = 0;
+      if (!isCycling) {
+        let lastWcDate = tank.lastWaterChange;
+        if (!lastWcDate && tank.history && tank.history.length > 0) {
+          const wcEntries = tank.history.filter(h => h.wc && h.wc > 0);
+          if (wcEntries.length > 0) {
+            lastWcDate = wcEntries.map(e => e.date).sort().reverse()[0];
+          }
+        }
+        if (!lastWcDate) lastWcDate = tank.startDate;
+        if (lastWcDate) {
+          daysSinceWc = Math.floor((today - new Date(lastWcDate)) / (1000 * 60 * 60 * 24));
+        }
+        daysUntilWc = 7 - daysSinceWc;
       }
-      const daysUntilTest = testInterval - daysSinceTest;
+
+      // 1. Chemical Water Test (Synchronized with Water Change on established tanks)
+      let daysUntilTest = 0;
+      if (isCycling) {
+        // Cycling tanks require testing every 2 days
+        const lastTestDate = tank.lastTest?.date || tank.startDate;
+        let daysSinceTest = 0;
+        if (lastTestDate) {
+          daysSinceTest = Math.floor((today - new Date(lastTestDate)) / (1000 * 60 * 60 * 24));
+        }
+        daysUntilTest = 2 - daysSinceTest;
+      } else {
+        // In established tanks, align testing with the water change day
+        let daysSinceTest = 999;
+        if (tank.lastTest?.date) {
+          daysSinceTest = Math.floor((today - new Date(tank.lastTest.date)) / (1000 * 60 * 60 * 24));
+        }
+        daysUntilTest = daysUntilWc;
+        if (daysSinceTest < 3 && daysUntilWc <= 1) {
+          daysUntilTest = daysUntilWc + 7;
+        }
+      }
+
       if (daysUntilTest <= windowDays) {
         tasks.push({
           id: `test-${tank.id}`,
@@ -2084,19 +2144,6 @@
           });
         }
       } else {
-        let lastWcDate = tank.lastWaterChange;
-        if (!lastWcDate && tank.history && tank.history.length > 0) {
-          const wcEntries = tank.history.filter(h => h.wc && h.wc > 0);
-          if (wcEntries.length > 0) {
-            lastWcDate = wcEntries.map(e => e.date).sort().reverse()[0];
-          }
-        }
-        if (!lastWcDate) lastWcDate = tank.startDate;
-        let daysSinceWc = 0;
-        if (lastWcDate) {
-          daysSinceWc = Math.floor((today - new Date(lastWcDate)) / (1000 * 60 * 60 * 24));
-        }
-        const daysUntilWc = 7 - daysSinceWc;
         if (daysUntilWc <= windowDays) {
           tasks.push({
             id: `wc-${tank.id}`,
@@ -2116,15 +2163,28 @@
         }
       }
 
-      // 3. Glass Algae Wipe & Scraping
-      let lastGlass = tank.lastGlassClean || tank.lastWaterChange || (tank.lastTest ? tank.lastTest.date : null);
-      let daysSinceGlass = 0;
-      if (lastGlass) {
-        daysSinceGlass = Math.floor((today - new Date(lastGlass)) / (1000 * 60 * 60 * 24));
+      // 3. Glass Algae Wipe & Scraping (Synchronized with Water Change)
+      let daysUntilGlass = 0;
+      if (isCycling) {
+        let lastGlass = tank.lastGlassClean || tank.startDate;
+        let daysSinceGlass = 0;
+        if (lastGlass) {
+          daysSinceGlass = Math.floor((today - new Date(lastGlass)) / (1000 * 60 * 60 * 24));
+        } else {
+          daysSinceGlass = 3;
+        }
+        daysUntilGlass = 7 - daysSinceGlass;
       } else {
-        daysSinceGlass = 3;
+        let daysSinceGlass = 999;
+        if (tank.lastGlassClean) {
+          daysSinceGlass = Math.floor((today - new Date(tank.lastGlassClean)) / (1000 * 60 * 60 * 24));
+        }
+        daysUntilGlass = daysUntilWc;
+        if (daysSinceGlass < 3 && daysUntilWc <= 1) {
+          daysUntilGlass = daysUntilWc + 7;
+        }
       }
-      const daysUntilGlass = 7 - daysSinceGlass;
+
       if (daysUntilGlass <= windowDays) {
         tasks.push({
           id: `glass-${tank.id}`,
@@ -2161,13 +2221,18 @@
         } else {
           daysSinceMedia = Math.max(0, interval - 5);
         }
-        const daysUntilMedia = interval - daysSinceMedia;
+        let daysUntilMedia = interval - daysSinceMedia;
+        // Mechanical sponge rinse aligns with water change day if within 2 days
+        if (!isCycling && m.cat === "mechanical" && Math.abs(daysUntilMedia - daysUntilWc) <= 2) {
+          daysUntilMedia = daysUntilWc;
+        }
         if (daysUntilMedia <= windowDays) {
           const verb = m.cat === "cartridge" || m.cat === "chemical" ? "Replace" : (m.cat === "biological" ? "Inspect" : "Rinse");
           const doneLabel = m.cat === "cartridge" || m.cat === "chemical" ? "✓ Replaced" : "✓ Rinsed";
           tasks.push({
             id: `media-${tank.id}-${mIdx}`,
             type: "filter",
+            mediaIdx: mIdx,
             tankId: tank.id,
             tankName: tank.name,
             title: `🧽 ${tank.name}: ${verb} ${m.name}`,
@@ -2183,16 +2248,29 @@
         }
       });
 
-      // 5. Plant Pruning & Maintenance (if tank has live plants)
+      // 5. Plant Pruning & Maintenance (Synchronized with Water Change)
       if (tank.plants && tank.plants.length > 0) {
-        let lastPlant = tank.lastPlantCare || tank.lastWaterChange || (tank.lastTest ? tank.lastTest.date : null);
-        let daysSincePlant = 0;
-        if (lastPlant) {
-          daysSincePlant = Math.floor((today - new Date(lastPlant)) / (1000 * 60 * 60 * 24));
+        let daysUntilPlant = 0;
+        if (isCycling) {
+          let lastPlant = tank.lastPlantCare || tank.startDate;
+          let daysSincePlant = 0;
+          if (lastPlant) {
+            daysSincePlant = Math.floor((today - new Date(lastPlant)) / (1000 * 60 * 60 * 24));
+          } else {
+            daysSincePlant = 3;
+          }
+          daysUntilPlant = 7 - daysSincePlant;
         } else {
-          daysSincePlant = 3;
+          let daysSincePlant = 999;
+          if (tank.lastPlantCare) {
+            daysSincePlant = Math.floor((today - new Date(tank.lastPlantCare)) / (1000 * 60 * 60 * 24));
+          }
+          daysUntilPlant = daysUntilWc;
+          if (daysSincePlant < 3 && daysUntilWc <= 1) {
+            daysUntilPlant = daysUntilWc + 7;
+          }
         }
-        const daysUntilPlant = 7 - daysSincePlant;
+
         if (daysUntilPlant <= windowDays) {
           tasks.push({
             id: `plant-${tank.id}`,
@@ -2275,12 +2353,29 @@
     function renderDashboardTasks() {
       const listEl = document.getElementById("dashboard-tasks-list");
       const badgeEl = document.getElementById("dashboard-tasks-badge");
+      const btnToday = document.getElementById("task-filter-today");
+      const btn3Days = document.getElementById("task-filter-3days");
       if (!listEl) return 0;
       listEl.innerHTML = "";
 
+      if (btnToday && btn3Days) {
+        if (dashboardTaskFilter === "today") {
+          btnToday.style.background = "rgba(0, 210, 255, 0.22)";
+          btnToday.style.color = "var(--cyan)";
+          btn3Days.style.background = "transparent";
+          btn3Days.style.color = "var(--text-muted)";
+        } else {
+          btn3Days.style.background = "rgba(0, 210, 255, 0.22)";
+          btn3Days.style.color = "var(--cyan)";
+          btnToday.style.background = "transparent";
+          btnToday.style.color = "var(--text-muted)";
+        }
+      }
+
+      const windowDays = (dashboardTaskFilter === "today") ? 0 : 3;
       const allTasks = [];
       appState.tanks.forEach(tank => {
-        const tankTasks = generateTankTasks(tank, 7);
+        const tankTasks = generateTankTasks(tank, windowDays);
         allTasks.push(...tankTasks);
       });
 
@@ -2291,22 +2386,22 @@
 
       if (badgeEl) {
         if (allTasks.length === 0) {
-          badgeEl.innerText = "All Clear";
+          badgeEl.innerText = dashboardTaskFilter === "today" ? "All Clear Today" : "All Clear (3 Days)";
           badgeEl.style.background = "rgba(0, 245, 160, 0.15)";
           badgeEl.style.color = "var(--neon-green)";
           badgeEl.style.borderColor = "var(--neon-green)";
         } else if (overdueCount > 0) {
-          badgeEl.innerText = `${overdueCount} Overdue • ${allTasks.length} in 7 Days`;
+          badgeEl.innerText = `${overdueCount} Overdue • ${allTasks.length} ${dashboardTaskFilter === 'today' ? 'Today' : 'in 3d'}`;
           badgeEl.style.background = "rgba(244, 63, 94, 0.15)";
           badgeEl.style.color = "var(--alert-red)";
           badgeEl.style.borderColor = "var(--alert-red)";
         } else if (todayCount > 0) {
-          badgeEl.innerText = `${todayCount} Due Today • ${allTasks.length} in 7 Days`;
+          badgeEl.innerText = `${todayCount} Due Today`;
           badgeEl.style.background = "rgba(245, 158, 11, 0.15)";
           badgeEl.style.color = "var(--alert-yellow)";
           badgeEl.style.borderColor = "var(--alert-yellow)";
         } else {
-          badgeEl.innerText = `${allTasks.length} in Next 7 Days`;
+          badgeEl.innerText = `${allTasks.length} in Next 3 Days`;
           badgeEl.style.background = "rgba(56, 189, 248, 0.15)";
           badgeEl.style.color = "var(--cyan)";
           badgeEl.style.borderColor = "var(--cyan)";
@@ -2314,10 +2409,13 @@
       }
 
       if (allTasks.length === 0) {
+        const emptyMsg = (dashboardTaskFilter === "today")
+          ? `✓ All maintenance is current for today. Zero tasks due.`
+          : `✓ All maintenance is current. No tasks scheduled across your aquariums in the next 3 days.`;
         listEl.innerHTML = `
-          <div style="font-size:12px; color:var(--text-muted); padding:6px 2px; display:flex; align-items:center; gap:8px;">
+          <div style="font-size:12px; color:var(--text-muted); padding:8px 2px; display:flex; align-items:center; gap:8px;">
             <span style="color:var(--neon-green); font-size:16px;">✓</span>
-            No maintenance tasks scheduled in the next 7 days.
+            ${emptyMsg}
           </div>
         `;
         return 0;
@@ -2328,20 +2426,83 @@
         if (t.isOverdue) subColor = "var(--alert-red)";
         else if (t.isToday) subColor = "var(--alert-yellow)";
 
+        const dismissBtnHtml = (t.isOverdue || t.isToday)
+          ? `<button class="btn-task-dismiss" title="Dismiss this task for this cycle" onclick="dismissTankTask(${t.tankId}, '${t.type}', ${t.mediaIdx !== undefined ? t.mediaIdx : -1})" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); color:var(--text-muted); border-radius:8px; width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px; font-weight:700; transition:all 0.15s ease;" onmouseover="this.style.color='var(--alert-red)'; this.style.borderColor='var(--alert-red)'; this.style.background='rgba(239,68,68,0.12)'" onmouseout="this.style.color='var(--text-muted)'; this.style.borderColor='rgba(255,255,255,0.14)'; this.style.background='rgba(255,255,255,0.06)'">✕</button>`
+          : ``;
+
         listEl.innerHTML += `
           <div class="task-item-row ${t.isOverdue ? 'overdue' : ''}">
             <div style="flex:1;">
               <div class="task-info-title">${t.title}</div>
               <div class="task-info-sub" style="color:${subColor}; font-weight:${t.isOverdue || t.isToday ? '600' : 'normal'};">${t.subtitle}</div>
             </div>
-            <button class="btn btn-secondary" style="width:auto; padding:5px 12px; font-size:11px; white-space:nowrap; ${t.isOverdue ? 'border-color:var(--alert-red); color:#fff;' : 'color:var(--cyan);'}" onclick="${t.actionFn}">
-              ${t.actionLabel}
-            </button>
+            <div style="display:flex; align-items:center; gap:6px;">
+              ${dismissBtnHtml}
+              <button class="btn btn-secondary" style="width:auto; padding:5px 12px; font-size:11px; white-space:nowrap; ${t.isOverdue ? 'border-color:var(--alert-red); color:#fff;' : 'color:var(--cyan);'}" onclick="${t.actionFn}">
+                ${t.actionLabel}
+              </button>
+            </div>
           </div>
         `;
       });
 
       return allTasks.length;
+    }
+
+    function dismissTankTask(tankId, taskType, mediaIdx = -1) {
+      const tank = appState.tanks.find(t => t.id == tankId);
+      if (!tank) return;
+      const today = new Date().toISOString().split("T")[0];
+      let taskName = "Task";
+
+      if (taskType === "wc") {
+        tank.lastWaterChange = today;
+        taskName = "Water change";
+        if (!tank.timeline) tank.timeline = [];
+        tank.timeline.unshift({ date: today, text: "⏭️ Skipped routine water change for this cycle" });
+      } else if (taskType === "test") {
+        if (!tank.lastTest) tank.lastTest = { nh3: 0, no2: 0, no3: 0, ph: 7.0, temp: 78 };
+        tank.lastTest.date = today;
+        taskName = "Water chemistry test";
+        if (!tank.timeline) tank.timeline = [];
+        tank.timeline.unshift({ date: today, text: "⏭️ Skipped water test for this cycle" });
+      } else if (taskType === "glass") {
+        tank.lastGlassClean = today;
+        taskName = "Glass algae wipe";
+        if (!tank.timeline) tank.timeline = [];
+        tank.timeline.unshift({ date: today, text: "⏭️ Skipped glass cleaning" });
+      } else if (taskType === "plants") {
+        tank.lastPlantCare = today;
+        taskName = "Plant pruning";
+        if (!tank.timeline) tank.timeline = [];
+        tank.timeline.unshift({ date: today, text: "⏭️ Skipped plant pruning" });
+      } else if (taskType === "impeller") {
+        tank.lastImpellerClean = today;
+        taskName = "Impeller check";
+        if (!tank.timeline) tank.timeline = [];
+        tank.timeline.unshift({ date: today, text: "⏭️ Skipped filter impeller maintenance" });
+      } else if (taskType === "heater") {
+        tank.lastHeaterCheck = today;
+        taskName = "Heater check";
+        if (!tank.timeline) tank.timeline = [];
+        tank.timeline.unshift({ date: today, text: "⏭️ Skipped heater calibration check" });
+      } else if (taskType === "filter") {
+        if (tank.filterMedia && tank.filterMedia[mediaIdx]) {
+          tank.filterMedia[mediaIdx].lastDate = today;
+          taskName = tank.filterMedia[mediaIdx].name;
+          if (!tank.timeline) tank.timeline = [];
+          tank.timeline.unshift({ date: today, text: `⏭️ Skipped maintenance for ${taskName}` });
+        }
+      }
+
+      saveDataToStorage();
+      renderDashboardTasks();
+      renderGlobalDashboard();
+      if (isInsideTank && activeTankId == tank.id) {
+        renderTankPlanTab();
+        renderTankOverviewTab();
+      }
+      showToast(`${taskName} dismissed until next cycle`);
     }
 
     function markFilterRinsedFromDashboard(tankId, mIdx) {
@@ -2705,7 +2866,7 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       }
 
       document.getElementById("tank-hub-title").innerText = tank.name;
-      document.getElementById("tank-hub-meta").innerText = `${calculateAge(tank.startDate)} • ${tank.vol} ${u.vol}`;
+      document.getElementById("tank-hub-meta").innerText = formatTankAgeLine(tank.startDate, tank.vol, u.vol);
 
       // User instruction: ONLY show badge if tank is Cycling!
       const badgeWrap = document.getElementById("tank-hub-badge-wrap");
@@ -3275,6 +3436,10 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
         if (t.isOverdue) subColor = "var(--alert-red)";
         else if (t.isToday) subColor = "var(--alert-yellow)";
 
+        const dismissBtnHtml = (t.isOverdue || t.isToday)
+          ? `<button class="btn-task-dismiss" title="Dismiss this task for this cycle" onclick="dismissTankTask(${activeTank.id}, '${t.type}', ${t.mediaIdx !== undefined ? t.mediaIdx : -1})" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); color:var(--text-muted); border-radius:8px; width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px; font-weight:700; transition:all 0.15s ease;" onmouseover="this.style.color='var(--alert-red)'; this.style.borderColor='var(--alert-red)'; this.style.background='rgba(239,68,68,0.12)'" onmouseout="this.style.color='var(--text-muted)'; this.style.borderColor='rgba(255,255,255,0.14)'; this.style.background='rgba(255,255,255,0.06)'">✕</button>`
+          : ``;
+
         const row = document.createElement("div");
         row.className = `task-item-row ${t.isOverdue ? 'overdue' : ''}`;
         row.innerHTML = `
@@ -3282,9 +3447,12 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
             <div class="task-info-title">${t.planTabTitle}</div>
             <div class="task-info-sub" style="color:${subColor}; font-weight:${t.isOverdue || t.isToday ? '600' : 'normal'};">${t.subtitle}</div>
           </div>
-          <button class="btn btn-secondary" style="width:auto; font-size:11px; padding:6px 12px; white-space:nowrap; ${t.isOverdue ? 'border-color:var(--alert-red); color:#fff;' : 'color:var(--cyan);'}">${t.actionLabel}</button>
+          <div style="display:flex; align-items:center; gap:6px;">
+            ${dismissBtnHtml}
+            <button class="btn btn-secondary" style="width:auto; font-size:11px; padding:6px 12px; white-space:nowrap; ${t.isOverdue ? 'border-color:var(--alert-red); color:#fff;' : 'color:var(--cyan);'}">${t.actionLabel}</button>
+          </div>
         `;
-        row.querySelector("button").onclick = () => {
+        row.querySelector("button.btn-secondary").onclick = () => {
           eval(t.planTabActionFn);
         };
         listEl.appendChild(row);
