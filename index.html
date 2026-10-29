@@ -246,6 +246,9 @@
       width: 100%; height: 180px; position: relative; background-size: cover; background-position: center;
       display: flex; flex-direction: column; justify-content: flex-end; padding: 16px;
     }
+    #tank-hub-banner {
+      height: 132px; padding: 14px 16px;
+    }
     .tank-banner-overlay {
       position: absolute; inset: 0; pointer-events: none;
       background: linear-gradient(180deg, rgba(4,8,18,0.08) 15%, rgba(5,10,22,0.94) 92%);
@@ -311,15 +314,34 @@
 
     /* Filter Media Progress Cards (F-16) */
     .media-card {
-      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 14px; padding: 14px; margin-bottom: 10px;
+      background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 13px; padding: 12px 14px; margin-bottom: 10px;
     }
+    .media-card:last-child { margin-bottom: 0; }
     .media-progress-bar {
-      width: 100%; height: 6px; background: rgba(255,255,255,0.08);
-      border-radius: 10px; margin: 8px 0; overflow: hidden;
+      width: 100%; height: 5px; background: rgba(255,255,255,0.08);
+      border-radius: 10px; margin: 7px 0; overflow: hidden;
     }
     .media-progress-fill {
       height: 100%; border-radius: 10px; transition: width 0.3s ease;
+    }
+
+    /* Hairline Care Plan Strip (Overview AI Card) */
+    .care-plan-strip {
+      display: grid; grid-template-columns: 1fr 1fr;
+      background: rgba(255, 255, 255, 0.025); border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 12px; margin-top: 11px; overflow: hidden;
+    }
+    .care-plan-cell {
+      padding: 9px 11px; border-right: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .care-plan-cell:last-child { border-right: none; }
+    .care-plan-lbl {
+      font-size: 9.5px; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px;
+    }
+    .care-plan-val {
+      font-size: 12px; font-weight: 600; color: #F1F5F9; line-height: 1.38;
     }
 
     /* AI Vision Photo Box (F-17) */
@@ -359,17 +381,15 @@
     .nav-tab.active svg { stroke: var(--cyan); filter: drop-shadow(0 0 6px rgba(0, 210, 255, 0.6)); }
     .nav-tab:active { transform: scale(0.92); }
 
-    /* Sub Tabs (Inside Tank Hub) */
+    /* Sub Tabs (Inside Tank Hub — 5 non-scrolling tabs) */
     .tab-bar-tank {
-      display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto;
-      background: rgba(8, 16, 32, 0.85); padding: 5px; border-radius: 16px;
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 16px;
+      background: rgba(8, 16, 32, 0.85); padding: 4px; border-radius: 15px;
       border: 1px solid rgba(56, 189, 248, 0.15);
-      scrollbar-width: none;
     }
-    .tab-bar-tank::-webkit-scrollbar { display: none; }
     .tab-btn-tank {
-      flex: 1; padding: 9px 12px; background: transparent; border: none; color: var(--text-muted);
-      font-size: 12px; font-weight: 600; border-radius: 12px; cursor: pointer; white-space: nowrap; text-align: center;
+      padding: 8px 4px; background: transparent; border: none; color: var(--text-muted);
+      font-size: 12px; font-weight: 600; border-radius: 11px; cursor: pointer; white-space: nowrap; text-align: center;
       transition: all 0.15s ease;
     }
     .tab-btn-tank.active {
@@ -808,10 +828,10 @@
 
     <!-- Contextual Tank Navigation (Shows when inside a specific tank) -->
     <div id="header-tank-nav" style="display:none; align-items:center; gap:8px;">
-      <button class="btn btn-secondary" style="width:auto; padding:6px 10px; font-size:12px;" onclick="exitTankHub()">
-        ← All Tanks
+      <button type="button" class="btn btn-secondary" style="width:auto; padding:6px 11px; font-size:12px;" onclick="exitTankHub()">
+        ← Home
       </button>
-      <span id="header-tank-title" style="font-size:14px; font-weight:700; color:#fff; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></span>
+      <select id="header-tank-switcher" class="ai-context-select" style="display:none; max-width:175px;" onchange="switchActiveTankFromHeader(this.value)" title="Switch aquarium"></select>
     </div>
 
     <div style="display:flex; align-items:center; gap:8px;">
@@ -985,7 +1005,10 @@
         <!-- MODE 2: COMPATIBILITY CHECK -->
         <div id="global-ai-compat-panel" style="display:none;">
           <div style="margin-bottom:10px;">
-            <label>Target Aquarium</label>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <label style="margin:0;">Target Aquarium</label>
+              <button type="button" id="global-ai-compat-back-btn" class="ghost-action-btn" style="display:none; padding:4px 9px; font-size:11px; color:var(--text-main);" onclick="backFromAiToTank()"></button>
+            </div>
             <select id="sandbox-tank-select" onchange="onSandboxInputChanged()"></select>
           </div>
           <div style="display:grid; grid-template-columns: 1fr 84px; gap:10px; margin-bottom:12px;">
@@ -1033,14 +1056,13 @@
         </div>
       </div>
 
-      <!-- Tank Sub-Tabs (Clean 1-word titles) -->
+      <!-- Tank Sub-Tabs (5 non-scrolling tabs) -->
       <div class="tab-bar-tank">
-        <button class="tab-btn-tank active" onclick="switchTankTab('overview', this)">Overview</button>
-        <button class="tab-btn-tank" onclick="switchTankTab('water', this)">Water</button>
-        <button class="tab-btn-tank" onclick="switchTankTab('plan', this)">Plan</button>
-        <button class="tab-btn-tank" onclick="switchTankTab('livestock', this)">Livestock</button>
-        <button class="tab-btn-tank" onclick="switchTankTab('hardware', this)">Gear</button>
-        <button class="tab-btn-tank" onclick="switchTankTab('plants', this)">Flora</button>
+        <button type="button" class="tab-btn-tank active" onclick="switchTankTab('overview', this)">Overview</button>
+        <button type="button" class="tab-btn-tank" onclick="switchTankTab('water', this)">Water</button>
+        <button type="button" class="tab-btn-tank" onclick="switchTankTab('livestock', this)">Livestock</button>
+        <button type="button" class="tab-btn-tank" onclick="switchTankTab('plants', this)">Scape</button>
+        <button type="button" class="tab-btn-tank" onclick="switchTankTab('hardware', this)">Gear</button>
       </div>
 
       <!-- TANK SUB-TAB 1: OVERVIEW -->
@@ -1048,18 +1070,26 @@
         <!-- Nitrogen Cycling Roadmap (Rendered dynamically when tank is in Cycling status) -->
         <div id="tank-cycling-roadmap-wrap"></div>
 
-        <!-- Unified Aquarist AI Ecosystem Assessment + Quick Chat Entry -->
-        <div class="card" style="background: linear-gradient(135deg, rgba(0, 245, 160, 0.07), rgba(6, 12, 24, 0.95)); border-color: rgba(0, 245, 160, 0.3);">
+        <!-- Unified Aquarist AI Ecosystem Assessment + Care Plan Strip + Quick Chat Entry -->
+        <div class="card" id="tank-ai-card" style="background: linear-gradient(135deg, rgba(0, 245, 160, 0.07), rgba(6, 12, 24, 0.95)); border-color: rgba(0, 245, 160, 0.3);">
           <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px;">
             <div style="font-size: 11px; font-weight: 800; color: var(--neon-green); text-transform: uppercase; letter-spacing: 0.8px;">
               ✦ Aquarist AI
             </div>
-            <div style="display:flex; align-items:center; gap:6px;">
-              <button type="button" id="tank-open-ai-chat-btn" class="ghost-action-btn" style="padding:3px 9px; font-size:10.5px;" onclick="openTankFocusedChat()">Open Chat</button>
-              <button type="button" class="ghost-action-btn" style="padding:3px 9px; font-size:10.5px; color:var(--text-muted);" onclick="copyTankDelta()">Copy Delta</button>
-            </div>
+            <button type="button" id="tank-open-ai-chat-btn" class="ghost-action-btn" style="padding:3px 10px; font-size:11px;" onclick="openTankFocusedChat()">Open Chat</button>
           </div>
           <div id="tank-overview-summary" style="font-size: 13.5px; line-height: 1.55; color: var(--text-main);"></div>
+
+          <div class="care-plan-strip" id="overview-care-strip">
+            <div class="care-plan-cell">
+              <div class="care-plan-lbl">Next Water Change</div>
+              <div id="action-wc-plan" class="care-plan-val"></div>
+            </div>
+            <div class="care-plan-cell">
+              <div class="care-plan-lbl">Conditioning &amp; Dosing</div>
+              <div id="action-dose-plan" class="care-plan-val"></div>
+            </div>
+          </div>
 
           <div style="margin-top:12px; padding-top:11px; border-top:1px solid rgba(255,255,255,0.07);">
             <div id="ai-vision-preview-chip" style="display:none; align-items:center; gap:8px; margin-bottom:8px; background:rgba(0,210,255,0.08); border:1px solid rgba(0,210,255,0.28); border-radius:10px; padding:6px 10px;">
@@ -1082,20 +1112,33 @@
 
         <!-- Latest Parameter Snapshot -->
         <div class="card">
-          <div class="card-header">
-            <div class="card-title">Current Water Balance</div>
-            <div style="display:flex; gap:6px;">
-              <button class="btn btn-secondary" style="width:auto; padding:5px 12px; font-size:11px; color:var(--cyan); border-color:rgba(0,210,255,0.35);" onclick="openQuickWcForActiveTank()">Log Water Change</button>
-              <button class="btn btn-secondary" style="width:auto; padding:5px 12px; font-size:11px;" onclick="openTestModalForActiveTank()">Log Chemistry</button>
+          <div class="card-header" style="gap:8px;">
+            <div>
+              <div class="card-title">Water Balance</div>
+              <div id="tank-overview-freshness" style="font-size:11px; color:var(--text-muted); margin-top:2px;"></div>
+            </div>
+            <div style="display:flex; gap:6px; flex-shrink:0;">
+              <button type="button" class="ghost-action-btn" onclick="openQuickWcForActiveTank()">+ Water Change</button>
+              <button type="button" class="ghost-action-btn" style="color:var(--neon-green); border-color:rgba(0,245,160,0.32);" onclick="openTestModalForActiveTank()">+ Test</button>
             </div>
           </div>
           <div class="param-strip" id="tank-overview-params"></div>
         </div>
 
+        <!-- Upcoming Care Checklist (Folded cleanly from Plan) -->
+        <div class="card" id="overview-tasks-card">
+          <div class="card-header" id="overview-tasks-header">
+            <div class="card-title">Upcoming Care</div>
+            <span id="overview-tasks-meta" style="font-size:11px; color:var(--text-muted); font-weight:600;">Next 7 days</span>
+          </div>
+          <div id="tank-plan-tasks-list"></div>
+        </div>
+
         <!-- Unified Activity Timeline -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Care & Activity Timeline</div>
+            <div class="card-title">Care &amp; Activity Timeline</div>
+            <button type="button" class="ghost-action-btn" onclick="openTimelineNoteModal(-1)">+ Note</button>
           </div>
           <div id="tank-overview-timeline"></div>
         </div>
@@ -1105,11 +1148,11 @@
       <div id="tanksub-water" class="tanksub-content" style="display:none;">
         <!-- Separate Water Actions -->
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:14px;">
-          <button class="btn btn-secondary" style="font-size:12px; padding:11px 12px; border-color:rgba(0,210,255,0.4); color:var(--cyan); justify-content:center;" onclick="openQuickWcForActiveTank()">
+          <button type="button" class="btn btn-secondary" style="font-size:12px; padding:11px 12px; border-color:rgba(0,210,255,0.4); color:var(--cyan); justify-content:center;" onclick="openQuickWcForActiveTank()">
             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
             Log Water Change
           </button>
-          <button class="btn btn-neon" style="font-size:12px; padding:11px 12px; justify-content:center;" onclick="openTestModalForActiveTank()">
+          <button type="button" class="btn btn-neon" style="font-size:12px; padding:11px 12px; justify-content:center;" onclick="openTestModalForActiveTank()">
             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2v6h.01L10 13v7a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2v-7l3.99-5H18V2H6z"/></svg>
             Record Chemistry Test
           </button>
@@ -1118,16 +1161,17 @@
         <!-- Visual Parameter Trend Graph (F-12) -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Multi-Week Chemistry Curves</div>
+            <div class="card-title">Chemistry Trends</div>
+            <span id="water-chart-scale-note" style="font-size:11px; color:var(--text-muted); font-weight:600;"></span>
           </div>
 
-          <div class="chart-filter-bar">
-            <button class="chart-pill-btn active" onclick="setChartFilter('all', this)">All Combined</button>
-            <button class="chart-pill-btn" onclick="setChartFilter('temp', this)">Temp</button>
-            <button class="chart-pill-btn" onclick="setChartFilter('ph', this)">pH</button>
-            <button class="chart-pill-btn" onclick="setChartFilter('nh3', this)">Ammonia (NH₃)</button>
-            <button class="chart-pill-btn" onclick="setChartFilter('no2', this)">Nitrite (NO₂)</button>
-            <button class="chart-pill-btn" onclick="setChartFilter('no3', this)">Nitrate (NO₃)</button>
+          <div class="chart-filter-bar" id="water-chart-filter-bar">
+            <button type="button" class="chart-pill-btn active" data-filter="no3" onclick="setChartFilter('no3', this)">NO₃</button>
+            <button type="button" class="chart-pill-btn" data-filter="nh3" onclick="setChartFilter('nh3', this)">NH₃</button>
+            <button type="button" class="chart-pill-btn" data-filter="no2" onclick="setChartFilter('no2', this)">NO₂</button>
+            <button type="button" class="chart-pill-btn" data-filter="ph" onclick="setChartFilter('ph', this)">pH</button>
+            <button type="button" class="chart-pill-btn" data-filter="temp" onclick="setChartFilter('temp', this)">Temp</button>
+            <button type="button" class="chart-pill-btn" data-filter="all" onclick="setChartFilter('all', this)">All</button>
           </div>
 
           <div class="chart-container">
@@ -1135,126 +1179,98 @@
           </div>
 
           <div class="chart-legend">
-            <div class="chart-legend-item"><span class="legend-dot" style="background:var(--neon-green);"></span> Temp</div>
-            <div class="chart-legend-item"><span class="legend-dot" style="background:var(--purple);"></span> pH</div>
+            <div class="chart-legend-item"><span class="legend-dot" style="background:var(--cyan);"></span> NO₃</div>
             <div class="chart-legend-item"><span class="legend-dot" style="background:var(--alert-red);"></span> NH₃</div>
             <div class="chart-legend-item"><span class="legend-dot" style="background:var(--alert-yellow);"></span> NO₂</div>
-            <div class="chart-legend-item"><span class="legend-dot" style="background:var(--cyan);"></span> NO₃</div>
-            <div class="chart-legend-item"><span>Water Change</span></div>
+            <div class="chart-legend-item"><span class="legend-dot" style="background:var(--purple);"></span> pH</div>
+            <div class="chart-legend-item"><span class="legend-dot" style="background:var(--neon-green);"></span> Temp</div>
+            <div class="chart-legend-item"><svg viewBox="0 0 12 14" width="10" height="11" fill="#38BDF8" style="display:inline-block; flex-shrink:0;"><path d="M6 1C8.8 4.4 9.5 7.2 9.5 9C9.5 10.9 7.9 12.5 6 12.5C4.1 12.5 2.5 10.9 2.5 9C2.5 7.2 3.2 4.4 6 1Z"/></svg> Water Change</div>
           </div>
         </div>
 
-        <!-- Test Log History with Edit/Delete Actions -->
+        <!-- Test & Water Change Log History -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Historical Test Logs</div>
+            <div class="card-title">Water &amp; Test History</div>
           </div>
           <div id="water-history-list"></div>
         </div>
       </div>
 
-      <!-- TANK SUB-TAB 3: PLAN (Dedicated Care Plan & Scheduled Tasks) -->
-      <div id="tanksub-plan" class="tanksub-content" style="display:none;">
-        <!-- Smart Action Card (F-15) -->
-        <div id="smart-action-card" class="action-card status-safe" style="margin-bottom:16px;">
-          <div style="font-size:11px; font-weight:800; color:var(--neon-green); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px;">
-            Aquarist AI Care Plan
-          </div>
-          <div id="action-verdict-summary" style="font-size:13.5px; line-height:1.55; color:var(--text-main); margin-bottom:12px;"></div>
-
-          <div class="action-plan-grid">
-            <div class="action-plan-box">
-              <div class="action-plan-title">Scheduled Water Change</div>
-              <div id="action-wc-plan" class="action-plan-val"></div>
-            </div>
-            <div class="action-plan-box">
-              <div class="action-plan-title">Prescribed Conditioning & Dosing</div>
-              <div id="action-dose-plan" class="action-plan-val"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Upcoming Maintenance Checklist for this tank -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">Upcoming Routine Tasks</div>
-          </div>
-          <div id="tank-plan-tasks-list"></div>
-        </div>
-      </div>
-
-      <!-- TANK SUB-TAB 4: LIVESTOCK -->
+      <!-- TANK SUB-TAB 3: LIVESTOCK -->
       <div id="tanksub-livestock" class="tanksub-content" style="display:none;">
         <div class="card">
-          <div class="card-header">
+          <div class="card-header" style="gap:8px;">
             <div class="card-title">Livestock Roster</div>
+            <button type="button" class="ghost-action-btn" onclick="openCompatibilityForActiveTank()">Check Compatibility →</button>
           </div>
           <div class="input-row">
-            <input type="text" id="tank-live-name" placeholder="Species / Fish Name (e.g. Neon Tetra)">
-            <input type="number" id="tank-live-count" placeholder="Qty" style="width:70px;" value="1">
-            <button class="btn" style="width:70px;" onclick="addTankLivestock()">Add</button>
+            <input type="text" id="tank-live-name" placeholder="Species / Fish Name (e.g. Neon Tetra)" onkeydown="if(event.key==='Enter'){event.preventDefault();addTankLivestock();}">
+            <input type="number" id="tank-live-count" placeholder="Qty" style="width:70px;" value="1" min="1" onkeydown="if(event.key==='Enter'){event.preventDefault();addTankLivestock();}">
+            <button type="button" class="btn" style="width:70px;" onclick="addTankLivestock()">Add</button>
           </div>
           <div id="tank-live-list" class="pill-list"></div>
 
           <!-- Health Event Trigger -->
-          <div style="margin-top:20px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); display:flex; justify-content:flex-end;">
-            <button class="btn btn-secondary" style="width:auto; font-size:11px; padding:6px 14px; opacity:0.9; color:var(--text-muted);" onclick="openLossModal()">
-              Record Health Event...
+          <div style="margin-top:18px; padding-top:13px; border-top:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:11.5px; color:var(--text-muted);">Track illness, treatment, or losses</span>
+            <button type="button" class="ghost-action-btn" style="color:var(--text-muted);" onclick="openLossModal()">
+              Record Health Event
             </button>
           </div>
         </div>
 
         <div id="loss-history-card" class="card" style="display:none; background:rgba(15,23,42,0.6);">
           <div class="card-header">
-            <div class="card-title" style="font-size:14px;">Health & Loss Records</div>
+            <div class="card-title" style="font-size:15px;">Health &amp; Loss Records</div>
           </div>
           <div id="loss-history-list"></div>
+        </div>
+      </div>
+
+      <!-- TANK SUB-TAB 4: SCAPE (Plants & Hardscape) -->
+      <div id="tanksub-plants" class="tanksub-content" style="display:none;">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Aquatic Flora &amp; Plants</div></div>
+          <div class="input-row">
+            <input type="text" id="tank-plant-input" placeholder="e.g. Amazon Sword, Anubias" onkeydown="if(event.key==='Enter'){event.preventDefault();addTankPlant();}">
+            <button type="button" class="btn" style="width:70px;" onclick="addTankPlant()">Add</button>
+          </div>
+          <div id="tank-plant-list" class="pill-list"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Hardscape &amp; Substrate</div></div>
+          <div class="input-row">
+            <input type="text" id="tank-decor-input" placeholder="e.g. Driftwood, Dragon Stone, Aqua Soil" onkeydown="if(event.key==='Enter'){event.preventDefault();addTankDecor();}">
+            <button type="button" class="btn" style="width:70px;" onclick="addTankDecor()">Add</button>
+          </div>
+          <div id="tank-decor-list" class="pill-list"></div>
         </div>
       </div>
 
       <!-- TANK SUB-TAB 5: GEAR (Filtration & Hardware) -->
       <div id="tanksub-hardware" class="tanksub-content" style="display:none;">
         <div class="card">
-          <div class="card-header">
+          <div class="card-header" style="gap:8px;">
             <div>
-              <div class="card-title">Filter Media & Automated Care</div>
-              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Automated rinse schedules & cartridge replacement tracking</div>
+              <div class="card-title">Filter Media &amp; Care</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Automated rinse, inspection &amp; replacement cycles</div>
             </div>
-            <button class="btn btn-secondary" style="width:auto; font-size:11px; padding:4px 10px;" onclick="openAddMediaModal()">+ Add Media</button>
+            <button type="button" class="ghost-action-btn" onclick="openAddMediaModal()">+ Add Media</button>
           </div>
           <div id="tank-media-list"></div>
         </div>
 
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Hardware, Heaters & Aeration</div>
+            <div class="card-title">Hardware, Lighting &amp; Heating</div>
           </div>
           <div class="input-row">
-            <input type="text" id="tank-equip-input" placeholder="e.g. Fluval 407, 150W Eheim Heater">
-            <button class="btn" style="width:70px;" onclick="addTankHardware()">Add</button>
+            <input type="text" id="tank-equip-input" placeholder="e.g. Fluval 407, 150W Eheim Heater" onkeydown="if(event.key==='Enter'){event.preventDefault();addTankHardware();}">
+            <button type="button" class="btn" style="width:70px;" onclick="addTankHardware()">Add</button>
           </div>
           <div id="tank-equip-list" class="pill-list"></div>
-        </div>
-      </div>
-
-      <!-- TANK SUB-TAB 6: PLANTS & DECOR -->
-      <div id="tanksub-plants" class="tanksub-content" style="display:none;">
-        <div class="card">
-          <div class="card-header"><div class="card-title">Aquatic Flora & Plants</div></div>
-          <div class="input-row">
-            <input type="text" id="tank-plant-input" placeholder="e.g. Amazon Sword, Anubias">
-            <button class="btn" style="width:70px;" onclick="addTankPlant()">Add</button>
-          </div>
-          <div id="tank-plant-list" class="pill-list"></div>
-        </div>
-
-        <div class="card">
-          <div class="card-header"><div class="card-title">Hardscape & Aquascape</div></div>
-          <div class="input-row">
-            <input type="text" id="tank-decor-input" placeholder="e.g. Driftwood, Dragon Stone">
-            <button class="btn" style="width:70px;" onclick="addTankDecor()">Add</button>
-          </div>
-          <div id="tank-decor-list" class="pill-list"></div>
         </div>
       </div>
 
@@ -1500,7 +1516,7 @@
 
       <div style="margin-bottom:12px;">
         <label>Media Name & Type</label>
-        <input type="text" id="m-media-name" placeholder="e.g. Coarse Foam Sponge, TopFin Cartridge, Purigen">
+        <input type="text" id="m-media-name" placeholder="e.g. Coarse Foam Sponge, TopFin Cartridge, Purigen" onkeydown="if(event.key==='Enter'){event.preventDefault();saveNewFilterMedia();}">
       </div>
 
       <div style="margin-bottom:14px;">
@@ -1535,7 +1551,7 @@
       <input type="hidden" id="edit-m-media-idx">
       <div style="margin-bottom:12px;">
         <label>Media Name & Type</label>
-        <input type="text" id="edit-m-media-name" placeholder="e.g. Coarse Foam Sponge, TopFin Cartridge, Purigen">
+        <input type="text" id="edit-m-media-name" placeholder="e.g. Coarse Foam Sponge, TopFin Cartridge, Purigen" onkeydown="if(event.key==='Enter'){event.preventDefault();saveEditedFilterMedia();}">
       </div>
       <div style="margin-bottom:14px;">
         <label>Media Category</label>
@@ -1568,11 +1584,11 @@
       <input type="hidden" id="edit-live-idx">
       <div style="margin-bottom:12px;">
         <label>Species Name</label>
-        <input type="text" id="edit-live-species" placeholder="e.g. Neon Tetra, Harlequin Rasbora">
+        <input type="text" id="edit-live-species" placeholder="e.g. Neon Tetra, Harlequin Rasbora" onkeydown="if(event.key==='Enter'){event.preventDefault();saveEditedLivestock();}">
       </div>
       <div style="margin-bottom:16px;">
         <label>Count / Quantity</label>
-        <input type="number" id="edit-live-count" min="1">
+        <input type="number" id="edit-live-count" min="1" onkeydown="if(event.key==='Enter'){event.preventDefault();saveEditedLivestock();}">
       </div>
       <div style="display:flex; gap:10px; margin-bottom:12px;">
         <button class="btn btn-secondary" onclick="closeModalById('editLivestockModal')">Cancel</button>
@@ -1580,6 +1596,31 @@
       </div>
       <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:10px; display:flex; justify-content:flex-end;">
         <button class="btn btn-danger" style="width:auto; font-size:11px; padding:6px 12px;" onclick="deleteActiveLivestockFromModal()">Remove from Tank</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: REUSABLE TANK ITEM & TIMELINE NOTE EDITOR ================= -->
+  <div class="modal-overlay" id="tankItemEditModal">
+    <div class="modal-box">
+      <div class="card-header" style="margin-bottom:12px;">
+        <h3 id="tank-item-modal-title" style="font-size:17px; margin:0;">Add Activity Note</h3>
+        <button type="button" class="icon-btn" style="width:28px;height:28px;" onclick="closeModalById('tankItemEditModal')">×</button>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label id="tank-item-modal-label">Note / Observation</label>
+        <input type="text" id="tank-item-modal-input" placeholder="e.g. Trimmed Rotala, spotted baby shrimp" onkeydown="if(event.key==='Enter'){event.preventDefault();saveTankItemModal();}">
+      </div>
+      <div id="tank-item-modal-date-wrap" style="display:none; margin-bottom:16px;">
+        <label>Date</label>
+        <input type="date" id="tank-item-modal-date">
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="btn btn-secondary" onclick="closeModalById('tankItemEditModal')">Cancel</button>
+        <button type="button" class="btn btn-neon" id="tank-item-modal-save-btn" onclick="saveTankItemModal()">Save</button>
+      </div>
+      <div id="tank-item-modal-delete-wrap" style="display:none; border-top:1px solid rgba(255,255,255,0.08); margin-top:12px; padding-top:10px; justify-content:flex-end;">
+        <button type="button" class="btn btn-danger" style="width:auto; font-size:11px; padding:6px 12px;" onclick="deleteFromTankItemModal()">Remove</button>
       </div>
     </div>
   </div>
@@ -1693,14 +1734,14 @@
   <div class="modal-overlay" id="quickWcModal">
     <div class="modal-box">
       <div class="card-header" style="margin-bottom:12px;">
-        <h3 style="font-size:18px;">Log Water Change</h3>
+        <h3 id="qwc-modal-title" style="font-size:18px; margin:0;">Log Water Change</h3>
         <button class="icon-btn" style="width:28px;height:28px;" onclick="closeModalById('quickWcModal')">×</button>
       </div>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">
+      <p id="qwc-modal-sub" style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">
         Record a routine water change without needing to enter water test values.
       </p>
 
-      <div style="margin-bottom:12px;">
+      <div id="qwc-tank-select-wrap" style="margin-bottom:12px;">
         <label>Aquarium</label>
         <select id="qwc-tank-select" onchange="onQuickWcTankChange()"></select>
       </div>
@@ -1739,7 +1780,7 @@
 
       <div style="display:flex; gap:10px;">
         <button class="btn btn-secondary" onclick="closeModalById('quickWcModal')">Cancel</button>
-        <button class="btn btn-neon" onclick="saveQuickWaterChange()">Log Water Change</button>
+        <button class="btn btn-neon" id="qwc-save-btn" onclick="saveQuickWaterChange()">Log Water Change</button>
       </div>
     </div>
   </div>
@@ -2751,7 +2792,8 @@
     let currentGlobalView = "dashboard"; // dashboard, closet, global-ai
     let currentTankSubtab = "overview";
     let isInsideTank = false;
-    let currentChartFilter = "all";
+    let currentChartFilter = "no3";
+    let chartFilterTankId = null;
     let activeVisionBase64 = null;
     let activeVisionDataUrl = null;
     let globalVisionBase64 = null;
@@ -2761,6 +2803,9 @@
     let globalAiThread = [];
     let tankAiThreads = {};
     let aiReturnTankId = null;
+    let aiReturnSubtab = "overview";
+    let tankItemModalState = null;
+    let editingWcHistoryIdx = -1;
     let isAiGenerating = false;
     let closetRestockOnly = false;
     let lastEvaluatedSandbox = null;
@@ -2845,6 +2890,7 @@
       currentGlobalView = viewName;
       if (!keepReturnTank || viewName !== "global-ai") {
         aiReturnTankId = null;
+        aiReturnSubtab = "overview";
       }
 
       // Update UI elements for Global Level
@@ -2874,15 +2920,45 @@
 
     function backFromAiToTank() {
       const tid = aiReturnTankId;
+      const sub = aiReturnSubtab || "overview";
       aiReturnTankId = null;
+      aiReturnSubtab = "overview";
       if (tid && appState.tanks.some(t => String(t.id) === String(tid))) {
-        enterTankHub(tid, true);
+        enterTankHub(tid, true, sub);
       } else {
         navToGlobal("dashboard", true);
       }
     }
 
-    function enterTankHub(tankId, pushHistory = true) {
+    function syncHeaderTankSwitcher() {
+      const sel = document.getElementById("header-tank-switcher");
+      if (!sel) return;
+      if (!Array.isArray(appState.tanks) || appState.tanks.length <= 1) {
+        sel.style.display = "none";
+        sel.innerHTML = "";
+        return;
+      }
+      const u = getUnitLabels();
+      sel.innerHTML = appState.tanks.map(t =>
+        `<option value="${t.id}" ${String(t.id) === String(activeTankId) ? "selected" : ""}>${escapeHtmlText(t.name)} (${displayVol(t.vol)} ${u.vol})</option>`
+      ).join("");
+      sel.value = String(activeTankId);
+      sel.style.display = "inline-block";
+    }
+
+    function switchActiveTankFromHeader(nextTankId) {
+      const target = appState.tanks.find(t => String(t.id) === String(nextTankId));
+      if (!target) return;
+      activeTankId = target.id;
+      if (String(chartFilterTankId) !== String(target.id)) {
+        currentChartFilter = target.status === "Cycling" ? "nh3" : "no3";
+        chartFilterTankId = target.id;
+      }
+      syncHeaderTankSwitcher();
+      renderTankHub();
+    }
+
+    function enterTankHub(tankId, pushHistory = true, initialTab = null) {
       closeAllModals(false);
       isInsideTank = true;
       activeTankId = tankId;
@@ -2890,10 +2966,20 @@
       const tank = getActiveTank();
       if (!tank) return;
 
+      if (String(chartFilterTankId) !== String(tank.id)) {
+        currentChartFilter = tank.status === "Cycling" ? "nh3" : "no3";
+        chartFilterTankId = tank.id;
+      }
+      if (initialTab) {
+        currentTankSubtab = initialTab === "plan" ? "overview" : initialTab;
+      } else if (currentTankSubtab === "plan") {
+        currentTankSubtab = "overview";
+      }
+
       // Header transforms to Tank View
       document.getElementById("header-brand").style.display = "none";
       document.getElementById("header-tank-nav").style.display = "flex";
-      document.getElementById("header-tank-title").innerText = tank.name;
+      syncHeaderTankSwitcher();
       document.getElementById("header-edit-tank-btn").style.display = "flex";
       document.getElementById("global-bottom-nav").style.display = "none";
 
@@ -2913,6 +2999,7 @@
     }
 
     function switchTankTab(tabName, btn) {
+      if (tabName === "plan") tabName = "overview";
       currentTankSubtab = tabName;
       document.querySelectorAll(".tab-btn-tank").forEach(b => b.classList.remove("active"));
       if (btn) {
@@ -2931,7 +3018,6 @@
 
       if (tabName === "overview") renderTankOverviewTab();
       if (tabName === "water") renderTankWaterTab();
-      if (tabName === "plan") renderTankPlanTab();
       if (tabName === "livestock") renderTankLivestockTab();
       if (tabName === "hardware") renderTankHardwareTab();
       if (tabName === "plants") renderTankPlantsTab();
@@ -3714,7 +3800,8 @@
             }
             if (h.wc) parts.push(`WC ${h.wc}%`);
             if (h.dose) parts.push(`Dose: ${h.dose}`);
-            if (h.note) parts.push(`Note: ${h.note}`);
+            const noteVal = h.notes || h.note;
+            if (noteVal) parts.push(`Note: ${noteVal}`);
             return `[${parts.join(" | ")}]`;
           }).join("; ")
         : "None recorded yet";
@@ -4185,10 +4272,7 @@
         let daysSinceMedia = 0;
         if (m.lastDate) {
           daysSinceMedia = Math.floor((today - new Date(m.lastDate)) / (1000 * 60 * 60 * 24));
-          if (daysSinceMedia > interval + 7) daysSinceMedia = interval;
-          if (m.cat === "biological" && daysSinceMedia > interval) {
-            daysSinceMedia = interval - 5;
-          }
+          if (daysSinceMedia > interval + 14) daysSinceMedia = interval + 1;
         } else {
           daysSinceMedia = Math.max(0, interval - 5);
         }
@@ -4199,7 +4283,7 @@
         }
         if (daysUntilMedia <= windowDays) {
           const verb = m.cat === "cartridge" || m.cat === "chemical" ? "Replace" : (m.cat === "biological" ? "Inspect" : "Rinse");
-          const doneLabel = m.cat === "cartridge" || m.cat === "chemical" ? "Replaced" : "Rinsed";
+          const doneLabel = m.cat === "cartridge" || m.cat === "chemical" ? "Replaced" : (m.cat === "biological" ? "Inspected" : "Rinsed");
           let mediaSub = formatTaskSubtitle(daysUntilMedia);
           if (m.cat === "cartridge" || m.cat === "chemical") {
             const spareMatch = findMatchingSpareMedia(m.name);
@@ -4477,14 +4561,22 @@
       const today = new Date().toISOString().split("T")[0];
       const media = tank.filterMedia[mIdx];
       media.lastDate = today;
-      addTankTimelineEvent(tank, `Rinsed ${media.name} (Using dechlorinated/tank water)`, today);
+      const actionVerb = (media.cat === "cartridge" || media.cat === "chemical")
+        ? "Replaced"
+        : (media.cat === "biological" ? "Inspected" : "Rinsed");
+      const detailNote = actionVerb === "Replaced"
+        ? `Replaced ${media.name}`
+        : (actionVerb === "Inspected"
+          ? `Inspected ${media.name} (Swished gently in tank water)`
+          : `Rinsed ${media.name} (Using dechlorinated/tank water)`);
+      addTankTimelineEvent(tank, detailNote, today);
       saveDataToStorage();
       renderDashboardTasks();
       if (isInsideTank && activeTankId == tank.id) {
         renderTankPlanTab();
         renderTankOverviewTab();
       }
-      showToast(`Rinsed ${media.name}!`);
+      showToast(`${actionVerb} ${media.name}`);
     }
 
     function markGlassCleaned(tankId) {
@@ -4552,45 +4644,74 @@
       showToast("Heater Check Logged");
     }
 
-    /* Decoupled Quick Water Change Engine (Recommendation 1) */
-    function openQuickWcModal(presetTankId = null) {
+    /* Decoupled Quick Water Change Engine (Supports both New & Edit WC Logs) */
+    function openQuickWcModal(presetTankId = null, editIdx = -1) {
       if (appState.tanks.length === 0) {
         showToast("Add an aquarium first");
         return;
       }
       const targetId = presetTankId || activeTankId || appState.tanks[0].id;
+      const targetTank = appState.tanks.find(t => t.id == targetId) || appState.tanks[0];
+      editingWcHistoryIdx = (editIdx >= 0 && targetTank && targetTank.history && targetTank.history[editIdx]) ? editIdx : -1;
+
       const u = getUnitLabels();
       const sel = document.getElementById("qwc-tank-select");
+      const selWrap = document.getElementById("qwc-tank-select-wrap");
+      const titleEl = document.getElementById("qwc-modal-title");
+      const saveBtn = document.getElementById("qwc-save-btn");
+
       if (sel) {
         sel.innerHTML = "";
         appState.tanks.forEach(t => {
-          sel.innerHTML += `<option value="${t.id}" ${t.id == targetId ? 'selected' : ''}>${t.name} (${displayVol(t.vol)} ${u.vol})</option>`;
+          sel.innerHTML += `<option value="${t.id}" ${t.id == targetTank.id ? 'selected' : ''}>${escapeHtmlText(t.name)} (${displayVol(t.vol)} ${u.vol})</option>`;
         });
+        sel.disabled = editingWcHistoryIdx >= 0;
+      }
+      if (selWrap) {
+        selWrap.style.opacity = editingWcHistoryIdx >= 0 ? "0.75" : "1";
       }
 
       const dateInput = document.getElementById("qwc-date-input");
-      if (dateInput) dateInput.value = new Date().toISOString().split("T")[0];
-
-      // Default to 25%
       const pctInput = document.getElementById("qwc-pct-input");
-      if (pctInput) pctInput.value = 25;
-      document.querySelectorAll(".quick-pct-btn").forEach((b, idx) => {
-        b.classList.toggle("active", idx === 2);
-      });
-
       const doseInput = document.getElementById("qwc-dose-input");
-      if (doseInput) {
-        doseInput.value = "";
-        doseInput.dataset.autoCalculated = "true";
-        doseInput.oninput = () => { doseInput.dataset.autoCalculated = "false"; };
+
+      if (editingWcHistoryIdx >= 0) {
+        const existing = targetTank.history[editingWcHistoryIdx];
+        const existingPct = parseFloat(existing.wc) || 25;
+        if (titleEl) titleEl.innerText = "Edit Water Change Log";
+        if (saveBtn) saveBtn.innerText = "Update Water Change";
+        if (dateInput) dateInput.value = existing.date || new Date().toISOString().split("T")[0];
+        if (pctInput) pctInput.value = existingPct;
+        const pctChoices = [15, 20, 25, 30, 50];
+        document.querySelectorAll(".quick-pct-btn").forEach((b, idx) => {
+          b.classList.toggle("active", pctChoices[idx] === existingPct);
+        });
+        if (doseInput) {
+          doseInput.value = existing.dose || "";
+          doseInput.dataset.autoCalculated = "false";
+          doseInput.oninput = () => { doseInput.dataset.autoCalculated = "false"; };
+        }
+      } else {
+        if (titleEl) titleEl.innerText = "Log Water Change";
+        if (saveBtn) saveBtn.innerText = "Log Water Change";
+        if (dateInput) dateInput.value = new Date().toISOString().split("T")[0];
+        if (pctInput) pctInput.value = 25;
+        document.querySelectorAll(".quick-pct-btn").forEach((b, idx) => {
+          b.classList.toggle("active", idx === 2);
+        });
+        if (doseInput) {
+          doseInput.value = "";
+          doseInput.dataset.autoCalculated = "true";
+          doseInput.oninput = () => { doseInput.dataset.autoCalculated = "false"; };
+        }
       }
 
       updateQuickWcCalculations();
       openModalById("quickWcModal");
     }
 
-    function openQuickWcForActiveTank() {
-      openQuickWcModal(activeTankId);
+    function openQuickWcForActiveTank(editIdx = -1) {
+      openQuickWcModal(activeTankId, editIdx);
     }
 
     function onQuickWcTankChange() {
@@ -4662,47 +4783,49 @@
         tank.lastWaterChange = date;
       }
 
-      // Add timeline event - sorted by record date
-      let eventText = `${pct}% Water Change (~${volAmt} ${u.vol})`;
-      if (dose) eventText += ` • Dosed: ${dose}`;
-      addTankTimelineEvent(tank, eventText, date);
-
-      // Add history record for charts & history list (strictly chronological)
-      if (!tank.history) tank.history = [];
-      const tested = hasTankBeenTested(tank);
-      if (tested) {
-        const prevTest = tank.lastTest || { nh3: 0, no2: 0, no3: 15, ph: 7.2, temp: 78 };
-        tank.history.unshift({
-          date,
-          temp: prevTest.temp,
-          nh3: prevTest.nh3,
-          no2: prevTest.no2,
-          no3: prevTest.no3,
-          ph: prevTest.ph,
-          wc: pct,
-          dose: dose || "Dechlorinator"
-        });
+      if (editingWcHistoryIdx >= 0 && tank.history && tank.history[editingWcHistoryIdx]) {
+        const entry = tank.history[editingWcHistoryIdx];
+        entry.date = date;
+        entry.wc = pct;
+        entry.dose = dose || "Dechlorinator";
+        sortRecordsByDateDesc(tank.history);
       } else {
+        // Add timeline event - sorted by record date
+        let eventText = `${pct}% Water Change (~${volAmt} ${u.vol})`;
+        if (dose) eventText += ` • Dosed: ${dose}`;
+        addTankTimelineEvent(tank, eventText, date);
+
+        // Add standalone water change record (without fabricating chemistry test readings)
+        if (!tank.history) tank.history = [];
         tank.history.unshift({
           date,
           wcOnly: true,
           wc: pct,
           dose: dose || "Dechlorinator"
         });
+        sortRecordsByDateDesc(tank.history);
+        if (!hasTankBeenTested(tank)) {
+          tank.summary = `Logged ${pct}% water change on ${date}. Record a baseline chemistry test to calibrate your care schedule.`;
+        }
       }
-      sortRecordsByDateDesc(tank.history);
 
-      tank.summary = `Last activity: ${pct}% water change on ${date}.`;
+      // Recalculate latest water change date after add or edit
+      const wcDates = (tank.history || []).filter(h => h.wc && h.wc > 0 && h.date).map(h => h.date).sort().reverse();
+      if (wcDates.length > 0) {
+        tank.lastWaterChange = wcDates[0];
+      }
+
+      const wasEdit = editingWcHistoryIdx >= 0;
+      editingWcHistoryIdx = -1;
       saveDataToStorage();
       closeModalById("quickWcModal");
-      showToast("Water Change Logged");
+      showToast(wasEdit ? "Water Change Updated" : "Water Change Logged");
 
       // Refresh screens
       renderGlobalDashboard();
       if (isInsideTank && activeTankId == tank.id) {
         renderTankOverviewTab();
         renderTankWaterTab();
-        renderTankPlanTab();
       }
     }
 
@@ -5453,14 +5576,16 @@
       const retTank = aiReturnTankId
         ? appState.tanks.find(t => String(t.id) === String(aiReturnTankId))
         : null;
-      if (backBtn) {
+      const compatBackBtn = document.getElementById("global-ai-compat-back-btn");
+      [backBtn, compatBackBtn].forEach(btn => {
+        if (!btn) return;
         if (retTank) {
-          backBtn.style.display = "inline-block";
-          backBtn.innerText = `← ${retTank.name}`;
+          btn.style.display = "inline-block";
+          btn.innerText = `← ${retTank.name}`;
         } else {
-          backBtn.style.display = "none";
+          btn.style.display = "none";
         }
-      }
+      });
 
       const savedSessions = (appState.aiSessions || []).filter(s => Array.isArray(s.messages) && s.messages.length > 0);
       if (historyBtn) {
@@ -5534,10 +5659,10 @@
           appState.tanks.forEach(t => {
             sel.innerHTML += `<option value="${t.id}">${escapeHtmlText(t.name)} (${displayVol(t.vol)} ${u.vol})</option>`;
           });
-          if (prevVal && appState.tanks.some(t => String(t.id) === String(prevVal))) {
-            sel.value = prevVal;
-          } else if (globalAiContextTankId !== "all") {
+          if (globalAiContextTankId !== "all" && appState.tanks.some(t => String(t.id) === String(globalAiContextTankId))) {
             sel.value = String(globalAiContextTankId);
+          } else if (prevVal && appState.tanks.some(t => String(t.id) === String(prevVal))) {
+            sel.value = prevVal;
           }
         }
       }
@@ -5967,6 +6092,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       const tank = getActiveTank();
       if (!tank) return;
 
+      syncHeaderTankSwitcher();
       const u = getUnitLabels();
       const clr = tank.color || "#38BDF8";
       const isCycling = tank.status === "Cycling";
@@ -5985,7 +6111,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       document.getElementById("tank-hub-title").innerText = tank.name;
       document.getElementById("tank-hub-meta").innerText = formatTankAgeLine(tank.startDate, tank.vol, u.vol);
 
-      // User instruction: ONLY show badge if tank is Cycling!
+      // Only show badge when tank is actively Cycling
       const badgeWrap = document.getElementById("tank-hub-badge-wrap");
       if (badgeWrap) {
         badgeWrap.innerHTML = isCycling ? `<span class="badge-cycling">● Cycling in Progress</span>` : ``;
@@ -5995,7 +6121,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       switchTankTab(currentTankSubtab);
     }
 
-    /* TANK SUB-TAB 1: OVERVIEW & ACTIVITY LOG */
+    /* TANK SUB-TAB 1: OVERVIEW, CARE PLAN & ACTIVITY LOG */
     function renderTankOverviewTab() {
       const tank = getActiveTank();
       if (!tank) return;
@@ -6008,12 +6134,24 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       renderCyclingRoadmap(tank);
 
       // Summary Assessment Box
-      document.getElementById("tank-overview-summary").innerText = 
-        tank.summary || (!tested
-          ? "No water chemistry test recorded yet. Log an initial test below so Aquarist AI can calibrate your care schedule."
-          : (tank.status === "Cycling" ? "Aquarium is currently cycling. Biological filtration is cultivating." : "Water parameters are balanced and in the safe zone."));
+      const summaryEl = document.getElementById("tank-overview-summary");
+      if (summaryEl) {
+        summaryEl.innerText =
+          tank.summary || (!tested
+            ? "No water chemistry test recorded yet. Log an initial test below so Aquarist AI can calibrate your care schedule."
+            : (tank.status === "Cycling" ? "Aquarium is currently cycling. Biological filtration is cultivating." : "Water parameters are balanced and in the safe zone."));
+      }
 
-      // Parameter Snapshot
+      // Care Plan Strip inside Aquarist AI card
+      renderSmartActionCard();
+
+      // Parameter Freshness & Snapshot
+      const freshnessEl = document.getElementById("tank-overview-freshness");
+      if (freshnessEl) {
+        const freshness = formatTestFreshness(tank);
+        freshnessEl.innerText = freshness.text;
+        freshnessEl.style.color = freshness.color;
+      }
       const paramContainer = document.getElementById("tank-overview-params");
       if (paramContainer) {
         paramContainer.innerHTML = buildParamGaugeInnerHtml(t, u);
@@ -6031,6 +6169,9 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         openAiBtn.innerText = hasTankChat ? "Continue Chat" : "Open Chat";
       }
 
+      // Upcoming Care Checklist (7-day window)
+      renderTankPlanTab();
+
       // Unified Timeline - Sorted strictly by record date descending (not insertion time)
       const timelineEl = document.getElementById("tank-overview-timeline");
       if (timelineEl) {
@@ -6039,7 +6180,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         sortRecordsByDateDesc(tank.timeline);
         const events = tank.timeline;
         if (events.length === 0) {
-          timelineEl.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:6px 0;">No activities recorded yet.</div>`;
+          timelineEl.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:4px 0;">No activities recorded yet. Tap "+ Note" to log an observation.</div>`;
         } else {
           const showAll = !!window.showAllTimelineEvents;
           const visibleEvents = showAll ? events : events.slice(0, 12);
@@ -6047,13 +6188,13 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
             timelineEl.innerHTML += `
               <div class="timeline-entry">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                  <div class="timeline-entry-date" style="font-weight:600; color:var(--cyan);">${e.date}</div>
+                  <div class="timeline-entry-date" style="font-weight:600; color:var(--cyan);">${escapeHtmlText(e.date)}</div>
                   <div style="display:flex; gap:8px; align-items:center;">
-                    <span style="font-size:11px; color:var(--text-muted); cursor:pointer;" onclick="editTimelineEvent(${idx})">Edit</span>
+                    <span style="font-size:11px; color:var(--text-muted); cursor:pointer;" onclick="openTimelineNoteModal(${idx})">Edit</span>
                     <span class="delete-x" onclick="deleteTimelineEvent(${idx})" title="Delete event">×</span>
                   </div>
                 </div>
-                <div>${e.text}</div>
+                <div>${escapeHtmlText(e.text)}</div>
               </div>
             `;
           });
@@ -6079,21 +6220,180 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       showToast("Activity Event Deleted");
     }
 
-    function editTimelineEvent(idx) {
-      const activeTank = getActiveTank();
-      if (!activeTank || !activeTank.timeline || !activeTank.timeline[idx]) return;
-      const current = activeTank.timeline[idx];
-      const updatedText = prompt("Edit activity log description:", current.text);
-      if (updatedText !== null && updatedText.trim()) {
-        const updatedDate = prompt("Edit activity date (YYYY-MM-DD):", current.date || new Date().toISOString().split("T")[0]);
-        current.text = updatedText.trim();
-        if (updatedDate && updatedDate.trim()) {
-          current.date = updatedDate.trim();
+    /* Native Reusable Tank Item & Timeline Note Modal (Zero Browser Prompts) */
+    function openTankItemModal(config) {
+      const titleEl = document.getElementById("tank-item-modal-title");
+      const labelEl = document.getElementById("tank-item-modal-label");
+      const inputEl = document.getElementById("tank-item-modal-input");
+      const dateWrap = document.getElementById("tank-item-modal-date-wrap");
+      const dateEl = document.getElementById("tank-item-modal-date");
+      const saveBtn = document.getElementById("tank-item-modal-save-btn");
+      const delWrap = document.getElementById("tank-item-modal-delete-wrap");
+      if (!inputEl) return;
+
+      tankItemModalState = {
+        kind: config.kind,
+        idx: config.idx !== undefined ? config.idx : -1
+      };
+
+      if (titleEl) titleEl.innerText = config.title || "Edit Item";
+      if (labelEl) labelEl.innerText = config.label || "Description";
+      inputEl.placeholder = config.placeholder || "";
+      inputEl.value = config.value || "";
+      inputEl.style.borderColor = "";
+
+      if (dateWrap && dateEl) {
+        if (config.showDate) {
+          dateWrap.style.display = "block";
+          dateEl.value = config.dateValue || new Date().toISOString().split("T")[0];
+        } else {
+          dateWrap.style.display = "none";
         }
-        sortRecordsByDateDesc(activeTank.timeline);
+      }
+
+      if (saveBtn) saveBtn.innerText = config.saveLabel || "Save Changes";
+      if (delWrap) {
+        delWrap.style.display = config.canDelete ? "flex" : "none";
+        const delBtn = delWrap.querySelector("button");
+        if (delBtn && config.deleteLabel) delBtn.innerText = config.deleteLabel;
+      }
+
+      openModalById("tankItemEditModal");
+      setTimeout(() => {
+        if (inputEl) inputEl.focus();
+      }, 40);
+    }
+
+    function openTimelineNoteModal(idx = -1) {
+      const activeTank = getActiveTank();
+      if (!activeTank) return;
+      const todayStr = new Date().toISOString().split("T")[0];
+      if (idx >= 0 && activeTank.timeline && activeTank.timeline[idx]) {
+        const current = activeTank.timeline[idx];
+        openTankItemModal({
+          kind: "timeline-edit",
+          idx,
+          title: "Edit Activity Note",
+          label: "Activity / Observation",
+          placeholder: "e.g. Trimmed Rotala, spotted baby shrimp",
+          value: current.text || "",
+          showDate: true,
+          dateValue: current.date || todayStr,
+          saveLabel: "Save Changes",
+          canDelete: true,
+          deleteLabel: "Delete Event"
+        });
+      } else {
+        openTankItemModal({
+          kind: "timeline-add",
+          idx: -1,
+          title: "Add Activity Note",
+          label: "Note / Observation",
+          placeholder: "e.g. Trimmed Rotala, spotted baby shrimp",
+          value: "",
+          showDate: true,
+          dateValue: todayStr,
+          saveLabel: "Add Note",
+          canDelete: false
+        });
+      }
+    }
+
+    function editTimelineEvent(idx) {
+      openTimelineNoteModal(idx);
+    }
+
+    function saveTankItemModal() {
+      const activeTank = getActiveTank();
+      const inputEl = document.getElementById("tank-item-modal-input");
+      const dateEl = document.getElementById("tank-item-modal-date");
+      if (!activeTank || !tankItemModalState || !inputEl) return;
+
+      const textVal = inputEl.value.trim();
+      const dateVal = (dateEl && dateEl.value) ? dateEl.value : new Date().toISOString().split("T")[0];
+      const { kind, idx } = tankItemModalState;
+
+      if (!textVal && kind !== "loss") {
+        inputEl.style.borderColor = "var(--alert-red)";
+        inputEl.focus();
+        return;
+      }
+
+      if (kind === "timeline-add") {
+        addTankTimelineEvent(activeTank, textVal, dateVal);
         saveDataToStorage();
+        closeModalById("tankItemEditModal");
         renderTankOverviewTab();
-        showToast("Activity Log Updated");
+        showToast("Note Added to Timeline");
+      } else if (kind === "timeline-edit") {
+        if (activeTank.timeline && activeTank.timeline[idx]) {
+          activeTank.timeline[idx].text = textVal;
+          activeTank.timeline[idx].date = dateVal;
+          sortRecordsByDateDesc(activeTank.timeline);
+          saveDataToStorage();
+          closeModalById("tankItemEditModal");
+          renderTankOverviewTab();
+          showToast("Activity Note Updated");
+        }
+      } else if (kind === "loss") {
+        if (activeTank.losses && activeTank.losses[idx]) {
+          activeTank.losses[idx].symptoms = textVal || "Unspecified";
+          activeTank.losses[idx].date = dateVal;
+          sortRecordsByDateDesc(activeTank.losses);
+          saveDataToStorage();
+          closeModalById("tankItemEditModal");
+          renderLossHistory();
+          renderTankOverviewTab();
+          showToast("Health Record Updated");
+        }
+      } else if (kind === "equipment") {
+        if (activeTank.equipment && activeTank.equipment[idx] !== undefined) {
+          activeTank.equipment[idx] = textVal;
+          saveDataToStorage();
+          closeModalById("tankItemEditModal");
+          renderTankHardwareTab();
+          showToast("Gear Updated");
+        }
+      } else if (kind === "plants") {
+        if (activeTank.plants && activeTank.plants[idx] !== undefined) {
+          activeTank.plants[idx] = textVal;
+          saveDataToStorage();
+          closeModalById("tankItemEditModal");
+          renderTankPlantsTab();
+          showToast("Plant Updated");
+        }
+      } else if (kind === "decor") {
+        if (activeTank.decor && activeTank.decor[idx] !== undefined) {
+          activeTank.decor[idx] = textVal;
+          saveDataToStorage();
+          closeModalById("tankItemEditModal");
+          renderTankPlantsTab();
+          showToast("Hardscape Updated");
+        }
+      }
+      tankItemModalState = null;
+    }
+
+    function deleteFromTankItemModal() {
+      const activeTank = getActiveTank();
+      if (!activeTank || !tankItemModalState) return;
+      const { kind, idx } = tankItemModalState;
+      tankItemModalState = null;
+      closeModalById("tankItemEditModal");
+
+      if (kind === "timeline-edit") {
+        deleteTimelineEvent(idx);
+      } else if (kind === "loss") {
+        deleteLossRecord(idx);
+      } else if (kind === "equipment") {
+        deleteTankHardware(idx);
+        showToast("Gear Removed");
+      } else if (kind === "plants") {
+        deleteTankPlant(idx);
+        showToast("Plant Removed");
+      } else if (kind === "decor") {
+        deleteTankDecor(idx);
+        showToast("Hardscape Removed");
       }
     }
 
@@ -6212,6 +6512,8 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       const tank = getActiveTank();
       if (!tank) return;
       tank.status = "Established";
+      currentChartFilter = "no3";
+      chartFilterTankId = tank.id;
       logTankTimelineEvent("Nitrogen cycle completed. Aquarium transitioned to Established status.");
       saveDataToStorage();
       renderTankHub();
@@ -6234,71 +6536,92 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
     /* TANK SUB-TAB 2: WATER & TRENDS */
     function renderTankWaterTab() {
       renderTrendChart();
-      renderSmartActionCard();
       renderWaterHistory();
-      const dateInput = document.getElementById("w-log-date");
-      if (dateInput && !dateInput.value) {
-        dateInput.valueAsDate = new Date();
-      }
-      updateWcVolumePreview(document.getElementById("w-log-wc").value);
     }
 
     function setChartFilter(paramName, btn) {
       currentChartFilter = paramName;
-      document.querySelectorAll(".chart-pill-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".chart-pill-btn").forEach(b => {
+        b.classList.toggle("active", b.getAttribute("data-filter") === paramName);
+      });
       if (btn) btn.classList.add("active");
       renderTrendChart();
     }
 
     function renderTrendChart() {
       const svg = document.getElementById("water-chart-svg");
+      const scaleNoteEl = document.getElementById("water-chart-scale-note");
       const activeTank = getActiveTank();
       if (!svg || !activeTank) return;
 
-      const history = sortRecordsByDateAsc((activeTank.history || []).filter(h => !h.wcOnly).slice());
+      document.querySelectorAll(".chart-pill-btn").forEach(b => {
+        b.classList.toggle("active", b.getAttribute("data-filter") === currentChartFilter);
+      });
+
+      const u = getUnitLabels();
+      const isMetric = appState.units === "metric";
+      if (scaleNoteEl) {
+        if (currentChartFilter === "all") scaleNoteEl.innerText = "Normalized ranges";
+        else if (currentChartFilter === "temp") scaleNoteEl.innerText = u.temp;
+        else if (currentChartFilter === "ph") scaleNoteEl.innerText = "pH scale";
+        else scaleNoteEl.innerText = "ppm";
+      }
+
+      const allHistory = activeTank.history || [];
+      const history = sortRecordsByDateAsc(allHistory.filter(h => !h.wcOnly).slice());
+      const wcOnlyLogs = sortRecordsByDateAsc(allHistory.filter(h => h.wcOnly && h.wc && h.wc > 0).slice());
+
       if (history.length === 0) {
         svg.innerHTML = `
-          <text x="250" y="105" text-anchor="middle" fill="#64748B" font-size="13">
-            No test data yet. Log your first test above to see curves.
+          <text x="250" y="${wcOnlyLogs.length > 0 ? 98 : 106}" text-anchor="middle" fill="#64748B" font-size="12.5">
+            No chemistry tests yet. Tap "Record Chemistry Test" above to plot curves.
           </text>
+          ${wcOnlyLogs.length > 0 ? `<text x="250" y="118" text-anchor="middle" fill="#38BDF8" font-size="11">${wcOnlyLogs.length} water change${wcOnlyLogs.length > 1 ? "s" : ""} logged below</text>` : ""}
         `;
         return;
       }
 
+      const isNormalizedAll = currentChartFilter === "all";
       const width = 500;
       const height = 210;
-      const padL = 40;
-      const padR = 20;
+      const padL = isNormalizedAll ? 38 : 40;
+      const padR = isNormalizedAll ? 68 : 22;
       const padT = 20;
       const padB = 30;
 
       const plotW = width - padL - padR;
       const plotH = height - padT - padB;
 
-      let maxY = 40;
-      let minY = 0;
-      const isMetric = appState.units === "metric";
+      const maxNo3Data = Math.max(...history.map(h => parseFloat(h.no3) || 0), 30);
+      const maxNh3Data = Math.max(...history.map(h => parseFloat(h.nh3) || 0), 2);
+      const maxNo2Data = Math.max(...history.map(h => parseFloat(h.no2) || 0), 2);
+      const tempValues = history.map(h => displayTemp(h.temp !== undefined ? h.temp : 78));
+      const phValues = history.map(h => parseFloat(h.ph !== undefined ? h.ph : 7.2) || 7.2);
 
-      if (currentChartFilter === "nh3" || currentChartFilter === "no2") {
-        maxY = 4;
-      } else if (currentChartFilter === "ph") {
-        minY = 6.0; maxY = 8.5;
-      } else if (currentChartFilter === "temp") {
-        minY = isMetric ? 18 : 65;
-        maxY = isMetric ? 31 : 86;
-      } else {
-        const maxNo3 = Math.max(...history.map(h => h.no3 || 0), 30);
-        maxY = Math.ceil(maxNo3 / 10) * 10;
-      }
+      const seriesDomains = {
+        no3: { min: 0, max: Math.max(40, Math.ceil(maxNo3Data / 10) * 10) },
+        nh3: { min: 0, max: Math.max(2, Math.ceil(maxNh3Data * 2) / 2) },
+        no2: { min: 0, max: Math.max(2, Math.ceil(maxNo2Data * 2) / 2) },
+        ph: { min: Math.min(6.0, Math.floor(Math.min(...phValues) * 2) / 2), max: Math.max(8.5, Math.ceil(Math.max(...phValues) * 2) / 2) },
+        temp: {
+          min: Math.min(isMetric ? 18 : 65, Math.floor(Math.min(...tempValues) - 1)),
+          max: Math.max(isMetric ? 31 : 86, Math.ceil(Math.max(...tempValues) + 1))
+        }
+      };
+
+      const activeDomain = seriesDomains[currentChartFilter] || seriesDomains.no3;
+      const minY = activeDomain.min;
+      const maxY = activeDomain.max;
 
       const getX = (idx) => {
         if (history.length === 1) return padL + plotW / 2;
         return padL + (idx / (history.length - 1)) * plotW;
       };
 
-      const getY = (val) => {
-        const clamped = Math.max(minY, Math.min(maxY, val));
-        return padT + plotH - ((clamped - minY) / (maxY - minY)) * plotH;
+      const getYForDomain = (val, dom) => {
+        const span = (dom.max - dom.min) || 1;
+        const clamped = Math.max(dom.min, Math.min(dom.max, val));
+        return padT + plotH - ((clamped - dom.min) / span) * plotH;
       };
 
       let svgHtml = `
@@ -6310,19 +6633,44 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         </defs>
       `;
 
-      if (currentChartFilter === "all" || currentChartFilter === "no3") {
-        const safeY1 = getY(20);
-        const safeY2 = getY(0);
-        svgHtml += `<rect x="${padL}" y="${safeY1}" width="${plotW}" height="${safeY2 - safeY1}" fill="url(#safeZoneGrad)" rx="4"/>`;
+      if (!isNormalizedAll) {
+        if (currentChartFilter === "no3") {
+          const safeY1 = getYForDomain(20, activeDomain);
+          const safeY2 = getYForDomain(0, activeDomain);
+          svgHtml += `<rect x="${padL}" y="${safeY1}" width="${plotW}" height="${Math.max(0, safeY2 - safeY1)}" fill="url(#safeZoneGrad)" rx="4"/>`;
+        } else if (currentChartFilter === "ph") {
+          const safeY1 = getYForDomain(7.8, activeDomain);
+          const safeY2 = getYForDomain(6.5, activeDomain);
+          svgHtml += `<rect x="${padL}" y="${safeY1}" width="${plotW}" height="${Math.max(0, safeY2 - safeY1)}" fill="url(#safeZoneGrad)" rx="4"/>`;
+        } else if (currentChartFilter === "temp") {
+          const safeY1 = getYForDomain(isMetric ? 27 : 80, activeDomain);
+          const safeY2 = getYForDomain(isMetric ? 23 : 74, activeDomain);
+          svgHtml += `<rect x="${padL}" y="${safeY1}" width="${plotW}" height="${Math.max(0, safeY2 - safeY1)}" fill="url(#safeZoneGrad)" rx="4"/>`;
+        }
       }
 
-      for (let i = 0; i <= 4; i++) {
-        const val = minY + (i / 4) * (maxY - minY);
-        const y = padT + plotH - (i / 4) * plotH;
-        svgHtml += `
-          <line x1="${padL}" y1="${y}" x2="${width - padR}" y2="${y}" stroke="rgba(255,255,255,0.08)" stroke-dasharray="3 3"/>
-          <text x="${padL - 8}" y="${y + 4}" fill="#64748B" font-size="9" text-anchor="end">${Math.round(val * 10) / 10}</text>
-        `;
+      if (isNormalizedAll) {
+        const normTicks = [
+          { ratio: 0, label: "Low" },
+          { ratio: 0.5, label: "Mid" },
+          { ratio: 1, label: "High" }
+        ];
+        normTicks.forEach(tk => {
+          const y = padT + plotH - tk.ratio * plotH;
+          svgHtml += `
+            <line x1="${padL}" y1="${y}" x2="${width - padR}" y2="${y}" stroke="rgba(255,255,255,0.08)" stroke-dasharray="3 3"/>
+            <text x="${padL - 7}" y="${y + 3.5}" fill="#64748B" font-size="8.5" text-anchor="end">${tk.label}</text>
+          `;
+        });
+      } else {
+        for (let i = 0; i <= 4; i++) {
+          const val = minY + (i / 4) * (maxY - minY);
+          const y = padT + plotH - (i / 4) * plotH;
+          svgHtml += `
+            <line x1="${padL}" y1="${y}" x2="${width - padR}" y2="${y}" stroke="rgba(255,255,255,0.08)" stroke-dasharray="3 3"/>
+            <text x="${padL - 8}" y="${y + 4}" fill="#64748B" font-size="9" text-anchor="end">${Math.round(val * 100) / 100}</text>
+          `;
+        }
       }
 
       const seriesList = [
@@ -6333,43 +6681,103 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         { key: "temp", label: "Temp", color: "var(--neon-green)", filter: "temp" }
       ];
 
-      seriesList.forEach(series => {
-        if (currentChartFilter !== "all" && currentChartFilter !== series.filter) return;
+      const endLabels = [];
 
-        let points = [];
-        history.forEach((h, idx) => {
-          const rawVal = (h[series.key] !== undefined) ? h[series.key] : 0;
-          const val = series.key === "temp" ? displayTemp(rawVal) : rawVal;
+      seriesList.forEach(series => {
+        if (!isNormalizedAll && currentChartFilter !== series.filter) return;
+        const dom = isNormalizedAll ? seriesDomains[series.key] : activeDomain;
+
+        const coords = history.map((h, idx) => {
+          const rawVal = (h[series.key] !== undefined) ? parseFloat(h[series.key]) || 0 : 0;
+          const val = series.key === "temp" ? displayTemp(h.temp !== undefined ? h.temp : 78) : rawVal;
           const x = getX(idx);
-          const y = getY(val);
-          points.push(`${x},${y}`);
+          const y = getYForDomain(val, dom);
+          return { x, y, val };
         });
 
-        if (points.length > 1) {
-          svgHtml += `<polyline points="${points.join(" ")}" fill="none" stroke="${series.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+        if (coords.length > 1) {
+          svgHtml += `<polyline points="${coords.map(c => `${c.x},${c.y}`).join(" ")}" fill="none" stroke="${series.color}" stroke-width="${isNormalizedAll ? 2 : 2.5}" stroke-linecap="round" stroke-linejoin="round"/>`;
         }
 
-        history.forEach((h, idx) => {
-          const rawVal = (h[series.key] !== undefined) ? h[series.key] : 0;
-          const val = series.key === "temp" ? displayTemp(rawVal) : rawVal;
-          const x = getX(idx);
-          const y = getY(val);
-          svgHtml += `<circle cx="${x}" cy="${y}" r="4" fill="#0B1324" stroke="${series.color}" stroke-width="2"/>`;
+        coords.forEach(c => {
+          svgHtml += `<circle cx="${c.x}" cy="${c.y}" r="${isNormalizedAll ? 3.3 : 4}" fill="#0B1324" stroke="${series.color}" stroke-width="2"/>`;
         });
+
+        if (isNormalizedAll && coords.length > 0) {
+          const lastPt = coords[coords.length - 1];
+          const formattedVal = series.key === "temp" ? `${lastPt.val}${u.temp}` : `${lastPt.val}`;
+          endLabels.push({
+            y: lastPt.y,
+            color: series.color,
+            text: `${series.label} ${formattedVal}`
+          });
+        }
       });
 
+      if (isNormalizedAll && endLabels.length > 0) {
+        endLabels.sort((a, b) => a.y - b.y);
+        const minGap = 11;
+        for (let i = 1; i < endLabels.length; i++) {
+          if (endLabels[i].y - endLabels[i - 1].y < minGap) {
+            endLabels[i].y = endLabels[i - 1].y + minGap;
+          }
+        }
+        const maxBottom = padT + plotH + 4;
+        if (endLabels[endLabels.length - 1].y > maxBottom) {
+          endLabels[endLabels.length - 1].y = maxBottom;
+          for (let i = endLabels.length - 2; i >= 0; i--) {
+            if (endLabels[i + 1].y - endLabels[i].y < minGap) {
+              endLabels[i].y = Math.max(padT - 2, endLabels[i + 1].y - minGap);
+            }
+          }
+        }
+        const labelX = (history.length === 1 ? getX(0) : (padL + plotW)) + 7;
+        endLabels.forEach(lbl => {
+          svgHtml += `<text x="${labelX}" y="${lbl.y + 3}" fill="${lbl.color}" font-size="8.5" font-weight="700">${escapeHtmlText(lbl.text)}</text>`;
+        });
+      }
+
+      // Render water change droplets (both combined and standalone wcOnly logs)
+      const dropletXs = [];
       history.forEach((h, idx) => {
         if (h.wc && h.wc > 0) {
-          const x = getX(idx);
-          svgHtml += `
-            <g transform="translate(${x}, ${height - 18})">
-              <path d="M0 -5 C2.5 -2, 3 0.5, 3 2 C3 3.7, 1.7 5, 0 5 C-1.7 5, -3 3.7, -3 2 C-3 0.5, -2.5 -2, 0 -5 Z" fill="#38BDF8"/>
-            </g>
-          `;
+          dropletXs.push(getX(idx));
         }
+      });
+      if (wcOnlyLogs.length > 0) {
+        const firstTs = parseRecordTimestamp(history[0].date);
+        const lastTs = parseRecordTimestamp(history[history.length - 1].date);
+        wcOnlyLogs.forEach(w => {
+          const wTs = parseRecordTimestamp(w.date);
+          let wx = padL + plotW;
+          if (history.length === 1 || lastTs <= firstTs) {
+            wx = wTs < firstTs ? padL + plotW * 0.25 : (wTs > firstTs ? padL + plotW * 0.75 : getX(0));
+          } else if (wTs <= firstTs) {
+            wx = padL;
+          } else if (wTs >= lastTs) {
+            wx = padL + plotW;
+          } else {
+            wx = padL + ((wTs - firstTs) / (lastTs - firstTs)) * plotW;
+          }
+          if (!dropletXs.some(existingX => Math.abs(existingX - wx) < 5)) {
+            dropletXs.push(wx);
+          }
+        });
+      }
+      dropletXs.forEach(dx => {
+        svgHtml += `
+          <g transform="translate(${dx}, ${height - 19})">
+            <path d="M0 -5 C2.5 -2, 3 0.5, 3 2 C3 3.7, 1.7 5, 0 5 C-1.7 5, -3 3.7, -3 2 C-3 0.5, -2.5 -2, 0 -5 Z" fill="#38BDF8"/>
+          </g>
+        `;
+      });
+
+      const labelStep = history.length > 7 ? Math.ceil(history.length / 6) : 1;
+      history.forEach((h, idx) => {
+        if (idx % labelStep !== 0 && idx !== history.length - 1) return;
         const dateShort = h.date ? h.date.substring(5) : "";
         svgHtml += `
-          <text x="${getX(idx)}" y="${height - 8}" fill="#94A3B8" font-size="9" text-anchor="middle">${dateShort}</text>
+          <text x="${getX(idx)}" y="${height - 7}" fill="#94A3B8" font-size="9" text-anchor="middle">${escapeHtmlText(dateShort)}</text>
         `;
       });
 
@@ -6378,19 +6786,40 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
 
     function renderSmartActionCard() {
       const activeTank = getActiveTank();
-      const card = document.getElementById("smart-action-card");
-      const summary = document.getElementById("action-verdict-summary");
+      const aiCard = document.getElementById("tank-ai-card");
       const wcPlan = document.getElementById("action-wc-plan");
       const dosePlan = document.getElementById("action-dose-plan");
-      if (!card || !activeTank) return;
+      if (!activeTank || !wcPlan || !dosePlan) return;
+
+      const u = getUnitLabels();
+      const tested = hasTankBeenTested(activeTank);
+
+      if (!tested) {
+        if (aiCard) {
+          aiCard.style.borderColor = "rgba(0, 245, 160, 0.28)";
+        }
+        wcPlan.innerHTML = `Baseline Test Pending<br><span style="font-size:11px; color:var(--text-muted); font-weight:normal;">Record test to calibrate schedule</span>`;
+        const refGal = activeTank.vol * 0.25;
+        const condRec = findBestConditioner(refGal, false, activeTank.vol);
+        const bacRec = activeTank.status === "Cycling" ? findBestBacteria(activeTank.vol, true) : { found: false };
+        const doseParts = [`25% WC (${displayVol(refGal)} ${u.vol}): ${escapeHtmlText(condRec.shortDose)}`];
+        if (bacRec.found) doseParts.push(escapeHtmlText(bacRec.doseText));
+        dosePlan.innerHTML = doseParts.join(" • ");
+        return;
+      }
 
       const analysis = analyzeTankWaterParameters(activeTank);
       if (!analysis) return;
-      const u = getUnitLabels();
 
-      let statusClass = "status-safe";
-      if (analysis.status === "danger") statusClass = "status-alert";
-      else if (analysis.status === "warning" || analysis.status === "caution" || analysis.status === "cycling") statusClass = "status-caution";
+      if (aiCard) {
+        if (analysis.status === "danger") {
+          aiCard.style.borderColor = "rgba(239, 68, 68, 0.48)";
+        } else if (analysis.status === "warning" || analysis.status === "caution" || analysis.status === "cycling") {
+          aiCard.style.borderColor = "rgba(245, 158, 11, 0.38)";
+        } else {
+          aiCard.style.borderColor = "rgba(0, 245, 160, 0.3)";
+        }
+      }
 
       let nextWcText = "";
       if (analysis.wcNeeded) {
@@ -6399,16 +6828,14 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         nextWcText = `${when}<br><span style="font-size:11px; color:${color}; font-weight:normal;">${analysis.wcPercent}% (${analysis.wcGallons} ${u.vol})</span>`;
       } else {
         if (activeTank.status === "Cycling") {
-          nextWcText = `Only if NH₃ > 2.0 ppm<br><span style="font-size:11px; color:var(--text-muted);">Protect bacteria colonization</span>`;
+          nextWcText = `Only if NH₃ &gt; 2.0 ppm<br><span style="font-size:11px; color:var(--text-muted); font-weight:normal;">Protect bacteria colonization</span>`;
         } else {
           nextWcText = `Not Needed This Week<br><span style="font-size:11px; color:var(--neon-green); font-weight:normal;">Nitrates safe (NO₃ &lt; 20 ppm)</span>`;
         }
       }
 
-      card.className = `action-card ${statusClass}`;
-      summary.innerHTML = analysis.aiAdvice;
       wcPlan.innerHTML = nextWcText;
-      dosePlan.innerHTML = analysis.doseAdvice;
+      dosePlan.innerHTML = escapeHtmlText(analysis.doseAdvice);
     }
 
     function openTestModalForTank(tankId, editIdx = -1) {
@@ -6440,7 +6867,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         document.getElementById("m-test-nh3").value = item.nh3 !== undefined ? item.nh3 : 0;
         document.getElementById("m-test-no2").value = item.no2 !== undefined ? item.no2 : 0;
         document.getElementById("m-test-no3").value = item.no3 !== undefined ? item.no3 : 10;
-        document.getElementById("m-test-notes").value = item.notes || "";
+        document.getElementById("m-test-notes").value = item.notes || item.note || "";
       } else {
         if (modalTitle) modalTitle.innerText = "Record Water Chemistry Test";
         if (modalBtn) modalBtn.innerText = "Analyze & Save Test";
@@ -6482,6 +6909,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       if (editIdx >= 0 && targetTank.history && targetTank.history[editIdx]) {
         const existing = targetTank.history[editIdx];
         delete existing.wcOnly;
+        delete existing.note;
         existing.date = date;
         existing.temp = temp;
         existing.ph = ph;
@@ -6530,7 +6958,6 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       if (isInsideTank && activeTankId == targetTank.id) {
         renderTankWaterTab();
         renderTankOverviewTab();
-        renderTankPlanTab();
       }
       renderDashboardTasks();
       renderGlobalDashboard();
@@ -6560,10 +6987,12 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       } else {
         activeTank.lastTest = null;
       }
+      const wcDates = activeTank.history.filter(h => h.wc && h.wc > 0 && h.date).map(h => h.date).sort().reverse();
+      activeTank.lastWaterChange = wcDates.length > 0 ? wcDates[0] : undefined;
       saveDataToStorage();
       renderTankWaterTab();
       renderTankOverviewTab();
-      renderTankPlanTab();
+      renderDashboardTasks();
       showToast("Log Deleted");
     }
 
@@ -6578,7 +7007,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       }
       const history = activeTank.history || [];
       if (history.length === 0) {
-        list.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:10px 0;">No tests recorded yet. Tap "Record Chemistry Test" above to log readings.</div>`;
+        list.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:6px 0;">No water changes or chemistry tests recorded yet.</div>`;
         return;
       }
 
@@ -6586,32 +7015,75 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       history.forEach((h, idx) => {
         const item = document.createElement("div");
         item.style.padding = "10px 0";
-        item.style.borderBottom = "1px solid rgba(255,255,255,0.06)";
+        item.style.borderBottom = idx < history.length - 1 ? "1px solid rgba(255,255,255,0.06)" : "none";
         item.style.fontSize = "13px";
-        const bodyLine = h.wcOnly
-          ? `<div style="font-size:12px; color:var(--text-muted); margin-bottom:2px;">Water change logged prior to baseline chemistry test</div>`
-          : `<div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-              <span>Temp: <b>${displayTemp(h.temp ?? 78)}${u.temp}</b> • pH: <b>${h.ph}</b> • NH₃: <b>${h.nh3}</b> • NO₂: <b>${h.no2}</b> • NO₃: <b>${h.no3}</b></span>
-            </div>`;
+
+        const noteText = h.notes || h.note || "";
+        const editCall = h.wcOnly ? `openQuickWcForActiveTank(${idx})` : `openTestModalForActiveTank(${idx})`;
+
+        let bodyHtml = "";
+        if (h.wcOnly) {
+          const pctNum = parseFloat(h.wc) || 0;
+          const approxVol = displayVol(activeTank.vol * (pctNum / 100));
+          bodyHtml = `
+            <div style="color:var(--cyan); font-size:12.5px;">
+              Water Change: <b>${escapeHtmlText(pctNum)}%</b> <span style="color:var(--text-muted);">(${approxVol} ${u.vol})</span>${h.dose ? ` • Dosed: <b style="color:var(--text-main);">${escapeHtmlText(h.dose)}</b>` : ""}
+            </div>
+            ${noteText ? `<div style="font-size:11px; color:var(--text-muted); margin-top:3px;">${escapeHtmlText(noteText)}</div>` : ""}
+          `;
+        } else {
+          bodyHtml = `
+            <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
+              <span>Temp: <b>${displayTemp(h.temp ?? 78)}${u.temp}</b> • pH: <b>${escapeHtmlText(h.ph)}</b> • NH₃: <b>${escapeHtmlText(h.nh3)}</b> • NO₂: <b>${escapeHtmlText(h.no2)}</b> • NO₃: <b>${escapeHtmlText(h.no3)}</b></span>
+            </div>
+            ${noteText ? `<div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${escapeHtmlText(noteText)}</div>` : ""}
+            ${h.wc ? `<div style="font-size:11px; color:var(--cyan); margin-top:2px;">Water Change: ${escapeHtmlText(h.wc)}%${h.dose ? ` • Dosed: ${escapeHtmlText(h.dose)}` : ""}</div>` : ""}
+          `;
+        }
+
         item.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-            <span style="font-size:11px; color:var(--text-muted);">${h.date}</span>
+            <span style="font-size:11px; color:var(--text-muted); font-weight:600;">${escapeHtmlText(h.date)}</span>
             <div style="display:flex; gap:8px; align-items:center;">
-              <span style="font-size:11px; color:var(--cyan); cursor:pointer;" onclick="openTestModalForActiveTank(${idx})">Edit</span>
+              <span style="font-size:11px; color:var(--cyan); cursor:pointer;" onclick="${editCall}">Edit</span>
               <span class="delete-x" onclick="deleteWaterLog(${idx})" title="Delete this log">×</span>
             </div>
           </div>
-          ${bodyLine}
-          ${h.notes ? `<div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${h.notes}</div>` : ''}
-          ${h.wc ? `<div style="font-size:11px; color:var(--cyan); margin-top:2px;">Water Change: ${h.wc}% ${h.dose ? `• Dosed: ${h.dose}` : ''}</div>` : ''}
+          ${bodyHtml}
         `;
         list.appendChild(item);
       });
     }
 
-    /* Dedicated Plan Tab Renderer */
+    /* Safe Task Action Dispatcher & Overview Care Checklist Renderer */
+    function executeTankTaskAction(t) {
+      if (!t) return;
+      if (t.type === "test") {
+        openTestModalForTank(t.tankId);
+      } else if (t.type === "wc") {
+        openQuickWcModal(t.tankId);
+      } else if (t.type === "glass") {
+        markGlassCleaned(t.tankId);
+      } else if (t.type === "filter") {
+        if (isInsideTank && String(activeTankId) === String(t.tankId)) {
+          resetMediaTimer(t.mediaIdx);
+        } else {
+          markFilterRinsedFromDashboard(t.tankId, t.mediaIdx);
+        }
+      } else if (t.type === "plants") {
+        markPlantCareDone(t.tankId);
+      } else if (t.type === "impeller") {
+        markImpellerCleaned(t.tankId);
+      } else if (t.type === "heater") {
+        markHeaterChecked(t.tankId);
+      }
+    }
+
     function renderTankPlanTab() {
       renderSmartActionCard();
+      const tasksCard = document.getElementById("overview-tasks-card");
+      const tasksHeader = document.getElementById("overview-tasks-header");
+      const tasksMeta = document.getElementById("overview-tasks-meta");
       const listEl = document.getElementById("tank-plan-tasks-list");
       if (!listEl) return;
       listEl.innerHTML = "";
@@ -6622,40 +7094,50 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       const tasks = generateTankTasks(activeTank, 7);
 
       if (tasks.length === 0) {
+        if (tasksCard) tasksCard.style.padding = "12px 16px";
+        if (tasksHeader) tasksHeader.style.marginBottom = "6px";
+        if (tasksMeta) tasksMeta.innerText = "All caught up";
         listEl.innerHTML = `
-          <div style="font-size:12px; color:var(--text-muted); padding:10px 0;">
-            All maintenance is current. No tasks scheduled for this aquarium in the next 7 days.
+          <div style="font-size:12px; color:var(--text-muted); padding:2px 0 0;">
+            All maintenance is current for the next 7 days.
           </div>
         `;
         return;
       }
 
-      tasks.forEach(t => {
+      if (tasksCard) tasksCard.style.padding = "16px 18px";
+      if (tasksHeader) tasksHeader.style.marginBottom = "10px";
+      if (tasksMeta) tasksMeta.innerText = `${tasks.length} scheduled · 7d`;
+
+      tasks.forEach((t, tIdx) => {
         let subColor = "var(--text-muted)";
         if (t.isOverdue) subColor = "var(--alert-red)";
         else if (t.isToday) subColor = "var(--alert-yellow)";
 
         const dismissBtnHtml = (t.isOverdue || t.isToday)
-          ? `<button class="btn-task-dismiss" title="Dismiss this task for this cycle" onclick="dismissTankTask(${activeTank.id}, '${t.type}', ${t.mediaIdx !== undefined ? t.mediaIdx : -1})" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); color:var(--text-muted); border-radius:8px; width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px; font-weight:700; transition:all 0.15s ease;" onmouseover="this.style.color='var(--alert-red)'; this.style.borderColor='var(--alert-red)'; this.style.background='rgba(239,68,68,0.12)'" onmouseout="this.style.color='var(--text-muted)'; this.style.borderColor='rgba(255,255,255,0.14)'; this.style.background='rgba(255,255,255,0.06)'">✕</button>`
+          ? `<button type="button" class="btn-task-dismiss" title="Dismiss this task for this cycle" onclick="dismissTankTask(${activeTank.id}, '${t.type}', ${t.mediaIdx !== undefined ? t.mediaIdx : -1})" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); color:var(--text-muted); border-radius:8px; width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px; font-weight:700; transition:all 0.15s ease;">×</button>`
           : ``;
 
-        const row = document.createElement("div");
-        row.className = `task-item-row ${t.isOverdue ? 'overdue' : ''}`;
-        row.innerHTML = `
-          <div style="flex:1;">
-            <div class="task-info-title">${t.planTabTitle}</div>
-            <div class="task-info-sub" style="color:${subColor}; font-weight:${t.isOverdue || t.isToday ? '600' : 'normal'};">${t.subtitle}</div>
-          </div>
-          <div style="display:flex; align-items:center; gap:6px;">
-            ${dismissBtnHtml}
-            <button class="btn btn-secondary" style="width:auto; font-size:11px; padding:6px 12px; white-space:nowrap; ${t.isOverdue ? 'border-color:var(--alert-red); color:#fff;' : 'color:var(--cyan);'}">${t.actionLabel}</button>
+        listEl.innerHTML += `
+          <div class="task-item-row ${t.isOverdue ? 'overdue' : ''}">
+            <div style="flex:1;">
+              <div class="task-info-title">${escapeHtmlText(t.planTabTitle)}</div>
+              <div class="task-info-sub" style="color:${subColor}; font-weight:${t.isOverdue || t.isToday ? '600' : 'normal'};">${escapeHtmlText(t.subtitle)}</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              ${dismissBtnHtml}
+              <button type="button" class="btn btn-secondary task-run-btn" style="width:auto; font-size:11px; padding:6px 12px; white-space:nowrap; ${t.isOverdue ? 'border-color:var(--alert-red); color:#fff;' : 'color:var(--cyan);'}" onclick="dispatchTankPlanTask(${tIdx})">${escapeHtmlText(t.actionLabel)}</button>
+            </div>
           </div>
         `;
-        row.querySelector("button.btn-secondary").onclick = () => {
-          eval(t.planTabActionFn);
-        };
-        listEl.appendChild(row);
       });
+      window.__currentPlanTasks = tasks;
+    }
+
+    function dispatchTankPlanTask(idx) {
+      if (!Array.isArray(window.__currentPlanTasks)) return;
+      const t = window.__currentPlanTasks[idx];
+      if (t) executeTankTaskAction(t);
     }
 
     /* TANK SUB-TAB 3: LIVESTOCK */
@@ -6708,18 +7190,18 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       losses.forEach((l, idx) => {
         const item = document.createElement("div");
         item.style.padding = "10px 0";
-        item.style.borderBottom = "1px solid rgba(255,255,255,0.06)";
+        item.style.borderBottom = idx < losses.length - 1 ? "1px solid rgba(255,255,255,0.06)" : "none";
         item.style.fontSize = "12.5px";
         item.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:11px; color:var(--text-muted);">${l.date}</span>
+            <span style="font-size:11px; color:var(--text-muted);">${escapeHtmlText(l.date)}</span>
             <div style="display:flex; gap:8px; align-items:center;">
               <span style="font-size:11px; color:var(--cyan); cursor:pointer;" onclick="editLossRecordPrompt(${idx})">Edit</span>
               <span class="delete-x" onclick="deleteLossRecord(${idx})" title="Delete record">×</span>
             </div>
           </div>
           <div style="color:var(--text-main); font-weight:600; margin-top:2px;">
-            ${l.qty || 1}x ${l.species}
+            ${escapeHtmlText(l.qty || 1)}x ${escapeHtmlText(l.species)}
           </div>
           <div style="font-size:11px; color:var(--alert-yellow); margin-top:2px;">
             Symptoms: ${escapeHtmlText(l.symptoms || "Unspecified")}
@@ -6744,17 +7226,22 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       const activeTank = getActiveTank();
       if (!activeTank || !activeTank.losses || !activeTank.losses[idx]) return;
       const l = activeTank.losses[idx];
-      const newSym = prompt("Update symptoms / clinical notes for " + l.species + ":", l.symptoms || "");
-      if (newSym !== null) {
-        l.symptoms = newSym.trim();
-        saveDataToStorage();
-        renderLossHistory();
-        renderTankOverviewTab();
-        showToast("Health Record Updated");
-      }
+      openTankItemModal({
+        kind: "loss",
+        idx,
+        title: `Edit Health Record (${l.species || "Fauna"})`,
+        label: "Symptoms / Clinical Notes",
+        placeholder: "e.g. Clamped fins, treated with Aquarium Salt",
+        value: l.symptoms || "",
+        showDate: true,
+        dateValue: l.date || new Date().toISOString().split("T")[0],
+        saveLabel: "Save Changes",
+        canDelete: true,
+        deleteLabel: "Delete Record"
+      });
     }
 
-    /* TANK SUB-TAB 4: HARDWARE & FILTERS */
+    /* TANK SUB-TAB 5: GEAR (Filtration & Hardware) */
     function renderTankHardwareTab() {
       const activeTank = getActiveTank();
       if (!activeTank) return;
@@ -6800,7 +7287,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       mediaItems.forEach((m, idx) => {
         const last = m.lastDate ? new Date(m.lastDate) : today;
         const diffDays = Math.floor((today - last) / (1000 * 60 * 60 * 24));
-        const interval = m.interval || 21;
+        const interval = m.interval || (m.cat === "biological" ? 90 : (m.cat === "chemical" ? 60 : (m.cat === "cartridge" ? 28 : 21)));
 
         let statusText = "";
         let fillPct = 100;
@@ -6808,15 +7295,24 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         let actionBtnText = "Log Rinsed";
 
         if (m.cat === "biological") {
-          statusText = "Permanent Biological Filter • 90d inspection";
-          fillPct = 100;
-          barColor = "var(--neon-green)";
+          const daysLeft = interval - diffDays;
+          fillPct = Math.max(8, Math.min(100, Math.round((daysLeft / interval) * 100)));
+          if (daysLeft < 0) {
+            statusText = `Inspection overdue by ${Math.abs(daysLeft)} days • Swish gently in tank water (never replace)`;
+            barColor = "var(--alert-yellow)";
+          } else if (daysLeft <= 10) {
+            statusText = `Permanent Bio-Media • Gentle inspection in ${daysLeft} days`;
+            barColor = "var(--alert-yellow)";
+          } else {
+            statusText = `Permanent Bio-Media • Inspect in ${daysLeft} days (90-day cycle)`;
+            barColor = "var(--neon-green)";
+          }
           actionBtnText = "Log Inspected";
         } else if (m.cat === "cartridge") {
           const daysLeft = interval - diffDays;
           fillPct = Math.max(5, Math.min(100, Math.round(((interval - diffDays) / interval) * 100)));
           if (daysLeft < 0) {
-            statusText = `Exhausted • Overdue by ${Math.abs(daysLeft)} days!`;
+            statusText = `Exhausted • Overdue by ${Math.abs(daysLeft)} days`;
             barColor = "var(--alert-red)";
           } else if (daysLeft <= 5) {
             statusText = `Replace cartridge in ${daysLeft} days`;
@@ -6830,7 +7326,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
           const daysLeft = interval - diffDays;
           fillPct = Math.max(5, Math.min(100, Math.round(((interval - diffDays) / interval) * 100)));
           if (daysLeft < 0) {
-            statusText = `Exhausted • Overdue by ${Math.abs(daysLeft)} days!`;
+            statusText = `Exhausted • Overdue by ${Math.abs(daysLeft)} days`;
             barColor = "var(--alert-red)";
           } else if (daysLeft <= 7) {
             statusText = `Replace / Recharge in ${daysLeft} days`;
@@ -6845,13 +7341,13 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
           const daysLeft = interval - diffDays;
           fillPct = Math.max(5, Math.min(100, Math.round(((interval - diffDays) / interval) * 100)));
           if (daysLeft < 0) {
-            statusText = `Rinse Overdue by ${Math.abs(daysLeft)} days!`;
+            statusText = `Rinse overdue by ${Math.abs(daysLeft)} days`;
             barColor = "var(--alert-red)";
           } else if (daysLeft <= 4) {
             statusText = `Rinse in tank water due in ${daysLeft} days`;
             barColor = "var(--alert-yellow)";
           } else {
-            statusText = `Optimal flow • Rinse in ${daysLeft} days (21-day schedule)`;
+            statusText = `Optimal flow • Rinse in ${daysLeft} days (${interval}-day schedule)`;
             barColor = "var(--neon-green)";
           }
           actionBtnText = "Log Rinsed";
@@ -6862,7 +7358,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         div.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <div style="font-weight:700; font-size:14px; color:#fff; display:flex; align-items:center; gap:8px;">
-              <span>${m.name}</span>
+              <span>${escapeHtmlText(m.name)}</span>
               <span style="font-size:11px; color:var(--cyan); cursor:pointer; font-weight:normal;" onclick="openEditMediaModal(${idx})">Edit</span>
             </div>
             <span class="delete-x" onclick="deleteFilterMedia(${idx})" title="Remove media">×</span>
@@ -6874,8 +7370,8 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
             <div class="media-progress-fill" style="width:${fillPct}%; background:${barColor};"></div>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-            <span style="font-size:11px; color:var(--text-muted);">Last serviced: ${m.lastDate || 'Recently'}</span>
-            ${actionBtnText ? `<button class="btn btn-secondary" style="width:auto; padding:4px 10px; font-size:11px;" onclick="resetMediaTimer(${idx})">${actionBtnText}</button>` : `<span style="font-size:10px; color:var(--alert-yellow);">Never rinse in tap water!</span>`}
+            <span style="font-size:11px; color:var(--text-muted);">Last serviced: ${escapeHtmlText(m.lastDate || "Recently")}</span>
+            <button type="button" class="btn btn-secondary" style="width:auto; padding:4px 10px; font-size:11px;" onclick="resetMediaTimer(${idx})">${actionBtnText}</button>
           </div>
         `;
         listEl.appendChild(div);
@@ -6894,15 +7390,17 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
 
     function resetMediaTimer(idx) {
       const activeTank = getActiveTank();
-      if (!activeTank || !activeTank.filterMedia) return;
+      if (!activeTank || !activeTank.filterMedia || !activeTank.filterMedia[idx]) return;
       const m = activeTank.filterMedia[idx];
       m.lastDate = new Date().toISOString().split("T")[0];
-      logTankTimelineEvent(`Serviced ${m.name} (${m.cat === 'chemical' || m.cat === 'cartridge' ? 'Replaced' : 'Rinsed'})`);
+      const actionVerb = (m.cat === "chemical" || m.cat === "cartridge")
+        ? "Replaced"
+        : (m.cat === "biological" ? "Inspected" : "Rinsed");
+      logTankTimelineEvent(`Serviced ${m.name} (${actionVerb})`);
       saveDataToStorage();
       renderFilterMediaList();
       renderTankOverviewTab();
-      renderTankPlanTab();
-      showToast("Media Reset & Rescheduled");
+      showToast(`${actionVerb} & Rescheduled`);
     }
 
     function openAddMediaModal() {
@@ -7143,9 +7641,29 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
     function openTankFocusedChat(tankId = activeTankId) {
       const tank = appState.tanks.find(t => String(t.id) === String(tankId)) || getActiveTank();
       aiReturnTankId = tank ? tank.id : null;
+      aiReturnSubtab = isInsideTank ? (currentTankSubtab || "overview") : "overview";
       globalAiMode = "ask";
       onGlobalAIContextChange(tank ? String(tank.id) : "all");
       navToGlobal("global-ai", true, true);
+    }
+
+    function openCompatibilityForActiveTank() {
+      const tank = getActiveTank();
+      if (!tank) return;
+      aiReturnTankId = tank.id;
+      aiReturnSubtab = "livestock";
+      globalAiMode = "compat";
+      globalAiContextTankId = String(tank.id);
+      navToGlobal("global-ai", true, true);
+      const sel = document.getElementById("sandbox-tank-select");
+      if (sel) {
+        sel.value = String(tank.id);
+      }
+      onSandboxInputChanged();
+      setTimeout(() => {
+        const speciesInput = document.getElementById("sandbox-species");
+        if (speciesInput) speciesInput.focus();
+      }, 50);
     }
 
     async function runUnifiedTankAI() {
@@ -7182,26 +7700,6 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       await askGlobalAI();
     }
 
-    function copyTankDelta() {
-      const activeTank = getActiveTank();
-      if (!activeTank) return;
-      const tap = appState.tapBaseline || {};
-      const u = getUnitLabels();
-      const tested = hasTankBeenTested(activeTank);
-      const last = tested ? activeTank.lastTest : null;
-      const paramStr = last
-        ? `NH3: ${last.nh3 ?? 0}, NO2: ${last.no2 ?? 0}, NO3: ${last.no3 ?? 0}, pH: ${last.ph ?? 7.2}, Temp: ${displayTemp(last.temp || 78)}${u.temp}`
-        : "Not tested yet";
-      const availStr = getAvailableSupplies().map(i => i.stock === "low" ? `${i.name} (Low)` : i.name).join(", ") || "None";
-      const text = `Quick Update for ${activeTank.name} (${activeTank.status}):
-- Age: ${calculateAge(activeTank.startDate)} • Size: ${displayVol(activeTank.vol)} ${u.vol}
-- Latest Parameters: ${paramStr}
-- Tap Water Baseline: pH ${tap.ph}, NO3 ${tap.no3} ppm
-- Available Supplies: ${availStr}
-- Question: `;
-      navigator.clipboard.writeText(text).then(() => showToast("Copied to Clipboard"));
-    }
-
     /* Health Event & Hybrid Symptoms Handler */
     function onSymptomSelectChange(val) {
       const wrap = document.getElementById("loss-symptoms-custom-wrap");
@@ -7226,7 +7724,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         sel.innerHTML = `<option value="Other / Fish">General Fauna</option>`;
       } else {
         live.forEach((entry) => {
-          sel.innerHTML += `<option value="${entry}">${entry}</option>`;
+          sel.innerHTML += `<option value="${escapeHtmlText(entry)}">${escapeHtmlText(entry)}</option>`;
         });
       }
 
@@ -7335,6 +7833,17 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       const el = document.getElementById(containerId);
       if (!el) return;
       el.innerHTML = "";
+
+      if (!items || items.length === 0) {
+        let emptyText = "No items logged yet.";
+        if (type === "livestock") emptyText = "No fish or invertebrates added yet.";
+        else if (type === "plants") emptyText = "No live plants logged yet.";
+        else if (type === "decor") emptyText = "No hardscape or substrate logged yet.";
+        else if (type === "equipment") emptyText = "No heaters, filters, or lighting logged yet.";
+        el.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:6px 0;">${emptyText}</div>`;
+        return;
+      }
+
       items.forEach((item, idx) => {
         const isLive = type === "livestock";
         const isEquip = type === "equipment";
@@ -7349,7 +7858,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
 
         el.innerHTML += `
           <div class="pill" style="cursor:${isEditable ? 'pointer' : 'default'};" ${isEditable ? `onclick="${clickHandler}"` : ''}>
-            <span>${item}</span>
+            <span>${escapeHtmlText(item)}</span>
             <span class="delete-x" onclick="event.stopPropagation(); ${deleteFnName}(${idx})">×</span>
           </div>
         `;
@@ -7358,41 +7867,53 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
 
     function editTankHardwarePrompt(idx) {
       const activeTank = getActiveTank();
-      if (!activeTank || !activeTank.equipment || !activeTank.equipment[idx]) return;
-      const current = activeTank.equipment[idx];
-      const updated = prompt("Edit hardware / equipment item:", current);
-      if (updated !== null && updated.trim()) {
-        activeTank.equipment[idx] = updated.trim();
-        saveDataToStorage();
-        renderTankHardwareTab();
-        showToast("Hardware Updated");
-      }
+      if (!activeTank || !activeTank.equipment || activeTank.equipment[idx] === undefined) return;
+      openTankItemModal({
+        kind: "equipment",
+        idx,
+        title: "Edit Gear & Hardware",
+        label: "Equipment / Hardware Name",
+        placeholder: "e.g. Fluval 407, 150W Eheim Heater",
+        value: activeTank.equipment[idx],
+        showDate: false,
+        saveLabel: "Save Changes",
+        canDelete: true,
+        deleteLabel: "Remove Gear"
+      });
     }
 
     function editTankPlantPrompt(idx) {
       const activeTank = getActiveTank();
-      if (!activeTank || !activeTank.plants || !activeTank.plants[idx]) return;
-      const current = activeTank.plants[idx];
-      const updated = prompt("Edit plant species / name:", current);
-      if (updated !== null && updated.trim()) {
-        activeTank.plants[idx] = updated.trim();
-        saveDataToStorage();
-        renderTankPlantsTab();
-        showToast("Plant Updated");
-      }
+      if (!activeTank || !activeTank.plants || activeTank.plants[idx] === undefined) return;
+      openTankItemModal({
+        kind: "plants",
+        idx,
+        title: "Edit Aquatic Plant",
+        label: "Plant Species / Name",
+        placeholder: "e.g. Amazon Sword, Anubias Nana",
+        value: activeTank.plants[idx],
+        showDate: false,
+        saveLabel: "Save Changes",
+        canDelete: true,
+        deleteLabel: "Remove Plant"
+      });
     }
 
     function editTankDecorPrompt(idx) {
       const activeTank = getActiveTank();
-      if (!activeTank || !activeTank.decor || !activeTank.decor[idx]) return;
-      const current = activeTank.decor[idx];
-      const updated = prompt("Edit hardscape / decor item:", current);
-      if (updated !== null && updated.trim()) {
-        activeTank.decor[idx] = updated.trim();
-        saveDataToStorage();
-        renderTankPlantsTab();
-        showToast("Decor Updated");
-      }
+      if (!activeTank || !activeTank.decor || activeTank.decor[idx] === undefined) return;
+      openTankItemModal({
+        kind: "decor",
+        idx,
+        title: "Edit Hardscape & Substrate",
+        label: "Hardscape / Substrate Item",
+        placeholder: "e.g. Driftwood, Dragon Stone, Aqua Soil",
+        value: activeTank.decor[idx],
+        showDate: false,
+        saveLabel: "Save Changes",
+        canDelete: true,
+        deleteLabel: "Remove Hardscape"
+      });
     }
 
     function formatInlineMarkdown(escapedLine) {
@@ -7791,8 +8312,13 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       const tank = getActiveTank();
       if (!tank) return;
       if (confirm(`Delete "${tank.name}"? This cannot be undone.`)) {
+        if (String(aiReturnTankId) === String(tank.id)) {
+          aiReturnTankId = null;
+          aiReturnSubtab = "overview";
+        }
         appState.tanks = appState.tanks.filter(t => t.id !== tank.id);
         activeTankId = appState.tanks[0] ? appState.tanks[0].id : 0;
+        syncHeaderTankSwitcher();
         saveDataToStorage();
         closeModalById("editTankModal");
         navToGlobal("dashboard", false);
@@ -8034,19 +8560,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       e.target.value = "";
     }
 
-    function updateWcVolumePreview(percentVal) {
-      const activeTank = getActiveTank();
-      const previewEl = document.getElementById("wc-vol-preview");
-      if (!previewEl || !activeTank) return;
-      const pct = parseFloat(percentVal) || 0;
-      if (pct > 0) {
-        const u = getUnitLabels();
-        const volAmt = displayVol(activeTank.vol * (pct / 100));
-        previewEl.innerText = `≈ ${volAmt} ${u.vol}`;
-      } else {
-        previewEl.innerText = "";
-      }
-    }
+
 
     /* ============================================================
        7. ANDROID NOTIFICATION SYSTEM (F-19)
