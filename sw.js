@@ -1,4 +1,4 @@
-const CACHE_NAME = "aquassist-cache-v21";
+const CACHE_NAME = "aquassist-cache-v22";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
@@ -13,16 +13,22 @@ const ASSETS_TO_CACHE = [
   "./apple-touch-icon.png"
 ];
 
-// Install: Cache critical assets for 100% offline functionality
+// Install: Cache critical assets fresh from network (bypassing HTTP cache)
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
+      return Promise.all(
+        ASSETS_TO_CACHE.map((url) =>
+          fetch(new Request(url, { cache: "reload" }))
+            .then((res) => (res && res.ok ? cache.put(url, res) : cache.add(url)))
+            .catch(() => cache.add(url))
+        )
+      );
     }).then(() => self.skipWaiting())
   );
 });
 
-// Activate: Clean up old caches
+// Activate: Clean up old caches immediately
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -33,25 +39,46 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Fetch: Stale-while-revalidate for instant loading
+// Fetch: Network-first for HTML navigation so updates apply immediately; stale-while-revalidate for static assets
 self.addEventListener("fetch", (event) => {
-  // Let external API calls (e.g. Gemini API) go straight to network
-  if (event.request.url.includes("googleapis.com")) {
+  if (event.request.method !== "GET" || event.request.url.includes("googleapis.com")) {
+    return;
+  }
+
+  const reqUrl = new URL(event.request.url);
+  const isHtmlNav =
+    event.request.mode === "navigate" ||
+    reqUrl.pathname.endsWith("/") ||
+    reqUrl.pathname.endsWith("/index.html");
+
+  if (isHtmlNav) {
+    event.respondWith(
+      fetch(event.request, { cache: "no-cache" })
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const clone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(event.request).then((res) => res || caches.match("./index.html")))
+    );
     return;
   }
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        // Fetch updated version in background
-        fetch(event.request).then((networkResponse) => {
+      const fetchPromise = fetch(event.request)
+        .then((networkResponse) => {
           if (networkResponse && networkResponse.status === 200) {
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
+            const clone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
           }
-        }).catch(() => {});
-        return cachedResponse;
-      }
-      return fetch(event.request);
+          return networkResponse;
+        })
+        .catch(() => cachedResponse);
+
+      return cachedResponse || fetchPromise;
     })
   );
 });

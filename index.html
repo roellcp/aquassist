@@ -423,6 +423,68 @@
     }
     .color-circle.selected { border-color: #fff; transform: scale(1.15); box-shadow: 0 0 10px rgba(255,255,255,0.4); }
 
+    /* Inline Segmented Controls */
+    .segmented-group {
+      display: inline-flex; background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 11px; padding: 3px; gap: 3px;
+    }
+    .segmented-group.full { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+    .segmented-btn {
+      background: transparent; border: 1px solid transparent; color: var(--text-muted);
+      font-size: 12px; font-weight: 600; padding: 7px 12px; border-radius: 8px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all 0.16s ease; white-space: nowrap;
+    }
+    .segmented-btn:hover { color: #E2E8F0; }
+    .segmented-btn.active {
+      background: rgba(56, 189, 248, 0.14); color: #fff;
+      border-color: rgba(56, 189, 248, 0.4); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+    .segmented-btn.active-green {
+      background: rgba(0, 245, 160, 0.13); color: #fff;
+      border-color: rgba(0, 245, 160, 0.4); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+    .segmented-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: 0.45;
+      transition: all 0.16s ease;
+    }
+    .segmented-btn.active .segmented-dot { background: var(--cyan); opacity: 1; box-shadow: 0 0 6px var(--cyan); }
+    .segmented-btn.active-green .segmented-dot { background: var(--neon-green); opacity: 1; box-shadow: 0 0 6px var(--neon-green); }
+
+    /* Clean Settings Sheet */
+    .settings-section {
+      padding: 15px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .settings-section:first-of-type { padding-top: 4px; }
+    .settings-section:last-of-type { border-bottom: none; padding-bottom: 2px; }
+    .settings-row {
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    }
+    .settings-title { font-size: 13.5px; font-weight: 600; color: #F8FAFC; letter-spacing: -0.1px; }
+    .settings-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; line-height: 1.35; }
+    .ghost-action-btn {
+      background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--cyan); font-size: 11.5px; font-weight: 600; padding: 5px 11px;
+      border-radius: 8px; cursor: pointer; transition: all 0.15s ease; white-space: nowrap;
+    }
+    .ghost-action-btn:hover { background: rgba(56, 189, 248, 0.12); border-color: rgba(56, 189, 248, 0.35); }
+    .tap-strip {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      background: rgba(255, 255, 255, 0.025); border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 12px; margin-top: 10px; overflow: hidden;
+    }
+    .tap-cell {
+      padding: 9px 6px; text-align: center; border-right: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .tap-cell:last-child { border-right: none; }
+    .tap-cell-lbl { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+    .tap-cell-val { font-size: 13px; font-weight: 700; color: #F1F5F9; margin-top: 3px; }
+    .tap-edit-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px;
+    }
+    .tap-edit-grid label { font-size: 10px; margin-bottom: 4px; color: var(--text-muted); }
+    .tap-edit-grid input { padding: 8px 8px; font-size: 13px; text-align: center; border-radius: 9px; }
+
     /* Pill Items */
     .pill-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
     .pill {
@@ -948,12 +1010,17 @@
           <input type="date" id="add-m-date">
         </div>
       </div>
-      <div style="margin-bottom:12px;">
+      <div style="margin-bottom:14px;">
         <label>Lifecycle Mode</label>
-        <select id="add-m-status">
-          <option value="Established">Established Tank</option>
-          <option value="Cycling">Cycling in Progress</option>
-        </select>
+        <input type="hidden" id="add-m-status" value="Established">
+        <div class="segmented-group full" id="add-status-group">
+          <button type="button" class="segmented-btn active-green" data-status="Established" onclick="selectLifecycleStatus('add', 'Established')">
+            <span class="segmented-dot"></span>Established Tank
+          </button>
+          <button type="button" class="segmented-btn" data-status="Cycling" onclick="selectLifecycleStatus('add', 'Cycling')">
+            <span class="segmented-dot"></span>Cycling in Progress
+          </button>
+        </div>
       </div>
       <div style="margin-bottom:14px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
@@ -998,12 +1065,17 @@
           <input type="date" id="edit-m-date">
         </div>
       </div>
-      <div style="margin-bottom:12px;">
-        <label>Lifecycle Status</label>
-        <select id="edit-m-status">
-          <option value="Established">Established Tank</option>
-          <option value="Cycling">Cycling in Progress</option>
-        </select>
+      <div style="margin-bottom:14px;">
+        <label>Lifecycle Mode</label>
+        <input type="hidden" id="edit-m-status" value="Established">
+        <div class="segmented-group full" id="edit-status-group">
+          <button type="button" class="segmented-btn active-green" data-status="Established" onclick="selectLifecycleStatus('edit', 'Established')">
+            <span class="segmented-dot"></span>Established Tank
+          </button>
+          <button type="button" class="segmented-btn" data-status="Cycling" onclick="selectLifecycleStatus('edit', 'Cycling')">
+            <span class="segmented-dot"></span>Cycling in Progress
+          </button>
+        </div>
       </div>
       <div style="margin-bottom:14px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
@@ -1336,111 +1408,123 @@
 
   <!-- ================= MODAL: SETTINGS & HOUSEHOLD ================= -->
   <div class="modal-overlay" id="settingsModal">
-    <div class="modal-box">
-      <div class="card-header" style="margin-bottom:14px;">
-        <h3 style="font-size:18px;">Preferences & Device Integration</h3>
+    <div class="modal-box" style="padding: 20px 22px;">
+      <div class="card-header" style="margin-bottom:10px;">
+        <h3 style="font-size:18px; font-weight:700; letter-spacing:-0.2px;">Settings</h3>
         <button class="icon-btn" style="width:28px;height:28px;" onclick="closeModalById('settingsModal')">×</button>
       </div>
 
-      <!-- Android System Notification Settings (Compact & Contextual) -->
-      <div class="card" style="margin-bottom:14px; background:rgba(0,245,160,0.04); border-color:rgba(0,245,160,0.3); padding:14px;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
+      <!-- 1. Measurement Units (Inline Segmented) -->
+      <div class="settings-section">
+        <div class="settings-row">
           <div>
-            <div style="font-size:13px; font-weight:700; color:var(--neon-green);">System Phone Alerts</div>
-            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Pop-up reminders for water changes & filter care</div>
+            <div class="settings-title">Measurement Units</div>
+            <div class="settings-sub">Volume, temperature &amp; length</div>
           </div>
-          <div id="notification-badge-wrap">
-            <button id="notif-enable-btn" class="btn btn-neon" style="width:auto; font-size:11px; padding:6px 12px;" onclick="requestNotificationPermission()">
-              Enable Alerts
+          <input type="hidden" id="setting-units" value="us">
+          <div class="segmented-group" id="settings-units-group">
+            <button type="button" class="segmented-btn active" data-unit="us" onclick="setUnitsFromSettings('us')">Imperial</button>
+            <button type="button" class="segmented-btn" data-unit="metric" onclick="setUnitsFromSettings('metric')">Metric</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. System Phone Reminders (Clean Status + Single Contextual Action, No Redundant Active Badge) -->
+      <div class="settings-section">
+        <div class="settings-row">
+          <div style="padding-right:4px;">
+            <div class="settings-title">System Reminders</div>
+            <div class="settings-sub" id="notification-status-text">Checking notification status...</div>
+          </div>
+          <div id="notification-badge-wrap" style="flex-shrink:0;">
+            <button id="notif-enable-btn" class="btn btn-neon" style="width:auto; font-size:11.5px; padding:6px 13px; border-radius:9px;" onclick="requestNotificationPermission()">
+              Enable
             </button>
-            <div id="notif-active-pill" style="display:none; font-size:11px; color:var(--neon-green); font-weight:700; background:rgba(0,245,160,0.12); padding:4px 8px; border-radius:12px; border:1px solid rgba(0,245,160,0.3);">
-              ● Alerts Active
+            <button id="notif-test-link" class="ghost-action-btn" style="display:none; color:var(--text-main);" onclick="sendTestNotification()">
+              Test Alert
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Tap Water Baseline (Top-Right Edit Button + Sleek Unified Strip) -->
+      <div class="settings-section">
+        <div class="settings-row">
+          <div>
+            <div class="settings-title">Tap Water Profile</div>
+            <div class="settings-sub">Faucet baseline for nitrate dilution math</div>
+          </div>
+          <button type="button" id="tap-edit-btn" class="ghost-action-btn" onclick="toggleTapEditMode()">Edit</button>
+        </div>
+
+        <div class="tap-strip" id="tap-display-strip">
+          <div class="tap-cell">
+            <div class="tap-cell-lbl">pH</div>
+            <div class="tap-cell-val" id="disp-tap-ph">7.4</div>
+          </div>
+          <div class="tap-cell">
+            <div class="tap-cell-lbl">NO₃</div>
+            <div class="tap-cell-val" id="disp-tap-no3">5 ppm</div>
+          </div>
+          <div class="tap-cell">
+            <div class="tap-cell-lbl">GH</div>
+            <div class="tap-cell-val" id="disp-tap-gh">8 dGH</div>
+          </div>
+          <div class="tap-cell">
+            <div class="tap-cell-lbl">KH</div>
+            <div class="tap-cell-val" id="disp-tap-kh">4 dKH</div>
+          </div>
+        </div>
+
+        <div id="tap-edit-panel" style="display:none;">
+          <div class="tap-edit-grid">
+            <div>
+              <label>pH</label>
+              <input type="number" id="tap-ph" step="0.1" placeholder="7.4" oninput="saveTapBaseline(false)" onchange="saveTapBaseline(true)">
+            </div>
+            <div>
+              <label>NO₃ (ppm)</label>
+              <input type="number" id="tap-no3" step="1" placeholder="5" oninput="saveTapBaseline(false)" onchange="saveTapBaseline(true)">
+            </div>
+            <div>
+              <label>GH (dGH)</label>
+              <input type="number" id="tap-gh" step="1" placeholder="8" oninput="saveTapBaseline(false)" onchange="saveTapBaseline(true)">
+            </div>
+            <div>
+              <label>KH (dKH)</label>
+              <input type="number" id="tap-kh" step="1" placeholder="4" oninput="saveTapBaseline(false)" onchange="saveTapBaseline(true)">
             </div>
           </div>
         </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.06);">
-          <div id="notification-status-text" style="font-size:10.5px; color:var(--text-muted);">Status: Checking...</div>
-          <button id="notif-test-link" class="btn btn-secondary" style="width:auto; font-size:10px; padding:3px 8px;" onclick="sendTestNotification()">Test Pop-Up</button>
-        </div>
       </div>
 
-      <div style="margin-bottom:14px;">
-        <label>Unit System</label>
-        <select id="setting-units" onchange="onUnitsChange(this.value)">
-          <option value="us">US Imperial (Gallons, °F, Inches)</option>
-          <option value="metric">Metric (Liters, °C, Centimeters)</option>
-        </select>
-      </div>
-
-      <!-- Tap Water Source Profile (Telemetry Card Style with Quick Edit) -->
-      <div class="card" style="margin-bottom:14px; background:rgba(255,255,255,0.03); border-color:var(--card-border-glow); padding:14px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <!-- 4. Gemini AI Key -->
+      <div class="settings-section">
+        <div class="settings-row" style="margin-bottom:8px;">
           <div>
-            <div style="font-size:13px; font-weight:700; color:var(--cyan);">Tap Water Source Profile</div>
-            <div style="font-size:10.5px; color:var(--text-muted);">Tested straight from faucet for dilution math</div>
+            <div class="settings-title">Gemini API Key</div>
+            <div class="settings-sub">Free at aistudio.google.com • Stored locally</div>
           </div>
+          <button type="button" id="api-key-toggle-btn" class="ghost-action-btn" style="color:var(--text-muted);" onclick="toggleApiKeyVisibility()">Show</button>
         </div>
-        
-        <div class="param-strip" style="margin-top:4px; padding-top:8px;">
-          <div class="param-chip">
-            <div class="param-chip-label">pH</div>
-            <div class="param-chip-val" id="disp-tap-ph">7.4</div>
-          </div>
-          <div class="param-chip">
-            <div class="param-chip-label">NO₃</div>
-            <div class="param-chip-val" id="disp-tap-no3">5 ppm</div>
-          </div>
-          <div class="param-chip">
-            <div class="param-chip-label">GH</div>
-            <div class="param-chip-val" id="disp-tap-gh">8 dGH</div>
-          </div>
-          <div class="param-chip">
-            <div class="param-chip-label">KH</div>
-            <div class="param-chip-val" id="disp-tap-kh">4 dKH</div>
-          </div>
-        </div>
-
-        <!-- Editable inputs in drawer -->
-        <details style="margin-top:10px;">
-          <summary style="font-size:11px; color:var(--cyan); cursor:pointer; font-weight:600;">Edit Tap Profile Values...</summary>
-          <div class="input-grid-2" style="margin-top:10px;">
-            <div><label>Tap pH</label><input type="number" id="tap-ph" step="0.1" placeholder="7.4" onchange="saveTapBaseline()"></div>
-            <div><label>Tap Nitrate (NO₃)</label><input type="number" id="tap-no3" step="1" placeholder="5" onchange="saveTapBaseline()"></div>
-            <div><label>Tap GH (dGH)</label><input type="number" id="tap-gh" step="1" placeholder="8" onchange="saveTapBaseline()"></div>
-            <div><label>Tap KH (dKH)</label><input type="number" id="tap-kh" step="1" placeholder="4" onchange="saveTapBaseline()"></div>
-          </div>
-        </details>
+        <input type="password" id="setting-api-key" placeholder="Paste AIzaSy... key" style="padding:9px 12px; font-size:13px; border-radius:10px;" onchange="saveApiKey()">
       </div>
 
-      <div style="margin-bottom:14px;">
-        <label>Google AI Studio (Gemini) API Key</label>
-        <div class="input-row">
-          <input type="password" id="setting-api-key" placeholder="AIzaSy..." onchange="saveApiKey()">
+      <!-- 5. Local Backup & Restore -->
+      <div class="settings-section">
+        <div style="margin-bottom:9px;">
+          <div class="settings-title">Data &amp; Backup</div>
+          <div class="settings-sub">Export or restore your aquariums as a local JSON file</div>
         </div>
-        <p style="font-size:10.5px; color:var(--text-muted); margin-top:2px;">Free at aistudio.google.com. Stored locally on this phone.</p>
-      </div>
-
-      <!-- Compact One-Click Data Safety & Backup -->
-      <div class="card" style="margin-bottom:14px; background:rgba(56,189,248,0.04); border-color:rgba(56,189,248,0.25); padding:14px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <div>
-            <div style="font-size:13px; font-weight:700; color:var(--cyan);">Data Safety & Local Backup</div>
-            <div style="font-size:10.5px; color:var(--text-muted);">100% private to device storage</div>
-          </div>
-        </div>
-        <div style="display:flex; gap:8px;">
-          <button class="btn btn-secondary" style="font-size:11px; padding:8px 12px; flex:1;" onclick="exportDataJSON()">
-            Export Backup (.json)
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <button class="btn btn-secondary" style="font-size:12px; font-weight:600; padding:9px 12px; border-radius:10px;" onclick="exportDataJSON()">
+            Export Backup
           </button>
-          <button class="btn btn-secondary" style="font-size:11px; padding:8px 12px; flex:1;" onclick="document.getElementById('importFile').click()">
+          <button class="btn btn-secondary" style="font-size:12px; font-weight:600; padding:9px 12px; border-radius:10px;" onclick="document.getElementById('importFile').click()">
             Restore Backup
           </button>
           <input type="file" id="importFile" accept=".json,application/json" style="display:none;" onchange="importDataJSON(event)">
         </div>
-      </div>
-
-      <div style="text-align:center; font-size:11px; color:var(--text-muted); margin-top:10px;">
-        aquAssist v8.0 • AI Aquarium Assistant
       </div>
     </div>
   </div>
@@ -1516,6 +1600,71 @@
       renderThemeColorPalette(prefix, hex);
     }
 
+    function selectLifecycleStatus(prefix, statusVal) {
+      const hiddenEl = document.getElementById(`${prefix}-m-status`);
+      const groupEl = document.getElementById(`${prefix}-status-group`);
+      if (hiddenEl) hiddenEl.value = statusVal;
+      if (groupEl) {
+        groupEl.querySelectorAll(".segmented-btn").forEach(btn => {
+          const isMatch = btn.getAttribute("data-status") === statusVal;
+          btn.classList.remove("active", "active-green");
+          if (isMatch) {
+            btn.classList.add(statusVal === "Established" ? "active-green" : "active");
+          }
+        });
+      }
+    }
+
+    function parseRecordTimestamp(dateStr) {
+      if (!dateStr || typeof dateStr !== "string") return 0;
+      const clean = dateStr.trim();
+      const isoMatch = clean.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+      if (isoMatch) {
+        return Date.UTC(parseInt(isoMatch[1], 10), parseInt(isoMatch[2], 10) - 1, parseInt(isoMatch[3], 10));
+      }
+      const usMatch = clean.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+      if (usMatch) {
+        return Date.UTC(parseInt(usMatch[3], 10), parseInt(usMatch[1], 10) - 1, parseInt(usMatch[2], 10));
+      }
+      const parsed = Date.parse(clean);
+      return Number.isNaN(parsed) ? 0 : parsed;
+    }
+
+    function sortRecordsByDateDesc(arr) {
+      if (!Array.isArray(arr)) return [];
+      return arr.sort((a, b) => parseRecordTimestamp(b && b.date) - parseRecordTimestamp(a && a.date));
+    }
+
+    function sortRecordsByDateAsc(arr) {
+      if (!Array.isArray(arr)) return [];
+      return arr.sort((a, b) => parseRecordTimestamp(a && a.date) - parseRecordTimestamp(b && b.date));
+    }
+
+    function normalizeAppStateChronology(state) {
+      if (!state || !Array.isArray(state.tanks)) return state;
+      state.tanks.forEach(tank => {
+        if (Array.isArray(tank.timeline)) sortRecordsByDateDesc(tank.timeline);
+        if (Array.isArray(tank.history)) {
+          sortRecordsByDateDesc(tank.history);
+          if (tank.history.length > 0) {
+            const newest = tank.history[0];
+            if (!tank.lastTest || parseRecordTimestamp(newest.date) >= parseRecordTimestamp(tank.lastTest.date)) {
+              tank.lastTest = {
+                nh3: newest.nh3 ?? 0,
+                no2: newest.no2 ?? 0,
+                no3: newest.no3 ?? 0,
+                ph: newest.ph ?? 7.2,
+                temp: newest.temp ?? 78.0,
+                date: newest.date
+              };
+            }
+          }
+        }
+        if (Array.isArray(tank.losses)) sortRecordsByDateDesc(tank.losses);
+      });
+      return state;
+    }
+
     const defaultState = {
       version: 8,
       units: "us",
@@ -1539,10 +1688,10 @@
           summary: "Biological filtration stable with zero Ammonia & Nitrite. Nitrates are in safe zone.",
           lastTest: { nh3: 0, no2: 0, no3: 15, ph: 7.2, temp: 78.0, date: "2026-10-25" },
           history: [
-            { date: "2026-10-05", nh3: 0, no2: 0, no3: 25, ph: 7.4, temp: 78.0, wc: 25, dose: "Prime 4ml" },
-            { date: "2026-10-12", nh3: 0, no2: 0, no3: 30, ph: 7.3, temp: 78.5, wc: 30, dose: "Prime 4ml" },
+            { date: "2026-10-25", nh3: 0, no2: 0, no3: 15, ph: 7.2, temp: 78.0, wc: 25, dose: "Prime 4ml", note: "Routine 25% water change" },
             { date: "2026-10-19", nh3: 0, no2: 0, no3: 20, ph: 7.2, temp: 78.0, wc: 20, dose: "Prime 4ml" },
-            { date: "2026-10-25", nh3: 0, no2: 0, no3: 15, ph: 7.2, temp: 78.0, wc: 25, dose: "Prime 4ml", note: "Routine 25% water change" }
+            { date: "2026-10-12", nh3: 0, no2: 0, no3: 30, ph: 7.3, temp: 78.5, wc: 30, dose: "Prime 4ml" },
+            { date: "2026-10-05", nh3: 0, no2: 0, no3: 25, ph: 7.4, temp: 78.0, wc: 25, dose: "Prime 4ml" }
           ],
           timeline: [
             { date: "2026-10-25", text: "25% Water Change (Dosed 4ml Seachem Prime)" },
@@ -1577,9 +1726,9 @@
           summary: "Nitrogen cycle in progress. Nitrite conversion active.",
           lastTest: { nh3: 0.25, no2: 1.0, no3: 10, ph: 7.0, temp: 79.0, date: "2026-10-26" },
           history: [
-            { date: "2026-10-10", nh3: 1.5, no2: 0, no3: 0, ph: 7.2, temp: 79.0, wc: 0, dose: "TurboStart" },
+            { date: "2026-10-26", nh3: 0.25, no2: 1.0, no3: 10, ph: 7.0, temp: 79.0, wc: 0, dose: "Prime 1ml" },
             { date: "2026-10-18", nh3: 0.5, no2: 2.0, no3: 5, ph: 7.0, temp: 79.0, wc: 25, dose: "Prime 1ml" },
-            { date: "2026-10-26", nh3: 0.25, no2: 1.0, no3: 10, ph: 7.0, temp: 79.0, wc: 0, dose: "Prime 1ml" }
+            { date: "2026-10-10", nh3: 1.5, no2: 0, no3: 0, ph: 7.2, temp: 79.0, wc: 0, dose: "TurboStart" }
           ],
           timeline: [
             { date: "2026-10-26", text: "Logged Test: NH₃ 0.25, NO₂ 1.0, NO₃ 10 ppm" },
@@ -1644,15 +1793,15 @@
           const req = store.get("state");
           req.onsuccess = () => {
             if (req.result) {
-              resolve(req.result);
+              resolve(normalizeAppStateChronology(req.result));
             } else {
-              resolve(defaultState);
+              resolve(normalizeAppStateChronology(defaultState));
             }
           };
-          req.onerror = () => resolve(defaultState);
+          req.onerror = () => resolve(normalizeAppStateChronology(defaultState));
         });
       } catch (err) {
-        return defaultState;
+        return normalizeAppStateChronology(defaultState);
       }
     }
 
@@ -2087,9 +2236,9 @@
         } else if (tankTasks.length > 0) {
           const urgentTask = tankTasks[0];
           if (urgentTask.isOverdue) {
-            actionableOverview = `${urgentTask.planTabTitle.replace(/^[^\s]+\s*/, '')} (${urgentTask.subtitle})`;
+            actionableOverview = `${urgentTask.planTabTitle} (${urgentTask.subtitle})`;
           } else if (urgentTask.isToday) {
-            actionableOverview = `${urgentTask.planTabTitle.replace(/^[^\s]+\s*/, '')} due today`;
+            actionableOverview = `${urgentTask.planTabTitle} due today`;
           } else {
             actionableOverview = `Healthy & balanced • Next care ${urgentTask.subtitle.toLowerCase()}`;
           }
@@ -2979,14 +3128,16 @@
       const u = getUnitLabels();
       const volAmt = Math.round((tank.vol * (pct / 100)) * 10) / 10;
 
-      tank.lastWaterChange = date;
+      if (!tank.lastWaterChange || parseRecordTimestamp(date) >= parseRecordTimestamp(tank.lastWaterChange)) {
+        tank.lastWaterChange = date;
+      }
 
       // Add timeline event - sorted by record date
       let eventText = `${pct}% Water Change (~${volAmt} ${u.vol})`;
       if (dose) eventText += ` • Dosed: ${dose}`;
       addTankTimelineEvent(tank, eventText, date);
 
-      // Add history record for charts
+      // Add history record for charts & history list (strictly chronological)
       if (!tank.history) tank.history = [];
       const prevTest = tank.lastTest || { nh3: 0, no2: 0, no3: 15, ph: 7.2, temp: 78 };
       tank.history.unshift({
@@ -2999,6 +3150,7 @@
         wc: pct,
         dose: dose || "Dechlorinator"
       });
+      sortRecordsByDateDesc(tank.history);
 
       tank.summary = `Last activity: ${pct}% water change on ${date}.`;
       saveDataToStorage();
@@ -3197,12 +3349,14 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       if (timelineEl) {
         timelineEl.innerHTML = "";
         if (!tank.timeline) tank.timeline = [];
-        tank.timeline.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+        sortRecordsByDateDesc(tank.timeline);
         const events = tank.timeline;
         if (events.length === 0) {
           timelineEl.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:6px 0;">No activities recorded yet.</div>`;
         } else {
-          events.slice(0, 10).forEach((e, idx) => {
+          const showAll = !!window.showAllTimelineEvents;
+          const visibleEvents = showAll ? events : events.slice(0, 12);
+          visibleEvents.forEach((e, idx) => {
             timelineEl.innerHTML += `
               <div class="timeline-entry">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -3216,6 +3370,15 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
               </div>
             `;
           });
+          if (events.length > 12) {
+            timelineEl.innerHTML += `
+              <div style="padding-top:6px; text-align:center;">
+                <button type="button" class="ghost-action-btn" onclick="window.showAllTimelineEvents = !window.showAllTimelineEvents; renderTankOverviewTab();">
+                  ${showAll ? "Show Recent Only" : `View All ${events.length} Records`}
+                </button>
+              </div>
+            `;
+          }
         }
       }
     }
@@ -3240,7 +3403,7 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
         if (updatedDate && updatedDate.trim()) {
           current.date = updatedDate.trim();
         }
-        activeTank.timeline.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+        sortRecordsByDateDesc(activeTank.timeline);
         saveDataToStorage();
         renderTankOverviewTab();
         showToast("Activity Log Updated");
@@ -3353,8 +3516,8 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
     function addTankTimelineEvent(tank, text, date = new Date().toISOString().split("T")[0]) {
       if (!tank) return;
       if (!tank.timeline) tank.timeline = [];
-      tank.timeline.push({ date, text });
-      tank.timeline.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+      tank.timeline.unshift({ date, text });
+      sortRecordsByDateDesc(tank.timeline);
     }
 
     function logTankTimelineEvent(text, date = new Date().toISOString().split("T")[0]) {
@@ -3387,7 +3550,7 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       const activeTank = getActiveTank();
       if (!svg || !activeTank) return;
 
-      const history = (activeTank.history || []).slice().reverse();
+      const history = sortRecordsByDateAsc((activeTank.history || []).slice());
       if (history.length === 0) {
         svg.innerHTML = `
           <text x="250" y="105" text-anchor="middle" fill="#64748B" font-size="13">
@@ -3595,18 +3758,30 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
         existing.no2 = no2;
         existing.no3 = no3;
         existing.notes = notes;
-        if (editIdx === 0) {
-          activeTank.lastTest = { nh3, no2, no3, ph, temp, date };
-        }
+        sortRecordsByDateDesc(activeTank.history);
       } else {
         const newLog = { date, temp, nh3, no2, no3, ph, wc: 0, dose: "", notes };
-        activeTank.lastTest = { nh3, no2, no3, ph, temp, date };
         if (!activeTank.history) activeTank.history = [];
         activeTank.history.unshift(newLog);
+        sortRecordsByDateDesc(activeTank.history);
 
         let eventText = `Logged Chemistry: Temp ${temp}°, pH ${ph}, NH₃ ${nh3}, NO₂ ${no2}, NO₃ ${no3} ppm`;
         if (notes) eventText += ` • ${notes}`;
         logTankTimelineEvent(eventText, date);
+      }
+
+      if (activeTank.history && activeTank.history.length > 0) {
+        const newest = activeTank.history[0];
+        activeTank.lastTest = {
+          nh3: newest.nh3 ?? 0,
+          no2: newest.no2 ?? 0,
+          no3: newest.no3 ?? 0,
+          ph: newest.ph ?? 7.2,
+          temp: newest.temp ?? 78.0,
+          date: newest.date
+        };
+      } else {
+        activeTank.lastTest = { nh3, no2, no3, ph, temp, date };
       }
 
       // Analyze new readings with Aquarist AI engine
@@ -3635,6 +3810,7 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       const activeTank = getActiveTank();
       if (!activeTank || !activeTank.history) return;
       activeTank.history.splice(idx, 1);
+      sortRecordsByDateDesc(activeTank.history);
       if (activeTank.history.length > 0) {
         const latest = activeTank.history[0];
         activeTank.lastTest = { ...latest };
@@ -3652,6 +3828,9 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       if (!list || !activeTank) return;
       list.innerHTML = "";
 
+      if (Array.isArray(activeTank.history)) {
+        sortRecordsByDateDesc(activeTank.history);
+      }
       const history = activeTank.history || [];
       if (history.length === 0) {
         list.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:10px 0;">No tests recorded yet. Tap "Record Chemistry Test" above to log readings.</div>`;
@@ -3768,6 +3947,9 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       const card = document.getElementById("loss-history-card");
       const list = document.getElementById("loss-history-list");
       if (!card || !list || !activeTank) return;
+      if (Array.isArray(activeTank.losses)) {
+        sortRecordsByDateDesc(activeTank.losses);
+      }
       const losses = activeTank.losses || [];
       if (losses.length === 0) {
         card.style.display = "none";
@@ -4331,6 +4513,7 @@ Instructions:
       if (!activeTank.losses) activeTank.losses = [];
       const lossRecord = { date, species: cleanSpecies, qty, symptoms };
       activeTank.losses.unshift(lossRecord);
+      sortRecordsByDateDesc(activeTank.losses);
 
       logTankTimelineEvent(`Health event: ${qty}x ${cleanSpecies} (${symptoms})`, date);
       saveDataToStorage();
@@ -4479,7 +4662,7 @@ Instructions:
       document.getElementById("add-m-name").value = "";
       document.getElementById("add-m-vol").value = "";
       document.getElementById("add-m-date").valueAsDate = new Date();
-      document.getElementById("add-m-status").value = "Established";
+      selectLifecycleStatus("add", "Established");
       document.getElementById("add-m-photo").value = "";
       renderThemeColorPalette("add", "#00D2FF");
       openModalById("addTankModal");
@@ -4492,7 +4675,7 @@ Instructions:
       document.getElementById("edit-m-name").value = tank.name;
       document.getElementById("edit-m-vol").value = tank.vol;
       document.getElementById("edit-m-date").value = tank.startDate || "2025-01-01";
-      document.getElementById("edit-m-status").value = tank.status;
+      selectLifecycleStatus("edit", tank.status || "Established");
       const clr = tank.color || "#00D2FF";
       renderThemeColorPalette("edit", clr);
       document.getElementById("edit-m-photo").value = "";
@@ -4614,8 +4797,47 @@ Instructions:
       reader.readAsDataURL(file);
     }
 
+    function syncSettingsUnitsButtons(unitVal) {
+      const hiddenEl = document.getElementById("setting-units");
+      if (hiddenEl) hiddenEl.value = unitVal;
+      const groupEl = document.getElementById("settings-units-group");
+      if (groupEl) {
+        groupEl.querySelectorAll(".segmented-btn").forEach(btn => {
+          btn.classList.toggle("active", btn.getAttribute("data-unit") === unitVal);
+        });
+      }
+    }
+
+    function setUnitsFromSettings(unitVal) {
+      syncSettingsUnitsButtons(unitVal);
+      onUnitsChange(unitVal);
+    }
+
+    function toggleTapEditMode(forceState) {
+      const panel = document.getElementById("tap-edit-panel");
+      const btn = document.getElementById("tap-edit-btn");
+      if (!panel || !btn) return;
+      const shouldOpen = typeof forceState === "boolean" ? forceState : panel.style.display === "none";
+      panel.style.display = shouldOpen ? "block" : "none";
+      btn.innerText = shouldOpen ? "Done" : "Edit";
+      btn.style.color = shouldOpen ? "var(--neon-green)" : "var(--cyan)";
+      btn.style.borderColor = shouldOpen ? "rgba(0, 245, 160, 0.35)" : "rgba(255, 255, 255, 0.1)";
+      if (!shouldOpen && typeof forceState !== "boolean") {
+        saveTapBaseline(true);
+      }
+    }
+
+    function toggleApiKeyVisibility() {
+      const input = document.getElementById("setting-api-key");
+      const btn = document.getElementById("api-key-toggle-btn");
+      if (!input || !btn) return;
+      const isPassword = input.type === "password";
+      input.type = isPassword ? "text" : "password";
+      btn.innerText = isPassword ? "Hide" : "Show";
+    }
+
     function openSettingsModal() {
-      document.getElementById("setting-units").value = appState.units || "us";
+      syncSettingsUnitsButtons(appState.units || "us");
       const tap = appState.tapBaseline || { ph: 7.4, no3: 5, gh: 8, kh: 4 };
       document.getElementById("tap-ph").value = tap.ph !== undefined ? tap.ph : "";
       document.getElementById("tap-no3").value = tap.no3 !== undefined ? tap.no3 : "";
@@ -4631,16 +4853,29 @@ Instructions:
       if (dispGh) dispGh.innerText = (tap.gh !== undefined ? tap.gh : "8") + " dGH";
       if (dispKh) dispKh.innerText = (tap.kh !== undefined ? tap.kh : "4") + " dKH";
 
-      document.getElementById("setting-api-key").value = appState.apiKey || "";
+      toggleTapEditMode(false);
+
+      const apiKeyInput = document.getElementById("setting-api-key");
+      const apiToggleBtn = document.getElementById("api-key-toggle-btn");
+      if (apiKeyInput) {
+        apiKeyInput.type = "password";
+        apiKeyInput.value = appState.apiKey || "";
+      }
+      if (apiToggleBtn) apiToggleBtn.innerText = "Show";
+
       updateNotificationStatusDisplay();
       openModalById("settingsModal");
     }
 
-    function saveTapBaseline() {
-      const ph = parseFloat(document.getElementById("tap-ph").value) || 7.4;
-      const no3 = parseFloat(document.getElementById("tap-no3").value) || 0;
-      const gh = parseFloat(document.getElementById("tap-gh").value) || 0;
-      const kh = parseFloat(document.getElementById("tap-kh").value) || 0;
+    function saveTapBaseline(persist = true) {
+      const phRaw = parseFloat(document.getElementById("tap-ph").value);
+      const no3Raw = parseFloat(document.getElementById("tap-no3").value);
+      const ghRaw = parseFloat(document.getElementById("tap-gh").value);
+      const khRaw = parseFloat(document.getElementById("tap-kh").value);
+      const ph = Number.isNaN(phRaw) ? 7.4 : phRaw;
+      const no3 = Number.isNaN(no3Raw) ? 0 : no3Raw;
+      const gh = Number.isNaN(ghRaw) ? 0 : ghRaw;
+      const kh = Number.isNaN(khRaw) ? 0 : khRaw;
       appState.tapBaseline = { ph, no3, gh, kh };
 
       const dispPh = document.getElementById("disp-tap-ph");
@@ -4652,7 +4887,9 @@ Instructions:
       if (dispGh) dispGh.innerText = gh + " dGH";
       if (dispKh) dispKh.innerText = kh + " dKH";
 
-      saveDataToStorage();
+      if (persist) {
+        saveDataToStorage();
+      }
     }
 
     function saveApiKey() {
@@ -4692,11 +4929,11 @@ Instructions:
             throw new Error("Invalid backup format. Missing aquariums data.");
           }
           if (confirm(`Restore ${imported.tanks.length} aquarium(s)? This will replace your local state with this backup file.`)) {
-            appState = imported;
+            appState = normalizeAppStateChronology(imported);
             saveDataToStorage();
             closeModalById("settingsModal");
             renderGlobalDashboard();
-            showToast(`Restored ${appState.tanks.length} Aquariums!`);
+            showToast(`Restored ${appState.tanks.length} Aquariums`);
           }
         } catch(err) {
           alert("Backup Restore Failed: " + err.message);
@@ -4726,40 +4963,35 @@ Instructions:
     function updateNotificationStatusDisplay() {
       const el = document.getElementById("notification-status-text");
       const enableBtn = document.getElementById("notif-enable-btn");
-      const activePill = document.getElementById("notif-active-pill");
       const testLink = document.getElementById("notif-test-link");
 
       if (!("Notification" in window)) {
         if (el) {
-          el.innerText = "Status: Pop-ups not supported in this browser.";
+          el.innerText = "Notifications not supported in this browser";
           el.style.color = "var(--alert-yellow)";
         }
         if (enableBtn) enableBtn.style.display = "none";
-        if (activePill) activePill.style.display = "none";
         if (testLink) testLink.style.display = "none";
       } else if (Notification.permission === "granted") {
         if (el) {
-          el.innerText = "Status: Alerts active for scheduled tank care.";
+          el.innerText = "Active for scheduled water tests & tank care";
           el.style.color = "var(--neon-green)";
         }
         if (enableBtn) enableBtn.style.display = "none";
-        if (activePill) activePill.style.display = "inline-block";
         if (testLink) testLink.style.display = "inline-block";
       } else if (Notification.permission === "denied") {
         if (el) {
-          el.innerText = "Status: Blocked in Android site permissions.";
+          el.innerText = "Blocked in browser site permissions";
           el.style.color = "var(--alert-red)";
         }
         if (enableBtn) enableBtn.style.display = "none";
-        if (activePill) activePill.style.display = "none";
         if (testLink) testLink.style.display = "none";
       } else {
         if (el) {
-          el.innerText = "Status: Tap Enable Alerts for scheduled reminders.";
+          el.innerText = "Reminders for water tests, changes & filter care";
           el.style.color = "var(--text-muted)";
         }
         if (enableBtn) enableBtn.style.display = "inline-block";
-        if (activePill) activePill.style.display = "none";
         if (testLink) testLink.style.display = "none";
       }
     }
@@ -4843,6 +5075,9 @@ Instructions:
       if ("serviceWorker" in navigator) {
         try {
           swRegistration = await navigator.serviceWorker.register("sw.js");
+          if (swRegistration && swRegistration.update) {
+            swRegistration.update().catch(() => {});
+          }
         } catch (err) {}
       }
 
