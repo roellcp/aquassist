@@ -557,54 +557,109 @@
     .staple-chip:hover:not(.owned) { border-color: var(--cyan); color: #fff; background: rgba(56, 189, 248, 0.1); }
     .staple-chip.owned { opacity: 0.45; border-color: rgba(0, 245, 160, 0.28); color: var(--neon-green); cursor: default; }
 
-    /* Minimal AI Assistant & Markdown Thread */
+    /* Aquarist AI Conversational Workspace & Markdown */
     .ai-key-notice {
       display: flex; justify-content: space-between; align-items: center; gap: 10px;
-      padding: 9px 11px; margin-bottom: 14px; border-radius: 10px;
+      padding: 9px 11px; margin-bottom: 12px; border-radius: 10px;
       background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.28);
       font-size: 12px; color: #E2E8F0; line-height: 1.35;
+    }
+    .ai-chat-shell {
+      display: flex; flex-direction: column;
+      min-height: calc(100dvh - 255px);
     }
     .ai-context-bar {
       display: flex; justify-content: space-between; align-items: center; gap: 10px;
       padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
     .ai-context-select {
-      width: auto; min-width: 145px; max-width: 220px; padding: 5px 28px 5px 10px;
+      width: auto; min-width: 145px; max-width: 225px; padding: 5px 28px 5px 10px;
       font-size: 12px; font-weight: 600; border-radius: 8px;
       background-color: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1);
       color: #F8FAFC;
     }
+    .ai-empty-state {
+      flex: 1; display: flex; flex-direction: column; justify-content: center;
+      padding: 22px 4px 20px;
+    }
+    .ai-empty-title {
+      font-size: 17px; font-weight: 700; color: #F8FAFC; letter-spacing: -0.25px; margin-bottom: 6px;
+    }
+    .ai-empty-sub {
+      font-size: 12.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px; max-width: 480px;
+    }
     .ai-starters-row {
-      display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;
+      display: flex; flex-wrap: wrap; gap: 7px;
     }
     .ai-starter-chip {
       background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.09);
-      color: var(--text-muted); font-size: 11.5px; font-weight: 500; padding: 6px 11px;
-      border-radius: 9px; cursor: pointer; transition: all 0.15s ease;
+      color: #CBD5E1; font-size: 12px; font-weight: 500; padding: 7px 12px;
+      border-radius: 10px; cursor: pointer; transition: all 0.15s ease; text-align: left;
     }
     .ai-starter-chip:hover {
-      border-color: rgba(56, 189, 248, 0.35); color: #F8FAFC; background: rgba(56, 189, 248, 0.08);
+      border-color: rgba(56, 189, 248, 0.38); color: #F8FAFC; background: rgba(56, 189, 248, 0.09);
     }
     .ai-thread {
-      display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px;
-      max-height: 420px; overflow-y: auto; padding-right: 2px;
+      display: flex; flex-direction: column; gap: 14px; margin-bottom: 12px;
+      max-height: 400px; overflow-y: auto; padding-right: 4px;
+    }
+    .ai-thread.global-stream {
+      flex: 1; max-height: calc(100dvh - 340px); min-height: 220px; padding-top: 4px;
     }
     .ai-turn-user {
-      align-self: flex-end; max-width: 86%;
-      background: rgba(56, 189, 248, 0.11); border: 1px solid rgba(56, 189, 248, 0.25);
-      color: #F8FAFC; padding: 8px 12px; border-radius: 12px 12px 3px 12px;
-      font-size: 13px; line-height: 1.45;
+      align-self: flex-end; max-width: 85%;
+      background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.26);
+      color: #F8FAFC; padding: 9px 13px; border-radius: 16px 16px 4px 16px;
+      font-size: 13.5px; line-height: 1.48; white-space: pre-wrap; word-break: break-word;
     }
     .ai-turn-user-thumb {
-      display: block; width: 64px; height: 48px; object-fit: cover;
-      border-radius: 6px; margin-bottom: 6px; border: 1px solid rgba(255, 255, 255, 0.15);
+      display: block; width: 72px; height: 54px; object-fit: cover;
+      border-radius: 7px; margin-bottom: 6px; border: 1px solid rgba(255, 255, 255, 0.16);
     }
     .ai-turn-model {
-      align-self: stretch; padding: 2px 2px 12px;
+      align-self: stretch; padding: 2px 2px 14px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      font-size: 13px; line-height: 1.58; color: var(--text-main);
+      font-size: 13.5px; line-height: 1.62; color: var(--text-main);
     }
-    .ai-turn-model:last-child { border-bottom: none; padding-bottom: 2px; }
+    .ai-turn-model:last-child { border-bottom: none; padding-bottom: 4px; }
+    .ai-model-label {
+      font-size: 11px; font-weight: 700; color: var(--cyan); letter-spacing: 0.2px;
+      margin-bottom: 5px; display: flex; align-items: center; gap: 5px;
+    }
+    .ai-composer-wrap { margin-top: auto; padding-top: 6px; }
+    .ai-composer-box {
+      display: flex; align-items: flex-end; gap: 6px;
+      background: rgba(7, 15, 30, 0.92); border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 18px; padding: 6px 7px 6px 8px;
+      transition: border-color 0.16s ease, box-shadow 0.16s ease;
+    }
+    .ai-composer-box:focus-within {
+      border-color: rgba(0, 210, 255, 0.48);
+      box-shadow: 0 0 0 2px rgba(0, 210, 255, 0.12);
+    }
+    .ai-composer-icon-btn {
+      width: 34px; height: 34px; border-radius: 50%; border: none;
+      background: transparent; color: var(--text-muted); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
+    .ai-composer-icon-btn:hover {
+      color: var(--cyan); background: rgba(56, 189, 248, 0.1);
+    }
+    .ai-composer-textarea {
+      flex: 1; background: transparent !important; border: none !important;
+      box-shadow: none !important; outline: none !important;
+      color: #F8FAFC; font-family: inherit; font-size: 13.5px; line-height: 1.45;
+      padding: 7px 4px; resize: none; min-height: 34px; max-height: 120px; overflow-y: auto;
+    }
+    .ai-composer-textarea::placeholder { color: var(--text-dim); }
+    .ai-send-btn {
+      width: 34px; height: 34px; border-radius: 50%; border: none;
+      background: linear-gradient(135deg, var(--cyan), var(--neon-green));
+      color: #04101E; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; flex-shrink: 0; transition: transform 0.14s ease, opacity 0.14s ease;
+    }
+    .ai-send-btn:hover { transform: scale(1.04); }
     .ai-md h3, .ai-md h4 {
       font-size: 13.5px; font-weight: 700; color: #F8FAFC;
       margin: 10px 0 4px; letter-spacing: -0.1px;
@@ -809,54 +864,64 @@
       </div>
     </section>
 
-    <!-- SCREEN 3: GLOBAL AI ADVISOR (Unified Ask AI & Compatibility) -->
+    <!-- SCREEN 3: AQUARIST AI (Ongoing Conversation & Stocking Compatibility) -->
     <section id="screen-global-ai" class="view-screen">
       <div class="card">
         <div class="card-header" style="margin-bottom:12px;">
-          <div class="card-title">AI Assistant</div>
+          <div class="card-title">Aquarist AI</div>
           <div class="segmented-group compact" id="global-ai-mode-group">
-            <button type="button" class="segmented-btn active" data-mode="ask" onclick="switchGlobalAIMode('ask')">Ask AI</button>
+            <button type="button" class="segmented-btn active" data-mode="ask" onclick="switchGlobalAIMode('ask')">Chat</button>
             <button type="button" class="segmented-btn" data-mode="compat" onclick="switchGlobalAIMode('compat')">Compatibility</button>
           </div>
         </div>
 
         <div id="global-ai-key-notice" class="ai-key-notice" style="display:none;">
-          <span>Add a Gemini API key for live diagnostics and photo vision.</span>
+          <span>Add a Gemini API key to chat with Aquarist AI and analyze photos.</span>
           <button type="button" class="ghost-action-btn" onclick="openSettingsModal()">Open Settings</button>
         </div>
 
-        <!-- MODE 1: ASK AI (Multi-Turn + Photo Vision + Tank Context) -->
-        <div id="global-ai-ask-panel">
+        <!-- MODE 1: ONGOING GEMINI CONVERSATION -->
+        <div id="global-ai-ask-panel" class="ai-chat-shell">
           <div class="ai-context-bar">
             <div style="display:flex; align-items:center; gap:8px;">
-              <span style="font-size:11.5px; color:var(--text-muted); font-weight:600;">Context</span>
+              <span style="font-size:11.5px; color:var(--text-muted); font-weight:600;">Focus</span>
               <select id="global-ai-context-select" class="ai-context-select" onchange="onGlobalAIContextChange(this.value)"></select>
             </div>
-            <button type="button" id="global-ai-clear-btn" class="ghost-action-btn" style="display:none; color:var(--text-muted);" onclick="clearGlobalAIThread()">Clear</button>
+            <button type="button" id="global-ai-clear-btn" class="ghost-action-btn" style="display:none; color:var(--text-muted);" onclick="clearGlobalAIThread()">New Chat</button>
           </div>
 
-          <div id="global-ai-starters" class="ai-starters-row">
-            <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Audit my water chemistry and upcoming care priorities.')">Audit water &amp; tasks</button>
-            <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Help diagnose a fish symptom or water issue: ', true)">Diagnose symptom or photo</button>
-            <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Review my in-stock supplies and exact dosing for my setup.')">Check supply dosing</button>
+          <div id="global-ai-empty" class="ai-empty-state">
+            <div class="ai-empty-title">What are we working on?</div>
+            <div class="ai-empty-sub">
+              Bounce aquascape or stocking ideas, talk through logs, or troubleshoot—Aquarist AI factors in your tanks, plants, livestock, decor, gear, logs, and supplies.
+            </div>
+            <div id="global-ai-starters" class="ai-starters-row">
+              <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Look at my current tanks, plants, hardscape, and lighting—what aquascape or flora ideas would elevate them?')">Bounce aquascape &amp; plant ideas</button>
+              <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Based on my current tanks, water parameters, and livestock, what interesting tankmates or stocking ideas could we explore?')">Brainstorm tankmates</button>
+              <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Walk me through how my aquariums are trending based on my recent water tests, activity logs, gear, and upcoming tasks.')">Review logs &amp; water trends</button>
+              <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Can you help me check on this: ', true)">Check a symptom or photo</button>
+            </div>
           </div>
 
-          <div id="global-ai-thread" class="ai-thread" style="display:none;"></div>
+          <div id="global-ai-thread" class="ai-thread global-stream" style="display:none;"></div>
 
-          <div style="display:flex; gap:6px; align-items:center;">
-            <input type="text" id="global-ai-input" placeholder="Ask about chemistry, symptoms, dosing..." style="flex:1;" onkeydown="if(event.key==='Enter'){event.preventDefault();askGlobalAI();}">
-            <button type="button" class="icon-btn" id="global-vision-camera-btn" onclick="document.getElementById('global-vision-file-input').click()" title="Attach photo of fish, plants, or water" style="background:rgba(0,210,255,0.12); border-color:var(--cyan); color:var(--cyan);">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-            </button>
-            <button type="button" class="btn btn-neon" style="width:auto; padding:10px 16px; font-size:13px;" onclick="askGlobalAI()">Ask</button>
-          </div>
+          <div class="ai-composer-wrap">
+            <div id="global-vision-preview-chip" style="display:none; align-items:center; gap:8px; margin-bottom:8px; background:rgba(0,210,255,0.08); border:1px solid rgba(0,210,255,0.28); border-radius:11px; padding:6px 10px;">
+              <img id="global-vision-preview-thumb" style="width:30px; height:30px; border-radius:6px; object-fit:cover;">
+              <span style="font-size:11.5px; color:var(--cyan); font-weight:600; flex:1;">Photo attached</span>
+              <span class="delete-x" onclick="clearGlobalVisionAttachment()" style="font-size:16px;">×</span>
+            </div>
 
-          <input type="file" id="global-vision-file-input" accept="image/*" style="display:none;" onchange="handleGlobalVisionSelected(event)">
-
-          <div id="global-vision-preview-chip" style="display:none; align-items:center; gap:8px; margin-top:10px; background:rgba(0,210,255,0.08); border:1px solid rgba(0,210,255,0.28); border-radius:10px; padding:6px 10px;">
-            <img id="global-vision-preview-thumb" style="width:28px; height:28px; border-radius:6px; object-fit:cover;">
-            <span style="font-size:11px; color:var(--cyan); font-weight:600; flex:1;">Photo attached</span>
-            <span class="delete-x" onclick="clearGlobalVisionAttachment()" style="font-size:16px;">×</span>
+            <div class="ai-composer-box">
+              <button type="button" class="ai-composer-icon-btn" id="global-vision-camera-btn" onclick="document.getElementById('global-vision-file-input').click()" title="Attach photo of tank, fish, or plants">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </button>
+              <textarea id="global-ai-input" class="ai-composer-textarea" rows="1" placeholder="Message Aquarist AI..." oninput="autoGrowAiInput(this)" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();askGlobalAI();}"></textarea>
+              <button type="button" class="ai-send-btn" id="global-ai-send-btn" onclick="askGlobalAI()" title="Send message">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+              </button>
+            </div>
+            <input type="file" id="global-vision-file-input" accept="image/*" style="display:none;" onchange="handleGlobalVisionSelected(event)">
           </div>
         </div>
 
@@ -1155,8 +1220,8 @@
       Supplies
     </button>
     <button class="nav-tab" onclick="navToGlobal('global-ai')" id="nav-btn-global-ai">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-      AI Assistant
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3c.5 4.2 3.8 7.5 8 8-4.2.5-7.5 3.8-8 8-.5-4.2-3.8-7.5-8-8 4.2-.5 7.5-3.8 8-8z"/></svg>
+      Aquarist AI
     </button>
   </nav>
 
@@ -2408,11 +2473,29 @@
       return stateObj.closet;
     }
 
+    function compactAiThreadForSave(thread) {
+      if (!Array.isArray(thread)) return [];
+      const sliced = thread.slice(-30);
+      return sliced.map((turn, idx) => {
+        const keepFullImage = turn.role === "user" && idx >= sliced.length - 4;
+        return {
+          role: turn.role === "model" ? "model" : "user",
+          text: String(turn.text || ""),
+          hadPhoto: !!(turn.hadPhoto || turn.imageBase64 || turn.thumbUrl),
+          imageBase64: keepFullImage ? (turn.imageBase64 || null) : null,
+          thumbUrl: idx >= sliced.length - 8 ? (turn.thumbUrl || null) : null,
+          isError: !!turn.isError
+        };
+      });
+    }
+
     function normalizeAppStateChronology(state) {
       if (!state) return state;
       ensureClosetNormalized(state);
+      state.aiThread = Array.isArray(state.aiThread) ? compactAiThreadForSave(state.aiThread) : [];
       if (!Array.isArray(state.tanks)) return state;
       state.tanks.forEach(tank => {
+        tank.aiThread = Array.isArray(tank.aiThread) ? compactAiThreadForSave(tank.aiThread) : [];
         if (Array.isArray(tank.timeline)) sortRecordsByDateDesc(tank.timeline);
         if (Array.isArray(tank.history)) {
           sortRecordsByDateDesc(tank.history);
@@ -2439,6 +2522,7 @@
       version: 8,
       units: "us",
       apiKey: "",
+      aiThread: [],
       tapBaseline: { ph: 7.4, no3: 5, gh: 8, kh: 4 },
       closet: ["Seachem Prime", "API Freshwater Master Test Kit", "Fritz TurboStart 700", "Aquarium Salt"],
       tanks: [
@@ -3419,11 +3503,20 @@
       const avail = all.filter(i => i.stock !== "out");
       const out = all.filter(i => i.stock === "out");
 
+      const catShort = {
+        conditioner: "Conditioner",
+        bacteria: "Cycling",
+        food: "Food",
+        fertilizer: "Fertilizer",
+        medication: "Treatment",
+        testing: "Testing"
+      };
+
       const availStr = avail.length > 0
         ? avail.map(i => {
-            let s = i.name;
-            if (i.stock === "low") s += " [Running Low]";
-            if (i.notes) s += ` (Note: ${i.notes})`;
+            const cLbl = catShort[i.cat] || "Supply";
+            let s = `${i.name} (${cLbl}${i.stock === "low" ? ", Running Low" : ""})`;
+            if (i.notes) s += ` [Note: ${i.notes}]`;
             if (targetTank) {
               const catEntry = matchSupplyCatalog(i.name);
               const conflict = catEntry ? detectTankSupplyConflicts(targetTank, catEntry) : null;
@@ -3434,23 +3527,75 @@
         : "None currently in stock";
 
       if (out.length > 0) {
-        return `${availStr} | Out of Stock (do NOT prescribe until restocked): ${out.map(i => i.name).join(", ")}`;
+        return `${availStr} | Out of Stock (do NOT prescribe until restocked): ${out.map(i => `${i.name} (${catShort[i.cat] || "Supply"})`).join(", ")}`;
       }
       return availStr;
     }
 
-    function formatAllTanksForPrompt() {
+    function buildTankEcosystemDossier(tank) {
+      if (!tank) return "";
       const u = getUnitLabels();
-      if (!Array.isArray(appState.tanks) || appState.tanks.length === 0) return "No aquariums added yet";
-      return appState.tanks.map(t => {
-        const tested = hasTankBeenTested(t);
-        const p = tested && t.lastTest
-          ? `Temp ${displayTemp(t.lastTest.temp || 78)}${u.temp}, pH ${t.lastTest.ph ?? 7.2}, NH3 ${t.lastTest.nh3 ?? 0}, NO2 ${t.lastTest.no2 ?? 0}, NO3 ${t.lastTest.no3 ?? 0} ppm`
-          : "Untested";
-        const live = (t.livestock || []).join(", ") || "Empty";
-        const plants = (t.plants || []).join(", ") || "None";
-        return `${t.name} (${displayVol(t.vol)} ${u.vol}, ${t.status}; Params: ${p}; Fauna: ${live}; Flora: ${plants})`;
-      }).join(" | ");
+      const tested = hasTankBeenTested(tank);
+      const freshness = formatTestFreshness(tank);
+      const last = tested ? tank.lastTest : null;
+
+      const latestParams = last
+        ? `${freshness.text} (${last.date || "recent"}): Temp ${displayTemp(last.temp || 78)}${u.temp}, pH ${last.ph ?? 7.2}, NH3 ${last.nh3 ?? 0} ppm, NO2 ${last.no2 ?? 0} ppm, NO3 ${last.no3 ?? 0} ppm`
+        : "Not tested yet";
+
+      const recentHistory = Array.isArray(tank.history) && tank.history.length > 0
+        ? tank.history.slice(0, 6).map(h => {
+            const parts = [h.date || "undated"];
+            if (!h.wcOnly) {
+              parts.push(`Temp ${displayTemp(h.temp || 78)}${u.temp}, pH ${h.ph ?? 7.2}, NH3 ${h.nh3 ?? 0}, NO2 ${h.no2 ?? 0}, NO3 ${h.no3 ?? 0} ppm`);
+            }
+            if (h.wc) parts.push(`WC ${h.wc}%`);
+            if (h.dose) parts.push(`Dose: ${h.dose}`);
+            if (h.note) parts.push(`Note: ${h.note}`);
+            return `[${parts.join(" | ")}]`;
+          }).join("; ")
+        : "None recorded yet";
+
+      const mediaDetails = Array.isArray(tank.filterMedia) && tank.filterMedia.length > 0
+        ? tank.filterMedia.map(m => `${m.name} (${m.cat || "media"}, every ${m.interval || 30}d, last serviced ${m.lastDate || "unknown"})`).join(", ")
+        : "Standard media";
+
+      const careDates = [
+        tank.lastWaterChange ? `Last WC: ${tank.lastWaterChange}` : null,
+        tank.lastPlantCare ? `Last Plant Care: ${tank.lastPlantCare}` : null,
+        tank.lastGlassClean ? `Last Glass Clean: ${tank.lastGlassClean}` : null,
+        tank.lastImpellerClean ? `Last Impeller Check: ${tank.lastImpellerClean}` : null,
+        tank.lastHeaterCheck ? `Last Heater Check: ${tank.lastHeaterCheck}` : null
+      ].filter(Boolean).join(" | ") || "No routine timestamps yet";
+
+      const recentTimeline = Array.isArray(tank.timeline) && tank.timeline.length > 0
+        ? tank.timeline.slice(0, 8).map(e => `${e.date}: ${e.text}`).join(" ; ")
+        : "No timeline entries yet";
+
+      const healthLogs = Array.isArray(tank.losses) && tank.losses.length > 0
+        ? tank.losses.slice(0, 5).map(l => `${l.date}: ${l.qty || 1}x ${l.species} (Symptoms: ${l.symptoms || "Unspecified"})`).join(" ; ")
+        : "None";
+
+      const upcomingTasks = generateTankTasks(tank, 7).slice(0, 5)
+        .map(tk => `${tk.planTabTitle} (${tk.subtitle})`).join("; ") || "All routines on schedule";
+
+      return `Aquarium "${tank.name}" (${displayVol(tank.vol)} ${u.vol}, Status: ${tank.status}, Setup: ${tank.startDate || "unknown"}, Age: ${calculateAge(tank.startDate)}):
+  - Current Water Chemistry: ${latestParams}
+  - Water & WC History Logs: ${recentHistory}
+  - Livestock / Fauna: ${(tank.livestock || []).join(", ") || "Empty / None"}
+  - Plants / Flora: ${(tank.plants || []).join(", ") || "None"}
+  - Hardscape & Decor: ${(tank.decor || []).join(", ") || "None"}
+  - Gear & Equipment: ${(tank.equipment || []).join(", ") || "Standard"}${tank.filterType ? ` (Filter type: ${tank.filterType})` : ""}
+  - Filter Media & Service: ${mediaDetails}
+  - Routine Care Timestamps: ${careDates}
+  - Activity Timeline Logs: ${recentTimeline}
+  - Health / Loss Logs: ${healthLogs}
+  - Upcoming Care Tasks (7d): ${upcomingTasks}`;
+    }
+
+    function formatAllTanksForPrompt() {
+      if (!Array.isArray(appState.tanks) || appState.tanks.length === 0) return "No aquariums added yet.";
+      return appState.tanks.map(t => buildTankEcosystemDossier(t)).join("\n\n");
     }
 
     function analyzeTankWaterParameters(tank) {
@@ -4705,15 +4850,29 @@
       throw lastErr || new Error("Gemini API request failed");
     }
 
+    function getGlobalAiThreadStore() {
+      if (!Array.isArray(appState.aiThread)) appState.aiThread = [];
+      globalAiThread = appState.aiThread;
+      return appState.aiThread;
+    }
+
+    function autoGrowAiInput(el) {
+      if (!el) return;
+      el.style.height = "auto";
+      const nextH = Math.min(120, Math.max(34, el.scrollHeight || 34));
+      el.style.height = nextH + "px";
+    }
+
     function buildMultiTurnContents(thread) {
-      const recent = thread.slice(-8);
+      const recent = (thread || []).filter(t => !t.isError).slice(-20);
       return recent.map((turn, idx) => {
         if (turn.role === "model") {
           return { role: "model", parts: [{ text: turn.text || "" }] };
         }
         const includeImage = turn.imageBase64 && idx >= recent.length - 3;
-        const promptLabel = turn.text || (turn.imageBase64 ? "Please analyze the attached aquarium photo." : "");
-        const parts = [{ text: (!includeImage && turn.imageBase64) ? `[Attached aquarium photo] ${promptLabel}` : promptLabel }];
+        const hadPhoto = !!(turn.hadPhoto || turn.imageBase64 || turn.thumbUrl);
+        const promptLabel = turn.text || (hadPhoto ? "Please analyze the attached aquarium photo." : "");
+        const parts = [{ text: (!includeImage && hadPhoto) ? `[Attached aquarium photo] ${promptLabel}` : promptLabel }];
         if (includeImage) {
           parts.push({ inlineData: { mimeType: "image/jpeg", data: turn.imageBase64 } });
         }
@@ -4744,12 +4903,12 @@
           const bodyHtml = turn.isError
             ? `<span style="color:var(--alert-red);">${escapeHtmlText(turn.text)}</span>`
             : renderMarkdownToHtml(turn.text);
-          html += `<div class="ai-turn-model">${bodyHtml}</div>`;
+          html += `<div class="ai-turn-model"><div class="ai-model-label">✦ Aquarist AI</div>${bodyHtml}</div>`;
         }
       });
 
       if (pendingText) {
-        html += `<div class="ai-turn-model" style="color:var(--text-muted);">${escapeHtmlText(pendingText)}</div>`;
+        html += `<div class="ai-turn-model"><div class="ai-model-label">✦ Aquarist AI</div><span style="color:var(--text-muted);">${escapeHtmlText(pendingText)}</span></div>`;
       }
 
       containerEl.innerHTML = html;
@@ -4767,7 +4926,7 @@
       const askPanel = document.getElementById("global-ai-ask-panel");
       const compatPanel = document.getElementById("global-ai-compat-panel");
       const group = document.getElementById("global-ai-mode-group");
-      if (askPanel) askPanel.style.display = globalAiMode === "ask" ? "block" : "none";
+      if (askPanel) askPanel.style.display = globalAiMode === "ask" ? "flex" : "none";
       if (compatPanel) compatPanel.style.display = globalAiMode === "compat" ? "block" : "none";
       if (group) {
         group.querySelectorAll(".segmented-btn").forEach(btn => {
@@ -4782,23 +4941,30 @@
     }
 
     function renderGlobalAIThreadView(pendingText = "") {
+      const thread = getGlobalAiThreadStore();
       const threadEl = document.getElementById("global-ai-thread");
       const clearBtn = document.getElementById("global-ai-clear-btn");
+      const emptyEl = document.getElementById("global-ai-empty");
       const startersEl = document.getElementById("global-ai-starters");
-      const hasActivity = globalAiThread.length > 0 || !!pendingText;
+      const hasActivity = thread.length > 0 || !!pendingText;
+      if (emptyEl) emptyEl.style.display = hasActivity ? "none" : "flex";
       if (startersEl) startersEl.style.display = hasActivity ? "none" : "flex";
-      renderAiThreadElement(threadEl, clearBtn, globalAiThread, pendingText);
+      renderAiThreadElement(threadEl, clearBtn, thread, pendingText);
     }
 
     function clearGlobalAIThread() {
-      globalAiThread = [];
+      appState.aiThread = [];
+      globalAiThread = appState.aiThread;
+      saveDataToStorage();
       renderGlobalAIThreadView();
+      showToast("New Chat Started");
     }
 
     function useGlobalStarterPrompt(promptStr, focusOnly = false) {
       const inputEl = document.getElementById("global-ai-input");
       if (!inputEl) return;
       inputEl.value = promptStr;
+      autoGrowAiInput(inputEl);
       if (focusOnly) {
         inputEl.focus();
         inputEl.setSelectionRange(promptStr.length, promptStr.length);
@@ -4811,7 +4977,7 @@
       updateGlobalAIKeyNotice();
       const u = getUnitLabels();
 
-      // Context selector (All Aquariums or specific tank)
+      // Focus selector (All Aquariums or specific tank)
       const ctxSel = document.getElementById("global-ai-context-select");
       if (ctxSel) {
         let ctxOpts = `<option value="all">All Aquariums</option>`;
@@ -4853,37 +5019,44 @@
         : null;
 
       if (focusedTank) {
-        const tested = hasTankBeenTested(focusedTank);
-        const last = tested ? focusedTank.lastTest : null;
-        const waterLine = last
-          ? `Temp ${displayTemp(last.temp || 78)}${u.temp}, pH ${last.ph ?? 7.2}, NH3 ${last.nh3 ?? 0} ppm, NO2 ${last.no2 ?? 0} ppm, NO3 ${last.no3 ?? 0} ppm`
-          : "Not tested yet";
-        return `You are aquAssist, a calm, scientifically grounded aquarist AI.
-Selected Aquarium Focus (${u.vol}, ${u.temp}):
-- Name: ${focusedTank.name} (${displayVol(focusedTank.vol)} ${u.vol}, ${focusedTank.status}, Age: ${calculateAge(focusedTank.startDate)})
-- Water Balance: ${waterLine}
-- Filtration & Gear: ${(focusedTank.equipment || []).join(", ") || "Standard"} | Media: ${(focusedTank.filterMedia || []).map(m => m.name).join(", ") || "Standard"}
-- Livestock: ${(focusedTank.livestock || []).join(", ") || "None"}
-- Live Plants: ${(focusedTank.plants || []).join(", ") || "None"} | Hardscape: ${(focusedTank.decor || []).join(", ") || "None"}
+        const otherTanks = appState.tanks
+          .filter(t => t.id !== focusedTank.id)
+          .map(t => `${t.name} (${displayVol(t.vol)} ${u.vol}, ${t.status})`)
+          .join(", ") || "None";
+
+        return `You are Aquarist AI, an insightful, collaborative, scientifically grounded aquarist and aquascaping partner inside aquAssist.
+Speak naturally like an ongoing Gemini conversation—great for bouncing aquascape, flora, hardscape, lighting, feeding, or stocking ideas back and forth, interpreting trends in the user's logs, or troubleshooting water chemistry and fish health.
+
+Primary Focus Aquarium (Preferred Units: ${u.vol}, ${u.temp}):
+${buildTankEcosystemDossier(focusedTank)}
+
+Other Household Context:
+- Other Aquariums in Household: ${otherTanks}
 - Tap Water Baseline: pH ${tap.ph ?? 7.4}, NO3 ${tap.no3 ?? 0} ppm, GH ${tap.gh ?? 8} dGH, KH ${tap.kh ?? 4} dKH
 - Household Supplies Shelf: ${formatSuppliesForPrompt(focusedTank)}
 
-Instructions:
-1. Tailor dosages and guidance specifically to '${focusedTank.name}' (${displayVol(focusedTank.vol)} ${u.vol}) and its inhabitants.
-2. Prioritize In-Stock Household Supplies first; never prescribe Out-of-Stock items unless advising a restock.
-3. Flag live plant, shrimp, snail, or scaleless-fish safety precautions clearly. Keep answers concise, structured, and free of emojis.`;
+Conversational Guidelines:
+1. Ground your ideas, suggestions, and diagnostics naturally in the tank's real plants, livestock, decor/hardscape, filtration/gear, water test history, activity timeline logs, and supplies—without robotically repeating every stat on every turn.
+2. When brainstorming (aquascaping, plant choices for their light/hardscape, stocking, rescapes, routines), be thoughtful, creative, and practical, and feel free to offer smart follow-up angles.
+3. When giving dosing or treatment steps, prioritize In-Stock Household Supplies first (noting Running Low items if helpful, and never prescribing Out-of-Stock items without mentioning a restock) and flag live plant, shrimp, snail, or scaleless-fish sensitivities.
+4. Keep formatting clean and readable, and do not use emojis.`;
       }
 
-      return `You are aquAssist, a calm, scientifically grounded aquarist AI.
-Household Context (Preferred Units: ${u.vol}, ${u.temp}):
-- Registered Aquariums: ${formatAllTanksForPrompt()}
-- Household Supplies Shelf: ${formatSuppliesForPrompt()}
-- Tap Water Baseline: pH ${tap.ph ?? 7.4}, NO3 ${tap.no3 ?? 0} ppm, GH ${tap.gh ?? 8} dGH, KH ${tap.kh ?? 4} dKH
+      return `You are Aquarist AI, an insightful, collaborative, scientifically grounded aquarist and aquascaping partner inside aquAssist.
+Speak naturally like an ongoing Gemini conversation—great for bouncing aquascape, flora, hardscape, lighting, feeding, or stocking ideas back and forth, interpreting trends across the user's logs, or troubleshooting water chemistry and fish health.
 
-Instructions:
-1. Reference the user's actual aquariums, volumes, inhabitants, and In-Stock Household Supplies when calculating dosages or care steps.
-2. Never prescribe a supply marked Out of Stock unless explicitly telling the user to restock it first.
-3. Flag any live plant, snail, shrimp, or scaleless-fish safety precautions. Keep advice clear, structured, concise, and free of emojis.`;
+Live Household Ecosystem Data (Preferred Units: ${u.vol}, ${u.temp}):
+${formatAllTanksForPrompt()}
+
+Household Tap Water & Supplies:
+- Tap Water Baseline: pH ${tap.ph ?? 7.4}, NO3 ${tap.no3 ?? 0} ppm, GH ${tap.gh ?? 8} dGH, KH ${tap.kh ?? 4} dKH
+- Household Supplies Shelf: ${formatSuppliesForPrompt()}
+
+Conversational Guidelines:
+1. Ground your ideas, suggestions, and diagnostics naturally in the user's real tanks, plants, livestock, decor/hardscape, filtration/gear, water test history, activity timeline logs, health records, and supplies—without robotically repeating every stat on every turn.
+2. When brainstorming (aquascaping, plant pairings, stocking ideas, gear upgrades, feeding routines), engage creatively and practically like a knowledgeable hobbyist partner.
+3. When giving dosing or treatment steps, prioritize In-Stock Household Supplies first (noting Running Low items if helpful, and never prescribing Out-of-Stock items without mentioning a restock) and flag live plant, shrimp, snail, or scaleless-fish sensitivities.
+4. Keep formatting clean and readable, and do not use emojis.`;
     }
 
     async function askGlobalAI() {
@@ -4903,34 +5076,38 @@ Instructions:
 
       const attachedBase64 = globalVisionBase64;
       const attachedThumb = globalVisionDataUrl;
-      if (inputEl) inputEl.value = "";
+      if (inputEl) {
+        inputEl.value = "";
+        inputEl.style.height = "34px";
+      }
       clearGlobalVisionAttachment();
 
-      if (globalAiThread.length >= 12) {
-        globalAiThread = globalAiThread.slice(-8);
-      }
-
+      const thread = getGlobalAiThreadStore();
       const userTurn = {
         role: "user",
         text: q,
+        hadPhoto: !!attachedBase64,
         imageBase64: attachedBase64 || null,
         thumbUrl: attachedThumb || null
       };
-      globalAiThread.push(userTurn);
-      renderGlobalAIThreadView("Aquarist AI is analyzing...");
+      thread.push(userTurn);
+      renderGlobalAIThreadView("Thinking...");
 
       try {
-        const contents = buildMultiTurnContents(globalAiThread);
+        const contents = buildMultiTurnContents(thread);
         const systemPrompt = buildGlobalAISystemPrompt();
         const reply = await callGeminiGenerate(contents, systemPrompt);
-        globalAiThread.push({ role: "model", text: reply });
+        thread.push({ role: "model", text: reply });
       } catch (err) {
-        globalAiThread.push({
+        thread.push({
           role: "model",
           isError: true,
           text: `Unable to reach Gemini API (${err.message || "connection error"}). Check your API key in Settings.`
         });
       }
+      appState.aiThread = compactAiThreadForSave(thread);
+      globalAiThread = appState.aiThread;
+      saveDataToStorage();
       renderGlobalAIThreadView();
     }
 
@@ -6349,18 +6526,27 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       if (chip) chip.style.display = "none";
     }
 
+    function getTankAiThreadStore(tank) {
+      if (!tank) return [];
+      if (!Array.isArray(tank.aiThread)) tank.aiThread = [];
+      tankAiThreads[tank.id] = tank.aiThread;
+      return tank.aiThread;
+    }
+
     function renderActiveTankAIThread(pendingText = "") {
       const activeTank = getActiveTank();
       const box = document.getElementById("tank-ai-chat-box");
       const clearBtn = document.getElementById("tank-ai-clear-btn");
-      const thread = activeTank ? (tankAiThreads[activeTank.id] || []) : [];
+      const thread = activeTank ? getTankAiThreadStore(activeTank) : [];
       renderAiThreadElement(box, clearBtn, thread, pendingText);
     }
 
     function clearTankAIThread() {
       const activeTank = getActiveTank();
       if (!activeTank) return;
-      tankAiThreads[activeTank.id] = [];
+      activeTank.aiThread = [];
+      tankAiThreads[activeTank.id] = activeTank.aiThread;
+      saveDataToStorage();
       renderActiveTankAIThread();
     }
 
@@ -6387,61 +6573,49 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       if (qInput) qInput.value = "";
       clearVisionAttachment();
 
-      if (!Array.isArray(tankAiThreads[activeTank.id])) {
-        tankAiThreads[activeTank.id] = [];
-      }
-      if (tankAiThreads[activeTank.id].length >= 12) {
-        tankAiThreads[activeTank.id] = tankAiThreads[activeTank.id].slice(-8);
-      }
-
-      tankAiThreads[activeTank.id].push({
+      const thread = getTankAiThreadStore(activeTank);
+      thread.push({
         role: "user",
         text: q,
+        hadPhoto: !!attachedBase64,
         imageBase64: attachedBase64 || null,
         thumbUrl: attachedThumb || null
       });
-      renderActiveTankAIThread("Aquarist AI is analyzing...");
+      renderActiveTankAIThread("Thinking...");
 
       const tap = appState.tapBaseline || {};
       const u = getUnitLabels();
-      const tested = hasTankBeenTested(activeTank);
-      const last = tested ? activeTank.lastTest : null;
-      const liveStr = (activeTank.livestock || []).join(", ") || "None";
-      const equipStr = (activeTank.equipment || []).join(", ") || "Standard";
-      const mediaStr = (activeTank.filterMedia || []).map(m => m.name).join(", ") || "Standard";
-      const plantsStr = (activeTank.plants || []).join(", ") || "None";
-      const decorStr = (activeTank.decor || []).join(", ") || "None";
       const closetStr = formatSuppliesForPrompt(activeTank);
-      const waterBalanceLine = last
-        ? `Temp ${displayTemp(last.temp || 78)}${u.temp}, pH ${last.ph ?? 7.2}, NH3 ${last.nh3 ?? 0} ppm, NO2 ${last.no2 ?? 0} ppm, NO3 ${last.no3 ?? 0} ppm`
-        : "Not tested yet";
 
-      const systemPrompt = `You are aquAssist, expert Aquarist AI analyzing aquarium '${activeTank.name}' (${displayVol(activeTank.vol)} ${u.vol}, ${activeTank.status}).
-Holistic Tank Blueprint:
-- Age: ${calculateAge(activeTank.startDate)}
-- Current Water Balance: ${waterBalanceLine}
+      const systemPrompt = `You are Aquarist AI, an insightful, collaborative, scientifically grounded aquarist and aquascaping partner analyzing aquarium '${activeTank.name}' (${displayVol(activeTank.vol)} ${u.vol}, ${activeTank.status}).
+Speak naturally like an ongoing Gemini conversation—great for bouncing ideas, interpreting recent logs, or troubleshooting water chemistry and fish health.
+
+Complete Tank Ecosystem Dossier (Preferred Units: ${u.vol}, ${u.temp}):
+${buildTankEcosystemDossier(activeTank)}
+
+Household Tap & Supplies:
 - Tap Water Baseline: pH ${tap.ph || 7.4}, NO3 ${tap.no3 || 0} ppm, GH ${tap.gh || 8} dGH, KH ${tap.kh || 4} dKH
-- Filtration & Gear: Equipment: ${equipStr} | Media: ${mediaStr}
-- Ecosystem Biota: Livestock: ${liveStr} | Flora: ${plantsStr} | Hardscape: ${decorStr}
-- Household Supplies & Treatments: ${closetStr}
+- Household Supplies Shelf: ${closetStr}
 
-Instructions:
-1. Provide a scientifically grounded, holistic assessment taking into account water parameters, filtration, bioload, and flora.
-2. If disease symptoms or water problems are identified, provide exact dosage instructions utilizing In-Stock products from the user's Household Supplies first (never prescribe Out-of-Stock items unless telling them to restock).
-3. Explicitly note invertebrate, scaleless-fish, and live-plant safety if recommending any treatments.
-4. Keep the explanation concise, structured, actionable, and free of emojis.`;
+Guidelines:
+1. Ground your advice naturally in this tank's water history, activity timeline logs, health records, filtration/gear, livestock, plants, hardscape, and supplies.
+2. If recommending dosing or treatments, prioritize In-Stock Household Supplies first (never prescribe Out-of-Stock items unless advising a restock) and flag invertebrate, scaleless-fish, and live-plant safety.
+3. Keep responses conversational, structured, actionable, and free of emojis.`;
 
       try {
-        const contents = buildMultiTurnContents(tankAiThreads[activeTank.id]);
+        const contents = buildMultiTurnContents(thread);
         const reply = await callGeminiGenerate(contents, systemPrompt);
-        tankAiThreads[activeTank.id].push({ role: "model", text: reply });
+        thread.push({ role: "model", text: reply });
       } catch (err) {
-        tankAiThreads[activeTank.id].push({
+        thread.push({
           role: "model",
           isError: true,
           text: `Unable to reach Gemini API (${err.message || "connection error"}). Check your connection or API key in Settings.`
         });
       }
+      activeTank.aiThread = compactAiThreadForSave(thread);
+      tankAiThreads[activeTank.id] = activeTank.aiThread;
+      saveDataToStorage();
       renderActiveTankAIThread();
     }
 
@@ -7213,6 +7387,7 @@ Instructions:
         return;
       }
       appState.tanks = [];
+      appState.aiThread = [];
       activeTankId = 0;
       globalAiThread = [];
       tankAiThreads = {};
