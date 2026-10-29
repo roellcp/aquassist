@@ -626,6 +626,39 @@
       font-size: 11px; font-weight: 700; color: var(--cyan); letter-spacing: 0.2px;
       margin-bottom: 5px; display: flex; align-items: center; gap: 5px;
     }
+    .ai-action-chips {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px;
+    }
+    .ai-action-chip {
+      background: rgba(0, 245, 160, 0.06); border: 1px solid rgba(0, 245, 160, 0.3);
+      color: var(--neon-green); font-size: 11.5px; font-weight: 600;
+      padding: 5px 10px; border-radius: 8px; cursor: pointer; transition: all 0.15s ease;
+    }
+    .ai-action-chip:hover:not(.applied) {
+      background: rgba(0, 245, 160, 0.14); border-color: rgba(0, 245, 160, 0.55); color: #fff;
+    }
+    .ai-action-chip.applied {
+      opacity: 0.58; cursor: default; background: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.12); color: var(--text-muted);
+    }
+    .ai-sessions-drawer {
+      background: rgba(255, 255, 255, 0.025); border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px; padding: 8px 12px; margin-bottom: 12px; display: none;
+    }
+    .ai-session-row {
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      padding: 8px 2px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); cursor: pointer;
+    }
+    .ai-session-row:last-child { border-bottom: none; padding-bottom: 2px; }
+    .ai-session-title {
+      font-size: 12.5px; font-weight: 600; color: #E2E8F0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .ai-session-row.active .ai-session-title { color: var(--cyan); }
+    .ai-session-row:hover .ai-session-title { color: #fff; }
+    .ai-session-meta {
+      font-size: 10.5px; color: var(--text-muted); white-space: nowrap;
+    }
     .ai-composer-wrap { margin-top: auto; padding-top: 6px; }
     .ai-composer-box {
       display: flex; align-items: flex-end; gap: 6px;
@@ -883,11 +916,23 @@
         <!-- MODE 1: ONGOING GEMINI CONVERSATION -->
         <div id="global-ai-ask-panel" class="ai-chat-shell">
           <div class="ai-context-bar">
-            <div style="display:flex; align-items:center; gap:8px;">
+            <div style="display:flex; align-items:center; gap:7px; min-width:0;">
+              <button type="button" id="global-ai-back-tank-btn" class="ghost-action-btn" style="display:none; padding:4px 9px; font-size:11px; color:var(--text-main);" onclick="backFromAiToTank()"></button>
               <span style="font-size:11.5px; color:var(--text-muted); font-weight:600;">Focus</span>
               <select id="global-ai-context-select" class="ai-context-select" onchange="onGlobalAIContextChange(this.value)"></select>
             </div>
-            <button type="button" id="global-ai-clear-btn" class="ghost-action-btn" style="display:none; color:var(--text-muted);" onclick="clearGlobalAIThread()">New Chat</button>
+            <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+              <button type="button" id="global-ai-history-btn" class="ghost-action-btn" style="display:none; font-size:11px; padding:4px 9px; color:var(--text-muted);" onclick="toggleAiSessionsDrawer()">Chats</button>
+              <button type="button" id="global-ai-clear-btn" class="ghost-action-btn" style="display:none; font-size:11px; padding:4px 9px;" onclick="clearGlobalAIThread()">+ New</button>
+            </div>
+          </div>
+
+          <div id="global-ai-sessions-drawer" class="ai-sessions-drawer">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:11px; font-weight:600; color:var(--text-muted);">Recent Conversations</span>
+              <span style="font-size:11px; color:var(--cyan); cursor:pointer; font-weight:600;" onclick="toggleAiSessionsDrawer(false)">Close</span>
+            </div>
+            <div id="global-ai-sessions-list"></div>
           </div>
 
           <div id="global-ai-empty" class="ai-empty-state">
@@ -946,7 +991,10 @@
           <div id="sandbox-result-box" style="display:none; margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.08); font-size:13px; line-height:1.58;"></div>
 
           <div id="sandbox-add-roster-wrap" style="display:none; margin-top:12px;">
-            <button type="button" id="sandbox-add-roster-btn" class="ghost-action-btn" style="width:100%; padding:9px 12px; font-size:12.5px; color:var(--neon-green); border-color:rgba(0,245,160,0.32); background:rgba(0,245,160,0.06);" onclick="addEvaluatedSpeciesToTank()"></button>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button type="button" id="sandbox-discuss-btn" class="ghost-action-btn" style="flex:1; min-width:140px; padding:9px 12px; font-size:12.5px;" onclick="discussCompatibilityInChat()">Discuss in Chat</button>
+              <button type="button" id="sandbox-add-roster-btn" class="ghost-action-btn" style="flex:1.4; min-width:180px; padding:9px 12px; font-size:12.5px; color:var(--neon-green); border-color:rgba(0,245,160,0.32); background:rgba(0,245,160,0.06);" onclick="addEvaluatedSpeciesToTank()"></button>
+            </div>
           </div>
         </div>
       </div>
@@ -988,12 +1036,36 @@
         <!-- Nitrogen Cycling Roadmap (Rendered dynamically when tank is in Cycling status) -->
         <div id="tank-cycling-roadmap-wrap"></div>
 
-        <!-- Holistic Ecosystem Assessment Card -->
-        <div class="card" style="background: linear-gradient(135deg, rgba(0, 245, 160, 0.08), rgba(6, 12, 24, 0.95)); border-color: rgba(0, 245, 160, 0.35);">
-          <div style="font-size: 11px; font-weight: 800; color: var(--neon-green); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;">
-            Aquarist AI Ecosystem Assessment
+        <!-- Unified Aquarist AI Ecosystem Assessment + Quick Chat Entry -->
+        <div class="card" style="background: linear-gradient(135deg, rgba(0, 245, 160, 0.07), rgba(6, 12, 24, 0.95)); border-color: rgba(0, 245, 160, 0.3);">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px;">
+            <div style="font-size: 11px; font-weight: 800; color: var(--neon-green); text-transform: uppercase; letter-spacing: 0.8px;">
+              ✦ Aquarist AI
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <button type="button" id="tank-open-ai-chat-btn" class="ghost-action-btn" style="padding:3px 9px; font-size:10.5px;" onclick="openTankFocusedChat()">Open Chat</button>
+              <button type="button" class="ghost-action-btn" style="padding:3px 9px; font-size:10.5px; color:var(--text-muted);" onclick="copyTankDelta()">Copy Delta</button>
+            </div>
           </div>
           <div id="tank-overview-summary" style="font-size: 13.5px; line-height: 1.55; color: var(--text-main);"></div>
+
+          <div style="margin-top:12px; padding-top:11px; border-top:1px solid rgba(255,255,255,0.07);">
+            <div id="ai-vision-preview-chip" style="display:none; align-items:center; gap:8px; margin-bottom:8px; background:rgba(0,210,255,0.08); border:1px solid rgba(0,210,255,0.28); border-radius:10px; padding:6px 10px;">
+              <img id="vision-preview-thumb" style="width:28px; height:28px; border-radius:6px; object-fit:cover;">
+              <span style="font-size:11px; color:var(--cyan); font-weight:600; flex:1;">Photo attached</span>
+              <span class="delete-x" onclick="clearVisionAttachment()" style="font-size:16px;">×</span>
+            </div>
+            <div class="ai-composer-box" style="padding:4px 6px 4px 7px; border-radius:15px;">
+              <button type="button" class="ai-composer-icon-btn" id="ai-vision-camera-btn" style="width:31px; height:31px;" onclick="document.getElementById('vision-file-input').click()" title="Attach photo of tank, fish, or water">
+                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </button>
+              <input type="text" id="tank-ai-chat-input" class="ai-composer-textarea" style="min-height:30px; padding:5px 4px; font-size:13px;" placeholder="Ask Aquarist AI about this tank..." onkeydown="if(event.key==='Enter'){event.preventDefault();runUnifiedTankAI();}">
+              <button type="button" class="ai-send-btn" style="width:31px; height:31px;" onclick="runUnifiedTankAI()" title="Ask Aquarist AI">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+              </button>
+            </div>
+            <input type="file" id="vision-file-input" accept="image/*" style="display:none;" onchange="handleVisionImageSelected(event)">
+          </div>
         </div>
 
         <!-- Latest Parameter Snapshot -->
@@ -1006,37 +1078,6 @@
             </div>
           </div>
           <div class="param-strip" id="tank-overview-params"></div>
-        </div>
-
-        <!-- Integrated Aquarist AI Lab (Consult AI + Inline Camera Vision) -->
-        <div class="card" style="background: linear-gradient(135deg, rgba(0, 210, 255, 0.08), rgba(9, 18, 36, 0.95)); border-color: rgba(56, 189, 248, 0.35);">
-          <div class="card-header">
-            <div class="card-title" style="font-size:15px;">Aquarist AI Lab</div>
-            <div style="display:flex; gap:6px; align-items:center;">
-              <button type="button" id="tank-ai-clear-btn" class="ghost-action-btn" style="display:none; padding:4px 9px; font-size:10.5px; color:var(--text-muted);" onclick="clearTankAIThread()">Clear</button>
-              <button type="button" class="btn btn-secondary" style="width:auto; padding:4px 8px; font-size:10px;" onclick="copyTankDelta()">Copy Delta</button>
-            </div>
-          </div>
-
-          <div id="tank-ai-chat-box" class="ai-thread" style="display:none; margin-bottom:12px;"></div>
-          
-          <!-- Unified Question Input with Inline Camera Icon Button -->
-          <div style="display:flex; gap:6px; align-items:center;">
-            <input type="text" id="tank-ai-chat-input" placeholder="Ask about parameters, fish symptoms, dosing..." style="flex:1;" onkeydown="if(event.key==='Enter'){event.preventDefault();runUnifiedTankAI();}">
-            <button type="button" class="icon-btn" id="ai-vision-camera-btn" onclick="document.getElementById('vision-file-input').click()" title="Attach photo of fish or water for AI Vision analysis" style="background:rgba(0,210,255,0.12); border-color:var(--cyan); color:var(--cyan);">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-            </button>
-            <button type="button" class="btn btn-neon" style="width:auto; padding:10px 16px; font-size:13px;" onclick="runUnifiedTankAI()">Ask</button>
-          </div>
-          
-          <input type="file" id="vision-file-input" accept="image/*" style="display:none;" onchange="handleVisionImageSelected(event)">
-          
-          <!-- Selected Image Chip Preview -->
-          <div id="ai-vision-preview-chip" style="display:none; align-items:center; gap:8px; margin-top:10px; background:rgba(0,210,255,0.1); border:1px solid rgba(0,210,255,0.3); border-radius:10px; padding:6px 10px;">
-            <img id="vision-preview-thumb" style="width:28px; height:28px; border-radius:6px; object-fit:cover;">
-            <span style="font-size:11px; color:var(--cyan); font-weight:600; flex:1;">Photo attached</span>
-            <span class="delete-x" onclick="clearVisionAttachment()" style="font-size:16px;">×</span>
-          </div>
         </div>
 
         <!-- Unified Activity Timeline -->
@@ -2478,7 +2519,17 @@
       const sliced = thread.slice(-30);
       return sliced.map((turn, idx) => {
         const keepFullImage = turn.role === "user" && idx >= sliced.length - 4;
-        return {
+        const cleanActions = Array.isArray(turn.actions)
+          ? turn.actions.slice(0, 3).map(a => ({
+              type: String(a.type || ""),
+              tankId: a.tankId ?? null,
+              value: a.value ? String(a.value) : "",
+              name: a.name ? String(a.name) : "",
+              stock: a.stock === "out" ? "out" : "in",
+              applied: !!a.applied
+            }))
+          : undefined;
+        const out = {
           role: turn.role === "model" ? "model" : "user",
           text: String(turn.text || ""),
           hadPhoto: !!(turn.hadPhoto || turn.imageBase64 || turn.thumbUrl),
@@ -2486,35 +2537,117 @@
           thumbUrl: idx >= sliced.length - 8 ? (turn.thumbUrl || null) : null,
           isError: !!turn.isError
         };
+        if (cleanActions && cleanActions.length > 0) out.actions = cleanActions;
+        return out;
       });
+    }
+
+    function deriveAiSessionTitle(messages, fallback = "New Conversation") {
+      if (!Array.isArray(messages)) return fallback;
+      const firstUser = messages.find(m => m && m.role === "user" && m.text && m.text.trim());
+      if (!firstUser) {
+        const anyPhoto = messages.find(m => m && m.role === "user" && (m.hadPhoto || m.imageBase64));
+        return anyPhoto ? "Photo check" : fallback;
+      }
+      const clean = firstUser.text.trim().replace(/\s+/g, " ");
+      return clean.length > 44 ? clean.slice(0, 42) + "..." : clean;
+    }
+
+    function ensureAiSessionsNormalized(state) {
+      if (!state) return;
+      if (!Array.isArray(state.aiSessions)) state.aiSessions = [];
+
+      // Migrate legacy global aiThread if not yet inside aiSessions
+      if (Array.isArray(state.aiThread) && state.aiThread.length > 0 && state.aiSessions.length === 0) {
+        const msgs = compactAiThreadForSave(state.aiThread);
+        const sid = "s_global_" + Date.now();
+        state.aiSessions.push({
+          id: sid,
+          title: deriveAiSessionTitle(msgs, "Household Chat"),
+          focusTankId: "all",
+          updatedAt: Date.now(),
+          messages: msgs
+        });
+        state.activeAiSessionId = sid;
+      }
+
+      // Migrate any legacy per-tank aiThread into unified aiSessions
+      if (Array.isArray(state.tanks)) {
+        state.tanks.forEach((tank, idx) => {
+          if (Array.isArray(tank.aiThread) && tank.aiThread.length > 0) {
+            const msgs = compactAiThreadForSave(tank.aiThread);
+            state.aiSessions.push({
+              id: `s_tank_${tank.id}_${Date.now() + idx}`,
+              title: deriveAiSessionTitle(msgs, `${tank.name} Chat`),
+              focusTankId: String(tank.id),
+              updatedAt: Date.now() - (idx + 1),
+              messages: msgs
+            });
+            tank.aiThread = [];
+          }
+        });
+      }
+
+      // Normalize existing sessions & cap stored history at 10 recent sessions
+      state.aiSessions = state.aiSessions
+        .filter(s => s && typeof s === "object")
+        .map((s, idx) => {
+          const msgs = compactAiThreadForSave(s.messages || []);
+          return {
+            id: String(s.id || `s_${Date.now()}_${idx}`),
+            title: String(s.title || deriveAiSessionTitle(msgs)),
+            focusTankId: s.focusTankId ? String(s.focusTankId) : "all",
+            updatedAt: Number(s.updatedAt) || Date.now(),
+            messages: msgs
+          };
+        })
+        .sort((a, b) => b.updatedAt - a.updatedAt)
+        .slice(0, 10);
+
+      if (state.aiSessions.length === 0) {
+        const initId = "s_init_" + Date.now();
+        state.aiSessions.push({
+          id: initId,
+          title: "New Conversation",
+          focusTankId: "all",
+          updatedAt: Date.now(),
+          messages: []
+        });
+        state.activeAiSessionId = initId;
+      } else if (!state.activeAiSessionId || !state.aiSessions.some(s => s.id === state.activeAiSessionId)) {
+        state.activeAiSessionId = state.aiSessions[0].id;
+      }
+
+      const active = state.aiSessions.find(s => s.id === state.activeAiSessionId) || state.aiSessions[0];
+      state.aiThread = active.messages;
     }
 
     function normalizeAppStateChronology(state) {
       if (!state) return state;
       ensureClosetNormalized(state);
-      state.aiThread = Array.isArray(state.aiThread) ? compactAiThreadForSave(state.aiThread) : [];
-      if (!Array.isArray(state.tanks)) return state;
-      state.tanks.forEach(tank => {
-        tank.aiThread = Array.isArray(tank.aiThread) ? compactAiThreadForSave(tank.aiThread) : [];
-        if (Array.isArray(tank.timeline)) sortRecordsByDateDesc(tank.timeline);
-        if (Array.isArray(tank.history)) {
-          sortRecordsByDateDesc(tank.history);
-          const newestChem = tank.history.find(h => !h.wcOnly);
-          if (newestChem) {
-            if (!tank.lastTest || parseRecordTimestamp(newestChem.date) >= parseRecordTimestamp(tank.lastTest.date)) {
-              tank.lastTest = {
-                nh3: newestChem.nh3 ?? 0,
-                no2: newestChem.no2 ?? 0,
-                no3: newestChem.no3 ?? 0,
-                ph: newestChem.ph ?? 7.2,
-                temp: newestChem.temp ?? 78.0,
-                date: newestChem.date
-              };
+      if (Array.isArray(state.tanks)) {
+        state.tanks.forEach(tank => {
+          if (Array.isArray(tank.timeline)) sortRecordsByDateDesc(tank.timeline);
+          if (Array.isArray(tank.history)) {
+            sortRecordsByDateDesc(tank.history);
+            const newestChem = tank.history.find(h => !h.wcOnly);
+            if (newestChem) {
+              if (!tank.lastTest || parseRecordTimestamp(newestChem.date) >= parseRecordTimestamp(tank.lastTest.date)) {
+                tank.lastTest = {
+                  nh3: newestChem.nh3 ?? 0,
+                  no2: newestChem.no2 ?? 0,
+                  no3: newestChem.no3 ?? 0,
+                  ph: newestChem.ph ?? 7.2,
+                  temp: newestChem.temp ?? 78.0,
+                  date: newestChem.date
+                };
+              }
             }
           }
-        }
-        if (Array.isArray(tank.losses)) sortRecordsByDateDesc(tank.losses);
-      });
+          if (Array.isArray(tank.losses)) sortRecordsByDateDesc(tank.losses);
+        });
+      }
+      ensureAiSessionsNormalized(state);
       return state;
     }
 
@@ -2523,6 +2656,8 @@
       units: "us",
       apiKey: "",
       aiThread: [],
+      aiSessions: [],
+      activeAiSessionId: "",
       tapBaseline: { ph: 7.4, no3: 5, gh: 8, kh: 4 },
       closet: ["Seachem Prime", "API Freshwater Master Test Kit", "Fritz TurboStart 700", "Aquarium Salt"],
       tanks: [
@@ -2617,6 +2752,7 @@
     let globalAiContextTankId = "all"; // "all" or tank id string
     let globalAiThread = [];
     let tankAiThreads = {};
+    let aiReturnTankId = null;
     let lastEvaluatedSandbox = null;
     let swRegistration = null;
     let dashboardTaskFilter = "today"; // "today" or "3days"
@@ -2693,10 +2829,13 @@
     /* ============================================================
        3. NAVIGATION, LEVEL 1/2 ROUTING & ANDROID BACK GESTURE
        ============================================================ */
-    function navToGlobal(viewName, pushHistory = true) {
+    function navToGlobal(viewName, pushHistory = true, keepReturnTank = false) {
       closeAllModals(false);
       isInsideTank = false;
       currentGlobalView = viewName;
+      if (!keepReturnTank || viewName !== "global-ai") {
+        aiReturnTankId = null;
+      }
 
       // Update UI elements for Global Level
       document.getElementById("header-brand").style.display = "flex";
@@ -2721,6 +2860,16 @@
       if (viewName === "global-ai") renderGlobalAIScreen();
 
       window.scrollTo(0, 0);
+    }
+
+    function backFromAiToTank() {
+      const tid = aiReturnTankId;
+      aiReturnTankId = null;
+      if (tid && appState.tanks.some(t => String(t.id) === String(tid))) {
+        enterTankHub(tid, true);
+      } else {
+        navToGlobal("dashboard", true);
+      }
     }
 
     function enterTankHub(tankId, pushHistory = true) {
@@ -2815,7 +2964,11 @@
         return;
       }
 
-      // 3. If on Global sub-screens, return to Dashboard
+      // 3. Restore Tank Hub or Global sub-screen from history state
+      if (e.state && e.state.level === "tank" && e.state.tankId) {
+        enterTankHub(e.state.tankId, false);
+        return;
+      }
       if (e.state && e.state.level === "global" && e.state.view) {
         navToGlobal(e.state.view, false);
       } else if (currentGlobalView !== "dashboard") {
@@ -3579,7 +3732,7 @@
       const upcomingTasks = generateTankTasks(tank, 7).slice(0, 5)
         .map(tk => `${tk.planTabTitle} (${tk.subtitle})`).join("; ") || "All routines on schedule";
 
-      return `Aquarium "${tank.name}" (${displayVol(tank.vol)} ${u.vol}, Status: ${tank.status}, Setup: ${tank.startDate || "unknown"}, Age: ${calculateAge(tank.startDate)}):
+      return `Aquarium "${tank.name}" [Tank ID: ${tank.id}] (${displayVol(tank.vol)} ${u.vol}, Status: ${tank.status}, Setup: ${tank.startDate || "unknown"}, Age: ${calculateAge(tank.startDate)}):
   - Current Water Chemistry: ${latestParams}
   - Water & WC History Logs: ${recentHistory}
   - Livestock / Fauna: ${(tank.livestock || []).join(", ") || "Empty / None"}
@@ -4850,10 +5003,263 @@
       throw lastErr || new Error("Gemini API request failed");
     }
 
+    function getActiveAiSession() {
+      if (!Array.isArray(appState.aiSessions) || appState.aiSessions.length === 0) {
+        ensureAiSessionsNormalized(appState);
+      }
+      let sess = appState.aiSessions.find(s => s.id === appState.activeAiSessionId);
+      if (!sess) {
+        sess = appState.aiSessions[0];
+        appState.activeAiSessionId = sess.id;
+      }
+      if (!Array.isArray(sess.messages)) sess.messages = [];
+      appState.aiThread = sess.messages;
+      globalAiThread = sess.messages;
+      return sess;
+    }
+
     function getGlobalAiThreadStore() {
-      if (!Array.isArray(appState.aiThread)) appState.aiThread = [];
-      globalAiThread = appState.aiThread;
-      return appState.aiThread;
+      return getActiveAiSession().messages;
+    }
+
+    function syncAiSessionState() {
+      const sess = getActiveAiSession();
+      sess.messages = compactAiThreadForSave(sess.messages);
+      if (sess.messages.length > 0 && (!sess.title || sess.title === "New Conversation")) {
+        sess.title = deriveAiSessionTitle(sess.messages);
+      }
+      ensureAiSessionsNormalized(appState);
+      const active = getActiveAiSession();
+      appState.aiThread = active.messages;
+      globalAiThread = active.messages;
+    }
+
+    function createFreshAiSession(focusTankId = "all") {
+      ensureAiSessionsNormalized(appState);
+      const cleanFocus = (focusTankId && focusTankId !== "all" && appState.tanks.some(t => String(t.id) === String(focusTankId)))
+        ? String(focusTankId)
+        : "all";
+      appState.aiSessions = appState.aiSessions.filter(s => Array.isArray(s.messages) && s.messages.length > 0);
+      const sid = "s_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+      const fresh = {
+        id: sid,
+        title: "New Conversation",
+        focusTankId: cleanFocus,
+        updatedAt: Date.now(),
+        messages: []
+      };
+      appState.aiSessions.unshift(fresh);
+      appState.aiSessions = appState.aiSessions.slice(0, 10);
+      appState.activeAiSessionId = sid;
+      globalAiContextTankId = cleanFocus;
+      appState.aiThread = fresh.messages;
+      globalAiThread = fresh.messages;
+      return fresh;
+    }
+
+    function formatSessionFocusLabel(focusTankId) {
+      if (!focusTankId || focusTankId === "all") return "All Aquariums";
+      const found = appState.tanks.find(t => String(t.id) === String(focusTankId));
+      return found ? found.name : "Aquarium";
+    }
+
+    function toggleAiSessionsDrawer(forceState) {
+      const drawer = document.getElementById("global-ai-sessions-drawer");
+      if (!drawer) return;
+      const shouldOpen = typeof forceState === "boolean" ? forceState : !drawer.classList.contains("open");
+      if (shouldOpen) {
+        renderAiSessionsDrawer();
+        drawer.classList.add("open");
+      } else {
+        drawer.classList.remove("open");
+      }
+    }
+
+    function renderAiSessionsDrawer() {
+      const listEl = document.getElementById("global-ai-sessions-list");
+      if (!listEl) return;
+      ensureAiSessionsNormalized(appState);
+      const saved = appState.aiSessions.filter(s => Array.isArray(s.messages) && s.messages.length > 0);
+      if (saved.length === 0) {
+        listEl.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:6px 4px;">No saved conversations yet.</div>`;
+        return;
+      }
+      listEl.innerHTML = saved.map(s => {
+        const isActive = s.id === appState.activeAiSessionId;
+        const focusLbl = formatSessionFocusLabel(s.focusTankId);
+        const turnCount = Math.max(1, Math.ceil((s.messages || []).filter(m => m.role === "user").length));
+        return `<div class="ai-session-row ${isActive ? "active" : ""}" onclick="selectAiSession('${escapeHtmlText(s.id)}')">
+          <div style="min-width:0; flex:1;">
+            <div class="ai-session-title">${escapeHtmlText(s.title || "Conversation")}</div>
+            <div class="ai-session-meta">${escapeHtmlText(focusLbl)} · ${turnCount} ${turnCount === 1 ? "prompt" : "prompts"}</div>
+          </div>
+          <span class="delete-x" title="Delete chat" onclick="deleteAiSession('${escapeHtmlText(s.id)}', event)">×</span>
+        </div>`;
+      }).join("");
+    }
+
+    function selectAiSession(sessionId) {
+      ensureAiSessionsNormalized(appState);
+      const target = appState.aiSessions.find(s => s.id === sessionId);
+      if (!target) return;
+      appState.activeAiSessionId = target.id;
+      const validFocus = target.focusTankId === "all" || appState.tanks.some(t => String(t.id) === String(target.focusTankId));
+      globalAiContextTankId = validFocus ? String(target.focusTankId) : "all";
+      appState.aiThread = target.messages;
+      globalAiThread = target.messages;
+      toggleAiSessionsDrawer(false);
+      saveDataToStorage();
+      renderGlobalAIScreen();
+    }
+
+    function deleteAiSession(sessionId, evt) {
+      if (evt && evt.stopPropagation) evt.stopPropagation();
+      ensureAiSessionsNormalized(appState);
+      appState.aiSessions = appState.aiSessions.filter(s => s.id !== sessionId);
+      ensureAiSessionsNormalized(appState);
+      const active = getActiveAiSession();
+      globalAiContextTankId = (active.focusTankId === "all" || appState.tanks.some(t => String(t.id) === String(active.focusTankId)))
+        ? String(active.focusTankId)
+        : "all";
+      saveDataToStorage();
+      renderAiSessionsDrawer();
+      renderGlobalAIScreen();
+    }
+
+    function extractAiReplyAndActions(rawText) {
+      let cleanText = String(rawText || "");
+      const actions = [];
+      const blockRegex = /```aquassist-actions\s*([\s\S]*?)```/gi;
+      const allowedTypes = new Set(["add_plant", "add_decor", "add_livestock", "add_equipment", "add_supply", "log_timeline"]);
+
+      cleanText = cleanText.replace(blockRegex, (_, jsonBody) => {
+        try {
+          const parsed = JSON.parse(String(jsonBody || "").trim());
+          const list = Array.isArray(parsed) ? parsed : [parsed];
+          list.forEach(item => {
+            if (!item || typeof item !== "object") return;
+            const type = String(item.type || "").trim();
+            if (!allowedTypes.has(type)) return;
+            const val = String(item.value || item.name || item.text || "").trim();
+            if (!val || val.length > 120) return;
+            if (actions.length >= 3) return;
+            actions.push({
+              type,
+              tankId: item.tankId ?? null,
+              value: val,
+              name: val,
+              stock: item.stock === "out" ? "out" : "in",
+              applied: false
+            });
+          });
+        } catch (err) {}
+        return "";
+      }).trim();
+
+      return { text: cleanText, actions };
+    }
+
+    function resolveActionTargetTank(action) {
+      if (action && action.tankId !== null && action.tankId !== undefined && action.tankId !== "") {
+        const byId = appState.tanks.find(t => String(t.id) === String(action.tankId));
+        if (byId) return byId;
+        const byName = appState.tanks.find(t => t.name && t.name.toLowerCase() === String(action.tankId).toLowerCase());
+        if (byName) return byName;
+      }
+      if (globalAiContextTankId && globalAiContextTankId !== "all") {
+        const focused = appState.tanks.find(t => String(t.id) === String(globalAiContextTankId));
+        if (focused) return focused;
+      }
+      return appState.tanks[0] || null;
+    }
+
+    function formatAiActionChipLabel(action) {
+      const prefix = action.applied ? "✓ " : "+ ";
+      const val = action.value || action.name || "";
+      if (action.type === "add_supply") {
+        const stockHint = action.stock === "out" ? " (Out of Stock)" : "";
+        return `${prefix}${action.applied ? "Added" : "Add"} ${val}${stockHint} to Supplies`;
+      }
+      const tank = resolveActionTargetTank(action);
+      const tName = tank ? tank.name : "Aquarium";
+      if (action.type === "add_plant") return `${prefix}${action.applied ? "Added" : "Add"} ${val} to ${tName} Flora`;
+      if (action.type === "add_decor") return `${prefix}${action.applied ? "Added" : "Add"} ${val} to ${tName} Hardscape`;
+      if (action.type === "add_livestock") return `${prefix}${action.applied ? "Added" : "Add"} ${val} to ${tName} Livestock`;
+      if (action.type === "add_equipment") return `${prefix}${action.applied ? "Added" : "Add"} ${val} to ${tName} Gear`;
+      if (action.type === "log_timeline") return `${prefix}${action.applied ? "Logged note to" : "Log note to"} ${tName}`;
+      return `${prefix}${val}`;
+    }
+
+    function applyAiSuggestedAction(turnIdx, actionIdx) {
+      const thread = getGlobalAiThreadStore();
+      const turn = thread[turnIdx];
+      if (!turn || !Array.isArray(turn.actions) || !turn.actions[actionIdx]) return;
+      const action = turn.actions[actionIdx];
+      if (action.applied) return;
+
+      const val = String(action.value || action.name || "").trim();
+      if (!val) return;
+      const today = new Date().toISOString().split("T")[0];
+
+      if (action.type === "add_supply") {
+        const shelf = ensureClosetNormalized();
+        const existing = shelf.find(i => i.name.toLowerCase() === val.toLowerCase());
+        if (existing) {
+          if (action.stock === "in" && existing.stock === "out") existing.stock = "in";
+        } else {
+          shelf.push({
+            id: Date.now(),
+            name: val,
+            cat: inferSupplyCategory(val),
+            stock: action.stock === "out" ? "out" : "in",
+            notes: ""
+          });
+        }
+        action.applied = true;
+        syncAiSessionState();
+        saveDataToStorage();
+        renderGlobalAIThreadView();
+        showToast("Added to Supplies");
+        return;
+      }
+
+      const tank = resolveActionTargetTank(action);
+      if (!tank) {
+        showToast("Add an aquarium first");
+        return;
+      }
+
+      if (action.type === "add_plant") {
+        if (!Array.isArray(tank.plants)) tank.plants = [];
+        if (!tank.plants.some(p => p.toLowerCase() === val.toLowerCase())) {
+          tank.plants.push(val);
+          addTankTimelineEvent(tank, `Added plant: ${val}`, today);
+        }
+      } else if (action.type === "add_decor") {
+        if (!Array.isArray(tank.decor)) tank.decor = [];
+        if (!tank.decor.some(d => d.toLowerCase() === val.toLowerCase())) {
+          tank.decor.push(val);
+          addTankTimelineEvent(tank, `Added hardscape/decor: ${val}`, today);
+        }
+      } else if (action.type === "add_livestock") {
+        if (!Array.isArray(tank.livestock)) tank.livestock = [];
+        tank.livestock.push(val);
+        addTankTimelineEvent(tank, `Added ${val} to aquarium`, today);
+      } else if (action.type === "add_equipment") {
+        if (!Array.isArray(tank.equipment)) tank.equipment = [];
+        if (!tank.equipment.some(e => e.toLowerCase() === val.toLowerCase())) {
+          tank.equipment.push(val);
+          addTankTimelineEvent(tank, `Added gear: ${val}`, today);
+        }
+      } else if (action.type === "log_timeline") {
+        addTankTimelineEvent(tank, val, today);
+      }
+
+      action.applied = true;
+      syncAiSessionState();
+      saveDataToStorage();
+      renderGlobalAIThreadView();
+      showToast(`Saved to ${tank.name}`);
     }
 
     function autoGrowAiInput(el) {
@@ -4894,7 +5300,7 @@
       if (clearBtnEl) clearBtnEl.style.display = hasTurns ? "inline-block" : "none";
 
       let html = "";
-      (thread || []).forEach(turn => {
+      (thread || []).forEach((turn, turnIdx) => {
         if (turn.role === "user") {
           const thumbHtml = turn.thumbUrl ? `<img src="${turn.thumbUrl}" class="ai-turn-user-thumb" alt="Attached photo">` : "";
           const label = turn.text || "Attached photo for visual analysis";
@@ -4903,7 +5309,14 @@
           const bodyHtml = turn.isError
             ? `<span style="color:var(--alert-red);">${escapeHtmlText(turn.text)}</span>`
             : renderMarkdownToHtml(turn.text);
-          html += `<div class="ai-turn-model"><div class="ai-model-label">✦ Aquarist AI</div>${bodyHtml}</div>`;
+          let actionsHtml = "";
+          if (!turn.isError && Array.isArray(turn.actions) && turn.actions.length > 0) {
+            actionsHtml = `<div class="ai-action-chips">${turn.actions.map((act, actIdx) => {
+              const appliedCls = act.applied ? " applied" : "";
+              return `<button type="button" class="ai-action-chip${appliedCls}" ${act.applied ? "disabled" : ""} onclick="applyAiSuggestedAction(${turnIdx}, ${actIdx})">${escapeHtmlText(formatAiActionChipLabel(act))}</button>`;
+            }).join("")}</div>`;
+          }
+          html += `<div class="ai-turn-model"><div class="ai-model-label">✦ Aquarist AI</div>${bodyHtml}${actionsHtml}</div>`;
         }
       });
 
@@ -4937,26 +5350,79 @@
     }
 
     function onGlobalAIContextChange(val) {
-      globalAiContextTankId = val || "all";
+      const nextFocus = (val && val !== "all" && appState.tanks.some(t => String(t.id) === String(val)))
+        ? String(val)
+        : "all";
+      globalAiContextTankId = nextFocus;
+
+      ensureAiSessionsNormalized(appState);
+      const current = getActiveAiSession();
+      if (current.focusTankId !== nextFocus) {
+        const existingMatch = appState.aiSessions.find(s => s.focusTankId === nextFocus && Array.isArray(s.messages) && s.messages.length > 0);
+        if (existingMatch) {
+          appState.activeAiSessionId = existingMatch.id;
+          appState.aiThread = existingMatch.messages;
+          globalAiThread = existingMatch.messages;
+        } else if (!current.messages || current.messages.length === 0) {
+          current.focusTankId = nextFocus;
+        } else {
+          createFreshAiSession(nextFocus);
+        }
+      }
+
+      const ctxSel = document.getElementById("global-ai-context-select");
+      if (ctxSel) ctxSel.value = nextFocus;
+      renderGlobalAIThreadView();
     }
 
     function renderGlobalAIThreadView(pendingText = "") {
       const thread = getGlobalAiThreadStore();
       const threadEl = document.getElementById("global-ai-thread");
       const clearBtn = document.getElementById("global-ai-clear-btn");
+      const historyBtn = document.getElementById("global-ai-history-btn");
+      const backBtn = document.getElementById("global-ai-back-tank-btn");
       const emptyEl = document.getElementById("global-ai-empty");
       const startersEl = document.getElementById("global-ai-starters");
       const hasActivity = thread.length > 0 || !!pendingText;
       if (emptyEl) emptyEl.style.display = hasActivity ? "none" : "flex";
       if (startersEl) startersEl.style.display = hasActivity ? "none" : "flex";
+
+      const retTank = aiReturnTankId
+        ? appState.tanks.find(t => String(t.id) === String(aiReturnTankId))
+        : null;
+      if (backBtn) {
+        if (retTank) {
+          backBtn.style.display = "inline-block";
+          backBtn.innerText = `← ${retTank.name}`;
+        } else {
+          backBtn.style.display = "none";
+        }
+      }
+
+      const savedSessions = (appState.aiSessions || []).filter(s => Array.isArray(s.messages) && s.messages.length > 0);
+      if (historyBtn) {
+        if (savedSessions.length > 0) {
+          historyBtn.style.display = "inline-block";
+          historyBtn.innerText = savedSessions.length > 1 ? `Chats (${savedSessions.length})` : "Chats";
+        } else {
+          historyBtn.style.display = "none";
+        }
+      }
+
       renderAiThreadElement(threadEl, clearBtn, thread, pendingText);
     }
 
     function clearGlobalAIThread() {
-      appState.aiThread = [];
-      globalAiThread = appState.aiThread;
-      saveDataToStorage();
+      const active = getActiveAiSession();
+      if (active.messages && active.messages.length > 0) {
+        syncAiSessionState();
+        createFreshAiSession(globalAiContextTankId);
+        saveDataToStorage();
+      }
+      toggleAiSessionsDrawer(false);
       renderGlobalAIThreadView();
+      const inputEl = document.getElementById("global-ai-input");
+      if (inputEl) inputEl.focus();
       showToast("New Chat Started");
     }
 
@@ -4976,8 +5442,14 @@
     function renderGlobalAIScreen() {
       updateGlobalAIKeyNotice();
       const u = getUnitLabels();
+      const activeSess = getActiveAiSession();
 
-      // Focus selector (All Aquariums or specific tank)
+      // Sync Focus selector with active session
+      const sessFocus = activeSess.focusTankId || "all";
+      const validSessFocus = sessFocus === "all" || appState.tanks.some(t => String(t.id) === String(sessFocus));
+      globalAiContextTankId = validSessFocus ? String(sessFocus) : "all";
+      activeSess.focusTankId = globalAiContextTankId;
+
       const ctxSel = document.getElementById("global-ai-context-select");
       if (ctxSel) {
         let ctxOpts = `<option value="all">All Aquariums</option>`;
@@ -4985,8 +5457,6 @@
           ctxOpts += `<option value="${t.id}">${escapeHtmlText(t.name)} (${displayVol(t.vol)} ${u.vol})</option>`;
         });
         ctxSel.innerHTML = ctxOpts;
-        const exists = globalAiContextTankId === "all" || appState.tanks.some(t => String(t.id) === String(globalAiContextTankId));
-        if (!exists) globalAiContextTankId = "all";
         ctxSel.value = String(globalAiContextTankId);
       }
 
@@ -5003,6 +5473,8 @@
           });
           if (prevVal && appState.tanks.some(t => String(t.id) === String(prevVal))) {
             sel.value = prevVal;
+          } else if (globalAiContextTankId !== "all") {
+            sel.value = String(globalAiContextTankId);
           }
         }
       }
@@ -5018,10 +5490,12 @@
         ? appState.tanks.find(t => String(t.id) === String(globalAiContextTankId))
         : null;
 
+      const actionsInstruction = `5. Optional Quick-Apply Actions: ONLY when your reply recommends a concrete plant, hardscape/decor item, livestock entry, piece of equipment, supply to add/restock, or timeline note that the user may want to save in 1 tap, you may append at the very end of your message a fenced block \`\`\`aquassist-actions\` containing a JSON array of up to 3 objects (e.g. [{"type":"add_plant","tankId":1,"value":"Bucephalandra"},{"type":"add_supply","value":"Aquarium Co-Op Easy Green","stock":"out"}]). Allowed types: "add_plant", "add_decor", "add_livestock", "add_equipment", "add_supply" (stock: "in" or "out"), "log_timeline". Omit the block completely on general Q&A turns.`;
+
       if (focusedTank) {
         const otherTanks = appState.tanks
           .filter(t => t.id !== focusedTank.id)
-          .map(t => `${t.name} (${displayVol(t.vol)} ${u.vol}, ${t.status})`)
+          .map(t => `${t.name} [Tank ID: ${t.id}] (${displayVol(t.vol)} ${u.vol}, ${t.status})`)
           .join(", ") || "None";
 
         return `You are Aquarist AI, an insightful, collaborative, scientifically grounded aquarist and aquascaping partner inside aquAssist.
@@ -5039,7 +5513,8 @@ Conversational Guidelines:
 1. Ground your ideas, suggestions, and diagnostics naturally in the tank's real plants, livestock, decor/hardscape, filtration/gear, water test history, activity timeline logs, and supplies—without robotically repeating every stat on every turn.
 2. When brainstorming (aquascaping, plant choices for their light/hardscape, stocking, rescapes, routines), be thoughtful, creative, and practical, and feel free to offer smart follow-up angles.
 3. When giving dosing or treatment steps, prioritize In-Stock Household Supplies first (noting Running Low items if helpful, and never prescribing Out-of-Stock items without mentioning a restock) and flag live plant, shrimp, snail, or scaleless-fish sensitivities.
-4. Keep formatting clean and readable, and do not use emojis.`;
+4. Keep formatting clean and readable, and do not use emojis.
+${actionsInstruction}`;
       }
 
       return `You are Aquarist AI, an insightful, collaborative, scientifically grounded aquarist and aquascaping partner inside aquAssist.
@@ -5056,7 +5531,8 @@ Conversational Guidelines:
 1. Ground your ideas, suggestions, and diagnostics naturally in the user's real tanks, plants, livestock, decor/hardscape, filtration/gear, water test history, activity timeline logs, health records, and supplies—without robotically repeating every stat on every turn.
 2. When brainstorming (aquascaping, plant pairings, stocking ideas, gear upgrades, feeding routines), engage creatively and practically like a knowledgeable hobbyist partner.
 3. When giving dosing or treatment steps, prioritize In-Stock Household Supplies first (noting Running Low items if helpful, and never prescribing Out-of-Stock items without mentioning a restock) and flag live plant, shrimp, snail, or scaleless-fish sensitivities.
-4. Keep formatting clean and readable, and do not use emojis.`;
+4. Keep formatting clean and readable, and do not use emojis.
+${actionsInstruction}`;
     }
 
     async function askGlobalAI() {
@@ -5081,8 +5557,11 @@ Conversational Guidelines:
         inputEl.style.height = "34px";
       }
       clearGlobalVisionAttachment();
+      toggleAiSessionsDrawer(false);
 
-      const thread = getGlobalAiThreadStore();
+      const sess = getActiveAiSession();
+      sess.focusTankId = globalAiContextTankId;
+      const thread = sess.messages;
       const userTurn = {
         role: "user",
         text: q,
@@ -5091,13 +5570,20 @@ Conversational Guidelines:
         thumbUrl: attachedThumb || null
       };
       thread.push(userTurn);
+      if (!sess.title || sess.title === "New Conversation") {
+        sess.title = deriveAiSessionTitle(thread);
+      }
+      sess.updatedAt = Date.now();
       renderGlobalAIThreadView("Thinking...");
 
       try {
         const contents = buildMultiTurnContents(thread);
         const systemPrompt = buildGlobalAISystemPrompt();
-        const reply = await callGeminiGenerate(contents, systemPrompt);
-        thread.push({ role: "model", text: reply });
+        const rawReply = await callGeminiGenerate(contents, systemPrompt);
+        const parsed = extractAiReplyAndActions(rawReply);
+        const modelTurn = { role: "model", text: parsed.text };
+        if (parsed.actions.length > 0) modelTurn.actions = parsed.actions;
+        thread.push(modelTurn);
       } catch (err) {
         thread.push({
           role: "model",
@@ -5105,8 +5591,8 @@ Conversational Guidelines:
           text: `Unable to reach Gemini API (${err.message || "connection error"}). Check your API key in Settings.`
         });
       }
-      appState.aiThread = compactAiThreadForSave(thread);
-      globalAiThread = appState.aiThread;
+      sess.updatedAt = Date.now();
+      syncAiSessionState();
       saveDataToStorage();
       renderGlobalAIThreadView();
     }
@@ -5117,18 +5603,64 @@ Conversational Guidelines:
       if (wrap) wrap.style.display = "none";
     }
 
-    function updateSandboxAddRosterBtn(targetTank, species, qty) {
+    function stripHtmlToPlainMarkdown(htmlStr) {
+      return String(htmlStr || "")
+        .replace(/<h4[^>]*>([\s\S]*?)<\/h4>/gi, "### $1\n")
+        .replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, "- $1\n")
+        .replace(/<b[^>]*>([\s\S]*?)<\/b>/gi, "**$1**")
+        .replace(/<[^>]+>/g, "")
+        .replace(/&amp;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+    }
+
+    function updateSandboxAddRosterBtn(targetTank, species, qty, summaryText = "") {
       const wrap = document.getElementById("sandbox-add-roster-wrap");
       const btn = document.getElementById("sandbox-add-roster-btn");
       if (!wrap || !btn || !targetTank || !species) {
         if (wrap) wrap.style.display = "none";
         return;
       }
-      lastEvaluatedSandbox = { tankId: targetTank.id, species, qty };
+      lastEvaluatedSandbox = { tankId: targetTank.id, species, qty, summaryText };
       btn.disabled = false;
       btn.style.opacity = "1";
       btn.innerText = `+ Add ${qty}x ${species} to ${targetTank.name}`;
       wrap.style.display = "block";
+    }
+
+    function discussCompatibilityInChat() {
+      if (!lastEvaluatedSandbox) return;
+      const targetTank = appState.tanks.find(t => t.id == lastEvaluatedSandbox.tankId);
+      if (!targetTank) return;
+
+      const { species, qty, summaryText } = lastEvaluatedSandbox;
+      onGlobalAIContextChange(String(targetTank.id));
+      const sess = getActiveAiSession();
+      const userPrompt = `Compatibility check: ${qty}x ${species} for ${targetTank.name}`;
+      const lastUser = [...(sess.messages || [])].reverse().find(m => m.role === "user");
+      if (!lastUser || lastUser.text !== userPrompt) {
+        sess.messages.push({ role: "user", text: userPrompt, hadPhoto: false });
+        sess.messages.push({
+          role: "model",
+          text: summaryText || `Evaluated ${qty}x ${species} for ${targetTank.name}.`,
+          actions: [{ type: "add_livestock", tankId: targetTank.id, value: `${qty}x ${species}`, name: `${qty}x ${species}`, stock: "in", applied: false }]
+        });
+        if (!sess.title || sess.title === "New Conversation") {
+          sess.title = `${qty}x ${species} in ${targetTank.name}`;
+        }
+        sess.updatedAt = Date.now();
+        syncAiSessionState();
+        saveDataToStorage();
+      }
+
+      switchGlobalAIMode("ask");
+      renderGlobalAIThreadView();
+      const inputEl = document.getElementById("global-ai-input");
+      if (inputEl) inputEl.focus();
     }
 
     function addEvaluatedSpeciesToTank() {
@@ -5340,19 +5872,21 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
 
         try {
           const reply = await callGeminiGenerate([{ text: prompt }]);
-          box.innerHTML = renderMarkdownToHtml(reply);
-          updateSandboxAddRosterBtn(targetTank, species, qty);
+          const parsed = extractAiReplyAndActions(reply);
+          box.innerHTML = renderMarkdownToHtml(parsed.text);
+          updateSandboxAddRosterBtn(targetTank, species, qty, parsed.text);
           return;
         } catch (err) {
           const fallbackHtml = buildOfflineCompatibilityHtml(targetTank, species, qty);
           box.innerHTML = `<div style="font-size:11.5px; color:var(--alert-yellow); margin-bottom:8px;">Live Gemini check unavailable (${escapeHtmlText(err.message || "network error")}) — showing local compatibility audit:</div>${fallbackHtml}`;
-          updateSandboxAddRosterBtn(targetTank, species, qty);
+          updateSandboxAddRosterBtn(targetTank, species, qty, stripHtmlToPlainMarkdown(fallbackHtml));
           return;
         }
       }
 
-      box.innerHTML = buildOfflineCompatibilityHtml(targetTank, species, qty);
-      updateSandboxAddRosterBtn(targetTank, species, qty);
+      const offlineHtml = buildOfflineCompatibilityHtml(targetTank, species, qty);
+      box.innerHTML = offlineHtml;
+      updateSandboxAddRosterBtn(targetTank, species, qty, stripHtmlToPlainMarkdown(offlineHtml));
     }
 
     /* ============================================================
@@ -5414,8 +5948,17 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         paramContainer.innerHTML = buildParamGaugeInnerHtml(t, u);
       }
 
-      // Sync per-tank AI Lab conversation thread
-      renderActiveTankAIThread();
+      // Sync unified Aquarist AI quick entry with this tank's session
+      const tankAiInput = document.getElementById("tank-ai-chat-input");
+      if (tankAiInput) {
+        tankAiInput.placeholder = `Ask Aquarist AI about ${tank.name}...`;
+      }
+      const openAiBtn = document.getElementById("tank-open-ai-chat-btn");
+      if (openAiBtn) {
+        ensureAiSessionsNormalized(appState);
+        const hasTankChat = appState.aiSessions.some(s => String(s.focusTankId) === String(tank.id) && Array.isArray(s.messages) && s.messages.length > 0);
+        openAiBtn.innerText = hasTankChat ? "Continue Chat" : "Open Chat";
+      }
 
       // Unified Timeline - Sorted strictly by record date descending (not insertion time)
       const timelineEl = document.getElementById("tank-overview-timeline");
@@ -6450,7 +6993,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       renderTankPlantsTab();
     }
 
-    /* Integrated Aquarist AI Lab & Shared Photo Vision */
+    /* Unified Aquarist AI & Shared Photo Vision */
     function processVisionImageFile(file, onProcessed) {
       if (!file) return;
       const reader = new FileReader();
@@ -6526,36 +7069,23 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       if (chip) chip.style.display = "none";
     }
 
-    function getTankAiThreadStore(tank) {
-      if (!tank) return [];
-      if (!Array.isArray(tank.aiThread)) tank.aiThread = [];
-      tankAiThreads[tank.id] = tank.aiThread;
-      return tank.aiThread;
-    }
-
-    function renderActiveTankAIThread(pendingText = "") {
-      const activeTank = getActiveTank();
-      const box = document.getElementById("tank-ai-chat-box");
-      const clearBtn = document.getElementById("tank-ai-clear-btn");
-      const thread = activeTank ? getTankAiThreadStore(activeTank) : [];
-      renderAiThreadElement(box, clearBtn, thread, pendingText);
-    }
-
-    function clearTankAIThread() {
-      const activeTank = getActiveTank();
-      if (!activeTank) return;
-      activeTank.aiThread = [];
-      tankAiThreads[activeTank.id] = activeTank.aiThread;
-      saveDataToStorage();
-      renderActiveTankAIThread();
+    function openTankFocusedChat(tankId = activeTankId) {
+      const tank = appState.tanks.find(t => String(t.id) === String(tankId)) || getActiveTank();
+      aiReturnTankId = tank ? tank.id : null;
+      globalAiMode = "ask";
+      onGlobalAIContextChange(tank ? String(tank.id) : "all");
+      navToGlobal("global-ai", true, true);
     }
 
     async function runUnifiedTankAI() {
+      const activeTank = getActiveTank();
       const qInput = document.getElementById("tank-ai-chat-input");
       const q = qInput ? qInput.value.trim() : "";
+
       if (!q && !activeVisionBase64) {
-        if (qInput) qInput.focus();
-        showToast("Type a question or attach a photo");
+        openTankFocusedChat(activeTank ? activeTank.id : null);
+        const globalInput = document.getElementById("global-ai-input");
+        if (globalInput) globalInput.focus();
         return;
       }
 
@@ -6565,58 +7095,20 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         return;
       }
 
-      const activeTank = getActiveTank();
-      if (!activeTank) return;
-
       const attachedBase64 = activeVisionBase64;
       const attachedThumb = activeVisionDataUrl;
       if (qInput) qInput.value = "";
       clearVisionAttachment();
 
-      const thread = getTankAiThreadStore(activeTank);
-      thread.push({
-        role: "user",
-        text: q,
-        hadPhoto: !!attachedBase64,
-        imageBase64: attachedBase64 || null,
-        thumbUrl: attachedThumb || null
-      });
-      renderActiveTankAIThread("Thinking...");
+      openTankFocusedChat(activeTank ? activeTank.id : null);
 
-      const tap = appState.tapBaseline || {};
-      const u = getUnitLabels();
-      const closetStr = formatSuppliesForPrompt(activeTank);
-
-      const systemPrompt = `You are Aquarist AI, an insightful, collaborative, scientifically grounded aquarist and aquascaping partner analyzing aquarium '${activeTank.name}' (${displayVol(activeTank.vol)} ${u.vol}, ${activeTank.status}).
-Speak naturally like an ongoing Gemini conversation—great for bouncing ideas, interpreting recent logs, or troubleshooting water chemistry and fish health.
-
-Complete Tank Ecosystem Dossier (Preferred Units: ${u.vol}, ${u.temp}):
-${buildTankEcosystemDossier(activeTank)}
-
-Household Tap & Supplies:
-- Tap Water Baseline: pH ${tap.ph || 7.4}, NO3 ${tap.no3 || 0} ppm, GH ${tap.gh || 8} dGH, KH ${tap.kh || 4} dKH
-- Household Supplies Shelf: ${closetStr}
-
-Guidelines:
-1. Ground your advice naturally in this tank's water history, activity timeline logs, health records, filtration/gear, livestock, plants, hardscape, and supplies.
-2. If recommending dosing or treatments, prioritize In-Stock Household Supplies first (never prescribe Out-of-Stock items unless advising a restock) and flag invertebrate, scaleless-fish, and live-plant safety.
-3. Keep responses conversational, structured, actionable, and free of emojis.`;
-
-      try {
-        const contents = buildMultiTurnContents(thread);
-        const reply = await callGeminiGenerate(contents, systemPrompt);
-        thread.push({ role: "model", text: reply });
-      } catch (err) {
-        thread.push({
-          role: "model",
-          isError: true,
-          text: `Unable to reach Gemini API (${err.message || "connection error"}). Check your connection or API key in Settings.`
-        });
+      const globalInput = document.getElementById("global-ai-input");
+      if (globalInput) globalInput.value = q;
+      if (attachedBase64) {
+        globalVisionBase64 = attachedBase64;
+        globalVisionDataUrl = attachedThumb;
       }
-      activeTank.aiThread = compactAiThreadForSave(thread);
-      tankAiThreads[activeTank.id] = activeTank.aiThread;
-      saveDataToStorage();
-      renderActiveTankAIThread();
+      await askGlobalAI();
     }
 
     function copyTankDelta() {
@@ -7388,10 +7880,15 @@ Guidelines:
       }
       appState.tanks = [];
       appState.aiThread = [];
+      appState.aiSessions = [];
+      appState.activeAiSessionId = "";
       activeTankId = 0;
+      globalAiContextTankId = "all";
+      aiReturnTankId = null;
       globalAiThread = [];
       tankAiThreads = {};
       lastEvaluatedSandbox = null;
+      ensureAiSessionsNormalized(appState);
       saveDataToStorage();
       closeModalById("settingsModal");
       navToGlobal("dashboard", false);
