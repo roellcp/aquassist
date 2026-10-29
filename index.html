@@ -576,9 +576,8 @@
           <div style="display:flex; align-items:center; gap:8px;">
             <div class="card-title">Upcoming Tasks</div>
             <div style="display:inline-flex; background:rgba(255,255,255,0.06); border-radius:20px; padding:2px; border:1px solid rgba(255,255,255,0.08);">
-              <button id="task-filter-today" onclick="setDashboardTaskFilter('today')" style="background:transparent; border:none; color:var(--text-muted); font-size:10px; font-weight:700; padding:3px 9px; border-radius:16px; cursor:pointer; transition:all 0.15s ease;">Today</button>
-              <button id="task-filter-3days" onclick="setDashboardTaskFilter('3days')" style="background:rgba(0,210,255,0.2); border:none; color:var(--cyan); font-size:10px; font-weight:700; padding:3px 9px; border-radius:16px; cursor:pointer; transition:all 0.15s ease;">3 Days</button>
-              <button id="task-filter-7days" onclick="setDashboardTaskFilter('7days')" style="background:transparent; border:none; color:var(--text-muted); font-size:10px; font-weight:700; padding:3px 9px; border-radius:16px; cursor:pointer; transition:all 0.15s ease;">7 Days</button>
+              <button id="task-filter-today" onclick="setDashboardTaskFilter('today')" style="background:rgba(0,210,255,0.2); border:none; color:var(--cyan); font-size:10px; font-weight:700; padding:3px 9px; border-radius:16px; cursor:pointer; transition:all 0.15s ease;">Today</button>
+              <button id="task-filter-3days" onclick="setDashboardTaskFilter('3days')" style="background:transparent; border:none; color:var(--text-muted); font-size:10px; font-weight:700; padding:3px 9px; border-radius:16px; cursor:pointer; transition:all 0.15s ease;">3 Days</button>
             </div>
           </div>
           <span id="dashboard-tasks-badge" class="badge-cycling" style="background:rgba(56,189,248,0.15); color:var(--cyan); border-color:var(--cyan); font-size:10px;">Checking...</span>
@@ -956,22 +955,16 @@
           <option value="Cycling">Cycling in Progress</option>
         </select>
       </div>
-      <div style="margin-bottom:12px;">
-        <label>Theme Color</label>
-        <div style="display:flex; align-items:center; gap:10px;">
-          <div id="add-color-preview" style="width:28px; height:28px; border-radius:50%; background:#00D2FF; flex-shrink:0; box-shadow:0 0 10px rgba(0,210,255,0.4); border:2px solid #fff;"></div>
-          <select id="add-m-color" onchange="document.getElementById('add-color-preview').style.background=this.value; document.getElementById('add-color-preview').style.boxShadow='0 0 10px ' + this.value;" style="flex:1;">
-            <option value="#00D2FF" selected>● Electric Cyan</option>
-            <option value="#00F5A0">● Bio-Emerald</option>
-            <option value="#38BDF8">● Sky Blue</option>
-            <option value="#A78BFA">● Lavender Purple</option>
-            <option value="#F59E0B">● Amber Gold</option>
-            <option value="#EC4899">● Neon Coral</option>
-            <option value="#34D399">● Mint Green</option>
-            <option value="#60A5FA">● Deep Ocean</option>
-            <option value="#F43F5E">● Crimson Red</option>
-          </select>
+      <div style="margin-bottom:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <label style="margin:0;">Theme Color</label>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span id="add-color-name" style="font-size:11px; color:var(--text-muted); font-weight:600;">Electric Cyan</span>
+            <div id="add-color-preview" style="width:14px; height:14px; border-radius:50%; background:#00D2FF; box-shadow:0 0 8px #00D2FF; border:1.5px solid #fff;"></div>
+          </div>
         </div>
+        <input type="hidden" id="add-m-color" value="#00D2FF">
+        <div id="add-color-palette" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px;"></div>
       </div>
       <div style="margin-bottom:16px;">
         <label>Tank Photo (Optional)</label>
@@ -1012,22 +1005,16 @@
           <option value="Cycling">Cycling in Progress</option>
         </select>
       </div>
-      <div style="margin-bottom:12px;">
-        <label>Theme Color</label>
-        <div style="display:flex; align-items:center; gap:10px;">
-          <div id="edit-color-preview" style="width:28px; height:28px; border-radius:50%; background:#00D2FF; flex-shrink:0; box-shadow:0 0 10px rgba(0,210,255,0.4); border:2px solid #fff;"></div>
-          <select id="edit-m-color" onchange="document.getElementById('edit-color-preview').style.background=this.value; document.getElementById('edit-color-preview').style.boxShadow='0 0 10px ' + this.value;" style="flex:1;">
-            <option value="#00D2FF">● Electric Cyan</option>
-            <option value="#00F5A0">● Bio-Emerald</option>
-            <option value="#38BDF8">● Sky Blue</option>
-            <option value="#A78BFA">● Lavender Purple</option>
-            <option value="#F59E0B">● Amber Gold</option>
-            <option value="#EC4899">● Neon Coral</option>
-            <option value="#34D399">● Mint Green</option>
-            <option value="#60A5FA">● Deep Ocean</option>
-            <option value="#F43F5E">● Crimson Red</option>
-          </select>
+      <div style="margin-bottom:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <label style="margin:0;">Theme Color</label>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span id="edit-color-name" style="font-size:11px; color:var(--text-muted); font-weight:600;">Electric Cyan</span>
+            <div id="edit-color-preview" style="width:14px; height:14px; border-radius:50%; background:#00D2FF; box-shadow:0 0 8px #00D2FF; border:1.5px solid #fff;"></div>
+          </div>
         </div>
+        <input type="hidden" id="edit-m-color" value="#00D2FF">
+        <div id="edit-color-palette" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px;"></div>
       </div>
       <div style="margin-bottom:16px;">
         <label>Update Photo</label>
@@ -1468,6 +1455,67 @@
       "#34D399", "#60A5FA", "#F43F5E", "#FBBF24", "#818CF8"
     ];
 
+    const TANK_THEME_COLORS = [
+      { hex: "#00D2FF", name: "Electric Cyan" },
+      { hex: "#00F5A0", name: "Bio-Emerald" },
+      { hex: "#38BDF8", name: "Sky Blue" },
+      { hex: "#A78BFA", name: "Lavender Purple" },
+      { hex: "#F59E0B", name: "Amber Gold" },
+      { hex: "#EC4899", name: "Neon Coral" },
+      { hex: "#34D399", name: "Mint Green" },
+      { hex: "#60A5FA", name: "Deep Ocean" },
+      { hex: "#F43F5E", name: "Crimson Red" }
+    ];
+
+    function renderThemeColorPalette(prefix, selectedHex) {
+      const container = document.getElementById(`${prefix}-color-palette`);
+      const input = document.getElementById(`${prefix}-m-color`);
+      const preview = document.getElementById(`${prefix}-color-preview`);
+      const nameEl = document.getElementById(`${prefix}-color-name`);
+      if (!container) return;
+
+      const current = (selectedHex || (input ? input.value : "#00D2FF")).toLowerCase();
+      container.innerHTML = "";
+
+      TANK_THEME_COLORS.forEach(c => {
+        const isSelected = c.hex.toLowerCase() === current;
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `color-palette-btn ${isSelected ? 'selected' : ''}`;
+        btn.style.display = "flex";
+        btn.style.alignItems = "center";
+        btn.style.gap = "6px";
+        btn.style.padding = "6px 8px";
+        btn.style.borderRadius = "8px";
+        btn.style.cursor = "pointer";
+        btn.style.background = isSelected ? `${c.hex}22` : "rgba(255,255,255,0.04)";
+        btn.style.border = `1px solid ${isSelected ? c.hex : 'rgba(255,255,255,0.1)'}`;
+        btn.style.color = isSelected ? "#fff" : "var(--text-muted)";
+        btn.style.transition = "all 0.15s ease";
+        btn.style.textAlign = "left";
+
+        btn.innerHTML = `
+          <span style="width:12px; height:12px; border-radius:50%; background:${c.hex}; flex-shrink:0; box-shadow:0 0 6px ${c.hex};"></span>
+          <span style="font-size:11px; font-weight:${isSelected ? '700' : '500'}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${c.name}</span>
+        `;
+
+        btn.onclick = () => selectThemeColor(prefix, c.hex, c.name);
+        container.appendChild(btn);
+      });
+
+      const matched = TANK_THEME_COLORS.find(c => c.hex.toLowerCase() === current) || TANK_THEME_COLORS[0];
+      if (input) input.value = matched.hex;
+      if (preview) {
+        preview.style.background = matched.hex;
+        preview.style.boxShadow = `0 0 8px ${matched.hex}`;
+      }
+      if (nameEl) nameEl.innerText = matched.name;
+    }
+
+    function selectThemeColor(prefix, hex, name) {
+      renderThemeColorPalette(prefix, hex);
+    }
+
     const defaultState = {
       version: 8,
       units: "us",
@@ -1559,7 +1607,7 @@
     let currentChartFilter = "all";
     let activeVisionBase64 = null;
     let swRegistration = null;
-    let dashboardTaskFilter = "3days"; // "today", "3days", or "7days"
+    let dashboardTaskFilter = "today"; // "today" or "3days"
 
     function setDashboardTaskFilter(filter) {
       dashboardTaskFilter = filter;
@@ -2617,26 +2665,24 @@
       const badgeEl = document.getElementById("dashboard-tasks-badge");
       const btnToday = document.getElementById("task-filter-today");
       const btn3Days = document.getElementById("task-filter-3days");
-      const btn7Days = document.getElementById("task-filter-7days");
       if (!listEl) return 0;
       listEl.innerHTML = "";
 
-      [
-        { btn: btnToday, id: "today" },
-        { btn: btn3Days, id: "3days" },
-        { btn: btn7Days, id: "7days" }
-      ].forEach(item => {
-        if (!item.btn) return;
-        if (dashboardTaskFilter === item.id) {
-          item.btn.style.background = "rgba(0, 210, 255, 0.22)";
-          item.btn.style.color = "var(--cyan)";
+      if (btnToday && btn3Days) {
+        if (dashboardTaskFilter === "today") {
+          btnToday.style.background = "rgba(0, 210, 255, 0.22)";
+          btnToday.style.color = "var(--cyan)";
+          btn3Days.style.background = "transparent";
+          btn3Days.style.color = "var(--text-muted)";
         } else {
-          item.btn.style.background = "transparent";
-          item.btn.style.color = "var(--text-muted)";
+          btn3Days.style.background = "rgba(0, 210, 255, 0.22)";
+          btn3Days.style.color = "var(--cyan)";
+          btnToday.style.background = "transparent";
+          btnToday.style.color = "var(--text-muted)";
         }
-      });
+      }
 
-      const windowDays = (dashboardTaskFilter === "today") ? 0 : (dashboardTaskFilter === "3days" ? 3 : 7);
+      const windowDays = (dashboardTaskFilter === "today") ? 0 : 3;
       const allTasks = [];
       appState.tanks.forEach(tank => {
         const tankTasks = generateTankTasks(tank, windowDays);
@@ -2649,15 +2695,13 @@
       const todayCount = allTasks.filter(t => t.daysRemaining === 0).length;
 
       if (badgeEl) {
-        const filterLabel = dashboardTaskFilter === "today" ? "Today" : (dashboardTaskFilter === "3days" ? "3 Days" : "7 Days");
         if (allTasks.length === 0) {
-          badgeEl.innerText = `All Clear (${filterLabel})`;
+          badgeEl.innerText = dashboardTaskFilter === "today" ? "All Clear Today" : "All Clear (3 Days)";
           badgeEl.style.background = "rgba(0, 245, 160, 0.15)";
           badgeEl.style.color = "var(--neon-green)";
           badgeEl.style.borderColor = "var(--neon-green)";
         } else if (overdueCount > 0) {
-          const suffix = dashboardTaskFilter === 'today' ? 'Today' : (dashboardTaskFilter === '3days' ? 'in 3d' : 'in 7d');
-          badgeEl.innerText = `${overdueCount} Overdue • ${allTasks.length} ${suffix}`;
+          badgeEl.innerText = `${overdueCount} Overdue • ${allTasks.length} ${dashboardTaskFilter === 'today' ? 'Today' : 'in 3d'}`;
           badgeEl.style.background = "rgba(244, 63, 94, 0.15)";
           badgeEl.style.color = "var(--alert-red)";
           badgeEl.style.borderColor = "var(--alert-red)";
@@ -2667,7 +2711,7 @@
           badgeEl.style.color = "var(--alert-yellow)";
           badgeEl.style.borderColor = "var(--alert-yellow)";
         } else {
-          badgeEl.innerText = `${allTasks.length} in Next ${filterLabel}`;
+          badgeEl.innerText = `${allTasks.length} in Next 3 Days`;
           badgeEl.style.background = "rgba(56, 189, 248, 0.15)";
           badgeEl.style.color = "var(--cyan)";
           badgeEl.style.borderColor = "var(--cyan)";
@@ -2677,9 +2721,7 @@
       if (allTasks.length === 0) {
         const emptyMsg = (dashboardTaskFilter === "today")
           ? `All maintenance is current for today. Zero tasks due.`
-          : (dashboardTaskFilter === "3days"
-              ? `All maintenance is current. No tasks scheduled across your aquariums in the next 3 days.`
-              : `All maintenance is current. No tasks scheduled across your aquariums in the next 7 days.`);
+          : `All maintenance is current. No tasks scheduled across your aquariums in the next 3 days.`;
         listEl.innerHTML = `
           <div style="font-size:12px; color:var(--text-muted); padding:8px 2px;">
             ${emptyMsg}
@@ -2725,40 +2767,33 @@
       if (taskType === "wc") {
         tank.lastWaterChange = today;
         taskName = "Water change";
-        if (!tank.timeline) tank.timeline = [];
-        tank.timeline.unshift({ date: today, text: "Skipped routine water change for this cycle" });
+        addTankTimelineEvent(tank, "Skipped routine water change for this cycle", today);
       } else if (taskType === "test") {
         if (!tank.lastTest) tank.lastTest = { nh3: 0, no2: 0, no3: 0, ph: 7.0, temp: 78 };
         tank.lastTest.date = today;
         taskName = "Water chemistry test";
-        if (!tank.timeline) tank.timeline = [];
-        tank.timeline.unshift({ date: today, text: "Skipped water test for this cycle" });
+        addTankTimelineEvent(tank, "Skipped water test for this cycle", today);
       } else if (taskType === "glass") {
         tank.lastGlassClean = today;
         taskName = "Glass algae wipe";
-        if (!tank.timeline) tank.timeline = [];
-        tank.timeline.unshift({ date: today, text: "Skipped glass cleaning" });
+        addTankTimelineEvent(tank, "Skipped glass cleaning", today);
       } else if (taskType === "plants") {
         tank.lastPlantCare = today;
         taskName = "Plant pruning";
-        if (!tank.timeline) tank.timeline = [];
-        tank.timeline.unshift({ date: today, text: "Skipped plant pruning" });
+        addTankTimelineEvent(tank, "Skipped plant pruning", today);
       } else if (taskType === "impeller") {
         tank.lastImpellerClean = today;
         taskName = "Impeller check";
-        if (!tank.timeline) tank.timeline = [];
-        tank.timeline.unshift({ date: today, text: "Skipped filter impeller maintenance" });
+        addTankTimelineEvent(tank, "Skipped filter impeller maintenance", today);
       } else if (taskType === "heater") {
         tank.lastHeaterCheck = today;
         taskName = "Heater check";
-        if (!tank.timeline) tank.timeline = [];
-        tank.timeline.unshift({ date: today, text: "Skipped heater calibration check" });
+        addTankTimelineEvent(tank, "Skipped heater calibration check", today);
       } else if (taskType === "filter") {
         if (tank.filterMedia && tank.filterMedia[mediaIdx]) {
           tank.filterMedia[mediaIdx].lastDate = today;
           taskName = tank.filterMedia[mediaIdx].name;
-          if (!tank.timeline) tank.timeline = [];
-          tank.timeline.unshift({ date: today, text: `Skipped maintenance for ${taskName}` });
+          addTankTimelineEvent(tank, `Skipped maintenance for ${taskName}`, today);
         }
       }
 
@@ -2778,11 +2813,7 @@
       const today = new Date().toISOString().split("T")[0];
       const media = tank.filterMedia[mIdx];
       media.lastDate = today;
-      if (!tank.timeline) tank.timeline = [];
-      tank.timeline.unshift({
-        date: today,
-        text: `Rinsed ${media.name} (Using dechlorinated/tank water)`
-      });
+      addTankTimelineEvent(tank, `Rinsed ${media.name} (Using dechlorinated/tank water)`, today);
       saveDataToStorage();
       renderDashboardTasks();
       if (isInsideTank && activeTankId == tank.id) {
@@ -2797,8 +2828,7 @@
       if (!tank) return;
       const today = new Date().toISOString().split("T")[0];
       tank.lastGlassClean = today;
-      if (!tank.timeline) tank.timeline = [];
-      tank.timeline.unshift({ date: today, text: "Cleaned algae from aquarium glass" });
+      addTankTimelineEvent(tank, "Cleaned algae from aquarium glass", today);
       saveDataToStorage();
       renderDashboardTasks();
       if (isInsideTank && activeTankId == tank.id) {
@@ -2813,8 +2843,7 @@
       if (!tank) return;
       const today = new Date().toISOString().split("T")[0];
       tank.lastImpellerClean = today;
-      if (!tank.timeline) tank.timeline = [];
-      tank.timeline.unshift({ date: today, text: "Cleaned filter intake & inspected impeller" });
+      addTankTimelineEvent(tank, "Cleaned filter intake & inspected impeller", today);
       saveDataToStorage();
       renderDashboardTasks();
       if (isInsideTank && activeTankId == tank.id) {
@@ -2829,8 +2858,7 @@
       if (!tank) return;
       const today = new Date().toISOString().split("T")[0];
       tank.lastPlantCare = today;
-      if (!tank.timeline) tank.timeline = [];
-      tank.timeline.unshift({ date: today, text: "Pruned plants & checked foliage health" });
+      addTankTimelineEvent(tank, "Pruned plants & checked foliage health", today);
       saveDataToStorage();
       renderDashboardTasks();
       if (isInsideTank && activeTankId == tank.id) {
@@ -2845,8 +2873,7 @@
       if (!tank) return;
       const today = new Date().toISOString().split("T")[0];
       tank.lastHeaterCheck = today;
-      if (!tank.timeline) tank.timeline = [];
-      tank.timeline.unshift({ date: today, text: "Verified water temperature & heater thermostat" });
+      addTankTimelineEvent(tank, "Verified water temperature & heater thermostat", today);
       saveDataToStorage();
       renderDashboardTasks();
       if (isInsideTank && activeTankId == tank.id) {
@@ -2954,11 +2981,10 @@
 
       tank.lastWaterChange = date;
 
-      // Add timeline event
-      if (!tank.timeline) tank.timeline = [];
+      // Add timeline event - sorted by record date
       let eventText = `${pct}% Water Change (~${volAmt} ${u.vol})`;
       if (dose) eventText += ` • Dosed: ${dose}`;
-      tank.timeline.unshift({ date, text: eventText });
+      addTankTimelineEvent(tank, eventText, date);
 
       // Add history record for charts
       if (!tank.history) tank.history = [];
@@ -3166,21 +3192,23 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
         paramContainer.innerHTML = buildParamGaugeInnerHtml(t, u);
       }
 
-      // Unified Timeline
+      // Unified Timeline - Sorted strictly by record date descending (not insertion time)
       const timelineEl = document.getElementById("tank-overview-timeline");
       if (timelineEl) {
         timelineEl.innerHTML = "";
-        const events = tank.timeline || [];
+        if (!tank.timeline) tank.timeline = [];
+        tank.timeline.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+        const events = tank.timeline;
         if (events.length === 0) {
           timelineEl.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:6px 0;">No activities recorded yet.</div>`;
         } else {
-          events.slice(0, 8).forEach((e, idx) => {
+          events.slice(0, 10).forEach((e, idx) => {
             timelineEl.innerHTML += `
               <div class="timeline-entry">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                  <div class="timeline-entry-date">${e.date}</div>
+                  <div class="timeline-entry-date" style="font-weight:600; color:var(--cyan);">${e.date}</div>
                   <div style="display:flex; gap:8px; align-items:center;">
-                    <span style="font-size:11px; color:var(--cyan); cursor:pointer;" onclick="editTimelineEvent(${idx})">Edit</span>
+                    <span style="font-size:11px; color:var(--text-muted); cursor:pointer;" onclick="editTimelineEvent(${idx})">Edit</span>
                     <span class="delete-x" onclick="deleteTimelineEvent(${idx})" title="Delete event">×</span>
                   </div>
                 </div>
@@ -3205,9 +3233,14 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       const activeTank = getActiveTank();
       if (!activeTank || !activeTank.timeline || !activeTank.timeline[idx]) return;
       const current = activeTank.timeline[idx];
-      const updated = prompt("Edit activity log description:", current.text);
-      if (updated !== null && updated.trim()) {
-        current.text = updated.trim();
+      const updatedText = prompt("Edit activity log description:", current.text);
+      if (updatedText !== null && updatedText.trim()) {
+        const updatedDate = prompt("Edit activity date (YYYY-MM-DD):", current.date || new Date().toISOString().split("T")[0]);
+        current.text = updatedText.trim();
+        if (updatedDate && updatedDate.trim()) {
+          current.date = updatedDate.trim();
+        }
+        activeTank.timeline.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
         saveDataToStorage();
         renderTankOverviewTab();
         showToast("Activity Log Updated");
@@ -3317,11 +3350,17 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       showToast("Aquarium is Established");
     }
 
+    function addTankTimelineEvent(tank, text, date = new Date().toISOString().split("T")[0]) {
+      if (!tank) return;
+      if (!tank.timeline) tank.timeline = [];
+      tank.timeline.push({ date, text });
+      tank.timeline.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+    }
+
     function logTankTimelineEvent(text, date = new Date().toISOString().split("T")[0]) {
       const tank = getActiveTank();
       if (!tank) return;
-      if (!tank.timeline) tank.timeline = [];
-      tank.timeline.unshift({ date, text });
+      addTankTimelineEvent(tank, text, date);
     }
 
     /* TANK SUB-TAB 2: WATER & TRENDS */
@@ -4440,10 +4479,9 @@ Instructions:
       document.getElementById("add-m-name").value = "";
       document.getElementById("add-m-vol").value = "";
       document.getElementById("add-m-date").valueAsDate = new Date();
-      document.getElementById("add-m-color").value = "#00D2FF";
-      document.getElementById("add-color-preview").style.background = "#00D2FF";
       document.getElementById("add-m-status").value = "Established";
       document.getElementById("add-m-photo").value = "";
+      renderThemeColorPalette("add", "#00D2FF");
       openModalById("addTankModal");
     }
 
@@ -4456,12 +4494,7 @@ Instructions:
       document.getElementById("edit-m-date").value = tank.startDate || "2025-01-01";
       document.getElementById("edit-m-status").value = tank.status;
       const clr = tank.color || "#00D2FF";
-      document.getElementById("edit-m-color").value = clr;
-      const preview = document.getElementById("edit-color-preview");
-      if (preview) {
-        preview.style.background = clr;
-        preview.style.boxShadow = `0 0 10px ${clr}`;
-      }
+      renderThemeColorPalette("edit", clr);
       document.getElementById("edit-m-photo").value = "";
       openModalById("editTankModal");
     }
