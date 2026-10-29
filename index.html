@@ -544,8 +544,8 @@
           <div style="font-size:11px; font-weight:800; color:var(--cyan); text-transform:uppercase; letter-spacing:0.8px;">
             Ecosystem Overview
           </div>
-          <div id="global-status-badge" style="font-size:11px; color:var(--neon-green); font-weight:700;">
-            <span class="live-pulse-dot"></span> Live Telemetry Active
+          <div id="global-status-badge" style="font-size:11px; font-weight:700;">
+            <span style="color:var(--neon-green);">● All Tanks Healthy</span>
           </div>
         </div>
         
@@ -556,17 +556,17 @@
             <div id="stat-total-tanks" style="font-size:18px; font-weight:800; color:#fff; margin-top:2px;">--</div>
           </div>
           <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:10px 8px; text-align:center;">
-            <div style="font-size:10px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Total Volume</div>
-            <div id="stat-total-vol" style="font-size:18px; font-weight:800; color:var(--cyan); margin-top:2px;">--</div>
+            <div style="font-size:10px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Water Quality</div>
+            <div id="stat-water-health" style="font-size:18px; font-weight:800; color:var(--neon-green); margin-top:2px;">All Safe</div>
           </div>
           <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:10px 8px; text-align:center;">
-            <div style="font-size:10px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Biostability</div>
-            <div id="stat-stability" style="font-size:18px; font-weight:800; color:var(--neon-green); margin-top:2px;">100%</div>
+            <div style="font-size:10px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Tasks Due</div>
+            <div id="stat-tasks-due" style="font-size:18px; font-weight:800; color:var(--cyan); margin-top:2px;">0 Due</div>
           </div>
         </div>
 
         <div id="global-ai-summary" style="font-size: 13.5px; line-height: 1.55; color: var(--text-main);">
-          Live biological monitoring active across your household.
+          All tanks are healthy and biologically balanced.
         </div>
       </div>
 
@@ -1807,36 +1807,122 @@
 
       const u = getUnitLabels();
       const totalTanks = appState.tanks.length;
-      const totalVol = appState.tanks.reduce((acc, t) => acc + (parseFloat(t.vol) || 0), 0);
-      const cyclingTanks = appState.tanks.filter(t => t.status === "Cycling").length;
+      const taskCount = renderDashboardTasks() || 0;
+
+      // Analyze water quality across all tanks
+      const toxinTanks = [];
+      const highNitrateTanks = [];
+      const cyclingTanks = [];
+      let minWcDays = 999;
+      let nextWcTankName = "";
+
+      appState.tanks.forEach(tank => {
+        const t = tank.lastTest || { nh3: 0, no2: 0, no3: 0 };
+        const nh3 = parseFloat(t.nh3) || 0;
+        const no2 = parseFloat(t.no2) || 0;
+        const no3 = parseFloat(t.no3) || 0;
+
+        if (tank.status === "Cycling") {
+          cyclingTanks.push(tank);
+        }
+        if (nh3 > 0.25 || no2 > 0.25) {
+          toxinTanks.push({ tank, nh3, no2 });
+        } else if (no3 > 40) {
+          highNitrateTanks.push({ tank, no3 });
+        }
+
+        // Check water change countdown
+        let lastWcDate = tank.lastWaterChange;
+        if (!lastWcDate && tank.history) {
+          const wcEntry = tank.history.find(h => h.wc && h.wc > 0);
+          if (wcEntry) lastWcDate = wcEntry.date;
+        }
+        if (lastWcDate) {
+          const daysSince = Math.floor((new Date() - new Date(lastWcDate)) / (1000 * 60 * 60 * 24));
+          const daysUntil = Math.max(0, 7 - daysSince);
+          if (daysUntil < minWcDays) {
+            minWcDays = daysUntil;
+            nextWcTankName = tank.name;
+          }
+        }
+      });
 
       // Update Executive Overview Stat Widgets
       const statTanksEl = document.getElementById("stat-total-tanks");
-      const statVolEl = document.getElementById("stat-total-vol");
-      const statStabEl = document.getElementById("stat-stability");
-      if (statTanksEl) statTanksEl.innerText = totalTanks;
-      if (statVolEl) statVolEl.innerText = `${totalVol} ${u.vol}`;
-      if (statStabEl) {
-        // Stability score based on parameters and cycling
-        let stableCount = appState.tanks.filter(t => {
-          const p = t.lastTest || {};
-          const nh3 = parseFloat(p.nh3) || 0;
-          const no2 = parseFloat(p.no2) || 0;
-          return t.status !== "Cycling" && nh3 === 0 && no2 === 0;
-        }).length;
-        let score = totalTanks > 0 ? Math.round((stableCount / totalTanks) * 100) : 100;
-        statStabEl.innerText = `${score}%`;
-        statStabEl.style.color = score >= 90 ? "var(--neon-green)" : (score >= 60 ? "var(--alert-yellow)" : "var(--alert-red)");
+      const statWaterEl = document.getElementById("stat-water-health");
+      const statTasksEl = document.getElementById("stat-tasks-due");
+      const globalStatusBadge = document.getElementById("global-status-badge");
+
+      if (statTanksEl) statTanksEl.innerText = `${totalTanks}`;
+
+      if (statWaterEl) {
+        if (totalTanks === 0) {
+          statWaterEl.innerText = "--";
+          statWaterEl.style.color = "var(--text-muted)";
+        } else if (toxinTanks.length > 0) {
+          statWaterEl.innerText = `${toxinTanks.length} Alert${toxinTanks.length > 1 ? 's' : ''}`;
+          statWaterEl.style.color = "var(--alert-red)";
+        } else if (highNitrateTanks.length > 0) {
+          statWaterEl.innerText = `${highNitrateTanks.length} High NO₃`;
+          statWaterEl.style.color = "var(--alert-yellow)";
+        } else if (cyclingTanks.length > 0 && cyclingTanks.length === totalTanks) {
+          statWaterEl.innerText = "Cycling";
+          statWaterEl.style.color = "var(--cyan)";
+        } else {
+          statWaterEl.innerText = "All Safe";
+          statWaterEl.style.color = "var(--neon-green)";
+        }
+      }
+
+      if (globalStatusBadge) {
+        if (totalTanks === 0) {
+          globalStatusBadge.innerHTML = `<span style="color:var(--text-muted);">● No Tanks Added</span>`;
+        } else if (toxinTanks.length > 0) {
+          globalStatusBadge.innerHTML = `<span style="color:var(--alert-red); font-weight:700;">⚠️ Toxin Spike Detected</span>`;
+        } else if (highNitrateTanks.length > 0) {
+          globalStatusBadge.innerHTML = `<span style="color:var(--alert-yellow); font-weight:700;">⚠️ Water Change Due</span>`;
+        } else if (cyclingTanks.length > 0 && cyclingTanks.length === totalTanks) {
+          globalStatusBadge.innerHTML = `<span style="color:var(--cyan); font-weight:700;">● Cycling In Progress</span>`;
+        } else {
+          globalStatusBadge.innerHTML = `<span style="color:var(--neon-green); font-weight:700;">● All Tanks Healthy</span>`;
+        }
+      }
+
+      if (statTasksEl) {
+        if (totalTanks === 0) {
+          statTasksEl.innerText = "--";
+          statTasksEl.style.color = "var(--text-muted)";
+        } else if (taskCount === 0) {
+          statTasksEl.innerText = "0 Due";
+          statTasksEl.style.color = "var(--neon-green)";
+        } else {
+          statTasksEl.innerText = `${taskCount} Due`;
+          statTasksEl.style.color = "var(--alert-yellow)";
+        }
       }
 
       const sumEl = document.getElementById("global-ai-summary");
       if (sumEl) {
         if (totalTanks === 0) {
-          sumEl.innerHTML = `No active aquariums registered. Tap <b>+ Add Aquarium</b> to start monitoring your biological ecosystems.`;
-        } else if (cyclingTanks > 0) {
-          sumEl.innerHTML = `Aquarist AI is actively monitoring <b>${totalTanks} systems</b> (${totalVol} ${u.vol}). <b>${cyclingTanks} aquarium(s)</b> currently cultivating biological filtration.`;
+          sumEl.innerHTML = `No aquariums registered yet. Tap <b>+ Add Aquarium</b> to set up your first tank.`;
+        } else if (toxinTanks.length > 0) {
+          const tSpike = toxinTanks[0];
+          sumEl.innerHTML = `⚠️ <b>${tSpike.tank.name}</b> logged toxic readings (${tSpike.nh3 > 0 ? `Ammonia: ${tSpike.nh3} ppm` : `Nitrite: ${tSpike.no2} ppm`}). Perform an immediate water change and dose water conditioner.`;
+        } else if (highNitrateTanks.length > 0) {
+          const tHigh = highNitrateTanks[0];
+          sumEl.innerHTML = `⚠️ Nitrates in <b>${tHigh.tank.name}</b> reached <b>${tHigh.no3} ppm</b>. A 25–30% water change is recommended to keep water clean and livestock safe.`;
+        } else if (cyclingTanks.length > 0 && cyclingTanks.length === totalTanks) {
+          sumEl.innerHTML = `<b>${cyclingTanks[0].name}</b> is actively cycling. Beneficial nitrifying bacteria are cultivating—no water change needed unless ammonia exceeds 2.0 ppm.`;
+        } else if (taskCount > 0) {
+          sumEl.innerHTML = `All water parameters are in the safe zone with zero detectable toxins. You have <b>${taskCount} routine task${taskCount > 1 ? 's' : ''}</b> ready for attention below.`;
+        } else if (minWcDays < 999 && nextWcTankName) {
+          if (minWcDays === 0) {
+            sumEl.innerHTML = `All tanks are healthy and biologically stable. Water change for <b>${nextWcTankName}</b> is scheduled for today.`;
+          } else {
+            sumEl.innerHTML = `All tanks are healthy and biologically balanced with zero ammonia or nitrite. Next scheduled care is for <b>${nextWcTankName}</b> in <b>${minWcDays} day${minWcDays > 1 ? 's' : ''}</b>.`;
+          }
         } else {
-          sumEl.innerHTML = `All <b>${totalTanks} aquatic systems</b> (${totalVol} ${u.vol}) are biologically established with nominal water chemistry.`;
+          sumEl.innerHTML = `All tanks are healthy and biologically balanced. Zero ammonia, zero nitrite, and all routines are on schedule.`;
         }
       }
 
@@ -1847,7 +1933,7 @@
         const t = tank.lastTest || { nh3: 0, no2: 0, no3: 0, ph: 7.2, temp: 78 };
 
         // Calculate 1-line actionable telemetry status
-        let actionableOverview = "All systems nominal • Next water change in 4 days";
+        let actionableOverview = "Healthy & stable • Next water change in 4 days";
         const nh3 = parseFloat(t.nh3) || 0;
         const no2 = parseFloat(t.no2) || 0;
         const no3 = parseFloat(t.no3) || 0;
@@ -1871,7 +1957,7 @@
             if (daysUntil === 0) {
               actionableOverview = `Water change due today (~${Math.round(tank.vol * 0.25)} ${u.vol})`;
             } else {
-              actionableOverview = `All systems nominal • Next water change in ${daysUntil} day${daysUntil > 1 ? 's' : ''}`;
+              actionableOverview = `Healthy & stable • Next water change in ${daysUntil} day${daysUntil > 1 ? 's' : ''}`;
             }
           }
         }
@@ -2011,7 +2097,7 @@
             All aquariums are maintained and up to date! Next routine scheduled in ~3-5 days.
           </div>
         `;
-        return;
+        return 0;
       }
 
       tasks.forEach((t) => {
@@ -2027,6 +2113,7 @@
           </div>
         `;
       });
+      return tasks.length;
     }
 
     function markFilterRinsedFromDashboard(tankId, mIdx) {
@@ -2347,7 +2434,7 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
 
       // Summary Assessment Box
       document.getElementById("tank-overview-summary").innerText = 
-        tank.summary || (tank.status === "Cycling" ? "Aquarium is currently cycling. Biological filtration is cultivating." : "Biological parameters are stable and within nominal ranges.");
+        tank.summary || (tank.status === "Cycling" ? "Aquarium is currently cycling. Biological filtration is cultivating." : "Water parameters are balanced and in the safe zone.");
 
       // Parameter Snapshot
       const paramContainer = document.getElementById("tank-overview-params");
@@ -2801,7 +2888,7 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       } else if (no3 > 40) {
         holisticSummary = `Nitrate elevated at ${no3} ppm. Schedule a 25-30% water change to protect livestock.`;
       } else {
-        holisticSummary = `Ecosystem healthy and stable. Ammonia and Nitrite at 0, Nitrate at nominal ${no3} ppm.`;
+        holisticSummary = `Ecosystem healthy and stable. Ammonia and Nitrite at 0, Nitrate safe at ${no3} ppm.`;
       }
       activeTank.summary = holisticSummary;
 
