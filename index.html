@@ -268,6 +268,7 @@
     .param-chip.status-safe { border-color: rgba(0, 245, 160, 0.25); }
     .param-chip.status-caution { border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.04); }
     .param-chip.status-alert { border-color: rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.06); }
+    .param-chip.status-neutral { border-color: rgba(255, 255, 255, 0.07); background: rgba(255, 255, 255, 0.02); opacity: 0.82; }
     .param-chip-header {
       display: flex; align-items: center; justify-content: center; gap: 3px; margin-bottom: 3px;
     }
@@ -278,6 +279,7 @@
     .param-chip-dot.safe { background: var(--neon-green); box-shadow: 0 0 5px var(--neon-green); }
     .param-chip-dot.caution { background: var(--alert-yellow); box-shadow: 0 0 5px var(--alert-yellow); }
     .param-chip-dot.alert { background: var(--alert-red); box-shadow: 0 0 5px var(--alert-red); }
+    .param-chip-dot.neutral { background: #64748B; }
     .param-chip-val { font-size: 12px; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
 
     /* Visual Parameter Chart (F-12) */
@@ -429,6 +431,22 @@
       border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 11px; padding: 3px; gap: 3px;
     }
     .segmented-group.full { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+    .segmented-group.quad { display: grid; grid-template-columns: repeat(4, 1fr); width: 100%; }
+    .segmented-group.compact { padding: 2px; border-radius: 9px; gap: 2px; }
+    .segmented-group.compact .segmented-btn { font-size: 11px; padding: 4px 10px; border-radius: 7px; }
+    .input-error { border-color: var(--alert-red) !important; box-shadow: 0 0 0 2px rgba(244, 63, 94, 0.16); }
+    .field-error-text { font-size: 11px; color: var(--alert-red); margin-bottom: 10px; display: none; font-weight: 600; }
+    .photo-upload-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      background: rgba(255, 255, 255, 0.025); border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 11px; padding: 8px 10px;
+    }
+    .photo-thumb-box {
+      width: 38px; height: 38px; border-radius: 8px; background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center;
+      justify-content: center; overflow: hidden; flex-shrink: 0; color: var(--text-muted);
+    }
+    .photo-thumb-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .segmented-btn {
       background: transparent; border: 1px solid transparent; color: var(--text-muted);
       font-size: 12px; font-weight: 600; padding: 7px 12px; border-radius: 8px; cursor: pointer;
@@ -635,11 +653,11 @@
       <!-- Actionable Upcoming Tasks & Routines Checklist -->
       <div class="card" id="dashboard-tasks-card" style="margin-bottom: 18px; border-color: rgba(56, 189, 248, 0.35);">
         <div class="card-header" style="margin-bottom: 10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-          <div style="display:flex; align-items:center; gap:8px;">
+          <div style="display:flex; align-items:center; gap:10px;">
             <div class="card-title">Upcoming Tasks</div>
-            <div style="display:inline-flex; background:rgba(255,255,255,0.06); border-radius:20px; padding:2px; border:1px solid rgba(255,255,255,0.08);">
-              <button id="task-filter-today" onclick="setDashboardTaskFilter('today')" style="background:rgba(0,210,255,0.2); border:none; color:var(--cyan); font-size:10px; font-weight:700; padding:3px 9px; border-radius:16px; cursor:pointer; transition:all 0.15s ease;">Today</button>
-              <button id="task-filter-3days" onclick="setDashboardTaskFilter('3days')" style="background:transparent; border:none; color:var(--text-muted); font-size:10px; font-weight:700; padding:3px 9px; border-radius:16px; cursor:pointer; transition:all 0.15s ease;">3 Days</button>
+            <div class="segmented-group compact">
+              <button type="button" id="task-filter-today" class="segmented-btn active" onclick="setDashboardTaskFilter('today')">Today</button>
+              <button type="button" id="task-filter-3days" class="segmented-btn" onclick="setDashboardTaskFilter('3days')">3 Days</button>
             </div>
           </div>
           <span id="dashboard-tasks-badge" class="badge-cycling" style="background:rgba(56,189,248,0.15); color:var(--cyan); border-color:var(--cyan); font-size:10px;">Checking...</span>
@@ -995,19 +1013,22 @@
   <!-- ================= MODAL: ADD AQUARIUM ================= -->
   <div class="modal-overlay" id="addTankModal">
     <div class="modal-box">
-      <h3 style="margin-bottom:14px; font-size:18px;">Add New Aquarium</h3>
+      <div class="card-header" style="margin-bottom:12px;">
+        <h3 style="font-size:18px;">Add New Aquarium</h3>
+        <button class="icon-btn" style="width:28px;height:28px;" onclick="closeModalById('addTankModal')">×</button>
+      </div>
       <div style="margin-bottom:12px;">
         <label>Tank Name</label>
-        <input type="text" id="add-m-name" placeholder="e.g. 55G Living Room Community">
+        <input type="text" id="add-m-name" placeholder="e.g. 55G Living Room Community" oninput="clearFieldError(this, 'add-form-error')">
       </div>
       <div class="input-grid-2">
         <div>
           <label>Volume (<span class="unit-vol-label">Gal</span>)</label>
-          <input type="number" id="add-m-vol" placeholder="55">
+          <input type="number" id="add-m-vol" placeholder="55" min="0.5" step="any" oninput="clearFieldError(this, 'add-form-error')">
         </div>
         <div>
-          <label>Setup / Cycling Date</label>
-          <input type="date" id="add-m-date">
+          <label>Setup / Start Date</label>
+          <input type="date" id="add-m-date" oninput="clearFieldError(this, 'add-form-error')">
         </div>
       </div>
       <div style="margin-bottom:14px;">
@@ -1023,6 +1044,16 @@
         </div>
       </div>
       <div style="margin-bottom:14px;">
+        <label>Filtration Preset</label>
+        <input type="hidden" id="add-m-filter" value="hob">
+        <div class="segmented-group quad" id="add-filter-group">
+          <button type="button" class="segmented-btn" data-filter="sponge" onclick="selectAddFilterPreset('sponge')" style="font-size:11.5px; padding:7px 6px;">Sponge</button>
+          <button type="button" class="segmented-btn active" data-filter="hob" onclick="selectAddFilterPreset('hob')" style="font-size:11.5px; padding:7px 6px;">HOB</button>
+          <button type="button" class="segmented-btn" data-filter="canister" onclick="selectAddFilterPreset('canister')" style="font-size:11.5px; padding:7px 6px;">Canister</button>
+          <button type="button" class="segmented-btn" data-filter="none" onclick="selectAddFilterPreset('none')" style="font-size:11.5px; padding:7px 6px;">None</button>
+        </div>
+      </div>
+      <div style="margin-bottom:14px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
           <label style="margin:0;">Theme Color</label>
           <div style="display:flex; align-items:center; gap:6px;">
@@ -1035,8 +1066,21 @@
       </div>
       <div style="margin-bottom:16px;">
         <label>Tank Photo (Optional)</label>
-        <input type="file" id="add-m-photo" accept="image/*">
+        <input type="file" id="add-m-photo" accept="image/*" style="display:none;" onchange="handleTankPhotoSelected('add', this)">
+        <div class="photo-upload-row">
+          <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+            <div class="photo-thumb-box" id="add-photo-thumb">
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            </div>
+            <div style="font-size:12px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="add-photo-label">No cover photo selected</div>
+          </div>
+          <div style="display:flex; gap:6px; flex-shrink:0;">
+            <button type="button" class="ghost-action-btn" id="add-photo-btn" onclick="document.getElementById('add-m-photo').click()">Upload</button>
+            <button type="button" class="ghost-action-btn" id="add-photo-remove-btn" style="display:none; color:var(--alert-red); border-color:rgba(244,63,94,0.3);" onclick="clearTankPhotoSelection('add')">Remove</button>
+          </div>
+        </div>
       </div>
+      <div id="add-form-error" class="field-error-text"></div>
       <div style="display:flex; gap:10px;">
         <button class="btn btn-secondary" onclick="closeModalById('addTankModal')">Cancel</button>
         <button class="btn btn-neon" onclick="saveNewTankData()">Save Aquarium</button>
@@ -1053,16 +1097,16 @@
       </div>
       <div style="margin-bottom:12px;">
         <label>Tank Name</label>
-        <input type="text" id="edit-m-name">
+        <input type="text" id="edit-m-name" oninput="clearFieldError(this, 'edit-form-error')">
       </div>
       <div class="input-grid-2">
         <div>
           <label>Volume (<span class="unit-vol-label">Gal</span>)</label>
-          <input type="number" id="edit-m-vol">
+          <input type="number" id="edit-m-vol" min="0.5" step="any" oninput="clearFieldError(this, 'edit-form-error')">
         </div>
         <div>
           <label>Setup / Start Date</label>
-          <input type="date" id="edit-m-date">
+          <input type="date" id="edit-m-date" oninput="clearFieldError(this, 'edit-form-error')">
         </div>
       </div>
       <div style="margin-bottom:14px;">
@@ -1089,9 +1133,22 @@
         <div id="edit-color-palette" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px;"></div>
       </div>
       <div style="margin-bottom:16px;">
-        <label>Update Photo</label>
-        <input type="file" id="edit-m-photo" accept="image/*">
+        <label>Tank Photo</label>
+        <input type="file" id="edit-m-photo" accept="image/*" style="display:none;" onchange="handleTankPhotoSelected('edit', this)">
+        <div class="photo-upload-row">
+          <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+            <div class="photo-thumb-box" id="edit-photo-thumb">
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            </div>
+            <div style="font-size:12px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="edit-photo-label">No cover photo set</div>
+          </div>
+          <div style="display:flex; gap:6px; flex-shrink:0;">
+            <button type="button" class="ghost-action-btn" id="edit-photo-btn" onclick="document.getElementById('edit-m-photo').click()">Upload</button>
+            <button type="button" class="ghost-action-btn" id="edit-photo-remove-btn" style="display:none; color:var(--alert-red); border-color:rgba(244,63,94,0.3);" onclick="clearTankPhotoSelection('edit')">Remove</button>
+          </div>
+        </div>
       </div>
+      <div id="edit-form-error" class="field-error-text"></div>
       <div style="display:flex; gap:10px; margin-bottom:14px;">
         <button class="btn btn-secondary" onclick="closeModalById('editTankModal')">Cancel</button>
         <button class="btn btn-neon" onclick="saveEditedTankData()">Save Changes</button>
@@ -1252,8 +1309,11 @@
   <!-- ================= MODAL: RECORD CHEMISTRY TEST ================= -->
   <div class="modal-overlay" id="recordTestModal">
     <div class="modal-box">
-      <div class="card-header" style="margin-bottom:12px;">
-        <h3 style="font-size:18px;">Record Water Chemistry Test</h3>
+      <div class="card-header" style="margin-bottom:8px;">
+        <div>
+          <h3 style="font-size:18px; margin:0;">Record Water Chemistry Test</h3>
+          <div id="m-test-tank-label" style="font-size:11.5px; color:var(--cyan); font-weight:600; margin-top:2px;"></div>
+        </div>
         <button class="icon-btn" style="width:28px;height:28px;" onclick="closeModalById('recordTestModal')">×</button>
       </div>
       <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
@@ -1505,9 +1565,13 @@
             <div class="settings-title">Gemini API Key</div>
             <div class="settings-sub">Free at aistudio.google.com • Stored locally</div>
           </div>
-          <button type="button" id="api-key-toggle-btn" class="ghost-action-btn" style="color:var(--text-muted);" onclick="toggleApiKeyVisibility()">Show</button>
+          <div style="display:flex; gap:6px; flex-shrink:0;">
+            <button type="button" id="api-key-verify-btn" class="ghost-action-btn" onclick="verifyApiKey()">Verify</button>
+            <button type="button" id="api-key-toggle-btn" class="ghost-action-btn" style="color:var(--text-muted);" onclick="toggleApiKeyVisibility()">Show</button>
+          </div>
         </div>
         <input type="password" id="setting-api-key" placeholder="Paste AIzaSy... key" style="padding:9px 12px; font-size:13px; border-radius:10px;" onchange="saveApiKey()">
+        <div id="api-key-status" style="display:none; font-size:11px; margin-top:6px; font-weight:600;"></div>
       </div>
 
       <!-- 5. Local Backup & Restore -->
@@ -1524,6 +1588,10 @@
             Restore Backup
           </button>
           <input type="file" id="importFile" accept=".json,application/json" style="display:none;" onchange="importDataJSON(event)">
+        </div>
+        <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:11px; color:var(--text-muted);">Start fresh with an empty tank list</span>
+          <button type="button" class="ghost-action-btn" style="color:var(--alert-red); border-color:rgba(244,63,94,0.28); font-size:11px; padding:4px 10px;" onclick="resetAppDataPrompt()">Clear All Data</button>
         </div>
       </div>
     </div>
@@ -1646,16 +1714,16 @@
         if (Array.isArray(tank.timeline)) sortRecordsByDateDesc(tank.timeline);
         if (Array.isArray(tank.history)) {
           sortRecordsByDateDesc(tank.history);
-          if (tank.history.length > 0) {
-            const newest = tank.history[0];
-            if (!tank.lastTest || parseRecordTimestamp(newest.date) >= parseRecordTimestamp(tank.lastTest.date)) {
+          const newestChem = tank.history.find(h => !h.wcOnly);
+          if (newestChem) {
+            if (!tank.lastTest || parseRecordTimestamp(newestChem.date) >= parseRecordTimestamp(tank.lastTest.date)) {
               tank.lastTest = {
-                nh3: newest.nh3 ?? 0,
-                no2: newest.no2 ?? 0,
-                no3: newest.no3 ?? 0,
-                ph: newest.ph ?? 7.2,
-                temp: newest.temp ?? 78.0,
-                date: newest.date
+                nh3: newestChem.nh3 ?? 0,
+                no2: newestChem.no2 ?? 0,
+                no3: newestChem.no3 ?? 0,
+                ph: newestChem.ph ?? 7.2,
+                temp: newestChem.temp ?? 78.0,
+                date: newestChem.date
               };
             }
           }
@@ -1973,10 +2041,74 @@
       };
     }
 
+    function displayVol(gal) {
+      const g = parseFloat(gal) || 0;
+      if (appState.units === "metric") {
+        const liters = g * 3.78541;
+        return liters >= 15 ? Math.round(liters) : Math.round(liters * 10) / 10;
+      }
+      return Math.round(g * 10) / 10;
+    }
+
+    function inputVolToGal(val) {
+      const num = parseFloat(val);
+      if (Number.isNaN(num)) return 0;
+      if (appState.units === "metric") {
+        return Math.round((num / 3.78541) * 100) / 100;
+      }
+      return num;
+    }
+
+    function displayTemp(tempF) {
+      const f = parseFloat(tempF);
+      const baseF = Number.isNaN(f) ? 78 : f;
+      if (appState.units === "metric") {
+        return Math.round(((baseF - 32) * 5 / 9) * 10) / 10;
+      }
+      return Math.round(baseF * 10) / 10;
+    }
+
+    function inputTempToF(val) {
+      const num = parseFloat(val);
+      if (Number.isNaN(num)) return 78.0;
+      if (appState.units === "metric") {
+        return Math.round(((num * 9 / 5) + 32) * 10) / 10;
+      }
+      return num;
+    }
+
+    function hasTankBeenTested(tank) {
+      if (!tank) return false;
+      if (Array.isArray(tank.history) && tank.history.some(h => !h.wcOnly)) return true;
+      return !!(tank.lastTest && tank.lastTest.date && tank.lastTest.untested !== true);
+    }
+
+    function formatTestFreshness(tank) {
+      if (!hasTankBeenTested(tank)) {
+        return { text: "Not tested yet", color: "var(--text-muted)" };
+      }
+      const dateStr = (tank.lastTest && tank.lastTest.date) || (tank.history && tank.history[0] && tank.history[0].date);
+      if (!dateStr) return { text: "Not tested yet", color: "var(--text-muted)" };
+      const ts = parseRecordTimestamp(dateStr);
+      if (!ts) return { text: dateStr, color: "var(--text-muted)" };
+      const now = new Date();
+      const todayUtc = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+      const diffDays = Math.max(0, Math.floor((todayUtc - ts) / (1000 * 60 * 60 * 24)));
+      if (diffDays === 0) return { text: "Tested today", color: "var(--neon-green)" };
+      if (diffDays === 1) return { text: "Tested yesterday", color: "var(--text-muted)" };
+      if (diffDays >= 10) return { text: `Tested ${diffDays}d ago`, color: "var(--alert-yellow)" };
+      return { text: `Tested ${diffDays}d ago`, color: "var(--text-muted)" };
+    }
+
     function updateDynamicUnitLabels() {
       const u = getUnitLabels();
+      const isMetric = appState.units === "metric";
       document.querySelectorAll(".unit-vol-label").forEach(el => el.innerText = u.vol);
       document.querySelectorAll(".unit-temp-label").forEach(el => el.innerText = u.temp);
+      const addVolInput = document.getElementById("add-m-vol");
+      if (addVolInput) addVolInput.placeholder = isMetric ? "200" : "55";
+      const testTempInput = document.getElementById("m-test-temp");
+      if (testTempInput) testTempInput.placeholder = isMetric ? "25.5" : "78.0";
     }
 
     function onUnitsChange(val) {
@@ -1988,7 +2120,8 @@
     }
 
     function formatTankAgeLine(startDateStr, vol, volUnit) {
-      if (!startDateStr) return vol ? `${vol} ${volUnit}` : "";
+      const convVol = displayVol(vol);
+      if (!startDateStr) return convVol ? `${convVol} ${volUnit}` : "";
       const start = new Date(startDateStr);
       const now = new Date();
       const diffDays = Math.max(1, Math.floor((now - start) / (1000 * 60 * 60 * 24)));
@@ -2002,7 +2135,7 @@
         const years = (diffDays / 365.25).toFixed(1).replace(/\.0$/, "");
         ageStr = `${years} year${years === "1" ? "" : "s"} old`;
       }
-      return `Day ${diffDays} • ${ageStr} • ${vol} ${volUnit}`;
+      return `Day ${diffDays} • ${ageStr} • ${convVol} ${volUnit}`;
     }
 
     function calculateAge(startDateStr) {
@@ -2021,20 +2154,30 @@
 
     /* High-Tech Telemetry Gauge Builders - Ordered: Temp, pH, NH3, NO2, NO3 */
     function buildParamGaugeInnerHtml(t, u) {
+      if (!t) {
+        const labels = ["Temp", "pH", "NH₃", "NO₂", "NO₃"];
+        return labels.map(lbl => `
+          <div class="param-chip status-neutral">
+            <div class="param-chip-header">
+              <span class="param-chip-dot neutral"></span>
+              <span class="param-chip-label">${lbl}</span>
+            </div>
+            <div class="param-chip-val" style="color:var(--text-muted);">--</div>
+          </div>
+        `).join("");
+      }
+
       const nh3 = parseFloat(t.nh3) || 0;
       const no2 = parseFloat(t.no2) || 0;
       const no3 = parseFloat(t.no3) || 0;
       const ph = parseFloat(t.ph) || 7.2;
-      const temp = parseFloat(t.temp) || 78;
+      const tempF = parseFloat(t.temp) || 78;
 
       const nh3Status = nh3 > 0.25 ? "alert" : (nh3 > 0 ? "caution" : "safe");
       const no2Status = no2 > 0.25 ? "alert" : (no2 > 0 ? "caution" : "safe");
       const no3Status = no3 > 40 ? "alert" : (no3 > 25 ? "caution" : "safe");
       const phStatus = (ph < 6.4 || ph > 8.2) ? "caution" : "safe";
-      const isMetric = appState.units === "metric";
-      const tempStatus = isMetric 
-        ? ((temp < 22 || temp > 28) ? "caution" : "safe")
-        : ((temp < 72 || temp > 82) ? "caution" : "safe");
+      const tempStatus = (tempF < 72 || tempF > 82) ? "caution" : "safe";
 
       return `
         <div class="param-chip status-${tempStatus}">
@@ -2042,7 +2185,7 @@
             <span class="param-chip-dot ${tempStatus}"></span>
             <span class="param-chip-label">Temp</span>
           </div>
-          <div class="param-chip-val">${t.temp || 78}${u.temp}</div>
+          <div class="param-chip-val">${displayTemp(tempF)}${u.temp}</div>
         </div>
         <div class="param-chip status-${phStatus}">
           <div class="param-chip-header">
@@ -2084,50 +2227,38 @@
        ============================================================ */
     function renderGlobalDashboard() {
       updateDynamicUnitLabels();
-      renderDashboardTasks();
       const container = document.getElementById("tank-card-list");
       if (!container) return;
       container.innerHTML = "";
 
       const u = getUnitLabels();
       const totalTanks = appState.tanks.length;
-      const taskCount = renderDashboardTasks() || 0;
+      renderDashboardTasks();
 
       // Analyze water quality across all tanks
       const toxinTanks = [];
       const highNitrateTanks = [];
       const cyclingTanks = [];
-      let minWcDays = 999;
-      let nextWcTankName = "";
+      const untestedTanks = [];
 
       appState.tanks.forEach(tank => {
+        const tested = hasTankBeenTested(tank);
+        if (tank.status === "Cycling") {
+          cyclingTanks.push(tank);
+        }
+        if (!tested) {
+          untestedTanks.push(tank);
+          return;
+        }
         const t = tank.lastTest || { nh3: 0, no2: 0, no3: 0 };
         const nh3 = parseFloat(t.nh3) || 0;
         const no2 = parseFloat(t.no2) || 0;
         const no3 = parseFloat(t.no3) || 0;
 
-        if (tank.status === "Cycling") {
-          cyclingTanks.push(tank);
-        }
         if (nh3 > 0.25 || no2 > 0.25) {
           toxinTanks.push({ tank, nh3, no2 });
         } else if (no3 > 40) {
           highNitrateTanks.push({ tank, no3 });
-        }
-
-        // Check water change countdown
-        let lastWcDate = tank.lastWaterChange;
-        if (!lastWcDate && tank.history) {
-          const wcEntry = tank.history.find(h => h.wc && h.wc > 0);
-          if (wcEntry) lastWcDate = wcEntry.date;
-        }
-        if (lastWcDate) {
-          const daysSince = Math.floor((new Date() - new Date(lastWcDate)) / (1000 * 60 * 60 * 24));
-          const daysUntil = Math.max(0, 7 - daysSince);
-          if (daysUntil < minWcDays) {
-            minWcDays = daysUntil;
-            nextWcTankName = tank.name;
-          }
         }
       });
 
@@ -2149,6 +2280,9 @@
         } else if (highNitrateTanks.length > 0) {
           statWaterEl.innerText = `${highNitrateTanks.length} High NO₃`;
           statWaterEl.style.color = "var(--alert-yellow)";
+        } else if (untestedTanks.length === totalTanks) {
+          statWaterEl.innerText = "Untested";
+          statWaterEl.style.color = "var(--text-muted)";
         } else if (cyclingTanks.length > 0 && cyclingTanks.length === totalTanks) {
           statWaterEl.innerText = "Cycling";
           statWaterEl.style.color = "var(--cyan)";
@@ -2165,6 +2299,8 @@
           globalStatusBadge.innerHTML = `<span style="color:var(--alert-red); font-weight:700;">● Toxin Spike Detected</span>`;
         } else if (highNitrateTanks.length > 0) {
           globalStatusBadge.innerHTML = `<span style="color:var(--alert-yellow); font-weight:700;">● Water Change Due</span>`;
+        } else if (untestedTanks.length === totalTanks) {
+          globalStatusBadge.innerHTML = `<span style="color:var(--cyan); font-weight:700;">● Awaiting Baseline Test</span>`;
         } else if (cyclingTanks.length > 0 && cyclingTanks.length === totalTanks) {
           globalStatusBadge.innerHTML = `<span style="color:var(--cyan); font-weight:700;">● Cycling In Progress</span>`;
         } else {
@@ -2193,13 +2329,15 @@
       const sumEl = document.getElementById("global-ai-summary");
       if (sumEl) {
         if (totalTanks === 0) {
-          sumEl.innerHTML = `No aquariums registered yet. Tap <b>+ Add Aquarium</b> to set up your first tank.`;
+          sumEl.innerHTML = `No aquariums registered yet. Tap <b>+ Add Aquarium</b> below to set up your first tank.`;
         } else if (toxinTanks.length > 0) {
           const tSpike = toxinTanks[0];
           sumEl.innerHTML = `<b>${tSpike.tank.name}</b> logged toxic readings (${tSpike.nh3 > 0 ? `Ammonia: ${tSpike.nh3} ppm` : `Nitrite: ${tSpike.no2} ppm`}). Perform an immediate water change and dose water conditioner.`;
         } else if (highNitrateTanks.length > 0) {
           const tHigh = highNitrateTanks[0];
-          sumEl.innerHTML = `Nitrates in <b>${tHigh.tank.name}</b> reached <b>${tHigh.no3} ppm</b>. A 25–30% water change is recommended to keep water clean and livestock safe.`;
+          sumEl.innerHTML = `Nitrates in <b>${tHigh.tank.name}</b> reached <b>${tHigh.no3} ppm</b>. A 25–35% water change is recommended to keep water clean and livestock safe.`;
+        } else if (untestedTanks.length === totalTanks) {
+          sumEl.innerHTML = `Log an initial water chemistry test for <b>${untestedTanks[0].name}</b> so Aquarist AI can calibrate your water change and maintenance schedule.`;
         } else if (cyclingTanks.length > 0 && cyclingTanks.length === totalTanks) {
           sumEl.innerHTML = `<b>${cyclingTanks[0].name}</b> is actively cycling. Beneficial nitrifying bacteria are cultivating—test every 2 days and hold water changes unless ammonia exceeds 2.0 ppm.`;
         } else if (dueNowCount > 0) {
@@ -2212,20 +2350,39 @@
         }
       }
 
+      if (totalTanks === 0) {
+        container.innerHTML = `
+          <div class="card" style="text-align:center; padding:28px 20px; border-style:dashed; border-color:rgba(255,255,255,0.14);">
+            <div style="font-size:15px; font-weight:700; color:#F8FAFC; margin-bottom:6px;">No Aquariums Added Yet</div>
+            <div style="font-size:12.5px; color:var(--text-muted); margin-bottom:16px; line-height:1.45;">
+              Add your first aquarium to track water chemistry, automate care schedules, and get tailored dosing guidance.
+            </div>
+            <button class="btn btn-neon" style="max-width:220px; margin:0 auto;" onclick="openAddTankModal()">+ Add Your First Aquarium</button>
+          </div>
+        `;
+        return;
+      }
+
       appState.tanks.forEach((tank) => {
         const clr = tank.color || "#38BDF8";
         const isCycling = tank.status === "Cycling";
         const badgeHtml = isCycling ? `<span class="badge-cycling">● Cycling</span>` : ``;
-        const t = tank.lastTest || { nh3: 0, no2: 0, no3: 0, ph: 7.2, temp: 78 };
-        const nh3 = parseFloat(t.nh3) || 0;
-        const no2 = parseFloat(t.no2) || 0;
-        const no3 = parseFloat(t.no3) || 0;
+        const tested = hasTankBeenTested(tank);
+        const t = tested ? (tank.lastTest || { nh3: 0, no2: 0, no3: 0, ph: 7.2, temp: 78 }) : null;
+        const nh3 = t ? (parseFloat(t.nh3) || 0) : 0;
+        const no2 = t ? (parseFloat(t.no2) || 0) : 0;
+        const no3 = t ? (parseFloat(t.no3) || 0) : 0;
+        const freshness = formatTestFreshness(tank);
 
         // Calculate 1-line actionable status based on generated tasks & water parameters
         const tankTasks = generateTankTasks(tank, 7);
         let actionableOverview = "All parameters healthy • Next routine care on schedule";
 
-        if (isCycling) {
+        if (!tested) {
+          actionableOverview = isCycling
+            ? "Log initial cycling test to track ammonia & nitrite"
+            : "Log initial baseline water test to calibrate care plan";
+        } else if (isCycling) {
           const testTask = tankTasks.find(tk => tk.type === "test");
           const testMsg = testTask ? ` • ${testTask.subtitle}` : "";
           actionableOverview = `Cultivating bio-filter • NH₃: ${nh3} | NO₂: ${no2} ppm${testMsg}`;
@@ -2269,8 +2426,11 @@
             </div>
           </div>
           <div class="tank-card-body">
-            <div style="font-size:12px; font-weight:600; color:${(nh3 > 0.25 || no2 > 0.25) ? 'var(--alert-yellow)' : 'var(--text-main)'}; margin-bottom:8px; line-height:1.4;">
-              ${actionableOverview}
+            <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-bottom:2px;">
+              <div style="font-size:12px; font-weight:600; color:${(nh3 > 0.25 || no2 > 0.25) ? 'var(--alert-yellow)' : 'var(--text-main)'}; line-height:1.4; flex:1; min-width:0;">
+                ${actionableOverview}
+              </div>
+              <span style="font-size:10.5px; font-weight:600; color:${freshness.color}; white-space:nowrap; flex-shrink:0;">${freshness.text}</span>
             </div>
             ${buildParamGaugeStripHtml(t, u)}
           </div>
@@ -2382,14 +2542,14 @@
         }
       }
 
-      const wcVol = Math.round(tank.vol * (wcPercent / 100));
+      const wcVol = displayVol(tank.vol * (wcPercent / 100));
       let doseAdvice = "";
       if (hasPrime) {
         const ml = Math.round((tank.vol * 0.1) * 10) / 10;
         const drops = Math.round(tank.vol * 2);
         doseAdvice = `Dose ${ml} ml (≈ ${drops} drops) Seachem Prime for new water`;
       } else {
-        doseAdvice = `Dose standard dechlorinator for ${wcVol || Math.round(tank.vol * 0.25)} ${u.vol} new water`;
+        doseAdvice = `Dose standard dechlorinator for ${wcVol || displayVol(tank.vol * 0.25)} ${u.vol} new water`;
       }
       if (isCycling && hasBacteria) {
         doseAdvice += ` • Add 1 booster dose of beneficial bacteria`;
@@ -2494,33 +2654,51 @@
       const analysis = analyzeTankWaterParameters(tank);
 
       // 1. Dynamic Water Test
+      const tested = hasTankBeenTested(tank);
       let lastTestDate = tank.lastTest?.date;
-      let daysSinceTest = 4;
-      if (lastTestDate) {
-        daysSinceTest = Math.floor((today - new Date(lastTestDate)) / (1000 * 60 * 60 * 24));
-        if (daysSinceTest > 30) daysSinceTest = 7;
+      let daysUntilTest = 0;
+
+      if (!tested) {
+        if (tank.lastTestDismissed) {
+          const daysSinceDismiss = Math.floor((today - new Date(tank.lastTestDismissed)) / (1000 * 60 * 60 * 24));
+          const dismissInterval = isCycling ? 2 : 7;
+          daysUntilTest = dismissInterval - daysSinceDismiss;
+        } else {
+          daysUntilTest = 0;
+        }
+      } else {
+        let daysSinceTest = 4;
+        if (lastTestDate) {
+          daysSinceTest = Math.floor((today - new Date(lastTestDate)) / (1000 * 60 * 60 * 24));
+          if (daysSinceTest > 30) daysSinceTest = 7;
+        }
+        const testInterval = analysis ? analysis.nextTestDays : (isCycling ? 2 : 7);
+        daysUntilTest = testInterval - daysSinceTest;
       }
-      const testInterval = analysis ? analysis.nextTestDays : (isCycling ? 2 : 7);
-      const daysUntilTest = testInterval - daysSinceTest;
 
       if (daysUntilTest <= windowDays) {
         let testSub = formatTaskSubtitle(daysUntilTest);
-        if (daysUntilTest <= 0) {
+        if (!tested) {
+          testSub = "Due today (Record baseline chemistry to calibrate AI schedule)";
+        } else if (daysUntilTest <= 0) {
           testSub += ` (Analyze water to update care plan)`;
         }
+        const baseTestName = !tested
+          ? "Initial Baseline Water Test"
+          : (isCycling ? "Cycling Water Test (Ammonia & Nitrite)" : "Chemical Water Test");
         tasks.push({
           id: `test-${tank.id}`,
           type: "test",
           tankId: tank.id,
           tankName: tank.name,
-          title: `${tank.name}: ${isCycling ? 'Cycling Water Test (Ammonia & Nitrite check)' : 'Chemical Water Test'}`,
-          planTabTitle: `${isCycling ? 'Cycling Water Test (Ammonia & Nitrite)' : 'Chemical Water Test'}`,
+          title: `${tank.name}: ${baseTestName}`,
+          planTabTitle: baseTestName,
           subtitle: testSub,
           daysRemaining: daysUntilTest,
           isOverdue: daysUntilTest < 0,
           isToday: daysUntilTest === 0,
           actionLabel: "Test",
-          actionFn: `enterTankHub(${tank.id}); switchTankTab('water'); openTestModalForActiveTank();`,
+          actionFn: `openTestModalForTank(${tank.id})`,
           planTabActionFn: `openTestModalForActiveTank()`
         });
       }
@@ -2584,13 +2762,14 @@
           } else {
             daysUntilWc = Math.min(analysis.wcDays, Math.max(0, 7 - daysSinceWc));
             if (daysUntilWc <= windowDays) {
+              const routineVol = analysis.wcGallons || displayVol(tank.vol * 0.25);
               tasks.push({
                 id: `wc-${tank.id}`,
                 type: "wc",
                 tankId: tank.id,
                 tankName: tank.name,
-                title: `${tank.name}: Routine Water Change (~${analysis.wcPercent || 25}% / ${analysis.wcGallons || Math.round(tank.vol * 0.25)} ${u.vol})`,
-                planTabTitle: `Routine Water Change (~${analysis.wcPercent || 25}% / ${analysis.wcGallons || Math.round(tank.vol * 0.25)} ${u.vol})`,
+                title: `${tank.name}: Routine Water Change (~${analysis.wcPercent || 25}% / ${routineVol} ${u.vol})`,
+                planTabTitle: `Routine Water Change (~${analysis.wcPercent || 25}% / ${routineVol} ${u.vol})`,
                 subtitle: formatTaskSubtitle(daysUntilWc),
                 daysRemaining: daysUntilWc,
                 isOverdue: daysUntilWc < 0,
@@ -2606,13 +2785,14 @@
           daysUntilWc = Math.max(0, 7 - daysSinceWc);
           if (daysUntilWc <= windowDays) {
             const isNow = daysUntilWc === 0;
+            const lightVol = displayVol(tank.vol * 0.15);
             tasks.push({
               id: `wc-${tank.id}`,
               type: "wc",
               tankId: tank.id,
               tankName: tank.name,
-              title: `${tank.name}: Light Water Change / Gravel Vac (~15% / ${Math.round(tank.vol * 0.15)} ${u.vol})`,
-              planTabTitle: `Light Water Change (~15% / ${Math.round(tank.vol * 0.15)} ${u.vol})`,
+              title: `${tank.name}: Light Water Change / Gravel Vac (~15% / ${lightVol} ${u.vol})`,
+              planTabTitle: `Light Water Change (~15% / ${lightVol} ${u.vol})`,
               subtitle: isNow ? `Due today (Water is clean: NO₃ < 20 ppm)` : formatTaskSubtitle(daysUntilWc),
               daysRemaining: daysUntilWc,
               isOverdue: false,
@@ -2751,30 +2931,32 @@
         }
       }
 
-      // 6. Filter Intake & Impeller Maintenance (every 30 days)
-      let lastImpeller = tank.lastImpellerClean;
-      let daysSinceImpeller = 24;
-      if (lastImpeller) {
-        daysSinceImpeller = Math.floor((today - new Date(lastImpeller)) / (1000 * 60 * 60 * 24));
-        if (daysSinceImpeller > 60) daysSinceImpeller = 25;
-      }
-      const daysUntilImpeller = 30 - daysSinceImpeller;
-      if (daysUntilImpeller <= windowDays) {
-        tasks.push({
-          id: `impeller-${tank.id}`,
-          type: "impeller",
-          tankId: tank.id,
-          tankName: tank.name,
-          title: `${tank.name}: Clean Filter Intake & Check Impeller`,
-          planTabTitle: `Clean Filter Intake & Check Impeller`,
-          subtitle: formatTaskSubtitle(daysUntilImpeller),
-          daysRemaining: daysUntilImpeller,
-          isOverdue: daysUntilImpeller < 0,
-          isToday: daysUntilImpeller === 0,
-          actionLabel: "Done",
-          actionFn: `markImpellerCleaned(${tank.id})`,
-          planTabActionFn: `markImpellerCleaned(${tank.id})`
-        });
+      // 6. Filter Intake & Impeller Maintenance (every 30 days for motorized filters)
+      if (tank.filterType !== "none" && tank.filterType !== "sponge") {
+        let lastImpeller = tank.lastImpellerClean;
+        let daysSinceImpeller = 24;
+        if (lastImpeller) {
+          daysSinceImpeller = Math.floor((today - new Date(lastImpeller)) / (1000 * 60 * 60 * 24));
+          if (daysSinceImpeller > 60) daysSinceImpeller = 25;
+        }
+        const daysUntilImpeller = 30 - daysSinceImpeller;
+        if (daysUntilImpeller <= windowDays) {
+          tasks.push({
+            id: `impeller-${tank.id}`,
+            type: "impeller",
+            tankId: tank.id,
+            tankName: tank.name,
+            title: `${tank.name}: Clean Filter Intake & Check Impeller`,
+            planTabTitle: `Clean Filter Intake & Check Impeller`,
+            subtitle: formatTaskSubtitle(daysUntilImpeller),
+            daysRemaining: daysUntilImpeller,
+            isOverdue: daysUntilImpeller < 0,
+            isToday: daysUntilImpeller === 0,
+            actionLabel: "Done",
+            actionFn: `markImpellerCleaned(${tank.id})`,
+            planTabActionFn: `markImpellerCleaned(${tank.id})`
+          });
+        }
       }
 
       // 7. Heater Calibration & Thermometer Check (every 30 days)
@@ -2810,25 +2992,22 @@
     }
 
     function renderDashboardTasks() {
+      const tasksCard = document.getElementById("dashboard-tasks-card");
       const listEl = document.getElementById("dashboard-tasks-list");
       const badgeEl = document.getElementById("dashboard-tasks-badge");
       const btnToday = document.getElementById("task-filter-today");
       const btn3Days = document.getElementById("task-filter-3days");
       if (!listEl) return 0;
+
+      if (tasksCard) {
+        tasksCard.style.display = appState.tanks.length === 0 ? "none" : "block";
+      }
       listEl.innerHTML = "";
+      if (appState.tanks.length === 0) return 0;
 
       if (btnToday && btn3Days) {
-        if (dashboardTaskFilter === "today") {
-          btnToday.style.background = "rgba(0, 210, 255, 0.22)";
-          btnToday.style.color = "var(--cyan)";
-          btn3Days.style.background = "transparent";
-          btn3Days.style.color = "var(--text-muted)";
-        } else {
-          btn3Days.style.background = "rgba(0, 210, 255, 0.22)";
-          btn3Days.style.color = "var(--cyan)";
-          btnToday.style.background = "transparent";
-          btnToday.style.color = "var(--text-muted)";
-        }
+        btnToday.classList.toggle("active", dashboardTaskFilter === "today");
+        btn3Days.classList.toggle("active", dashboardTaskFilter !== "today");
       }
 
       const windowDays = (dashboardTaskFilter === "today") ? 0 : 3;
@@ -2868,14 +3047,24 @@
       }
 
       if (allTasks.length === 0) {
-        const emptyMsg = (dashboardTaskFilter === "today")
-          ? `All maintenance is current for today. Zero tasks due.`
-          : `All maintenance is current. No tasks scheduled across your aquariums in the next 3 days.`;
-        listEl.innerHTML = `
-          <div style="font-size:12px; color:var(--text-muted); padding:8px 2px;">
-            ${emptyMsg}
-          </div>
-        `;
+        if (dashboardTaskFilter === "today") {
+          let next3dCount = 0;
+          appState.tanks.forEach(tank => { next3dCount += generateTankTasks(tank, 3).length; });
+          const nextHint = next3dCount > 0
+            ? ` • <span style="color:var(--cyan); font-weight:600; cursor:pointer;" onclick="setDashboardTaskFilter('3days')">${next3dCount} task${next3dCount > 1 ? 's' : ''} in next 3 days →</span>`
+            : ` • Zero tasks in next 3 days`;
+          listEl.innerHTML = `
+            <div style="font-size:12px; color:var(--text-muted); padding:4px 2px 2px;">
+              All caught up for today${nextHint}
+            </div>
+          `;
+        } else {
+          listEl.innerHTML = `
+            <div style="font-size:12px; color:var(--text-muted); padding:4px 2px 2px;">
+              All maintenance is current. No tasks scheduled in the next 3 days.
+            </div>
+          `;
+        }
         return 0;
       }
 
@@ -2918,8 +3107,12 @@
         taskName = "Water change";
         addTankTimelineEvent(tank, "Skipped routine water change for this cycle", today);
       } else if (taskType === "test") {
-        if (!tank.lastTest) tank.lastTest = { nh3: 0, no2: 0, no3: 0, ph: 7.0, temp: 78 };
-        tank.lastTest.date = today;
+        if (!hasTankBeenTested(tank)) {
+          tank.lastTestDismissed = today;
+        } else {
+          if (!tank.lastTest) tank.lastTest = { nh3: 0, no2: 0, no3: 0, ph: 7.0, temp: 78 };
+          tank.lastTest.date = today;
+        }
         taskName = "Water chemistry test";
         addTankTimelineEvent(tank, "Skipped water test for this cycle", today);
       } else if (taskType === "glass") {
@@ -3034,12 +3227,17 @@
 
     /* Decoupled Quick Water Change Engine (Recommendation 1) */
     function openQuickWcModal(presetTankId = null) {
-      const targetId = presetTankId || activeTankId || (appState.tanks[0] ? appState.tanks[0].id : 1);
+      if (appState.tanks.length === 0) {
+        showToast("Add an aquarium first");
+        return;
+      }
+      const targetId = presetTankId || activeTankId || appState.tanks[0].id;
+      const u = getUnitLabels();
       const sel = document.getElementById("qwc-tank-select");
       if (sel) {
         sel.innerHTML = "";
         appState.tanks.forEach(t => {
-          sel.innerHTML += `<option value="${t.id}" ${t.id == targetId ? 'selected' : ''}>${t.name} (${t.vol} ${getUnitLabels().vol})</option>`;
+          sel.innerHTML += `<option value="${t.id}" ${t.id == targetId ? 'selected' : ''}>${t.name} (${displayVol(t.vol)} ${u.vol})</option>`;
         });
       }
 
@@ -3053,6 +3251,9 @@
         b.classList.toggle("active", idx === 2);
       });
 
+      const doseInput = document.getElementById("qwc-dose-input");
+      if (doseInput) doseInput.value = "";
+
       updateQuickWcCalculations();
       openModalById("quickWcModal");
     }
@@ -3062,6 +3263,8 @@
     }
 
     function onQuickWcTankChange() {
+      const doseInput = document.getElementById("qwc-dose-input");
+      if (doseInput) doseInput.value = "";
       updateQuickWcCalculations();
     }
 
@@ -3069,6 +3272,8 @@
       document.getElementById("qwc-pct-input").value = pct;
       document.querySelectorAll(".quick-pct-btn").forEach(b => b.classList.remove("active"));
       if (btn) btn.classList.add("active");
+      const doseInput = document.getElementById("qwc-dose-input");
+      if (doseInput) doseInput.value = "";
       updateQuickWcCalculations();
     }
 
@@ -3084,12 +3289,13 @@
 
       const pct = parseFloat(document.getElementById("qwc-pct-input").value) || 0;
       const u = getUnitLabels();
-      const volAmt = Math.round((tank.vol * (pct / 100)) * 10) / 10;
+      const galChanged = tank.vol * (pct / 100);
+      const volAmt = displayVol(galChanged);
       
       const calcEl = document.getElementById("qwc-vol-calc");
       if (calcEl) calcEl.value = `≈ ${volAmt} ${u.vol}`;
 
-      // Smart conditioner calculation based on supply closet
+      // Smart conditioner calculation based on supply closet (always using canonical gallons)
       const doseInput = document.getElementById("qwc-dose-input");
       const hintEl = document.getElementById("qwc-dose-hint");
       const closet = (appState.closet || []).map(s => s.toLowerCase());
@@ -3098,13 +3304,10 @@
       let recommendedDose = "";
 
       if (hasPrime) {
-        if (appState.units === "metric") {
-          const ml = Math.max(0.2, Math.round((volAmt / 200 * 5) * 10) / 10);
-          recommendedDose = `Seachem Prime ${ml} ml (~2 drops per 4L)`;
-        } else {
-          const ml = Math.max(0.2, Math.round((volAmt / 50 * 5) * 10) / 10);
-          recommendedDose = `Seachem Prime ${ml} ml (~2 drops per gallon)`;
-        }
+        const ml = Math.max(0.2, Math.round((galChanged * 0.1) * 10) / 10);
+        recommendedDose = appState.units === "metric"
+          ? `Seachem Prime ${ml} ml (~2 drops per 4L)`
+          : `Seachem Prime ${ml} ml (~2 drops per gallon)`;
       } else {
         recommendedDose = "Standard dechlorinator dose";
       }
@@ -3126,7 +3329,7 @@
       const date = document.getElementById("qwc-date-input").value || new Date().toISOString().split("T")[0];
       const dose = document.getElementById("qwc-dose-input").value.trim();
       const u = getUnitLabels();
-      const volAmt = Math.round((tank.vol * (pct / 100)) * 10) / 10;
+      const volAmt = displayVol(tank.vol * (pct / 100));
 
       if (!tank.lastWaterChange || parseRecordTimestamp(date) >= parseRecordTimestamp(tank.lastWaterChange)) {
         tank.lastWaterChange = date;
@@ -3139,17 +3342,27 @@
 
       // Add history record for charts & history list (strictly chronological)
       if (!tank.history) tank.history = [];
-      const prevTest = tank.lastTest || { nh3: 0, no2: 0, no3: 15, ph: 7.2, temp: 78 };
-      tank.history.unshift({
-        date,
-        temp: prevTest.temp,
-        nh3: prevTest.nh3,
-        no2: prevTest.no2,
-        no3: prevTest.no3,
-        ph: prevTest.ph,
-        wc: pct,
-        dose: dose || "Dechlorinator"
-      });
+      const tested = hasTankBeenTested(tank);
+      if (tested) {
+        const prevTest = tank.lastTest || { nh3: 0, no2: 0, no3: 15, ph: 7.2, temp: 78 };
+        tank.history.unshift({
+          date,
+          temp: prevTest.temp,
+          nh3: prevTest.nh3,
+          no2: prevTest.no2,
+          no3: prevTest.no3,
+          ph: prevTest.ph,
+          wc: pct,
+          dose: dose || "Dechlorinator"
+        });
+      } else {
+        tank.history.unshift({
+          date,
+          wcOnly: true,
+          wc: pct,
+          dose: dose || "Dechlorinator"
+        });
+      }
       sortRecordsByDateDesc(tank.history);
 
       tank.summary = `Last activity: ${pct}% water change on ${date}.`;
@@ -3197,12 +3410,39 @@
       renderGlobalClosetScreen();
     }
 
+    async function callGeminiGenerate(parts) {
+      const models = ["gemini-2.5-flash", "gemini-2.0-flash"];
+      let lastErr = null;
+      for (const model of models) {
+        try {
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(appState.apiKey)}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ contents: [{ parts }] })
+          });
+          const data = await res.json();
+          if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+            return data.candidates[0].content.parts[0].text;
+          }
+          lastErr = new Error(data.error?.message || `HTTP ${res.status}`);
+        } catch (err) {
+          lastErr = err;
+        }
+      }
+      throw lastErr || new Error("Gemini API request failed");
+    }
+
     function renderGlobalAIScreen() {
       const sel = document.getElementById("sandbox-tank-select");
       if (!sel) return;
+      const u = getUnitLabels();
       sel.innerHTML = "";
+      if (appState.tanks.length === 0) {
+        sel.innerHTML = `<option value="">No aquariums added yet</option>`;
+        return;
+      }
       appState.tanks.forEach(t => {
-        sel.innerHTML += `<option value="${t.id}">${t.name} (${t.vol} ${getUnitLabels().vol})</option>`;
+        sel.innerHTML += `<option value="${t.id}">${t.name} (${displayVol(t.vol)} ${u.vol})</option>`;
       });
     }
 
@@ -3230,16 +3470,10 @@ Question: ${q}
 Provide practical, plain-English advice tailored to beginners.`;
 
       try {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${appState.apiKey}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-        });
-        const data = await res.json();
-        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
+        const reply = await callGeminiGenerate([{ text: prompt }]);
         box.innerHTML = renderMarkdownToHtml(reply);
       } catch (err) {
-        box.innerHTML = `<span style="color:var(--alert-red)">Error connecting to Gemini API. Check your API key.</span>`;
+        box.innerHTML = `<span style="color:var(--alert-red)">Error connecting to Gemini API. Check your API key in Settings.</span>`;
       }
     }
 
@@ -3253,38 +3487,39 @@ Provide practical, plain-English advice tailored to beginners.`;
         alert("Please enter a fish or invertebrate species name!");
         return;
       }
+      if (!targetTank) {
+        box.style.display = "block";
+        box.innerHTML = `<span style="color:var(--alert-yellow)">Add an aquarium first to evaluate stocking compatibility.</span>`;
+        return;
+      }
       box.style.display = "block";
       box.innerHTML = "Evaluating compatibility...";
 
       const u = getUnitLabels();
       const currentLive = (targetTank.livestock || []).join(", ");
       const t = targetTank.lastTest || { temp: 78, ph: 7.2 };
+      const dispVolVal = displayVol(targetTank.vol);
+      const dispTempVal = displayTemp(t.temp);
 
       if (appState.apiKey) {
         const prompt = `You are aquAssist Stocking Advisor.
 Candidate: ${qty}x ${species}
-Target Tank: ${targetTank.name} (${targetTank.vol} ${u.vol}, ${targetTank.status})
-Current Parameters: Temp ${t.temp}${u.temp}, pH ${t.ph}
+Target Tank: ${targetTank.name} (${dispVolVal} ${u.vol}, ${targetTank.status})
+Current Parameters: Temp ${dispTempVal}${u.temp}, pH ${t.ph}
 Existing Livestock: ${currentLive || "Empty Tank"}
 Evaluate water parameter overlap, temperament/fin-nipping, and bioload impact. Conclude with a clear verdict.`;
 
         try {
-          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${appState.apiKey}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-          });
-          const data = await res.json();
-          const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+          const reply = await callGeminiGenerate([{ text: prompt }]);
           box.innerHTML = renderMarkdownToHtml(reply);
           return;
         } catch(err) {}
       }
 
       box.innerHTML = `<b>Sandbox Evaluation for ${qty}x ${species}:</b><br>
-Target Tank: ${targetTank.name} (${targetTank.vol} ${u.vol})<br>
+Target Tank: ${targetTank.name} (${dispVolVal} ${u.vol})<br>
 Current Livestock: ${currentLive || 'None'}<br>
-Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
+Water Temp: ${dispTempVal}${u.temp} • pH: ${t.ph}<br>
 <span style="font-size:11px; color:var(--text-muted);">(Connect your Gemini API Key in Settings for deep bioload and temperament calculation.)</span>`;
     }
 
@@ -3329,14 +3564,17 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       if (!tank) return;
 
       const u = getUnitLabels();
-      const t = tank.lastTest || { nh3: 0, no2: 0, no3: 0, ph: 7.2, temp: 78 };
+      const tested = hasTankBeenTested(tank);
+      const t = tested ? (tank.lastTest || { nh3: 0, no2: 0, no3: 0, ph: 7.2, temp: 78 }) : null;
 
       // Render Dedicated Cycling Roadmap if tank is Cycling
       renderCyclingRoadmap(tank);
 
       // Summary Assessment Box
       document.getElementById("tank-overview-summary").innerText = 
-        tank.summary || (tank.status === "Cycling" ? "Aquarium is currently cycling. Biological filtration is cultivating." : "Water parameters are balanced and in the safe zone.");
+        tank.summary || (!tested
+          ? "No water chemistry test recorded yet. Log an initial test below so Aquarist AI can calibrate your care schedule."
+          : (tank.status === "Cycling" ? "Aquarium is currently cycling. Biological filtration is cultivating." : "Water parameters are balanced and in the safe zone."));
 
       // Parameter Snapshot
       const paramContainer = document.getElementById("tank-overview-params");
@@ -3550,11 +3788,11 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       const activeTank = getActiveTank();
       if (!svg || !activeTank) return;
 
-      const history = sortRecordsByDateAsc((activeTank.history || []).slice());
+      const history = sortRecordsByDateAsc((activeTank.history || []).filter(h => !h.wcOnly).slice());
       if (history.length === 0) {
         svg.innerHTML = `
           <text x="250" y="105" text-anchor="middle" fill="#64748B" font-size="13">
-            No test data yet. Log your first test below to see curves!
+            No test data yet. Log your first test above to see curves.
           </text>
         `;
         return;
@@ -3572,13 +3810,15 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
 
       let maxY = 40;
       let minY = 0;
+      const isMetric = appState.units === "metric";
 
       if (currentChartFilter === "nh3" || currentChartFilter === "no2") {
         maxY = 4;
       } else if (currentChartFilter === "ph") {
         minY = 6.0; maxY = 8.5;
       } else if (currentChartFilter === "temp") {
-        minY = 65; maxY = 86;
+        minY = isMetric ? 18 : 65;
+        maxY = isMetric ? 31 : 86;
       } else {
         const maxNo3 = Math.max(...history.map(h => h.no3 || 0), 30);
         maxY = Math.ceil(maxNo3 / 10) * 10;
@@ -3631,7 +3871,8 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
 
         let points = [];
         history.forEach((h, idx) => {
-          const val = (h[series.key] !== undefined) ? h[series.key] : 0;
+          const rawVal = (h[series.key] !== undefined) ? h[series.key] : 0;
+          const val = series.key === "temp" ? displayTemp(rawVal) : rawVal;
           const x = getX(idx);
           const y = getY(val);
           points.push(`${x},${y}`);
@@ -3642,7 +3883,8 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
         }
 
         history.forEach((h, idx) => {
-          const val = (h[series.key] !== undefined) ? h[series.key] : 0;
+          const rawVal = (h[series.key] !== undefined) ? h[series.key] : 0;
+          const val = series.key === "temp" ? displayTemp(rawVal) : rawVal;
           const x = getX(idx);
           const y = getY(val);
           svgHtml += `<circle cx="${x}" cy="${y}" r="4" fill="#0B1324" stroke="${series.color}" stroke-width="2"/>`;
@@ -3702,19 +3944,31 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       dosePlan.innerHTML = analysis.doseAdvice;
     }
 
-    function openTestModalForActiveTank(editIdx = -1) {
-      const activeTank = getActiveTank();
-      if (!activeTank) return;
+    function openTestModalForTank(tankId, editIdx = -1) {
+      const targetTank = appState.tanks.find(t => t.id == tankId) || getActiveTank();
+      if (!targetTank) {
+        showToast("Add an aquarium first");
+        return;
+      }
+      window.testingTankId = targetTank.id;
       window.editingWaterLogIdx = editIdx;
-      const modalTitle = document.querySelector("#recordTestModal h3");
-      const modalBtn = document.querySelector("#recordTestModal .btn-neon");
+      updateDynamicUnitLabels();
 
-      if (editIdx >= 0 && activeTank.history && activeTank.history[editIdx]) {
-        const item = activeTank.history[editIdx];
+      const modalTitle = document.querySelector("#recordTestModal h3");
+      const modalTankLbl = document.getElementById("m-test-tank-label");
+      const modalBtn = document.querySelector("#recordTestModal .btn-neon");
+      const u = getUnitLabels();
+
+      if (modalTankLbl) {
+        modalTankLbl.innerText = `${targetTank.name} (${displayVol(targetTank.vol)} ${u.vol})`;
+      }
+
+      if (editIdx >= 0 && targetTank.history && targetTank.history[editIdx]) {
+        const item = targetTank.history[editIdx];
         if (modalTitle) modalTitle.innerText = "Edit Water Chemistry Test";
         if (modalBtn) modalBtn.innerText = "Update Test Log";
         document.getElementById("m-test-date").value = item.date || new Date().toISOString().split("T")[0];
-        document.getElementById("m-test-temp").value = item.temp !== undefined ? item.temp : 78;
+        document.getElementById("m-test-temp").value = displayTemp(item.temp !== undefined ? item.temp : 78);
         document.getElementById("m-test-ph").value = item.ph !== undefined ? item.ph : 7.2;
         document.getElementById("m-test-nh3").value = item.nh3 !== undefined ? item.nh3 : 0;
         document.getElementById("m-test-no2").value = item.no2 !== undefined ? item.no2 : 0;
@@ -3723,9 +3977,9 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       } else {
         if (modalTitle) modalTitle.innerText = "Record Water Chemistry Test";
         if (modalBtn) modalBtn.innerText = "Analyze & Save Test";
-        const last = activeTank.lastTest || { temp: 78, ph: 7.2, nh3: 0, no2: 0, no3: 10 };
+        const last = targetTank.lastTest || { temp: 78, ph: 7.2, nh3: 0, no2: 0, no3: 10 };
         document.getElementById("m-test-date").valueAsDate = new Date();
-        document.getElementById("m-test-temp").value = last.temp || 78;
+        document.getElementById("m-test-temp").value = displayTemp(last.temp || 78);
         document.getElementById("m-test-ph").value = last.ph || 7.2;
         document.getElementById("m-test-nh3").value = last.nh3 ?? 0;
         document.getElementById("m-test-no2").value = last.no2 ?? 0;
@@ -3735,22 +3989,32 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       openModalById("recordTestModal");
     }
 
-    function saveModalWaterLog() {
+    function openTestModalForActiveTank(editIdx = -1) {
       const activeTank = getActiveTank();
       if (!activeTank) return;
+      openTestModalForTank(activeTank.id, editIdx);
+    }
+
+    function saveModalWaterLog() {
+      const targetTank = appState.tanks.find(t => t.id == window.testingTankId) || getActiveTank();
+      if (!targetTank) return;
 
       const date = document.getElementById("m-test-date").value || new Date().toISOString().split("T")[0];
-      const temp = parseFloat(document.getElementById("m-test-temp").value) || 78.0;
-      const ph = parseFloat(document.getElementById("m-test-ph").value) || 7.2;
+      const tempInputVal = parseFloat(document.getElementById("m-test-temp").value);
+      const temp = inputTempToF(tempInputVal);
+      const phRaw = parseFloat(document.getElementById("m-test-ph").value);
+      const ph = Number.isNaN(phRaw) ? 7.2 : phRaw;
       const nh3 = parseFloat(document.getElementById("m-test-nh3").value) || 0;
       const no2 = parseFloat(document.getElementById("m-test-no2").value) || 0;
       const no3 = parseFloat(document.getElementById("m-test-no3").value) || 0;
       const notes = document.getElementById("m-test-notes").value.trim();
+      const u = getUnitLabels();
 
       const editIdx = window.editingWaterLogIdx !== undefined ? window.editingWaterLogIdx : -1;
 
-      if (editIdx >= 0 && activeTank.history && activeTank.history[editIdx]) {
-        const existing = activeTank.history[editIdx];
+      if (editIdx >= 0 && targetTank.history && targetTank.history[editIdx]) {
+        const existing = targetTank.history[editIdx];
+        delete existing.wcOnly;
         existing.date = date;
         existing.temp = temp;
         existing.ph = ph;
@@ -3758,49 +4022,54 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
         existing.no2 = no2;
         existing.no3 = no3;
         existing.notes = notes;
-        sortRecordsByDateDesc(activeTank.history);
+        sortRecordsByDateDesc(targetTank.history);
       } else {
         const newLog = { date, temp, nh3, no2, no3, ph, wc: 0, dose: "", notes };
-        if (!activeTank.history) activeTank.history = [];
-        activeTank.history.unshift(newLog);
-        sortRecordsByDateDesc(activeTank.history);
+        if (!targetTank.history) targetTank.history = [];
+        targetTank.history.unshift(newLog);
+        sortRecordsByDateDesc(targetTank.history);
 
-        let eventText = `Logged Chemistry: Temp ${temp}°, pH ${ph}, NH₃ ${nh3}, NO₂ ${no2}, NO₃ ${no3} ppm`;
+        let eventText = `Logged Chemistry: Temp ${displayTemp(temp)}${u.temp}, pH ${ph}, NH₃ ${nh3}, NO₂ ${no2}, NO₃ ${no3} ppm`;
         if (notes) eventText += ` • ${notes}`;
-        logTankTimelineEvent(eventText, date);
+        addTankTimelineEvent(targetTank, eventText, date);
       }
 
-      if (activeTank.history && activeTank.history.length > 0) {
-        const newest = activeTank.history[0];
-        activeTank.lastTest = {
-          nh3: newest.nh3 ?? 0,
-          no2: newest.no2 ?? 0,
-          no3: newest.no3 ?? 0,
-          ph: newest.ph ?? 7.2,
-          temp: newest.temp ?? 78.0,
-          date: newest.date
+      delete targetTank.lastTestDismissed;
+      const newestChem = (targetTank.history || []).find(h => !h.wcOnly);
+      if (newestChem) {
+        targetTank.lastTest = {
+          nh3: newestChem.nh3 ?? 0,
+          no2: newestChem.no2 ?? 0,
+          no3: newestChem.no3 ?? 0,
+          ph: newestChem.ph ?? 7.2,
+          temp: newestChem.temp ?? 78.0,
+          date: newestChem.date
         };
       } else {
-        activeTank.lastTest = { nh3, no2, no3, ph, temp, date };
+        targetTank.lastTest = { nh3, no2, no3, ph, temp, date };
       }
 
       // Analyze new readings with Aquarist AI engine
-      const analysis = analyzeTankWaterParameters(activeTank);
+      const analysis = analyzeTankWaterParameters(targetTank);
       if (analysis) {
-        activeTank.summary = analysis.aiAdvice;
+        targetTank.summary = analysis.aiAdvice;
       }
 
       window.editingWaterLogIdx = -1;
+      window.testingTankId = null;
       saveDataToStorage();
       closeModalById("recordTestModal");
-      renderTankWaterTab();
-      renderTankOverviewTab();
-      renderTankPlanTab();
+
+      if (isInsideTank && activeTankId == targetTank.id) {
+        renderTankWaterTab();
+        renderTankOverviewTab();
+        renderTankPlanTab();
+      }
       renderDashboardTasks();
       renderGlobalDashboard();
 
       if (analysis) {
-        openTestAnalysisModal(activeTank, analysis);
+        openTestAnalysisModal(targetTank, analysis);
       } else {
         showToast(editIdx >= 0 ? "Test Log Updated" : "Chemistry Logged & Analyzed");
       }
@@ -3811,9 +4080,18 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       if (!activeTank || !activeTank.history) return;
       activeTank.history.splice(idx, 1);
       sortRecordsByDateDesc(activeTank.history);
-      if (activeTank.history.length > 0) {
-        const latest = activeTank.history[0];
-        activeTank.lastTest = { ...latest };
+      const newestChem = activeTank.history.find(h => !h.wcOnly);
+      if (newestChem) {
+        activeTank.lastTest = {
+          nh3: newestChem.nh3 ?? 0,
+          no2: newestChem.no2 ?? 0,
+          no3: newestChem.no3 ?? 0,
+          ph: newestChem.ph ?? 7.2,
+          temp: newestChem.temp ?? 78.0,
+          date: newestChem.date
+        };
+      } else {
+        activeTank.lastTest = null;
       }
       saveDataToStorage();
       renderTankWaterTab();
@@ -3843,6 +4121,11 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
         item.style.padding = "10px 0";
         item.style.borderBottom = "1px solid rgba(255,255,255,0.06)";
         item.style.fontSize = "13px";
+        const bodyLine = h.wcOnly
+          ? `<div style="font-size:12px; color:var(--text-muted); margin-bottom:2px;">Water change logged prior to baseline chemistry test</div>`
+          : `<div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+              <span>Temp: <b>${displayTemp(h.temp ?? 78)}${u.temp}</b> • pH: <b>${h.ph}</b> • NH₃: <b>${h.nh3}</b> • NO₂: <b>${h.no2}</b> • NO₃: <b>${h.no3}</b></span>
+            </div>`;
         item.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
             <span style="font-size:11px; color:var(--text-muted);">${h.date}</span>
@@ -3851,9 +4134,7 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
               <span class="delete-x" onclick="deleteWaterLog(${idx})" title="Delete this log">×</span>
             </div>
           </div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-            <span>Temp: <b>${h.temp || 78}${u.temp}</b> • pH: <b>${h.ph}</b> • NH₃: <b>${h.nh3}</b> • NO₂: <b>${h.no2}</b> • NO₃: <b>${h.no3}</b></span>
-          </div>
+          ${bodyLine}
           ${h.notes ? `<div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${h.notes}</div>` : ''}
           ${h.wc ? `<div style="font-size:11px; color:var(--cyan); margin-top:2px;">Water Change: ${h.wc}% ${h.dose ? `• Dosed: ${h.dose}` : ''}</div>` : ''}
         `;
@@ -4379,20 +4660,25 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       box.innerHTML = "Aquarist AI is analyzing...";
 
       const activeTank = getActiveTank();
+      if (!activeTank) return;
       const tap = appState.tapBaseline || {};
       const u = getUnitLabels();
-      const last = activeTank.lastTest || { temp: 78, ph: 7.2, nh3: 0, no2: 0, no3: 0 };
+      const tested = hasTankBeenTested(activeTank);
+      const last = tested ? activeTank.lastTest : null;
       const liveStr = (activeTank.livestock || []).join(", ") || "None";
       const equipStr = (activeTank.equipment || []).join(", ") || "Standard";
       const mediaStr = (activeTank.filterMedia || []).map(m => m.name).join(", ") || "Standard";
       const plantsStr = (activeTank.plants || []).join(", ") || "None";
       const decorStr = (activeTank.decor || []).join(", ") || "None";
       const closetStr = (appState.closet || []).join(", ") || "None";
+      const waterBalanceLine = last
+        ? `Temp ${displayTemp(last.temp || 78)}${u.temp}, pH ${last.ph ?? 7.2}, NH₃ ${last.nh3 ?? 0} ppm, NO₂ ${last.no2 ?? 0} ppm, NO₃ ${last.no3 ?? 0} ppm`
+        : "Not tested yet";
 
-      const promptText = `You are aquAssist, expert Aquarist AI analyzing aquarium '${activeTank.name}' (${activeTank.vol} ${u.vol}, ${activeTank.status}).
+      const promptText = `You are aquAssist, expert Aquarist AI analyzing aquarium '${activeTank.name}' (${displayVol(activeTank.vol)} ${u.vol}, ${activeTank.status}).
 Holistic Tank Blueprint:
 - Age: ${calculateAge(activeTank.startDate)}
-- Current Water Balance: Temp ${last.temp || 78}${u.temp}, pH ${last.ph || 7.2}, NH₃ ${last.nh3 ?? 0} ppm, NO₂ ${last.no2 ?? 0} ppm, NO₃ ${last.no3 ?? 0} ppm
+- Current Water Balance: ${waterBalanceLine}
 - Tap Water Baseline: pH ${tap.ph || 7.4}, NO₃ ${tap.no3 || 0} ppm, GH ${tap.gh || 8} dGH, KH ${tap.kh || 4} dKH
 - Filtration & Gear: Equipment: ${equipStr} | Media: ${mediaStr}
 - Ecosystem Biota: Livestock: ${liveStr} | Flora: ${plantsStr} | Hardscape: ${decorStr}
@@ -4414,30 +4700,30 @@ Instructions:
           });
         }
 
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${appState.apiKey}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ contents: [{ parts }] })
-        });
-        const data = await res.json();
-        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
+        const reply = await callGeminiGenerate(parts);
         box.innerHTML = renderMarkdownToHtml(reply);
       } catch (err) {
-        box.innerHTML = `<span style="color:var(--alert-red)">Error communicating with Gemini API. Check your connection or API key.</span>`;
+        box.innerHTML = `<span style="color:var(--alert-red)">Error communicating with Gemini API. Check your connection or API key in Settings.</span>`;
       }
     }
 
     function copyTankDelta() {
       const activeTank = getActiveTank();
+      if (!activeTank) return;
       const tap = appState.tapBaseline || {};
       const u = getUnitLabels();
+      const tested = hasTankBeenTested(activeTank);
+      const last = tested ? activeTank.lastTest : null;
+      const paramStr = last
+        ? `NH3: ${last.nh3 ?? 0}, NO2: ${last.no2 ?? 0}, NO3: ${last.no3 ?? 0}, pH: ${last.ph ?? 7.2}, Temp: ${displayTemp(last.temp || 78)}${u.temp}`
+        : "Not tested yet";
       const text = `Quick Update for ${activeTank.name} (${activeTank.status}):
-- Age: ${calculateAge(activeTank.startDate)} • Size: ${activeTank.vol} ${u.vol}
-- Latest Parameters: NH3: ${activeTank.lastTest.nh3}, NO2: ${activeTank.lastTest.no2}, NO3: ${activeTank.lastTest.no3}, pH: ${activeTank.lastTest.ph}, Temp: ${activeTank.lastTest.temp}${u.temp}
+- Age: ${calculateAge(activeTank.startDate)} • Size: ${displayVol(activeTank.vol)} ${u.vol}
+- Latest Parameters: ${paramStr}
 - Tap Water Baseline: pH ${tap.ph}, NO3 ${tap.no3} ppm
 - Available Supplies: ${(appState.closet || []).join(", ")}
 - Question: `;
-      navigator.clipboard.writeText(text).then(() => showToast("Copied to Clipboard!"));
+      navigator.clipboard.writeText(text).then(() => showToast("Copied to Clipboard"));
     }
 
     /* Health Event & Hybrid Symptoms Handler */
@@ -4658,12 +4944,94 @@ Instructions:
       });
     }
 
+    let pendingTankPhotoData = { add: null, edit: null };
+    let editTankPhotoRemoved = false;
+
+    const DEFAULT_PHOTO_ICON_SVG = `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>`;
+
+    function selectAddFilterPreset(presetVal) {
+      const hiddenEl = document.getElementById("add-m-filter");
+      const groupEl = document.getElementById("add-filter-group");
+      if (hiddenEl) hiddenEl.value = presetVal;
+      if (groupEl) {
+        groupEl.querySelectorAll(".segmented-btn").forEach(btn => {
+          btn.classList.toggle("active", btn.getAttribute("data-filter") === presetVal);
+        });
+      }
+    }
+
+    function updatePhotoPickerUI(prefix, imgSrc, labelText) {
+      const thumbEl = document.getElementById(`${prefix}-photo-thumb`);
+      const lblEl = document.getElementById(`${prefix}-photo-label`);
+      const btnEl = document.getElementById(`${prefix}-photo-btn`);
+      const rmBtnEl = document.getElementById(`${prefix}-photo-remove-btn`);
+      if (thumbEl) {
+        thumbEl.innerHTML = imgSrc ? `<img src="${imgSrc}" alt="Preview">` : DEFAULT_PHOTO_ICON_SVG;
+      }
+      if (lblEl) {
+        lblEl.innerText = labelText;
+        lblEl.style.color = imgSrc ? "var(--text-main)" : "var(--text-muted)";
+      }
+      if (btnEl) btnEl.innerText = imgSrc ? "Change" : "Upload";
+      if (rmBtnEl) rmBtnEl.style.display = imgSrc ? "inline-block" : "none";
+    }
+
+    function handleTankPhotoSelected(prefix, fileInput) {
+      if (!fileInput || !fileInput.files || !fileInput.files[0]) return;
+      const file = fileInput.files[0];
+      processImageFile(file, (dataUrl) => {
+        pendingTankPhotoData[prefix] = dataUrl;
+        if (prefix === "edit") editTankPhotoRemoved = false;
+        updatePhotoPickerUI(prefix, dataUrl, file.name || "Cover photo ready");
+      });
+    }
+
+    function clearTankPhotoSelection(prefix) {
+      pendingTankPhotoData[prefix] = null;
+      const inputEl = document.getElementById(`${prefix}-m-photo`);
+      if (inputEl) inputEl.value = "";
+      if (prefix === "edit") editTankPhotoRemoved = true;
+      updatePhotoPickerUI(prefix, null, prefix === "edit" ? "Photo will be removed on save" : "No cover photo selected");
+    }
+
+    function clearFieldError(inputEl, errBoxId) {
+      if (inputEl) inputEl.classList.remove("input-error");
+      const errBox = document.getElementById(errBoxId);
+      if (errBox) {
+        errBox.style.display = "none";
+        errBox.innerText = "";
+      }
+    }
+
+    function showFormError(errBoxId, msg, invalidEls = []) {
+      invalidEls.forEach(el => { if (el) el.classList.add("input-error"); });
+      const errBox = document.getElementById(errBoxId);
+      if (errBox) {
+        errBox.innerText = msg;
+        errBox.style.display = "block";
+      }
+    }
+
     function openAddTankModal() {
-      document.getElementById("add-m-name").value = "";
-      document.getElementById("add-m-vol").value = "";
-      document.getElementById("add-m-date").valueAsDate = new Date();
+      updateDynamicUnitLabels();
+      const todayStr = new Date().toISOString().split("T")[0];
+      const nameEl = document.getElementById("add-m-name");
+      const volEl = document.getElementById("add-m-vol");
+      const dateEl = document.getElementById("add-m-date");
+
+      nameEl.value = "";
+      volEl.value = "";
+      dateEl.value = todayStr;
+      dateEl.max = todayStr;
+      clearFieldError(nameEl, "add-form-error");
+      clearFieldError(volEl, "add-form-error");
+      clearFieldError(dateEl, "add-form-error");
+
       selectLifecycleStatus("add", "Established");
+      selectAddFilterPreset("hob");
+      pendingTankPhotoData.add = null;
       document.getElementById("add-m-photo").value = "";
+      updatePhotoPickerUI("add", null, "No cover photo selected");
       renderThemeColorPalette("add", "#00D2FF");
       openModalById("addTankModal");
     }
@@ -4671,106 +5039,190 @@ Instructions:
     function openEditActiveTankModal() {
       const tank = getActiveTank();
       if (!tank) return;
+      updateDynamicUnitLabels();
+      const todayStr = new Date().toISOString().split("T")[0];
+      const nameEl = document.getElementById("edit-m-name");
+      const volEl = document.getElementById("edit-m-vol");
+      const dateEl = document.getElementById("edit-m-date");
 
-      document.getElementById("edit-m-name").value = tank.name;
-      document.getElementById("edit-m-vol").value = tank.vol;
-      document.getElementById("edit-m-date").value = tank.startDate || "2025-01-01";
+      nameEl.value = tank.name;
+      volEl.value = displayVol(tank.vol);
+      dateEl.value = tank.startDate || "2025-01-01";
+      dateEl.max = todayStr;
+      clearFieldError(nameEl, "edit-form-error");
+      clearFieldError(volEl, "edit-form-error");
+      clearFieldError(dateEl, "edit-form-error");
+
       selectLifecycleStatus("edit", tank.status || "Established");
       const clr = tank.color || "#00D2FF";
       renderThemeColorPalette("edit", clr);
+
+      pendingTankPhotoData.edit = null;
+      editTankPhotoRemoved = false;
       document.getElementById("edit-m-photo").value = "";
+      if (tank.image) {
+        updatePhotoPickerUI("edit", tank.image, "Current cover photo");
+      } else {
+        updatePhotoPickerUI("edit", null, "No cover photo set");
+      }
       openModalById("editTankModal");
     }
 
-    function saveNewTankData() {
-      const name = document.getElementById("add-m-name").value.trim() || "New Aquarium";
-      const vol = parseFloat(document.getElementById("add-m-vol").value) || 20;
-      const startDate = document.getElementById("add-m-date").value || new Date().toISOString().split("T")[0];
-      const color = document.getElementById("add-m-color").value;
-      const status = document.getElementById("add-m-status").value;
-      const fileInput = document.getElementById("add-m-photo");
-
-      const finalizeSave = (imgData) => {
-        const newTank = {
-          id: Date.now(),
-          name,
-          vol,
-          startDate,
-          color,
-          status,
-          image: imgData || "",
-          summary: status === "Cycling" 
-            ? "Biological filtration cultivating. Ammonia converting to Nitrite." 
-            : "Biological parameters established and balanced.",
-          lastTest: { nh3: 0, no2: 0, no3: 0, ph: 7.2, temp: 78.0, date: startDate },
-          history: [],
-          timeline: [{ date: startDate, text: "Aquarium setup & initialized" }],
-          equipment: [],
+    function buildInitialFilterSetup(filterPreset, startDate) {
+      const baseId = Date.now();
+      if (filterPreset === "sponge") {
+        return {
+          equipment: ["Air-Driven Sponge Filter"],
           filterMedia: [
-            { id: Date.now() + 1, name: "Mechanical Sponge", cat: "mechanical", interval: 21, lastDate: startDate },
-            { id: Date.now() + 2, name: "Biological Media", cat: "biological", interval: 0, lastDate: startDate }
-          ],
-          livestock: [],
-          losses: [],
-          plants: [],
-          decor: []
+            { id: baseId + 1, name: "Sponge Filter Foam", cat: "mechanical", interval: 21, lastDate: startDate }
+          ]
         };
-        appState.tanks.push(newTank);
-        saveDataToStorage();
-        closeModalById("addTankModal");
-        enterTankHub(newTank.id, true);
-      };
-
-      if (fileInput.files && fileInput.files[0]) {
-        processImageFile(fileInput.files[0], finalizeSave);
-      } else {
-        finalizeSave("");
       }
+      if (filterPreset === "canister") {
+        return {
+          equipment: ["Canister Filter"],
+          filterMedia: [
+            { id: baseId + 1, name: "Coarse Pre-Filter Foam", cat: "mechanical", interval: 30, lastDate: startDate },
+            { id: baseId + 2, name: "Chemical / Purigen Pad", cat: "chemical", interval: 60, lastDate: startDate },
+            { id: baseId + 3, name: "Biological Ceramic Media", cat: "biological", interval: 90, lastDate: startDate }
+          ]
+        };
+      }
+      if (filterPreset === "none") {
+        return {
+          equipment: [],
+          filterMedia: []
+        };
+      }
+      return {
+        equipment: ["Hang-on-Back Filter"],
+        filterMedia: [
+          { id: baseId + 1, name: "Mechanical Sponge Pad", cat: "mechanical", interval: 21, lastDate: startDate },
+          { id: baseId + 2, name: "Biological Ceramic Rings", cat: "biological", interval: 90, lastDate: startDate }
+        ]
+      };
     }
 
-    // Redundant duplicate openEditActiveTankModal removed
+    function saveNewTankData() {
+      const nameEl = document.getElementById("add-m-name");
+      const volEl = document.getElementById("add-m-vol");
+      const dateEl = document.getElementById("add-m-date");
+      const name = nameEl.value.trim();
+      const rawVol = parseFloat(volEl.value);
+      const todayStr = new Date().toISOString().split("T")[0];
+      const startDate = dateEl.value || todayStr;
+
+      if (!name) {
+        showFormError("add-form-error", "Please enter a name for your aquarium.", [nameEl]);
+        nameEl.focus();
+        return;
+      }
+      if (Number.isNaN(rawVol) || rawVol <= 0) {
+        const u = getUnitLabels();
+        showFormError("add-form-error", `Please enter a valid tank volume in ${u.vol}.`, [volEl]);
+        volEl.focus();
+        return;
+      }
+      if (startDate > todayStr) {
+        showFormError("add-form-error", "Setup date cannot be in the future.", [dateEl]);
+        return;
+      }
+
+      const vol = inputVolToGal(rawVol);
+      const color = document.getElementById("add-m-color").value;
+      const status = document.getElementById("add-m-status").value;
+      const filterType = (document.getElementById("add-m-filter") && document.getElementById("add-m-filter").value) || "hob";
+      const filterSetup = buildInitialFilterSetup(filterType, todayStr);
+      const imgData = pendingTankPhotoData.add || "";
+
+      const newTank = {
+        id: Date.now(),
+        name,
+        vol,
+        startDate,
+        color,
+        status,
+        filterType,
+        lastWaterChange: status === "Established" ? todayStr : undefined,
+        lastGlassClean: todayStr,
+        lastImpellerClean: todayStr,
+        lastHeaterCheck: todayStr,
+        image: imgData,
+        summary: status === "Cycling" 
+          ? "Nitrogen cycle initialized. Record your first ammonia and nitrite test to track progress." 
+          : "Aquarium added. Log an initial baseline water test so Aquarist AI can calibrate your care plan.",
+        lastTest: null,
+        history: [],
+        timeline: [{ date: startDate, text: "Aquarium setup & initialized" }],
+        equipment: filterSetup.equipment,
+        filterMedia: filterSetup.filterMedia,
+        livestock: [],
+        losses: [],
+        plants: [],
+        decor: []
+      };
+
+      appState.tanks.push(newTank);
+      pendingTankPhotoData.add = null;
+      saveDataToStorage();
+      closeModalById("addTankModal");
+      enterTankHub(newTank.id, true);
+    }
 
     function saveEditedTankData() {
       const tank = getActiveTank();
       if (!tank) return;
 
-      const name = document.getElementById("edit-m-name").value.trim() || tank.name;
-      const vol = parseFloat(document.getElementById("edit-m-vol").value) || tank.vol;
-      const startDate = document.getElementById("edit-m-date").value || tank.startDate;
-      const color = document.getElementById("edit-m-color").value;
-      const status = document.getElementById("edit-m-status").value;
-      const fileInput = document.getElementById("edit-m-photo");
+      const nameEl = document.getElementById("edit-m-name");
+      const volEl = document.getElementById("edit-m-vol");
+      const dateEl = document.getElementById("edit-m-date");
+      const name = nameEl.value.trim();
+      const rawVol = parseFloat(volEl.value);
+      const todayStr = new Date().toISOString().split("T")[0];
+      const startDate = dateEl.value || tank.startDate;
 
-      const finalizeEdit = (imgData) => {
-        tank.name = name;
-        tank.vol = vol;
-        tank.startDate = startDate;
-        tank.color = color;
-        tank.status = status;
-        if (imgData) tank.image = imgData;
-
-        saveDataToStorage();
-        closeModalById("editTankModal");
-        renderTankHub();
-        showToast("Aquarium Updated");
-      };
-
-      if (fileInput.files && fileInput.files[0]) {
-        processImageFile(fileInput.files[0], finalizeEdit);
-      } else {
-        finalizeEdit(null);
+      if (!name) {
+        showFormError("edit-form-error", "Aquarium name cannot be empty.", [nameEl]);
+        nameEl.focus();
+        return;
       }
+      if (Number.isNaN(rawVol) || rawVol <= 0) {
+        const u = getUnitLabels();
+        showFormError("edit-form-error", `Please enter a valid volume in ${u.vol}.`, [volEl]);
+        volEl.focus();
+        return;
+      }
+      if (startDate > todayStr) {
+        showFormError("edit-form-error", "Setup date cannot be in the future.", [dateEl]);
+        return;
+      }
+
+      tank.name = name;
+      tank.vol = inputVolToGal(rawVol);
+      tank.startDate = startDate;
+      tank.color = document.getElementById("edit-m-color").value;
+      tank.status = document.getElementById("edit-m-status").value;
+
+      if (pendingTankPhotoData.edit) {
+        tank.image = pendingTankPhotoData.edit;
+      } else if (editTankPhotoRemoved) {
+        tank.image = "";
+      }
+
+      pendingTankPhotoData.edit = null;
+      editTankPhotoRemoved = false;
+      saveDataToStorage();
+      closeModalById("editTankModal");
+      renderTankHub();
+      showToast("Aquarium Updated");
     }
 
     function deleteActiveTank() {
-      if (appState.tanks.length <= 1) {
-        alert("You must keep at least one aquarium in your app!");
-        return;
-      }
       const tank = getActiveTank();
-      if (confirm(`Are you sure you want to delete ${tank.name}? This cannot be undone.`)) {
+      if (!tank) return;
+      if (confirm(`Delete "${tank.name}"? This cannot be undone.`)) {
         appState.tanks = appState.tanks.filter(t => t.id !== tank.id);
-        activeTankId = appState.tanks[0].id;
+        activeTankId = appState.tanks[0] ? appState.tanks[0].id : 0;
         saveDataToStorage();
         closeModalById("editTankModal");
         navToGlobal("dashboard", false);
@@ -4857,11 +5309,16 @@ Instructions:
 
       const apiKeyInput = document.getElementById("setting-api-key");
       const apiToggleBtn = document.getElementById("api-key-toggle-btn");
+      const apiStatusEl = document.getElementById("api-key-status");
       if (apiKeyInput) {
         apiKeyInput.type = "password";
         apiKeyInput.value = appState.apiKey || "";
       }
       if (apiToggleBtn) apiToggleBtn.innerText = "Show";
+      if (apiStatusEl) {
+        apiStatusEl.style.display = "none";
+        apiStatusEl.innerText = "";
+      }
 
       updateNotificationStatusDisplay();
       openModalById("settingsModal");
@@ -4894,7 +5351,60 @@ Instructions:
 
     function saveApiKey() {
       appState.apiKey = document.getElementById("setting-api-key").value.trim();
+      const apiStatusEl = document.getElementById("api-key-status");
+      if (apiStatusEl) apiStatusEl.style.display = "none";
       saveDataToStorage();
+    }
+
+    async function verifyApiKey() {
+      const inputEl = document.getElementById("setting-api-key");
+      const statusEl = document.getElementById("api-key-status");
+      const verifyBtn = document.getElementById("api-key-verify-btn");
+      if (!inputEl || !statusEl) return;
+
+      const key = inputEl.value.trim();
+      appState.apiKey = key;
+      saveDataToStorage();
+
+      if (!key) {
+        statusEl.style.display = "block";
+        statusEl.style.color = "var(--alert-yellow)";
+        statusEl.innerText = "Paste a Gemini API key first.";
+        return;
+      }
+
+      statusEl.style.display = "block";
+      statusEl.style.color = "var(--text-muted)";
+      statusEl.innerText = "Verifying key with Google AI...";
+      if (verifyBtn) verifyBtn.disabled = true;
+
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`);
+        if (res.ok) {
+          statusEl.style.color = "var(--neon-green)";
+          statusEl.innerText = "API key verified and ready.";
+        } else {
+          statusEl.style.color = "var(--alert-red)";
+          statusEl.innerText = "Invalid API key. Double-check the key from aistudio.google.com.";
+        }
+      } catch (err) {
+        statusEl.style.color = "var(--alert-yellow)";
+        statusEl.innerText = "Key saved locally (unable to verify while offline).";
+      } finally {
+        if (verifyBtn) verifyBtn.disabled = false;
+      }
+    }
+
+    function resetAppDataPrompt() {
+      if (!confirm("Clear all aquariums and activity logs from this device? Your unit preference, tap water profile, and API key will be kept.")) {
+        return;
+      }
+      appState.tanks = [];
+      activeTankId = 0;
+      saveDataToStorage();
+      closeModalById("settingsModal");
+      navToGlobal("dashboard", false);
+      showToast("All Aquariums Cleared");
     }
 
     function exportDataJSON() {
@@ -4950,7 +5460,7 @@ Instructions:
       const pct = parseFloat(percentVal) || 0;
       if (pct > 0) {
         const u = getUnitLabels();
-        const volAmt = Math.round((activeTank.vol * (pct / 100)) * 10) / 10;
+        const volAmt = displayVol(activeTank.vol * (pct / 100));
         previewEl.innerText = `≈ ${volAmt} ${u.vol}`;
       } else {
         previewEl.innerText = "";
@@ -5037,30 +5547,42 @@ Instructions:
         return;
       }
       const activeTank = getActiveTank();
-      sendSystemNotification("aquAssist: Water Change Due", {
-        body: `${activeTank.name}: 25% water change scheduled today. Dose 1ml Seachem Prime to tap water.`,
+      const tankLabel = activeTank ? activeTank.name : "Your Aquarium";
+      sendSystemNotification("aquAssist: Care Reminder", {
+        body: `${tankLabel}: Water test and routine care reminders are active on this device.`,
         icon: "icon.svg"
       });
-      showToast("Test Notification Sent!");
+      showToast("Test Alert Sent");
     }
 
     function checkMaintenanceReminders() {
       if (!("Notification" in window) || Notification.permission !== "granted") return;
-      const today = new Date();
+      if (!Array.isArray(appState.tanks) || appState.tanks.length === 0) return;
+
+      const todayStr = new Date().toISOString().split("T")[0];
+      try {
+        if (localStorage.getItem("aquassist_last_notif_day") === todayStr) return;
+      } catch (err) {}
+
+      const dueTasks = [];
       appState.tanks.forEach((tank) => {
-        (tank.filterMedia || []).forEach((m) => {
-          if (m.interval > 0 && m.lastDate) {
-            const last = new Date(m.lastDate);
-            const diff = Math.floor((today - last) / (1000 * 60 * 60 * 24));
-            if (diff >= m.interval) {
-              sendSystemNotification(`aquAssist: Filter Maintenance Overdue`, {
-                body: `${tank.name}: ${m.name} is due for a rinse. Remember to use tank water!`,
-                icon: "icon.svg"
-              });
-            }
-          }
-        });
+        const tasks = generateTankTasks(tank, 0);
+        tasks.forEach(t => dueTasks.push(t));
       });
+
+      if (dueTasks.length === 0) return;
+      dueTasks.sort((a, b) => a.daysRemaining - b.daysRemaining);
+      const top = dueTasks[0];
+      const extraCount = dueTasks.length - 1;
+      const title = top.isOverdue ? "aquAssist: Maintenance Overdue" : "aquAssist: Tank Care Due Today";
+      const body = extraCount > 0
+        ? `${top.title} (+${extraCount} more scheduled today)`
+        : `${top.title} — ${top.subtitle}`;
+
+      sendSystemNotification(title, { body, icon: "icon.svg" });
+      try {
+        localStorage.setItem("aquassist_last_notif_day", todayStr);
+      } catch (err) {}
     }
 
     /* ============================================================
