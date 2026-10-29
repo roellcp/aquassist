@@ -492,6 +492,18 @@
       background: rgba(255, 255, 255, 0.025); border: 1px solid rgba(255, 255, 255, 0.07);
       border-radius: 12px; margin-top: 10px; overflow: hidden;
     }
+    .tap-strip.tri { grid-template-columns: repeat(3, 1fr); }
+    .color-swatch-row {
+      display: grid; grid-template-columns: repeat(9, 1fr); gap: 6px; align-items: center;
+      background: rgba(255, 255, 255, 0.025); border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 12px; padding: 8px 10px;
+    }
+    .color-swatch-dot {
+      width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent;
+      cursor: pointer; margin: 0 auto; padding: 0; transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+    .color-swatch-dot:hover { transform: scale(1.1); }
+    .color-swatch-dot.selected { border-color: #FFFFFF; transform: scale(1.16); }
     .tap-cell {
       padding: 9px 6px; text-align: center; border-right: 1px solid rgba(255, 255, 255, 0.06);
     }
@@ -692,7 +704,8 @@
       color: #04101E; cursor: pointer; display: flex; align-items: center;
       justify-content: center; flex-shrink: 0; transition: transform 0.14s ease, opacity 0.14s ease;
     }
-    .ai-send-btn:hover { transform: scale(1.04); }
+    .ai-send-btn:hover:not(:disabled) { transform: scale(1.04); }
+    .ai-send-btn:disabled { opacity: 0.45; cursor: default; }
     .ai-md h3, .ai-md h4 {
       font-size: 13.5px; font-weight: 700; color: #F8FAFC;
       margin: 10px 0 4px; letter-spacing: -0.1px;
@@ -816,8 +829,8 @@
     <!-- SCREEN 1: GLOBAL DASHBOARD (All Tanks Overview) -->
     <section id="screen-dashboard" class="view-screen active">
       <!-- Executive Ecosystem Assessment Hero -->
-      <div class="greeting-card" style="padding:18px 20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <div class="greeting-card" style="padding:16px 18px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
           <div style="font-size:11px; font-weight:800; color:var(--cyan); text-transform:uppercase; letter-spacing:0.8px;">
             Ecosystem Overview
           </div>
@@ -825,39 +838,40 @@
             <span style="color:var(--neon-green);">● All Tanks Healthy</span>
           </div>
         </div>
-        
-        <!-- Summary Stat Badges -->
-        <div id="global-stats-row" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin-bottom:14px;">
-          <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:10px 8px; text-align:center;">
-            <div style="font-size:10px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Aquariums</div>
-            <div id="stat-total-tanks" style="font-size:18px; font-weight:800; color:#fff; margin-top:2px;">--</div>
+
+        <div id="global-ai-summary" style="font-size: 13.5px; line-height: 1.52; color: var(--text-main);">
+          All tanks are healthy and biologically balanced.
+        </div>
+
+        <!-- Calm Hairline Metric Strip -->
+        <div id="global-stats-row" class="tap-strip tri" style="margin-top:12px;">
+          <div class="tap-cell">
+            <div class="tap-cell-lbl">Aquariums</div>
+            <div class="tap-cell-val" id="stat-total-tanks">--</div>
           </div>
-          <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:10px 8px; text-align:center;">
-            <div style="font-size:10px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Water Quality</div>
-            <div id="stat-water-health" style="font-size:18px; font-weight:800; color:var(--neon-green); margin-top:2px;">All Safe</div>
+          <div class="tap-cell">
+            <div class="tap-cell-lbl">Water</div>
+            <div class="tap-cell-val" id="stat-water-health" style="color:var(--neon-green);">All Safe</div>
           </div>
-          <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:10px 8px; text-align:center;">
-            <div style="font-size:10px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Tasks Due</div>
-            <div id="stat-tasks-due" style="font-size:18px; font-weight:800; color:var(--cyan); margin-top:2px;">0 Due</div>
+          <div class="tap-cell">
+            <div class="tap-cell-lbl">Schedule</div>
+            <div class="tap-cell-val" id="stat-tasks-due" style="color:var(--cyan);">0 Due</div>
           </div>
         </div>
 
-        <div id="global-ai-summary" style="font-size: 13.5px; line-height: 1.55; color: var(--text-main);">
-          All tanks are healthy and biologically balanced.
+        <div style="display:flex; justify-content:flex-end; margin-top:10px;">
+          <button type="button" class="ghost-action-btn" style="font-size:11px; padding:4px 10px;" onclick="navToGlobal('global-ai')">✦ Ask Aquarist AI →</button>
         </div>
       </div>
 
       <!-- Actionable Upcoming Tasks & Routines Checklist -->
-      <div class="card" id="dashboard-tasks-card" style="margin-bottom: 18px; border-color: rgba(56, 189, 248, 0.35);">
-        <div class="card-header" style="margin-bottom: 10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <div class="card-title">Upcoming Tasks</div>
-            <div class="segmented-group compact">
-              <button type="button" id="task-filter-today" class="segmented-btn active" onclick="setDashboardTaskFilter('today')">Today</button>
-              <button type="button" id="task-filter-3days" class="segmented-btn" onclick="setDashboardTaskFilter('3days')">3 Days</button>
-            </div>
+      <div class="card" id="dashboard-tasks-card" style="margin-bottom: 18px; border-color: rgba(56, 189, 248, 0.28); padding: 15px 18px;">
+        <div class="card-header" id="dashboard-tasks-header" style="margin-bottom: 10px; display:flex; justify-content:space-between; align-items:center; gap:8px;">
+          <div class="card-title" style="font-size:15px;">Upcoming Tasks</div>
+          <div class="segmented-group compact">
+            <button type="button" id="task-filter-today" class="segmented-btn active" onclick="setDashboardTaskFilter('today')">Today</button>
+            <button type="button" id="task-filter-3days" class="segmented-btn" onclick="setDashboardTaskFilter('3days')">3 Days</button>
           </div>
-          <span id="dashboard-tasks-badge" class="badge-cycling" style="background:rgba(56,189,248,0.15); color:var(--cyan); border-color:var(--cyan); font-size:10px;">Checking...</span>
         </div>
         <div id="dashboard-tasks-list"></div>
       </div>
@@ -876,7 +890,10 @@
       <div class="card">
         <div class="card-header" style="margin-bottom:12px;">
           <div class="card-title">Household Supplies</div>
-          <button type="button" id="closet-staples-btn" class="ghost-action-btn" style="font-size:11px; padding:4px 10px;" onclick="toggleSupplyStaplesDrawer()">+ Staples</button>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <button type="button" id="closet-restock-btn" class="ghost-action-btn" style="display:none; font-size:11px; padding:4px 10px; color:var(--alert-yellow); border-color:rgba(245,158,11,0.3);" onclick="toggleClosetRestockFilter()">Restock</button>
+            <button type="button" id="closet-staples-btn" class="ghost-action-btn" style="font-size:11px; padding:4px 10px;" onclick="toggleSupplyStaplesDrawer()">+ Staples</button>
+          </div>
         </div>
 
         <div class="input-row" style="margin-bottom:12px;">
@@ -936,16 +953,11 @@
           </div>
 
           <div id="global-ai-empty" class="ai-empty-state">
-            <div class="ai-empty-title">What are we working on?</div>
-            <div class="ai-empty-sub">
+            <div id="global-ai-empty-title" class="ai-empty-title">What are we working on?</div>
+            <div id="global-ai-empty-sub" class="ai-empty-sub">
               Bounce aquascape or stocking ideas, talk through logs, or troubleshoot—Aquarist AI factors in your tanks, plants, livestock, decor, gear, logs, and supplies.
             </div>
-            <div id="global-ai-starters" class="ai-starters-row">
-              <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Look at my current tanks, plants, hardscape, and lighting—what aquascape or flora ideas would elevate them?')">Bounce aquascape &amp; plant ideas</button>
-              <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Based on my current tanks, water parameters, and livestock, what interesting tankmates or stocking ideas could we explore?')">Brainstorm tankmates</button>
-              <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Walk me through how my aquariums are trending based on my recent water tests, activity logs, gear, and upcoming tasks.')">Review logs &amp; water trends</button>
-              <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Can you help me check on this: ', true)">Check a symptom or photo</button>
-            </div>
+            <div id="global-ai-starters" class="ai-starters-row"></div>
           </div>
 
           <div id="global-ai-thread" class="ai-thread global-stream" style="display:none;"></div>
@@ -1254,7 +1266,7 @@
   <nav class="bottom-nav" id="global-bottom-nav">
     <button class="nav-tab active" onclick="navToGlobal('dashboard')" id="nav-btn-dashboard">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-      Aquariums
+      Home
     </button>
     <button class="nav-tab" onclick="navToGlobal('closet')" id="nav-btn-closet">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
@@ -1314,11 +1326,11 @@
           <label style="margin:0;">Theme Color</label>
           <div style="display:flex; align-items:center; gap:6px;">
             <span id="add-color-name" style="font-size:11px; color:var(--text-muted); font-weight:600;">Electric Cyan</span>
-            <div id="add-color-preview" style="width:14px; height:14px; border-radius:50%; background:#00D2FF; box-shadow:0 0 8px #00D2FF; border:1.5px solid #fff;"></div>
+            <div id="add-color-preview" style="width:12px; height:12px; border-radius:50%; background:#00D2FF; box-shadow:0 0 6px #00D2FF; border:1.5px solid #fff;"></div>
           </div>
         </div>
         <input type="hidden" id="add-m-color" value="#00D2FF">
-        <div id="add-color-palette" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px;"></div>
+        <div id="add-color-palette" class="color-swatch-row"></div>
       </div>
       <div style="margin-bottom:16px;">
         <label>Tank Photo (Optional)</label>
@@ -1378,15 +1390,25 @@
         </div>
       </div>
       <div style="margin-bottom:14px;">
+        <label>Filtration Type</label>
+        <input type="hidden" id="edit-m-filter" value="hob">
+        <div class="segmented-group quad" id="edit-filter-group">
+          <button type="button" class="segmented-btn" data-filter="sponge" onclick="selectFilterPreset('edit', 'sponge')" style="font-size:11.5px; padding:7px 6px;">Sponge</button>
+          <button type="button" class="segmented-btn active" data-filter="hob" onclick="selectFilterPreset('edit', 'hob')" style="font-size:11.5px; padding:7px 6px;">HOB</button>
+          <button type="button" class="segmented-btn" data-filter="canister" onclick="selectFilterPreset('edit', 'canister')" style="font-size:11.5px; padding:7px 6px;">Canister</button>
+          <button type="button" class="segmented-btn" data-filter="none" onclick="selectFilterPreset('edit', 'none')" style="font-size:11.5px; padding:7px 6px;">None</button>
+        </div>
+      </div>
+      <div style="margin-bottom:14px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
           <label style="margin:0;">Theme Color</label>
           <div style="display:flex; align-items:center; gap:6px;">
             <span id="edit-color-name" style="font-size:11px; color:var(--text-muted); font-weight:600;">Electric Cyan</span>
-            <div id="edit-color-preview" style="width:14px; height:14px; border-radius:50%; background:#00D2FF; box-shadow:0 0 8px #00D2FF; border:1.5px solid #fff;"></div>
+            <div id="edit-color-preview" style="width:12px; height:12px; border-radius:50%; background:#00D2FF; box-shadow:0 0 6px #00D2FF; border:1.5px solid #fff;"></div>
           </div>
         </div>
         <input type="hidden" id="edit-m-color" value="#00D2FF">
-        <div id="edit-color-palette" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px;"></div>
+        <div id="edit-color-palette" class="color-swatch-row"></div>
       </div>
       <div style="margin-bottom:16px;">
         <label>Tank Photo</label>
@@ -1826,7 +1848,7 @@
             <button type="button" id="api-key-toggle-btn" class="ghost-action-btn" style="color:var(--text-muted);" onclick="toggleApiKeyVisibility()">Show</button>
           </div>
         </div>
-        <input type="password" id="setting-api-key" placeholder="Paste AIzaSy... key" style="padding:9px 12px; font-size:13px; border-radius:10px;" onchange="saveApiKey()">
+        <input type="password" id="setting-api-key" placeholder="Paste AIzaSy... key" style="padding:9px 12px; font-size:13px; border-radius:10px;" oninput="saveApiKey(true)" onchange="saveApiKey(false)">
         <div id="api-key-status" style="display:none; font-size:11px; margin-top:6px; font-weight:600;"></div>
       </div>
 
@@ -1847,7 +1869,7 @@
         </div>
         <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
           <span style="font-size:11px; color:var(--text-muted);">Start fresh with an empty tank list</span>
-          <button type="button" class="ghost-action-btn" style="color:var(--alert-red); border-color:rgba(244,63,94,0.28); font-size:11px; padding:4px 10px;" onclick="resetAppDataPrompt()">Clear All Data</button>
+          <button type="button" class="ghost-action-btn" style="color:var(--alert-red); border-color:rgba(244,63,94,0.28); font-size:11px; padding:4px 10px;" onclick="resetAppDataPrompt()">Reset Aquariums</button>
         </div>
       </div>
     </div>
@@ -1948,24 +1970,10 @@
         const isSelected = c.hex.toLowerCase() === current;
         const btn = document.createElement("button");
         btn.type = "button";
-        btn.className = `color-palette-btn ${isSelected ? 'selected' : ''}`;
-        btn.style.display = "flex";
-        btn.style.alignItems = "center";
-        btn.style.gap = "6px";
-        btn.style.padding = "6px 8px";
-        btn.style.borderRadius = "8px";
-        btn.style.cursor = "pointer";
-        btn.style.background = isSelected ? `${c.hex}22` : "rgba(255,255,255,0.04)";
-        btn.style.border = `1px solid ${isSelected ? c.hex : 'rgba(255,255,255,0.1)'}`;
-        btn.style.color = isSelected ? "#fff" : "var(--text-muted)";
-        btn.style.transition = "all 0.15s ease";
-        btn.style.textAlign = "left";
-
-        btn.innerHTML = `
-          <span style="width:12px; height:12px; border-radius:50%; background:${c.hex}; flex-shrink:0; box-shadow:0 0 6px ${c.hex};"></span>
-          <span style="font-size:11px; font-weight:${isSelected ? '700' : '500'}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${c.name}</span>
-        `;
-
+        btn.className = `color-swatch-dot ${isSelected ? "selected" : ""}`;
+        btn.title = c.name;
+        btn.style.background = c.hex;
+        btn.style.boxShadow = isSelected ? `0 0 10px ${c.hex}` : "none";
         btn.onclick = () => selectThemeColor(prefix, c.hex, c.name);
         container.appendChild(btn);
       });
@@ -2753,6 +2761,8 @@
     let globalAiThread = [];
     let tankAiThreads = {};
     let aiReturnTankId = null;
+    let isAiGenerating = false;
+    let closetRestockOnly = false;
     let lastEvaluatedSandbox = null;
     let swRegistration = null;
     let dashboardTaskFilter = "today"; // "today" or "3days"
@@ -2804,13 +2814,13 @@
       }
     }
 
-    async function saveDataToStorage(dataToSave = appState) {
+    async function saveDataToStorage(dataToSave = appState, silent = false) {
       try {
         const db = await openDatabase();
         const tx = db.transaction(STORE_NAME, "readwrite");
         const store = tx.objectStore(STORE_NAME);
         store.put(dataToSave, "state");
-        showToast("Saved");
+        if (!silent) showToast("Saved");
       } catch (err) {
         console.error("Storage save failed:", err);
       }
@@ -3282,19 +3292,19 @@
           sumEl.innerHTML = `No aquariums registered yet. Tap <b>+ Add Aquarium</b> below to set up your first tank.`;
         } else if (toxinTanks.length > 0) {
           const tSpike = toxinTanks[0];
-          sumEl.innerHTML = `<b>${tSpike.tank.name}</b> logged toxic readings (${tSpike.nh3 > 0 ? `Ammonia: ${tSpike.nh3} ppm` : `Nitrite: ${tSpike.no2} ppm`}). Perform an immediate water change and dose water conditioner.`;
+          sumEl.innerHTML = `<b>${escapeHtmlText(tSpike.tank.name)}</b> logged toxic readings (${tSpike.nh3 > 0 ? `Ammonia: ${tSpike.nh3} ppm` : `Nitrite: ${tSpike.no2} ppm`}). Perform an immediate water change and dose water conditioner.`;
         } else if (highNitrateTanks.length > 0) {
           const tHigh = highNitrateTanks[0];
-          sumEl.innerHTML = `Nitrates in <b>${tHigh.tank.name}</b> reached <b>${tHigh.no3} ppm</b>. A 25–35% water change is recommended to keep water clean and livestock safe.`;
+          sumEl.innerHTML = `Nitrates in <b>${escapeHtmlText(tHigh.tank.name)}</b> reached <b>${tHigh.no3} ppm</b>. A 25–35% water change is recommended to keep water clean and livestock safe.`;
         } else if (untestedTanks.length === totalTanks) {
-          sumEl.innerHTML = `Log an initial water chemistry test for <b>${untestedTanks[0].name}</b> so Aquarist AI can calibrate your water change and maintenance schedule.`;
+          sumEl.innerHTML = `Log an initial water chemistry test for <b>${escapeHtmlText(untestedTanks[0].name)}</b> so Aquarist AI can calibrate your water change and maintenance schedule.`;
         } else if (cyclingTanks.length > 0 && cyclingTanks.length === totalTanks) {
-          sumEl.innerHTML = `<b>${cyclingTanks[0].name}</b> is actively cycling. Beneficial nitrifying bacteria are cultivating—test every 2 days and hold water changes unless ammonia exceeds 2.0 ppm.`;
+          sumEl.innerHTML = `<b>${escapeHtmlText(cyclingTanks[0].name)}</b> is actively cycling. Beneficial nitrifying bacteria are cultivating—test every 2 days and hold water changes unless ammonia exceeds 2.0 ppm.`;
         } else if (dueNowCount > 0) {
-          sumEl.innerHTML = `All water parameters are safe. You have <b>${dueNowCount} maintenance task${dueNowCount > 1 ? 's' : ''} due today</b> across your aquariums.`;
+          sumEl.innerHTML = `Water chemistry is balanced across your tanks. Review your scheduled care tasks below.`;
         } else if (allUpcomingTasks.length > 0) {
           const nextTask = allUpcomingTasks[0];
-          sumEl.innerHTML = `All tanks are healthy and biologically balanced. Next scheduled care is <b>${nextTask.title}</b> (${nextTask.subtitle.toLowerCase()}).`;
+          sumEl.innerHTML = `All tanks are healthy and biologically balanced. Next scheduled care is <b>${escapeHtmlText(nextTask.title)}</b> (${escapeHtmlText(nextTask.subtitle.toLowerCase())}).`;
         } else {
           sumEl.innerHTML = `All tanks are healthy and biologically balanced. Zero ammonia, zero nitrite, and all routines are on schedule.`;
         }
@@ -3366,7 +3376,7 @@
             <div class="tank-banner-content">
               <div style="display:flex; justify-content:space-between; align-items:flex-end;">
                 <div>
-                  <h3 class="card-title">${tank.name}</h3>
+                  <h3 class="card-title">${escapeHtmlText(tank.name)}</h3>
                   <div style="font-size:11px; color:var(--text-muted); margin-top:3px; font-weight:600; letter-spacing:0.1px;">
                     ${formatTankAgeLine(tank.startDate, tank.vol, u.vol)}
                   </div>
@@ -4327,8 +4337,8 @@
 
     function renderDashboardTasks() {
       const tasksCard = document.getElementById("dashboard-tasks-card");
+      const tasksHeader = document.getElementById("dashboard-tasks-header");
       const listEl = document.getElementById("dashboard-tasks-list");
-      const badgeEl = document.getElementById("dashboard-tasks-badge");
       const btnToday = document.getElementById("task-filter-today");
       const btn3Days = document.getElementById("task-filter-3days");
       if (!listEl) return 0;
@@ -4353,54 +4363,32 @@
 
       allTasks.sort((a, b) => a.daysRemaining - b.daysRemaining);
 
-      const overdueCount = allTasks.filter(t => t.daysRemaining < 0).length;
-      const todayCount = allTasks.filter(t => t.daysRemaining === 0).length;
-
-      if (badgeEl) {
-        if (allTasks.length === 0) {
-          badgeEl.innerText = dashboardTaskFilter === "today" ? "All Clear Today" : "All Clear (3 Days)";
-          badgeEl.style.background = "rgba(0, 245, 160, 0.15)";
-          badgeEl.style.color = "var(--neon-green)";
-          badgeEl.style.borderColor = "var(--neon-green)";
-        } else if (overdueCount > 0) {
-          badgeEl.innerText = `${overdueCount} Overdue • ${allTasks.length} ${dashboardTaskFilter === 'today' ? 'Today' : 'in 3d'}`;
-          badgeEl.style.background = "rgba(244, 63, 94, 0.15)";
-          badgeEl.style.color = "var(--alert-red)";
-          badgeEl.style.borderColor = "var(--alert-red)";
-        } else if (todayCount > 0) {
-          badgeEl.innerText = `${todayCount} Due Today`;
-          badgeEl.style.background = "rgba(245, 158, 11, 0.15)";
-          badgeEl.style.color = "var(--alert-yellow)";
-          badgeEl.style.borderColor = "var(--alert-yellow)";
-        } else {
-          badgeEl.innerText = `${allTasks.length} in Next 3 Days`;
-          badgeEl.style.background = "rgba(56, 189, 248, 0.15)";
-          badgeEl.style.color = "var(--cyan)";
-          badgeEl.style.borderColor = "var(--cyan)";
-        }
-      }
-
       if (allTasks.length === 0) {
+        if (tasksCard) tasksCard.style.padding = "12px 16px";
+        if (tasksHeader) tasksHeader.style.marginBottom = "6px";
         if (dashboardTaskFilter === "today") {
           let next3dCount = 0;
           appState.tanks.forEach(tank => { next3dCount += generateTankTasks(tank, 3).length; });
           const nextHint = next3dCount > 0
-            ? ` • <span style="color:var(--cyan); font-weight:600; cursor:pointer;" onclick="setDashboardTaskFilter('3days')">${next3dCount} task${next3dCount > 1 ? 's' : ''} in next 3 days →</span>`
-            : ` • Zero tasks in next 3 days`;
+            ? ` · <span style="color:var(--cyan); font-weight:600; cursor:pointer;" onclick="setDashboardTaskFilter('3days')">${next3dCount} in next 3 days →</span>`
+            : ` · Clear for next 3 days`;
           listEl.innerHTML = `
-            <div style="font-size:12px; color:var(--text-muted); padding:4px 2px 2px;">
+            <div style="font-size:12px; color:var(--text-muted); padding:2px 1px 0;">
               All caught up for today${nextHint}
             </div>
           `;
         } else {
           listEl.innerHTML = `
-            <div style="font-size:12px; color:var(--text-muted); padding:4px 2px 2px;">
-              All maintenance is current. No tasks scheduled in the next 3 days.
+            <div style="font-size:12px; color:var(--text-muted); padding:2px 1px 0;">
+              All maintenance is current for the next 3 days.
             </div>
           `;
         }
         return 0;
       }
+
+      if (tasksCard) tasksCard.style.padding = "15px 18px";
+      if (tasksHeader) tasksHeader.style.marginBottom = "10px";
 
       allTasks.forEach(t => {
         let subColor = "var(--text-muted)";
@@ -4414,13 +4402,13 @@
         listEl.innerHTML += `
           <div class="task-item-row ${t.isOverdue ? 'overdue' : ''}">
             <div style="flex:1;">
-              <div class="task-info-title">${t.title}</div>
-              <div class="task-info-sub" style="color:${subColor}; font-weight:${t.isOverdue || t.isToday ? '600' : 'normal'};">${t.subtitle}</div>
+              <div class="task-info-title">${escapeHtmlText(t.title)}</div>
+              <div class="task-info-sub" style="color:${subColor}; font-weight:${t.isOverdue || t.isToday ? '600' : 'normal'};">${escapeHtmlText(t.subtitle)}</div>
             </div>
             <div style="display:flex; align-items:center; gap:6px;">
               ${dismissBtnHtml}
               <button class="btn btn-secondary" style="width:auto; padding:5px 12px; font-size:11px; white-space:nowrap; ${t.isOverdue ? 'border-color:var(--alert-red); color:#fff;' : 'color:var(--cyan);'}" onclick="${t.actionFn}">
-                ${t.actionLabel}
+                ${escapeHtmlText(t.actionLabel)}
               </button>
             </div>
           </div>
@@ -4787,11 +4775,31 @@
       testing: "Testing"
     };
 
+    function toggleClosetRestockFilter() {
+      closetRestockOnly = !closetRestockOnly;
+      renderGlobalClosetScreen();
+    }
+
     function renderGlobalClosetScreen() {
       const container = document.getElementById("global-closet-list");
+      const restockBtn = document.getElementById("closet-restock-btn");
       if (!container) return;
 
       const items = ensureClosetNormalized();
+      const restockCount = items.filter(i => i.stock === "low" || i.stock === "out").length;
+      if (restockCount === 0) {
+        closetRestockOnly = false;
+      }
+      if (restockBtn) {
+        if (restockCount > 0) {
+          restockBtn.style.display = "inline-block";
+          restockBtn.innerText = closetRestockOnly ? `✓ Restock (${restockCount})` : `Restock (${restockCount})`;
+          restockBtn.style.background = closetRestockOnly ? "rgba(245, 158, 11, 0.16)" : "rgba(255, 255, 255, 0.05)";
+          restockBtn.style.borderColor = closetRestockOnly ? "rgba(245, 158, 11, 0.55)" : "rgba(245, 158, 11, 0.3)";
+        } else {
+          restockBtn.style.display = "none";
+        }
+      }
 
       const drawer = document.getElementById("closet-staples-drawer");
       if (drawer && drawer.style.display === "block") {
@@ -4814,6 +4822,7 @@
       const catRank = { conditioner: 1, bacteria: 2, food: 3, fertilizer: 4, medication: 5, testing: 6 };
       const sorted = items
         .map((item, idx) => ({ item, idx }))
+        .filter(({ item }) => !closetRestockOnly || item.stock === "low" || item.stock === "out")
         .sort((a, b) => {
           const outDiff = (a.item.stock === "out" ? 1 : 0) - (b.item.stock === "out" ? 1 : 0);
           if (outDiff !== 0) return outDiff;
@@ -5375,6 +5384,57 @@
       renderGlobalAIThreadView();
     }
 
+    function renderGlobalAIEmptyWelcome() {
+      const titleEl = document.getElementById("global-ai-empty-title");
+      const subEl = document.getElementById("global-ai-empty-sub");
+      const startersEl = document.getElementById("global-ai-starters");
+      const focusedTank = globalAiContextTankId !== "all"
+        ? appState.tanks.find(t => String(t.id) === String(globalAiContextTankId))
+        : null;
+
+      if (focusedTank) {
+        const safeName = escapeHtmlText(focusedTank.name);
+        const jsSafeName = focusedTank.name.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+        if (titleEl) titleEl.innerText = `What are we working on in ${focusedTank.name}?`;
+        if (subEl) {
+          subEl.innerText = focusedTank.status === "Cycling"
+            ? `Aquarist AI has ${focusedTank.name}'s cycling status, water readings, gear, plants, hardscape, logs, and supplies ready.`
+            : `Bounce aquascape or stocking ideas, review logs, or troubleshoot—Aquarist AI has ${focusedTank.name}'s plants, livestock, decor, gear, logs, and supplies in view.`;
+        }
+        if (startersEl) {
+          if (focusedTank.status === "Cycling") {
+            startersEl.innerHTML = `
+              <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('How is the nitrogen cycle progressing in ${jsSafeName} based on my recent tests and supplies, and what should I do next?')">Check cycling progress</button>
+              <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Look at ${jsSafeName}\\'s plants, hardscape, and lighting—what aquascape or flora ideas would work well while it cycles?')">Bounce aquascape &amp; plant ideas</button>
+              <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Once ${jsSafeName} finishes cycling, what stocking or tankmate ideas fit its size, water, and current setup?')">Plan post-cycle stocking</button>
+              <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Can you check on this in ${jsSafeName}: ', true)">Check a symptom or photo</button>
+            `;
+          } else {
+            startersEl.innerHTML = `
+              <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Look at ${jsSafeName}\\'s current plants, hardscape, and lighting—what aquascape or flora ideas would elevate it?')">Bounce aquascape &amp; plant ideas</button>
+              <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Based on ${jsSafeName}\\'s size, water parameters, and current livestock, what tankmates or stocking ideas could we explore?')">Brainstorm tankmates</button>
+              <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Walk me through how ${jsSafeName} is trending based on its water tests, activity logs, gear, and upcoming care.')">Review logs &amp; water trends</button>
+              <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Can you help me check on this in ${jsSafeName}: ', true)">Check a symptom or photo</button>
+            `;
+          }
+        }
+        return;
+      }
+
+      if (titleEl) titleEl.innerText = "What are we working on?";
+      if (subEl) {
+        subEl.innerText = "Bounce aquascape or stocking ideas, talk through logs, or troubleshoot—Aquarist AI factors in your tanks, plants, livestock, decor, gear, logs, and supplies.";
+      }
+      if (startersEl) {
+        startersEl.innerHTML = `
+          <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Look at my current tanks, plants, hardscape, and lighting—what aquascape or flora ideas would elevate them?')">Bounce aquascape &amp; plant ideas</button>
+          <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Based on my current tanks, water parameters, and livestock, what interesting tankmates or stocking ideas could we explore?')">Brainstorm tankmates</button>
+          <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Walk me through how my aquariums are trending based on my recent water tests, activity logs, gear, and upcoming tasks.')">Review logs &amp; water trends</button>
+          <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Can you help me check on this: ', true)">Check a symptom or photo</button>
+        `;
+      }
+    }
+
     function renderGlobalAIThreadView(pendingText = "") {
       const thread = getGlobalAiThreadStore();
       const threadEl = document.getElementById("global-ai-thread");
@@ -5384,6 +5444,9 @@
       const emptyEl = document.getElementById("global-ai-empty");
       const startersEl = document.getElementById("global-ai-starters");
       const hasActivity = thread.length > 0 || !!pendingText;
+      if (!hasActivity) {
+        renderGlobalAIEmptyWelcome();
+      }
       if (emptyEl) emptyEl.style.display = hasActivity ? "none" : "flex";
       if (startersEl) startersEl.style.display = hasActivity ? "none" : "flex";
 
@@ -5536,7 +5599,9 @@ ${actionsInstruction}`;
     }
 
     async function askGlobalAI() {
+      if (isAiGenerating) return;
       const inputEl = document.getElementById("global-ai-input");
+      const sendBtn = document.getElementById("global-ai-send-btn");
       const q = inputEl ? inputEl.value.trim() : "";
       if (!q && !globalVisionBase64) {
         if (inputEl) inputEl.focus();
@@ -5549,6 +5614,9 @@ ${actionsInstruction}`;
         openSettingsModal();
         return;
       }
+
+      isAiGenerating = true;
+      if (sendBtn) sendBtn.disabled = true;
 
       const attachedBase64 = globalVisionBase64;
       const attachedThumb = globalVisionDataUrl;
@@ -5590,6 +5658,9 @@ ${actionsInstruction}`;
           isError: true,
           text: `Unable to reach Gemini API (${err.message || "connection error"}). Check your API key in Settings.`
         });
+      } finally {
+        isAiGenerating = false;
+        if (sendBtn) sendBtn.disabled = false;
       }
       sess.updatedAt = Date.now();
       syncAiSessionState();
@@ -7426,15 +7497,32 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
 
     const DEFAULT_PHOTO_ICON_SVG = `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>`;
 
-    function selectAddFilterPreset(presetVal) {
-      const hiddenEl = document.getElementById("add-m-filter");
-      const groupEl = document.getElementById("add-filter-group");
+    function inferTankFilterType(tank) {
+      if (tank && tank.filterType && ["sponge", "hob", "canister", "none"].includes(tank.filterType)) {
+        return tank.filterType;
+      }
+      const eq = ((tank && tank.equipment) || []).join(" ").toLowerCase();
+      if (eq.includes("canister")) return "canister";
+      if (eq.includes("sponge")) return "sponge";
+      if (eq.includes("hob") || eq.includes("hang") || eq.includes("aquaclear") || eq.includes("tidal")) return "hob";
+      return (tank && Array.isArray(tank.filterMedia) && tank.filterMedia.length === 0 && (!tank.equipment || tank.equipment.length === 0))
+        ? "none"
+        : "hob";
+    }
+
+    function selectFilterPreset(prefix, presetVal) {
+      const hiddenEl = document.getElementById(`${prefix}-m-filter`);
+      const groupEl = document.getElementById(`${prefix}-filter-group`);
       if (hiddenEl) hiddenEl.value = presetVal;
       if (groupEl) {
         groupEl.querySelectorAll(".segmented-btn").forEach(btn => {
           btn.classList.toggle("active", btn.getAttribute("data-filter") === presetVal);
         });
       }
+    }
+
+    function selectAddFilterPreset(presetVal) {
+      selectFilterPreset("add", presetVal);
     }
 
     function updatePhotoPickerUI(prefix, imgSrc, labelText) {
@@ -7531,6 +7619,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       clearFieldError(dateEl, "edit-form-error");
 
       selectLifecycleStatus("edit", tank.status || "Established");
+      selectFilterPreset("edit", inferTankFilterType(tank));
       const clr = tank.color || "#00D2FF";
       renderThemeColorPalette("edit", clr);
 
@@ -7679,6 +7768,10 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       tank.startDate = startDate;
       tank.color = document.getElementById("edit-m-color").value;
       tank.status = document.getElementById("edit-m-status").value;
+      const editFilterEl = document.getElementById("edit-m-filter");
+      if (editFilterEl && editFilterEl.value) {
+        tank.filterType = editFilterEl.value;
+      }
 
       if (pendingTankPhotoData.edit) {
         tank.image = pendingTankPhotoData.edit;
@@ -7826,12 +7919,12 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       }
     }
 
-    function saveApiKey() {
+    function saveApiKey(silent = false) {
       appState.apiKey = document.getElementById("setting-api-key").value.trim();
       const apiStatusEl = document.getElementById("api-key-status");
       if (apiStatusEl) apiStatusEl.style.display = "none";
       updateGlobalAIKeyNotice();
-      saveDataToStorage();
+      saveDataToStorage(appState, silent);
     }
 
     async function verifyApiKey() {
