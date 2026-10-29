@@ -2989,7 +2989,7 @@
       document.getElementById("screen-tank-hub").classList.add("active");
 
       if (pushHistory) {
-        history.pushState({ level: "tank", tankId: tankId }, "");
+        history.pushState({ level: "tank", tankId: tankId, subtab: currentTankSubtab || "overview" }, "");
       }
 
       renderTankHub();
@@ -3014,6 +3014,9 @@
           }
         });
       }
+      if (isInsideTank && activeTankId && (!history.state || history.state.level === "tank")) {
+        history.replaceState({ level: "tank", tankId: activeTankId, subtab: currentTankSubtab }, "");
+      }
       document.querySelectorAll(".tanksub-content").forEach(c => c.style.display = "none");
       const target = document.getElementById("tanksub-" + tabName);
       if (target) target.style.display = "block";
@@ -3031,7 +3034,12 @@
       const el = document.getElementById(modalId);
       if (el) {
         el.classList.add("open");
-        history.pushState({ modal: modalId }, "");
+        const modalState = { modal: modalId };
+        if (isInsideTank && activeTankId) {
+          modalState.tankId = activeTankId;
+          modalState.subtab = currentTankSubtab || "overview";
+        }
+        history.pushState(modalState, "");
       }
     }
 
@@ -3049,27 +3057,29 @@
 
     // Android Back-Gesture & Browser Popstate Engine
     window.addEventListener("popstate", (e) => {
-      // 1. If any modal is open, close it!
+      // 1. If any modal was open, close it and stay in the current view!
       const openModals = document.querySelectorAll(".modal-overlay.open");
       if (openModals.length > 0) {
         openModals.forEach(m => m.classList.remove("open"));
         return;
       }
 
-      // 2. If inside a Tank Hub, back gesture returns to Home Dashboard!
-      if (isInsideTank) {
-        navToGlobal("dashboard", false);
-        return;
-      }
-
-      // 3. Restore Tank Hub or Global sub-screen from history state
+      // 2. If history state points to a specific screen, restore it cleanly
       if (e.state && e.state.level === "tank" && e.state.tankId) {
-        enterTankHub(e.state.tankId, false);
+        enterTankHub(e.state.tankId, false, e.state.subtab || null);
         return;
       }
       if (e.state && e.state.level === "global" && e.state.view) {
         navToGlobal(e.state.view, false);
-      } else if (currentGlobalView !== "dashboard") {
+        return;
+      }
+
+      // 3. Fallback back-gesture handling
+      if (isInsideTank) {
+        navToGlobal("dashboard", false);
+        return;
+      }
+      if (currentGlobalView !== "dashboard") {
         navToGlobal("dashboard", false);
       }
     });
