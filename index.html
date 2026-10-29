@@ -1196,9 +1196,12 @@
         <h3 style="font-size:18px;">Record Water Chemistry Test</h3>
         <button class="icon-btn" style="width:28px;height:28px;" onclick="closeModalById('recordTestModal')">×</button>
       </div>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
         Enter current test tube or digital readings. Aquarist AI will audit bio-filtration balance.
       </p>
+      <div style="font-size:11px; color:var(--cyan); margin-bottom:14px; background:rgba(0,210,255,0.08); border:1px solid rgba(0,210,255,0.2); border-radius:8px; padding:7px 10px; line-height:1.4;">
+        💡 <b>AI Dynamic Scheduling:</b> Test before changing water. The AI analyzes your bio-load to determine if a water change is needed, the exact volume %, and when to test next.
+      </div>
 
       <div class="input-grid-2">
         <div>
@@ -1242,6 +1245,51 @@
       <div style="display:flex; gap:10px;">
         <button class="btn btn-secondary" onclick="closeModalById('recordTestModal')">Cancel</button>
         <button class="btn btn-neon" onclick="saveModalWaterLog()">Analyze & Save Test</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: AI TEST ANALYSIS & ACTION PLAN ================= -->
+  <div class="modal-overlay" id="testAnalysisResultModal">
+    <div class="modal-box" style="border: 1px solid rgba(0, 245, 160, 0.4); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 245, 160, 0.15);">
+      <div class="card-header" style="margin-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:20px;">🧠</span>
+          <h3 style="font-size:18px; margin:0;" id="analysis-modal-title">AI Water Chemistry Diagnosis</h3>
+        </div>
+        <button class="icon-btn" style="width:28px;height:28px;" onclick="closeModalById('testAnalysisResultModal')">×</button>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <span id="analysis-modal-tankname" style="font-size:12px; font-weight:700; color:var(--text-muted);">40G Community</span>
+        <span id="analysis-modal-badge" class="badge-cycling" style="font-size:11px;">● All Safe</span>
+      </div>
+
+      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:12px; margin-bottom:14px;">
+        <div id="analysis-modal-headline" style="font-size:14px; font-weight:800; color:#fff; margin-bottom:6px;">Moderate Nitrates (20-40 ppm)</div>
+        <div id="analysis-modal-advice" style="font-size:12.5px; line-height:1.55; color:var(--text-main);">
+          Parameters are stable. Standard 25% water change is scheduled in 3 days.
+        </div>
+      </div>
+
+      <div class="input-grid-2" style="margin-bottom:14px;">
+        <div style="background:rgba(56,189,248,0.06); border:1px solid rgba(56,189,248,0.15); border-radius:10px; padding:10px;">
+          <div style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Next Water Change</div>
+          <div id="analysis-modal-wc" style="font-size:13px; font-weight:800; color:#fff; margin-top:2px;">In 3 days (~25%)</div>
+        </div>
+        <div style="background:rgba(0,245,160,0.06); border:1px solid rgba(0,245,160,0.15); border-radius:10px; padding:10px;">
+          <div style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Next Chemistry Test</div>
+          <div id="analysis-modal-test" style="font-size:13px; font-weight:800; color:#fff; margin-top:2px;">In 7 days</div>
+        </div>
+      </div>
+
+      <div id="analysis-modal-dose-box" style="font-size:11px; color:var(--text-muted); margin-bottom:16px; background:rgba(255,255,255,0.02); padding:8px 10px; border-radius:8px;">
+        💡 <b>Conditioner:</b> <span id="analysis-modal-dose">Dose standard dechlorinator</span>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary" style="flex:1;" onclick="closeModalById('testAnalysisResultModal')">Got It</button>
+        <button class="btn btn-neon" id="analysis-modal-action-btn" style="flex:1;">💧 Log Water Change</button>
       </div>
     </div>
   </div>
@@ -2037,8 +2085,195 @@
     }
 
     /* ============================================================
-       3. 7-DAY TANK MAINTENANCE & SCHEDULING ENGINE
+       3. ADAPTIVE AQUARIST AI ENGINE & TASK SCHEDULER
        ============================================================ */
+    function analyzeTankWaterParameters(tank) {
+      if (!tank) return null;
+      const isCycling = tank.status === "Cycling";
+      const t = tank.lastTest || { nh3: 0, no2: 0, no3: 15, ph: 7.2, temp: 78, date: new Date().toISOString().split("T")[0] };
+      const tap = appState.tapBaseline || { ph: 7.4, no3: 5 };
+      const u = getUnitLabels();
+
+      const nh3 = parseFloat(t.nh3) || 0;
+      const no2 = parseFloat(t.no2) || 0;
+      const no3 = parseFloat(t.no3) || 0;
+      const ph = parseFloat(t.ph) || 7.2;
+      const temp = parseFloat(t.temp) || 78;
+
+      const closet = (appState.closet || []).map(c => c.toLowerCase());
+      const hasPrime = closet.some(c => c.includes("prime"));
+      const hasBacteria = closet.some(c => c.includes("turbostart") || c.includes("stability") || c.includes("quick start"));
+
+      let status = "safe";
+      let statusBadge = "● All Safe";
+      let statusColor = "var(--neon-green)";
+      let wcNeeded = false;
+      let wcPercent = 0;
+      let wcDays = 7;
+      let nextTestDays = 7;
+      let headline = "";
+      let aiAdvice = "";
+      let actionSummary = "";
+
+      if (isCycling) {
+        status = "cycling";
+        if (nh3 >= 2.0 || no2 >= 3.0) {
+          status = "danger";
+          statusBadge = "⚠️ Cycle Spike";
+          statusColor = "var(--alert-red)";
+          wcNeeded = true;
+          wcPercent = 25;
+          wcDays = 0;
+          nextTestDays = 1;
+          headline = "Toxin Spike Threatens Bacteria Colony";
+          aiAdvice = `Ammonia reached ${nh3} ppm or Nitrite reached ${no2} ppm. Excessive waste concentrations can stall bacterial colonization and harm livestock. Perform a 25% safety water change today and re-test in 24 hours.`;
+          actionSummary = "25% Safety Water Change Today • Retest Tomorrow";
+        } else {
+          statusBadge = "● Cycling In Progress";
+          statusColor = "var(--cyan)";
+          wcNeeded = false;
+          wcDays = 999;
+          nextTestDays = 2;
+          headline = "Nitrogen Cycle Cultivating Bacteria";
+          aiAdvice = `Beneficial bacteria are actively establishing on filter media (NH₃: ${nh3} ppm, NO₂: ${no2} ppm). Hold water changes so bacteria have continuous waste to convert. Retest in 48 hours.`;
+          actionSummary = "Hold Water Changes • Retest in 48 Hours";
+        }
+      } else {
+        // Established aquarium
+        if (nh3 > 0.25 || no2 > 0.25) {
+          status = "danger";
+          statusBadge = "⚠️ Toxin Spike Detected";
+          statusColor = "var(--alert-red)";
+          wcNeeded = true;
+          wcPercent = 40;
+          wcDays = 0;
+          nextTestDays = 1;
+          headline = "Toxic Ammonia or Nitrite Detected";
+          aiAdvice = `Detected ${nh3 > 0 ? `Ammonia: ${nh3} ppm` : ''}${nh3 > 0 && no2 > 0 ? ' and ' : ''}${no2 > 0 ? `Nitrite: ${no2} ppm` : ''}. In an established tank, these must remain at absolute zero. Perform an immediate 40% water change, dose water conditioner across the full tank volume, and re-test in 24 hours.`;
+          actionSummary = "40% Emergency Water Change Today • Retest in 24 Hours";
+        } else if (no3 > 40) {
+          status = "warning";
+          statusBadge = "⚠️ High Nitrates";
+          statusColor = "var(--alert-yellow)";
+          wcNeeded = true;
+          wcPercent = 35;
+          wcDays = 0;
+          nextTestDays = 2;
+          const expectedNo3 = Math.round((no3 * (1 - 0.35)) + (tap.no3 * 0.35));
+          headline = `High Bio-Accumulation (${no3} ppm Nitrate)`;
+          aiAdvice = `Nitrate reached ${no3} ppm. A 35% water change will dilute nitrates down to ~${expectedNo3} ppm based on your tap baseline (${tap.no3} ppm). Perform this change today and re-test in 48 hours.`;
+          actionSummary = "35% Water Change Today • Retest in 48 Hours";
+        } else if (no3 >= 20) {
+          status = "caution";
+          statusBadge = "● Moderate Nitrates";
+          statusColor = "var(--cyan)";
+          wcNeeded = true;
+          wcPercent = 25;
+          wcDays = 3;
+          nextTestDays = 7;
+          headline = `Balanced Parameters (${no3} ppm Nitrate)`;
+          aiAdvice = `Water parameters are safe with zero toxins. Nitrates are in the normal accumulation zone (${no3} ppm). Standard 25% water change is scheduled in 3 days. Next chemistry test in 7 days.`;
+          actionSummary = "25% Water Change in 3 Days • Next Test in 7 Days";
+        } else {
+          status = "pristine";
+          statusBadge = "● Pristine Quality";
+          statusColor = "var(--neon-green)";
+          wcNeeded = false;
+          wcDays = 7;
+          nextTestDays = 7;
+          headline = `Water is Pristine (${no3} ppm Nitrate)`;
+          aiAdvice = `Nitrate is very low (${no3} ppm) with zero ammonia or nitrite. Your plants and bio-filter are handling the bio-load effortlessly. No water change needed this week! Next chemistry test in 7 days.`;
+          actionSummary = "Skip Water Change This Week • Next Test in 7 Days";
+        }
+      }
+
+      const wcVol = Math.round(tank.vol * (wcPercent / 100));
+      let doseAdvice = "";
+      if (hasPrime) {
+        const ml = Math.round((tank.vol * 0.1) * 10) / 10;
+        const drops = Math.round(tank.vol * 2);
+        doseAdvice = `Dose ${ml} ml (≈ ${drops} drops) Seachem Prime for new water`;
+      } else {
+        doseAdvice = `Dose standard dechlorinator for ${wcVol || Math.round(tank.vol * 0.25)} ${u.vol} new water`;
+      }
+      if (isCycling && hasBacteria) {
+        doseAdvice += ` • Add 1 booster dose of beneficial bacteria`;
+      }
+
+      return {
+        status,
+        statusBadge,
+        statusColor,
+        wcNeeded,
+        wcPercent,
+        wcGallons: wcVol,
+        wcDays,
+        nextTestDays,
+        headline,
+        aiAdvice,
+        actionSummary,
+        doseAdvice
+      };
+    }
+
+    function openTestAnalysisModal(tank, analysis) {
+      if (!tank || !analysis) return;
+      const modal = document.getElementById("testAnalysisResultModal");
+      if (!modal) return;
+
+      const titleEl = document.getElementById("analysis-modal-title");
+      const tankNameEl = document.getElementById("analysis-modal-tankname");
+      const badgeEl = document.getElementById("analysis-modal-badge");
+      const headlineEl = document.getElementById("analysis-modal-headline");
+      const adviceEl = document.getElementById("analysis-modal-advice");
+      const wcEl = document.getElementById("analysis-modal-wc");
+      const testEl = document.getElementById("analysis-modal-test");
+      const doseEl = document.getElementById("analysis-modal-dose");
+      const actionBtn = document.getElementById("analysis-modal-action-btn");
+
+      if (tankNameEl) tankNameEl.innerText = tank.name;
+      if (badgeEl) {
+        badgeEl.innerText = analysis.statusBadge;
+        badgeEl.style.color = analysis.statusColor;
+        badgeEl.style.borderColor = analysis.statusColor;
+      }
+      if (headlineEl) headlineEl.innerText = analysis.headline;
+      if (adviceEl) adviceEl.innerText = analysis.aiAdvice;
+
+      if (wcEl) {
+        if (analysis.wcNeeded) {
+          const u = getUnitLabels();
+          const whenStr = analysis.wcDays === 0 ? "Due Today" : `In ${analysis.wcDays} days`;
+          wcEl.innerHTML = `${whenStr} <span style="font-size:11px; font-weight:normal; color:var(--cyan);">(~${analysis.wcPercent}% / ${analysis.wcGallons} ${u.vol})</span>`;
+        } else {
+          wcEl.innerHTML = `Not Needed <span style="font-size:11px; font-weight:normal; color:var(--neon-green);">(Water pristine)</span>`;
+        }
+      }
+
+      if (testEl) {
+        testEl.innerText = `In ${analysis.nextTestDays} day${analysis.nextTestDays > 1 ? 's' : ''}`;
+      }
+
+      if (doseEl) {
+        doseEl.innerText = analysis.doseAdvice;
+      }
+
+      if (actionBtn) {
+        if (analysis.wcNeeded && analysis.wcDays === 0) {
+          actionBtn.style.display = "inline-flex";
+          actionBtn.innerText = `💧 Log ${analysis.wcPercent}% Water Change Now`;
+          actionBtn.onclick = () => {
+            closeModalById("testAnalysisResultModal");
+            openQuickWcModal(tank.id);
+          };
+        } else {
+          actionBtn.style.display = "none";
+        }
+      }
+
+      openModalById("testAnalysisResultModal");
+    }
+
     function formatTaskSubtitle(daysRemaining) {
       if (daysRemaining < 0) {
         return `Overdue by ${Math.abs(daysRemaining)} day${Math.abs(daysRemaining) > 1 ? 's' : ''}`;
@@ -2061,48 +2296,22 @@
       const todayStr = today.toISOString().split("T")[0];
       const tasks = [];
       const isCycling = tank.status === "Cycling";
+      const analysis = analyzeTankWaterParameters(tank);
 
-      // Calculate Water Change timing first as anchor for weekly routines
-      let daysUntilWc = 999;
-      let daysSinceWc = 0;
-      if (!isCycling) {
-        let lastWcDate = tank.lastWaterChange;
-        if (!lastWcDate && tank.history && tank.history.length > 0) {
-          const wcEntries = tank.history.filter(h => h.wc && h.wc > 0);
-          if (wcEntries.length > 0) {
-            lastWcDate = wcEntries.map(e => e.date).sort().reverse()[0];
-          }
-        }
-        if (!lastWcDate) lastWcDate = tank.startDate;
-        if (lastWcDate) {
-          daysSinceWc = Math.floor((today - new Date(lastWcDate)) / (1000 * 60 * 60 * 24));
-        }
-        daysUntilWc = 7 - daysSinceWc;
+      // 1. Dynamic Water Test
+      const lastTestDate = tank.lastTest?.date || tank.startDate;
+      let daysSinceTest = 0;
+      if (lastTestDate) {
+        daysSinceTest = Math.floor((today - new Date(lastTestDate)) / (1000 * 60 * 60 * 24));
       }
-
-      // 1. Chemical Water Test (Synchronized with Water Change on established tanks)
-      let daysUntilTest = 0;
-      if (isCycling) {
-        // Cycling tanks require testing every 2 days
-        const lastTestDate = tank.lastTest?.date || tank.startDate;
-        let daysSinceTest = 0;
-        if (lastTestDate) {
-          daysSinceTest = Math.floor((today - new Date(lastTestDate)) / (1000 * 60 * 60 * 24));
-        }
-        daysUntilTest = 2 - daysSinceTest;
-      } else {
-        // In established tanks, align testing with the water change day
-        let daysSinceTest = 999;
-        if (tank.lastTest?.date) {
-          daysSinceTest = Math.floor((today - new Date(tank.lastTest.date)) / (1000 * 60 * 60 * 24));
-        }
-        daysUntilTest = daysUntilWc;
-        if (daysSinceTest < 3 && daysUntilWc <= 1) {
-          daysUntilTest = daysUntilWc + 7;
-        }
-      }
+      const testInterval = analysis ? analysis.nextTestDays : (isCycling ? 2 : 7);
+      const daysUntilTest = testInterval - daysSinceTest;
 
       if (daysUntilTest <= windowDays) {
+        let testSub = formatTaskSubtitle(daysUntilTest);
+        if (daysUntilTest <= 0) {
+          testSub += ` (Analyze water to update care plan)`;
+        }
         tasks.push({
           id: `test-${tank.id}`,
           type: "test",
@@ -2110,7 +2319,7 @@
           tankName: tank.name,
           title: `🧪 ${tank.name}: ${isCycling ? 'Cycling Water Test (NH₃ & NO₂ check)' : 'Chemical Water Test'}`,
           planTabTitle: `🧪 ${isCycling ? 'Cycling Water Test (Ammonia & Nitrite)' : 'Chemical Water Test'}`,
-          subtitle: formatTaskSubtitle(daysUntilTest),
+          subtitle: testSub,
           daysRemaining: daysUntilTest,
           isOverdue: daysUntilTest < 0,
           isToday: daysUntilTest === 0,
@@ -2120,21 +2329,20 @@
         });
       }
 
-      // 2. Water Change & Gravel Vacuum
+      // 2. Dynamic Water Change & Gravel Vacuum
+      let daysUntilWc = 999;
       if (isCycling) {
-        // In cycling tanks, routine water changes are suppressed to let nitrifying bacteria cultivate.
-        // Only schedule an emergency water change if ammonia >= 2.0 ppm or nitrite >= 3.0 ppm.
-        const nh3Val = tank.lastTest ? parseFloat(tank.lastTest.nh3 || 0) : 0;
-        const no2Val = tank.lastTest ? parseFloat(tank.lastTest.no2 || 0) : 0;
-        if (nh3Val >= 2.0 || no2Val >= 3.0) {
+        // Cycling tanks: ONLY change water if toxic spike occurs (NH3 >= 2.0 or NO2 >= 3.0)
+        if (analysis && analysis.wcNeeded && analysis.wcDays === 0) {
+          daysUntilWc = 0;
           tasks.push({
             id: `wc-${tank.id}`,
             type: "wc",
             tankId: tank.id,
             tankName: tank.name,
-            title: `💧 ${tank.name}: Cycling Safety Water Change (Ammonia/Nitrite Spike)`,
-            planTabTitle: `💧 Safety Water Change (~${Math.round(tank.vol * 0.25)} ${u.vol} due to high NH₃/NO₂)`,
-            subtitle: `Due today (Toxic Spike)`,
+            title: `💧 ${tank.name}: Cycling Safety Water Change (~${analysis.wcPercent}% / ${analysis.wcGallons} ${u.vol})`,
+            planTabTitle: `💧 Safety Water Change (~${analysis.wcPercent}% / ${analysis.wcGallons} ${u.vol})`,
+            subtitle: `Due today (Toxic Spike Threshold Exceeded)`,
             daysRemaining: 0,
             isOverdue: false,
             isToday: true,
@@ -2144,28 +2352,85 @@
           });
         }
       } else {
-        if (daysUntilWc <= windowDays) {
-          tasks.push({
-            id: `wc-${tank.id}`,
-            type: "wc",
-            tankId: tank.id,
-            tankName: tank.name,
-            title: `💧 ${tank.name}: Routine Water Change (~${Math.round(tank.vol * 0.25)} ${u.vol})`,
-            planTabTitle: `💧 Routine Water Change (~${Math.round(tank.vol * 0.25)} ${u.vol})`,
-            subtitle: formatTaskSubtitle(daysUntilWc),
-            daysRemaining: daysUntilWc,
-            isOverdue: daysUntilWc < 0,
-            isToday: daysUntilWc === 0,
-            actionLabel: "💧 Log Change",
-            actionFn: `openQuickWcModal(${tank.id})`,
-            planTabActionFn: `openQuickWcForActiveTank()`
-          });
+        // Established tank: Check last water change date & analysis recommendations
+        let lastWcDate = tank.lastWaterChange;
+        if (!lastWcDate && tank.history && tank.history.length > 0) {
+          const wcEntries = tank.history.filter(h => h.wc && h.wc > 0);
+          if (wcEntries.length > 0) {
+            lastWcDate = wcEntries.map(e => e.date).sort().reverse()[0];
+          }
+        }
+        if (!lastWcDate) lastWcDate = tank.startDate;
+        let daysSinceWc = 0;
+        if (lastWcDate) {
+          daysSinceWc = Math.floor((today - new Date(lastWcDate)) / (1000 * 60 * 60 * 24));
+        }
+
+        if (analysis && analysis.wcNeeded) {
+          if (analysis.wcDays === 0) {
+            daysUntilWc = 0;
+            const urgencyLabel = analysis.status === "danger" ? "Emergency Detox" : "High Nitrate Dilution";
+            tasks.push({
+              id: `wc-${tank.id}`,
+              type: "wc",
+              tankId: tank.id,
+              tankName: tank.name,
+              title: `💧 ${tank.name}: ${urgencyLabel} (~${analysis.wcPercent}% / ${analysis.wcGallons} ${u.vol})`,
+              planTabTitle: `💧 ${urgencyLabel} (~${analysis.wcPercent}% / ${analysis.wcGallons} ${u.vol})`,
+              subtitle: `Due today (${analysis.actionSummary})`,
+              daysRemaining: 0,
+              isOverdue: false,
+              isToday: true,
+              actionLabel: "💧 Log Change",
+              actionFn: `openQuickWcModal(${tank.id})`,
+              planTabActionFn: `openQuickWcForActiveTank()`
+            });
+          } else {
+            daysUntilWc = Math.min(analysis.wcDays, Math.max(0, 7 - daysSinceWc));
+            if (daysUntilWc <= windowDays) {
+              tasks.push({
+                id: `wc-${tank.id}`,
+                type: "wc",
+                tankId: tank.id,
+                tankName: tank.name,
+                title: `💧 ${tank.name}: Routine Water Change (~${analysis.wcPercent || 25}% / ${analysis.wcGallons || Math.round(tank.vol * 0.25)} ${u.vol})`,
+                planTabTitle: `💧 Routine Water Change (~${analysis.wcPercent || 25}% / ${analysis.wcGallons || Math.round(tank.vol * 0.25)} ${u.vol})`,
+                subtitle: formatTaskSubtitle(daysUntilWc),
+                daysRemaining: daysUntilWc,
+                isOverdue: daysUntilWc < 0,
+                isToday: daysUntilWc === 0,
+                actionLabel: "💧 Log Change",
+                actionFn: `openQuickWcModal(${tank.id})`,
+                planTabActionFn: `openQuickWcForActiveTank()`
+              });
+            }
+          }
+        } else {
+          // Water is pristine (NO3 < 20 ppm)
+          const daysUntilRoutine = 7 - daysSinceWc;
+          if (daysUntilRoutine <= 0) {
+            tasks.push({
+              id: `wc-${tank.id}`,
+              type: "wc",
+              tankId: tank.id,
+              tankName: tank.name,
+              title: `💧 ${tank.name}: Light Water Change / Gravel Vac (~15% / ${Math.round(tank.vol * 0.15)} ${u.vol})`,
+              planTabTitle: `💧 Light Water Change (~15% / ${Math.round(tank.vol * 0.15)} ${u.vol})`,
+              subtitle: `Due today (Water is clean: NO₃ < 20 ppm)`,
+              daysRemaining: 0,
+              isOverdue: false,
+              isToday: true,
+              actionLabel: "💧 Log Change",
+              actionFn: `openQuickWcModal(${tank.id})`,
+              planTabActionFn: `openQuickWcForActiveTank()`
+            });
+          }
         }
       }
 
       // 3. Glass Algae Wipe & Scraping (Synchronized with Water Change)
       let daysUntilGlass = 0;
-      if (isCycling) {
+      if (isCycling || daysUntilWc > 14) {
         let lastGlass = tank.lastGlassClean || tank.startDate;
         let daysSinceGlass = 0;
         if (lastGlass) {
@@ -3206,63 +3471,31 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       const dosePlan = document.getElementById("action-dose-plan");
       if (!card || !activeTank) return;
 
-      const t = activeTank.lastTest || { nh3: 0, no2: 0, no3: 15, ph: 7.2, temp: 78 };
-      const tap = appState.tapBaseline || { ph: 7.4, no3: 5 };
+      const analysis = analyzeTankWaterParameters(activeTank);
+      if (!analysis) return;
       const u = getUnitLabels();
-      const isCycling = activeTank.status === "Cycling";
 
       let statusClass = "status-safe";
-      let summaryText = "";
+      if (analysis.status === "danger") statusClass = "status-alert";
+      else if (analysis.status === "warning" || analysis.status === "caution" || analysis.status === "cycling") statusClass = "status-caution";
+
       let nextWcText = "";
-      let doseText = "";
-
-      if (t.nh3 > 0 || t.no2 > 0) {
-        if (isCycling) {
-          statusClass = "status-caution";
-          summaryText = `Nitrogen cycle in progress! Ammonia (${t.nh3} ppm) and Nitrite (${t.no2} ppm) are being converted by beneficial bacteria. Keep aeration high.`;
-          nextWcText = `Only change water if NH₃ > 2.0 ppm<br><span style="font-size:11px; color:var(--text-muted);">Protect bacteria colonization</span>`;
+      if (analysis.wcNeeded) {
+        const when = analysis.wcDays === 0 ? "Today / Immediately" : `In ${analysis.wcDays} days`;
+        const color = analysis.wcDays === 0 ? "var(--alert-red)" : "var(--cyan)";
+        nextWcText = `${when}<br><span style="font-size:11px; color:${color}; font-weight:normal;">${analysis.wcPercent}% (${analysis.wcGallons} ${u.vol})</span>`;
+      } else {
+        if (activeTank.status === "Cycling") {
+          nextWcText = `Only if NH₃ > 2.0 ppm<br><span style="font-size:11px; color:var(--text-muted);">Protect bacteria colonization</span>`;
         } else {
-          statusClass = "status-alert";
-          summaryText = `Spiked parameters detected. Ammonia (${t.nh3} ppm) or Nitrite (${t.no2} ppm) present. Perform an immediate water change.`;
-          const wcPct = 35;
-          const volAmt = Math.round(activeTank.vol * (wcPct / 100));
-          nextWcText = `Today / Immediately<br><span style="font-size:11px; color:var(--alert-red);">${wcPct}% (${volAmt} ${u.vol})</span>`;
+          nextWcText = `Not Needed This Week<br><span style="font-size:11px; color:var(--neon-green); font-weight:normal;">Nitrates safe (NO₃ &lt; 20 ppm)</span>`;
         }
-      } else if (t.no3 > 35) {
-        statusClass = "status-caution";
-        const targetWcPct = 30;
-        const volAmt = Math.round(activeTank.vol * (targetWcPct / 100));
-        const expectedNo3 = Math.round((t.no3 * (1 - targetWcPct / 100)) + (tap.no3 * (targetWcPct / 100)));
-        summaryText = `Nitrate reached ${t.no3} ppm. With your tap baseline at ${tap.no3} ppm, a ${targetWcPct}% change drops nitrate safely to ~${expectedNo3} ppm.`;
-        nextWcText = `Tomorrow or This Weekend<br><span style="font-size:11px; color:var(--cyan); font-weight:normal;">${targetWcPct}% (${volAmt} ${u.vol})</span>`;
-      } else {
-        statusClass = "status-safe";
-        summaryText = `Biological filtration is stable with zero Ammonia & Nitrite. Nitrates are in the safe zone (${t.no3} ppm).`;
-        const wcPct = 20;
-        const volAmt = Math.round(activeTank.vol * (wcPct / 100));
-        nextWcText = `Scheduled: Sunday<br><span style="font-size:11px; color:var(--cyan); font-weight:normal;">${wcPct}% (${volAmt} ${u.vol})</span>`;
-      }
-
-      const closet = (appState.closet || []).map(c => c.toLowerCase());
-      const hasPrime = closet.some(c => c.includes("prime"));
-      const hasBacteria = closet.some(c => c.includes("turbostart") || c.includes("stability") || c.includes("quick start"));
-
-      if (hasPrime) {
-        const ml = Math.round((activeTank.vol * 0.1) * 10) / 10;
-        const drops = Math.round(activeTank.vol * 2);
-        doseText = `Seachem Prime (From Closet)<br><span style="font-size:11px; color:var(--neon-green); font-weight:normal;">${ml} ml (≈ ${drops} drops) in new water</span>`;
-      } else {
-        doseText = `Water Conditioner<br><span style="font-size:11px; color:var(--alert-yellow); font-weight:normal;">Dose standard tap dechlorinator</span>`;
-      }
-
-      if (isCycling && hasBacteria) {
-        doseText += `<br><span style="font-size:11px; color:var(--cyan);">+ Add 1 dose beneficial bacteria</span>`;
       }
 
       card.className = `action-card ${statusClass}`;
-      summary.innerHTML = summaryText;
+      summary.innerHTML = analysis.aiAdvice;
       wcPlan.innerHTML = nextWcText;
-      dosePlan.innerHTML = doseText;
+      dosePlan.innerHTML = analysis.doseAdvice;
     }
 
     function openTestModalForActiveTank(editIdx = -1) {
@@ -3330,24 +3563,16 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
         if (!activeTank.history) activeTank.history = [];
         activeTank.history.unshift(newLog);
 
-        // Log event to activity timeline
         let eventText = `Logged Chemistry: Temp ${temp}°, pH ${ph}, NH₃ ${nh3}, NO₂ ${no2}, NO₃ ${no3} ppm`;
         if (notes) eventText += ` • ${notes}`;
         logTankTimelineEvent(eventText, date);
       }
 
-      // Update AI holistic summary
-      let holisticSummary = "";
-      if (activeTank.status === "Cycling") {
-        holisticSummary = `Cycling in progress: Ammonia at ${nh3} ppm, Nitrite at ${no2} ppm. Biofilter is cultivating.`;
-      } else if (nh3 > 0.25 || no2 > 0.25) {
-        holisticSummary = `⚠️ Toxin alert: NH₃ (${nh3} ppm) or NO₂ (${no2} ppm) detected. Emergency water change required.`;
-      } else if (no3 > 40) {
-        holisticSummary = `Nitrate elevated at ${no3} ppm. Schedule a 25-30% water change to protect livestock.`;
-      } else {
-        holisticSummary = `Ecosystem healthy and stable. Ammonia and Nitrite at 0, Nitrate safe at ${no3} ppm.`;
+      // Analyze new readings with Aquarist AI engine
+      const analysis = analyzeTankWaterParameters(activeTank);
+      if (analysis) {
+        activeTank.summary = analysis.aiAdvice;
       }
-      activeTank.summary = holisticSummary;
 
       window.editingWaterLogIdx = -1;
       saveDataToStorage();
@@ -3355,7 +3580,14 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
       renderTankWaterTab();
       renderTankOverviewTab();
       renderTankPlanTab();
-      showToast(editIdx >= 0 ? "Test Log Updated" : "Chemistry Logged & Analyzed");
+      renderDashboardTasks();
+      renderGlobalDashboard();
+
+      if (analysis) {
+        openTestAnalysisModal(activeTank, analysis);
+      } else {
+        showToast(editIdx >= 0 ? "Test Log Updated" : "Chemistry Logged & Analyzed");
+      }
     }
 
     function deleteWaterLog(idx) {
