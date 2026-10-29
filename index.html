@@ -1162,12 +1162,12 @@
           </div>
 
           <div class="chart-filter-bar" id="water-chart-filter-bar">
-            <button type="button" class="chart-pill-btn active" data-filter="no3" onclick="setChartFilter('no3', this)">NO₃</button>
+            <button type="button" class="chart-pill-btn active" data-filter="all" onclick="setChartFilter('all', this)">All</button>
+            <button type="button" class="chart-pill-btn" data-filter="no3" onclick="setChartFilter('no3', this)">NO₃</button>
             <button type="button" class="chart-pill-btn" data-filter="nh3" onclick="setChartFilter('nh3', this)">NH₃</button>
             <button type="button" class="chart-pill-btn" data-filter="no2" onclick="setChartFilter('no2', this)">NO₂</button>
             <button type="button" class="chart-pill-btn" data-filter="ph" onclick="setChartFilter('ph', this)">pH</button>
             <button type="button" class="chart-pill-btn" data-filter="temp" onclick="setChartFilter('temp', this)">Temp</button>
-            <button type="button" class="chart-pill-btn" data-filter="all" onclick="setChartFilter('all', this)">All</button>
           </div>
 
           <div class="chart-container">
@@ -2788,7 +2788,7 @@
     let currentGlobalView = "dashboard"; // dashboard, closet, global-ai
     let currentTankSubtab = "overview";
     let isInsideTank = false;
-    let currentChartFilter = "no3";
+    let currentChartFilter = "all";
     let chartFilterTankId = null;
     let activeVisionBase64 = null;
     let activeVisionDataUrl = null;
@@ -2953,7 +2953,7 @@
       if (!target) return;
       activeTankId = target.id;
       if (String(chartFilterTankId) !== String(target.id)) {
-        currentChartFilter = target.status === "Cycling" ? "nh3" : "no3";
+        currentChartFilter = "all";
         chartFilterTankId = target.id;
       }
       syncHeaderTankSwitcher();
@@ -2969,7 +2969,7 @@
       if (!tank) return;
 
       if (String(chartFilterTankId) !== String(tank.id)) {
-        currentChartFilter = tank.status === "Cycling" ? "nh3" : "no3";
+        currentChartFilter = "all";
         chartFilterTankId = tank.id;
       }
       if (initialTab) {
@@ -6526,7 +6526,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       const tank = getActiveTank();
       if (!tank) return;
       tank.status = "Established";
-      currentChartFilter = "no3";
+      currentChartFilter = "all";
       chartFilterTankId = tank.id;
       logTankTimelineEvent("Nitrogen cycle completed. Aquarium transitioned to Established status.");
       saveDataToStorage();
