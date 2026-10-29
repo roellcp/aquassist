@@ -431,6 +431,7 @@
       border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 11px; padding: 3px; gap: 3px;
     }
     .segmented-group.full { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+    .segmented-group.tri { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; }
     .segmented-group.quad { display: grid; grid-template-columns: repeat(4, 1fr); width: 100%; }
     .segmented-group.compact { padding: 2px; border-radius: 9px; gap: 2px; }
     .segmented-group.compact .segmented-btn { font-size: 11px; padding: 4px 10px; border-radius: 7px; }
@@ -510,6 +511,59 @@
       border-radius: 12px; padding: 8px 12px; font-size: 13px; display: flex; align-items: center; gap: 8px;
     }
     .delete-x { color: var(--alert-red); cursor: pointer; font-weight: 700; font-size: 16px; padding: 0 4px; }
+
+    /* Structured Supplies Inventory & Dosing Reference */
+    .supply-group {
+      padding: 14px 0 6px; border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .supply-group:first-child { padding-top: 4px; border-top: none; }
+    .supply-group-header {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px;
+      color: var(--cyan); margin-bottom: 6px;
+    }
+    .supply-row {
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+      padding: 11px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      transition: opacity 0.15s ease;
+    }
+    .supply-row:last-child { border-bottom: none; padding-bottom: 4px; }
+    .supply-row.out-of-stock { opacity: 0.56; }
+    .supply-name {
+      font-size: 13.5px; font-weight: 700; color: #F8FAFC; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 6px; line-height: 1.3;
+    }
+    .supply-name:hover { color: var(--cyan); }
+    .supply-dose {
+      font-size: 11.5px; color: var(--text-muted); margin-top: 3px; line-height: 1.4;
+    }
+    .supply-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+    .supply-tag {
+      font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 6px; letter-spacing: 0.1px;
+    }
+    .supply-tag.safe { background: rgba(0, 245, 160, 0.09); color: var(--neon-green); border: 1px solid rgba(0, 245, 160, 0.25); }
+    .supply-tag.caution { background: rgba(245, 158, 11, 0.11); color: var(--alert-yellow); border: 1px solid rgba(245, 158, 11, 0.3); }
+    .supply-tag.conflict { background: rgba(244, 63, 94, 0.12); color: var(--alert-red); border: 1px solid rgba(244, 63, 94, 0.35); }
+    .supply-tag.neutral { background: rgba(255, 255, 255, 0.04); color: var(--text-muted); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .stock-pill {
+      font-size: 10.5px; font-weight: 700; padding: 4px 9px; border-radius: 8px;
+      cursor: pointer; border: 1px solid transparent; white-space: nowrap; transition: all 0.15s ease;
+      background: transparent;
+    }
+    .stock-pill.in { background: rgba(0, 245, 160, 0.11); color: var(--neon-green); border-color: rgba(0, 245, 160, 0.3); }
+    .stock-pill.low { background: rgba(245, 158, 11, 0.13); color: var(--alert-yellow); border-color: rgba(245, 158, 11, 0.38); }
+    .stock-pill.out { background: rgba(244, 63, 94, 0.11); color: var(--alert-red); border-color: rgba(244, 63, 94, 0.32); }
+    .staples-drawer {
+      background: rgba(255, 255, 255, 0.025); border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 12px; padding: 11px 12px; margin-bottom: 12px; display: none;
+    }
+    .staple-chip {
+      background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-main); font-size: 11px; font-weight: 600; padding: 5px 10px;
+      border-radius: 8px; cursor: pointer; transition: all 0.15s ease;
+    }
+    .staple-chip:hover:not(.owned) { border-color: var(--cyan); color: #fff; background: rgba(56, 189, 248, 0.1); }
+    .staple-chip.owned { opacity: 0.5; border-color: rgba(0, 245, 160, 0.3); color: var(--neon-green); cursor: default; }
 
     /* Toast Notification */
     .toast {
@@ -677,20 +731,37 @@
     <!-- SCREEN 2: GLOBAL SUPPLY CLOSET -->
     <section id="screen-closet" class="view-screen">
       <div class="card">
-        <div class="card-header">
+        <div class="card-header" style="align-items:flex-start; margin-bottom:10px;">
           <div>
-            <div class="card-title">Household Supplies & Treatments</div>
-            <div style="font-size:11px; color:var(--cyan); margin-top:2px;">Shared inventory across all aquariums</div>
+            <div class="card-title">Household Supplies &amp; Treatments</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Synced with AI assessments, water changes &amp; care tasks</div>
+          </div>
+          <span id="closet-summary-badge" class="badge-cycling" style="font-size:10.5px; background:rgba(0,245,160,0.12); color:var(--neon-green); border-color:rgba(0,245,160,0.35); box-shadow:none;">0 In Stock</span>
+        </div>
+
+        <div class="input-row" style="margin-bottom:8px;">
+          <input type="text" id="global-closet-input" placeholder="Add product (e.g. Seachem Prime, Ich-X, Easy Green)" onkeydown="if(event.key==='Enter'){event.preventDefault();addGlobalSupplyItem();}">
+          <button class="btn" style="width:76px;" onclick="addGlobalSupplyItem()">Add</button>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+          <button type="button" id="closet-staples-btn" class="ghost-action-btn" style="font-size:11px; padding:4px 10px;" onclick="toggleSupplyStaplesDrawer()">+ Quick-Add Staples</button>
+          <div id="closet-dose-bar" style="display:flex; align-items:center; gap:6px;">
+            <span style="font-size:11px; color:var(--text-muted); font-weight:600; white-space:nowrap;">Dose for:</span>
+            <select id="closet-tank-select" style="width:auto; max-width:175px; padding:4px 9px; font-size:11.5px; border-radius:8px; background:rgba(255,255,255,0.04);" onchange="onClosetTankChange(this.value)"></select>
           </div>
         </div>
-        <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px; line-height:1.45;">
-          The AI assistant cross-references your shelf to provide exact, zero-guesswork dosage calculations using products you already own.
-        </p>
-        <div class="input-row">
-          <input type="text" id="global-closet-input" placeholder="e.g. Seachem Prime, API Master Test Kit, Fritz TurboStart">
-          <button class="btn" style="width:75px;" onclick="addGlobalSupplyItem()">Add</button>
+
+        <!-- Collapsible Quick-Add Common Staples Drawer -->
+        <div id="closet-staples-drawer" class="staples-drawer">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Tap to Add Common Aquarium Staples</span>
+            <span style="font-size:11px; color:var(--cyan); cursor:pointer; font-weight:600;" onclick="toggleSupplyStaplesDrawer(false)">Done</span>
+          </div>
+          <div id="closet-staples-grid" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
         </div>
-        <div id="global-closet-pills" class="pill-list"></div>
+
+        <div id="global-closet-list"></div>
       </div>
     </section>
 
@@ -1597,6 +1668,65 @@
     </div>
   </div>
 
+  <!-- ================= MODAL: EDIT SUPPLY ITEM ================= -->
+  <div class="modal-overlay" id="editSupplyModal">
+    <div class="modal-box">
+      <div class="card-header" style="margin-bottom:14px;">
+        <h3 style="font-size:17px; font-weight:700; margin:0;">Edit Supply Item</h3>
+        <button class="icon-btn" style="width:28px;height:28px;" onclick="closeModalById('editSupplyModal')">×</button>
+      </div>
+      <input type="hidden" id="edit-supply-idx">
+
+      <div style="margin-bottom:12px;">
+        <label>Product Name</label>
+        <input type="text" id="edit-supply-name" placeholder="e.g. Seachem Prime, Aquarium Co-Op Easy Green">
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <label>Category</label>
+        <select id="edit-supply-cat">
+          <option value="conditioner">Conditioners &amp; Water Chemistry</option>
+          <option value="bacteria">Bacteria &amp; Cycling</option>
+          <option value="medication">Medications &amp; Treatments</option>
+          <option value="fertilizer">Plant Fertilizers &amp; Nutrition</option>
+          <option value="testing">Test Kits, Food &amp; Spare Media</option>
+        </select>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <label>Stock Status</label>
+        <input type="hidden" id="edit-supply-stock" value="in">
+        <div class="segmented-group tri" id="edit-supply-stock-group">
+          <button type="button" class="segmented-btn active-green" data-stock="in" onclick="selectEditSupplyStock('in')">
+            <span class="segmented-dot"></span>In Stock
+          </button>
+          <button type="button" class="segmented-btn" data-stock="low" onclick="selectEditSupplyStock('low')">
+            <span class="segmented-dot"></span>Running Low
+          </button>
+          <button type="button" class="segmented-btn" data-stock="out" onclick="selectEditSupplyStock('out')">
+            <span class="segmented-dot"></span>Out of Stock
+          </button>
+        </div>
+        <div style="font-size:11px; color:var(--text-muted); margin-top:6px; line-height:1.35;">
+          Out-of-stock items remain on your restock list and won't be prescribed by Aquarist AI.
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label>Custom Dosing / Notes <span style="font-weight:400; opacity:0.7;">(Optional)</span></label>
+        <input type="text" id="edit-supply-notes" placeholder="e.g. 1 capful per 20 Gal, quarantine tank only">
+      </div>
+
+      <div style="display:flex; gap:10px; margin-bottom:12px;">
+        <button class="btn btn-secondary" onclick="closeModalById('editSupplyModal')">Cancel</button>
+        <button class="btn btn-neon" onclick="saveEditedSupplyItem()">Save Changes</button>
+      </div>
+      <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:10px; display:flex; justify-content:flex-end;">
+        <button class="btn btn-danger" style="width:auto; font-size:11px; padding:6px 12px;" onclick="deleteSupplyFromModal()">Remove Item</button>
+      </div>
+    </div>
+  </div>
+
   <!-- IndexedDB & App Script -->
   <script>
     /* ============================================================
@@ -1708,8 +1838,463 @@
       return arr.sort((a, b) => parseRecordTimestamp(a && a.date) - parseRecordTimestamp(b && b.date));
     }
 
+    /* ============================================================
+       1B. SMART HOUSEHOLD SUPPLIES CATALOG & DOSING ENGINE
+       ============================================================ */
+    const SUPPLY_CATEGORIES = [
+      { key: "conditioner", label: "Conditioners & Water Chemistry" },
+      { key: "bacteria", label: "Bacteria & Cycling" },
+      { key: "medication", label: "Medications & Treatments" },
+      { key: "fertilizer", label: "Plant Fertilizers & Nutrition" },
+      { key: "testing", label: "Test Kits, Food & Spare Media" }
+    ];
+
+    const COMMON_SUPPLY_STAPLES = [
+      "Seachem Prime",
+      "Fritz Complete",
+      "API Stress Coat",
+      "SaltyShrimp GH/KH+",
+      "Fritz TurboStart 700",
+      "Seachem Stability",
+      "DrTim's Ammonium Chloride",
+      "Ich-X",
+      "Seachem Kanaplex",
+      "Hikari PraziPro",
+      "Aquarium Salt",
+      "Aquarium Co-Op Easy Green",
+      "Seachem Flourish",
+      "Root Tabs",
+      "API Freshwater Master Test Kit",
+      "Seachem Purigen"
+    ];
+
+    const SUPPLY_CATALOG = [
+      {
+        key: "prime",
+        keywords: ["seachem prime", "prime"],
+        cat: "conditioner",
+        subType: "dechlorinator",
+        detoxCapable: true,
+        mlPerGal: 0.1,
+        safety: { label: "Invert & Plant Safe", tone: "safe" },
+        conflicts: [],
+        tankDoseFn: (gal, u) => {
+          const fullMl = Math.max(0.2, Math.round(gal * 0.1 * 10) / 10);
+          const wcMl = Math.max(0.1, Math.round(gal * 0.25 * 0.1 * 10) / 10);
+          return `25% WC: ${wcMl} ml • Full-tank detox: ${fullMl} ml (${u.vol === "L" ? "1 ml per 38 L" : "0.1 ml/gal / 2 drops/gal"})`;
+        }
+      },
+      {
+        key: "safe",
+        keywords: ["seachem safe"],
+        cat: "conditioner",
+        subType: "dechlorinator",
+        detoxCapable: true,
+        mgPerGal: 4,
+        safety: { label: "Invert & Plant Safe", tone: "safe" },
+        conflicts: [],
+        tankDoseFn: (gal) => {
+          const fullMg = Math.max(10, Math.round(gal * 4));
+          const wcMg = Math.max(5, Math.round(gal * 0.25 * 4));
+          return `25% WC: ~${wcMg} mg • Full-tank detox: ~${fullMg} mg (200 mg per 50 Gal)`;
+        }
+      },
+      {
+        key: "fritz_complete",
+        keywords: ["fritz complete"],
+        cat: "conditioner",
+        subType: "dechlorinator",
+        detoxCapable: true,
+        mlPerGal: 0.1,
+        safety: { label: "Invert & Plant Safe", tone: "safe" },
+        conflicts: [],
+        tankDoseFn: (gal, u) => {
+          const fullMl = Math.max(0.2, Math.round(gal * 0.1 * 10) / 10);
+          const wcMl = Math.max(0.1, Math.round(gal * 0.25 * 0.1 * 10) / 10);
+          return `25% WC: ${wcMl} ml • Full-tank detox: ${fullMl} ml (${u.vol === "L" ? "1 ml per 38 L" : "1 ml per 10 Gal"})`;
+        }
+      },
+      {
+        key: "stress_coat",
+        keywords: ["stress coat"],
+        cat: "conditioner",
+        subType: "dechlorinator",
+        detoxCapable: false,
+        mlPerGal: 0.5,
+        safety: { label: "Invert & Plant Safe", tone: "safe" },
+        conflicts: [],
+        tankDoseFn: (gal, u) => {
+          const wcMl = Math.max(0.5, Math.round(gal * 0.25 * 0.5 * 10) / 10);
+          const fullMl = Math.max(1, Math.round(gal * 0.5 * 10) / 10);
+          return `25% WC: ${wcMl} ml • Full tank: ${fullMl} ml (${u.vol === "L" ? "5 ml per 38 L" : "5 ml per 10 Gal"})`;
+        }
+      },
+      {
+        key: "aquasafe",
+        keywords: ["aquasafe", "aqua safe"],
+        cat: "conditioner",
+        subType: "dechlorinator",
+        detoxCapable: false,
+        mlPerGal: 0.5,
+        safety: { label: "Invert & Plant Safe", tone: "safe" },
+        conflicts: [],
+        tankDoseFn: (gal, u) => {
+          const wcMl = Math.max(0.5, Math.round(gal * 0.25 * 0.5 * 10) / 10);
+          return `25% WC: ${wcMl} ml (${u.vol === "L" ? "5 ml per 38 L" : "5 ml per 10 Gal"})`;
+        }
+      },
+      {
+        key: "amguard",
+        keywords: ["amguard", "ammo-lock", "ammo lock", "amquel"],
+        cat: "conditioner",
+        subType: "detox",
+        detoxCapable: true,
+        mlPerGal: 0.1,
+        safety: { label: "Emergency NH₃ Binder", tone: "safe" },
+        conflicts: [],
+        tankDoseFn: (gal) => {
+          const fullMl = Math.max(0.5, Math.round(gal * 0.1 * 10) / 10);
+          return `Emergency NH₃ detox: ${fullMl} ml across full tank (binds toxins up to 48h)`;
+        }
+      },
+      {
+        key: "remineralizer",
+        keywords: ["saltyshrimp", "salty shrimp", "equilibrium", "alkaline buffer", "acid buffer", "neutral regulator", "crushed coral", "wonder shell", "gh+", "kh+"],
+        cat: "conditioner",
+        subType: "buffer",
+        detoxCapable: false,
+        safety: { label: "Dose Replacement Water Only", tone: "neutral" },
+        conflicts: [],
+        tankDoseFn: (gal, u) => {
+          const wcVol = displayVol(gal * 0.25);
+          return `Match GH/KH in ${wcVol} ${u.vol} replacement water prior to adding to tank`;
+        }
+      },
+      {
+        key: "turbostart",
+        keywords: ["turbostart", "turbo start"],
+        cat: "bacteria",
+        subType: "bacteria",
+        mlPerGal: 1.2,
+        boosterMlPerGal: 0.5,
+        safety: { label: "Live Nitrifying Bacteria (Refrigerate)", tone: "safe" },
+        conflicts: [],
+        tankDoseFn: (gal) => {
+          const initMl = Math.max(5, Math.round(gal * 1.2));
+          const boostMl = Math.max(3, Math.round(gal * 0.5));
+          return `New cycle: ${initMl} ml (1 oz / 25 Gal) • Spike booster: ${boostMl} ml`;
+        }
+      },
+      {
+        key: "fritzzyme",
+        keywords: ["fritzzyme", "fritz zyme"],
+        cat: "bacteria",
+        subType: "bacteria",
+        mlPerGal: 11.8,
+        boosterMlPerGal: 5.0,
+        safety: { label: "Live Nitrifying Bacteria", tone: "safe" },
+        conflicts: [],
+        tankDoseFn: (gal) => {
+          const initMl = Math.max(15, Math.round(gal * 11.8));
+          const boostMl = Math.max(10, Math.round(gal * 5));
+          return `New cycle: ${initMl} ml • Maintenance booster: ${boostMl} ml`;
+        }
+      },
+      {
+        key: "stability",
+        keywords: ["stability"],
+        cat: "bacteria",
+        subType: "bacteria",
+        mlPerGal: 0.5,
+        boosterMlPerGal: 0.25,
+        safety: { label: "Invert & Plant Safe", tone: "safe" },
+        conflicts: [],
+        tankDoseFn: (gal) => {
+          const d1 = Math.max(2, Math.round(gal * 0.5 * 10) / 10);
+          const dNext = Math.max(1, Math.round(gal * 0.25 * 10) / 10);
+          return `Day 1: ${d1} ml • Days 2–7 or WC booster: ${dNext} ml`;
+        }
+      },
+      {
+        key: "quickstart",
+        keywords: ["quick start", "quickstart", "safestart", "safe start"],
+        cat: "bacteria",
+        subType: "bacteria",
+        mlPerGal: 1.0,
+        boosterMlPerGal: 1.0,
+        safety: { label: "Invert & Plant Safe", tone: "safe" },
+        conflicts: [],
+        tankDoseFn: (gal) => {
+          const ml = Math.max(2, Math.round(gal * 1.0));
+          return `Cycle or toxin booster: ${ml} ml (10 ml per 10 Gal)`;
+        }
+      },
+      {
+        key: "liquid_ammonia",
+        keywords: ["drtim", "dr tim", "ammonium chloride", "liquid ammonia"],
+        cat: "bacteria",
+        subType: "ammonia",
+        safety: { label: "Fishless Cycling Only", tone: "caution" },
+        conflicts: ["livestock"],
+        tankDoseFn: (gal) => {
+          const drops = Math.max(4, Math.round(gal * 4));
+          return `Fishless target (2 ppm NH₃): ${drops} drops (4 drops/Gal)`;
+        }
+      },
+      {
+        key: "ich_x",
+        keywords: ["ich-x", "ich x", "ichx"],
+        cat: "medication",
+        subType: "med",
+        treats: ["ich", "velvet", "fungus"],
+        safety: { label: "Invert, Snail & Plant Safe", tone: "safe" },
+        conflicts: [],
+        tankDoseFn: (gal) => {
+          const ml = Math.max(1, Math.round(gal * 0.5 * 10) / 10);
+          return `Dose ${ml} ml (5 ml per 10 Gal) after 30% water change`;
+        }
+      },
+      {
+        key: "kanaplex",
+        keywords: ["kanaplex"],
+        cat: "medication",
+        subType: "med",
+        treats: ["fin", "dropsy", "bacterial"],
+        safety: { label: "Caution: Shrimp, Snails & Delicate Plants", tone: "caution" },
+        conflicts: ["inverts", "plants"],
+        tankDoseFn: (gal) => {
+          const scoops = Math.max(0.5, Math.round((gal / 5) * 2) / 2);
+          return `Dose ${scoops} level measure(s) every 48h (max 3 doses; remove carbon)`;
+        }
+      },
+      {
+        key: "paraguard",
+        keywords: ["paraguard"],
+        cat: "medication",
+        subType: "med",
+        treats: ["ich", "fin", "fungus"],
+        safety: { label: "Caution: Snails & Shrimp", tone: "caution" },
+        conflicts: ["inverts"],
+        tankDoseFn: (gal) => {
+          const ml = Math.max(1, Math.round(gal * 0.5 * 10) / 10);
+          return `Dose ${ml} ml daily (5 ml per 10 Gal; remove chemical media)`;
+        }
+      },
+      {
+        key: "prazipro",
+        keywords: ["prazipro", "prazi pro"],
+        cat: "medication",
+        subType: "med",
+        treats: ["parasite", "gill", "internal"],
+        safety: { label: "Invert, Plant & Bio-Filter Safe", tone: "safe" },
+        conflicts: [],
+        tankDoseFn: (gal) => {
+          const ml = Math.max(0.5, Math.round(gal * 0.25 * 10) / 10);
+          return `Dose ${ml} ml (5 ml per 20 Gal) single 5–7 day course; increase aeration`;
+        }
+      },
+      {
+        key: "maracyn",
+        keywords: ["maracyn", "erythromycin", "fin & body", "fin and body"],
+        cat: "medication",
+        subType: "med",
+        treats: ["fin", "bacterial"],
+        safety: { label: "Invert & Plant Safe (Monitor NH₃)", tone: "safe" },
+        conflicts: [],
+        tankDoseFn: (gal) => {
+          const pkts = Math.max(0.5, Math.round((gal / 10) * 2) / 2);
+          return `Dose ${pkts} packet(s) daily for 5 days (1 packet per 10 Gal)`;
+        }
+      },
+      {
+        key: "general_cure",
+        keywords: ["general cure", "paracleanse"],
+        cat: "medication",
+        subType: "med",
+        treats: ["parasite", "velvet", "internal"],
+        safety: { label: "Invert & Plant Safe", tone: "safe" },
+        conflicts: [],
+        tankDoseFn: (gal) => {
+          const pkts = Math.max(0.5, Math.round((gal / 10) * 2) / 2);
+          return `Dose ${pkts} packet(s), repeat once after 48h, then 25% WC on Day 5`;
+        }
+      },
+      {
+        key: "aquarium_salt",
+        keywords: ["aquarium salt"],
+        cat: "medication",
+        subType: "med",
+        treats: ["ich", "fin", "gill", "nitrite"],
+        safety: { label: "Caution: Live Plants, Snails & Scaleless Fish", tone: "caution" },
+        conflicts: ["plants", "inverts", "scaleless"],
+        tankDoseFn: (gal) => {
+          const tbsp = Math.max(0.5, Math.round((gal / 5) * 2) / 2);
+          return `Mild tonic: ${tbsp} tbsp pre-dissolved (1 tbsp / 5 Gal) — use hospital bath if planted`;
+        }
+      },
+      {
+        key: "easy_green",
+        keywords: ["easy green"],
+        cat: "fertilizer",
+        subType: "liquid_fert",
+        mlPerGal: 0.1,
+        pumpsPer10Gal: 1,
+        safety: { label: "Shrimp & Snail Safe", tone: "safe" },
+        conflicts: [],
+        tankDoseFn: (gal) => {
+          const ml = Math.max(0.2, Math.round(gal * 0.1 * 10) / 10);
+          return `Weekly: ${ml} pump${ml === 1 ? "" : "s"} / ${ml} ml (1 pump per 10 Gal; target NO₃ 20 ppm)`;
+        }
+      },
+      {
+        key: "thrive",
+        keywords: ["thrive"],
+        cat: "fertilizer",
+        subType: "liquid_fert",
+        mlPerGal: 0.2,
+        pumpsPer10Gal: 1,
+        safety: { label: "Invert Safe", tone: "safe" },
+        conflicts: [],
+        tankDoseFn: (gal) => {
+          const pumps = Math.max(0.5, Math.round((gal / 10) * 10) / 10);
+          const ml = Math.max(0.5, Math.round(gal * 0.2 * 10) / 10);
+          return `1–2x weekly: ${pumps} pump${pumps === 1 ? "" : "s"} (${ml} ml)`;
+        }
+      },
+      {
+        key: "flourish_excel",
+        keywords: ["flourish excel", "easy carbon", "liquid carbon"],
+        cat: "fertilizer",
+        subType: "liquid_carbon",
+        mlPerGal: 0.1,
+        safety: { label: "Caution: Vallisneria, Moss & Sensitive Shrimp", tone: "caution" },
+        conflicts: ["shrimp"],
+        tankDoseFn: (gal) => {
+          const ml = Math.max(0.2, Math.round(gal * 0.1 * 10) / 10);
+          return `Daily bio-carbon: ${ml} ml (5 ml per 50 Gal; do not overdose)`;
+        }
+      },
+      {
+        key: "root_tabs",
+        keywords: ["root tab", "flourish tab"],
+        cat: "fertilizer",
+        subType: "root_tab",
+        safety: { label: "Invert & Substrate Safe", tone: "safe" },
+        conflicts: [],
+        tankDoseFn: () => `Push 1 capsule deep into substrate every 4–6 in under Swords/Crypts every 6 weeks`
+      },
+      {
+        key: "flourish",
+        keywords: ["seachem flourish", "flourish"],
+        cat: "fertilizer",
+        subType: "liquid_fert",
+        mlPerGal: 0.083,
+        safety: { label: "Invert Safe Micronutrients", tone: "safe" },
+        conflicts: [],
+        tankDoseFn: (gal) => {
+          const ml = Math.max(0.2, Math.round(gal * 0.083 * 10) / 10);
+          return `1–2x weekly: ${ml} ml (5 ml per 60 Gal)`;
+        }
+      },
+      {
+        key: "master_test_kit",
+        keywords: ["master test", "liquid test", "api freshwater", "api test"],
+        cat: "testing",
+        subType: "test_kit",
+        isLiquidKit: true,
+        safety: { label: "High-Precision Liquid Reagents", tone: "safe" },
+        conflicts: [],
+        tankDoseFn: () => `5 ml tank water per tube • Shake Nitrate Bottle #2 vigorously for 30s`
+      },
+      {
+        key: "test_strips",
+        keywords: ["test strip", "multi-test"],
+        cat: "testing",
+        subType: "test_kit",
+        isLiquidKit: false,
+        safety: { label: "Quick Screening Strips", tone: "neutral" },
+        conflicts: [],
+        tankDoseFn: () => `Rapid dip check — verify unexpected spikes with liquid drop reagents`
+      },
+      {
+        key: "purigen",
+        keywords: ["purigen"],
+        cat: "testing",
+        subType: "media",
+        safety: { label: "Remove Before Medicating", tone: "caution" },
+        conflicts: [],
+        tankDoseFn: () => `100 ml bag polishes up to 100 Gal for ~60 days (regenerable)`
+      }
+    ];
+
+    function matchSupplyCatalog(nameStr) {
+      if (!nameStr || typeof nameStr !== "string") return null;
+      const lower = nameStr.toLowerCase().trim();
+      for (const entry of SUPPLY_CATALOG) {
+        if (entry.keywords.some(kw => lower.includes(kw))) {
+          return entry;
+        }
+      }
+      return null;
+    }
+
+    function inferSupplyCategory(nameStr) {
+      const catMatch = matchSupplyCatalog(nameStr);
+      if (catMatch) return catMatch.cat;
+      const lower = (nameStr || "").toLowerCase();
+      if (/(dechlor|conditioner|chlorine|chloramine|buffer|gh|kh|remineral|ph up|ph down|coral|ammonia detox)/.test(lower)) return "conditioner";
+      if (/(bacteria|zyme|cycle|starter|nitrif|ammonia|bio-spira|biospira)/.test(lower)) return "bacteria";
+      if (/(ich|salt|cure|med|fungus|parasite|antibiotic|methylene|malachite|acriflavine|levamisole|flubendazole|metroplex|focus|polyguard|melafix|pimafix)/.test(lower)) return "medication";
+      if (/(fert|plant|iron|potassium|nitrogen|phosphorus|trace|leaf zone|macro|micro|tab)/.test(lower)) return "fertilizer";
+      return "testing";
+    }
+
+    function normalizeSupplyItem(raw, idx = 0) {
+      if (!raw) return null;
+      if (typeof raw === "string") {
+        const cleanName = raw.trim();
+        if (!cleanName) return null;
+        return {
+          id: Date.now() + idx,
+          name: cleanName,
+          cat: inferSupplyCategory(cleanName),
+          stock: "in",
+          notes: ""
+        };
+      }
+      if (typeof raw === "object" && raw.name) {
+        const cleanName = String(raw.name).trim();
+        if (!cleanName) return null;
+        const validCats = SUPPLY_CATEGORIES.map(c => c.key);
+        const validStocks = ["in", "low", "out"];
+        return {
+          id: raw.id || (Date.now() + idx),
+          name: cleanName,
+          cat: validCats.includes(raw.cat) ? raw.cat : inferSupplyCategory(cleanName),
+          stock: validStocks.includes(raw.stock) ? raw.stock : "in",
+          notes: raw.notes ? String(raw.notes).trim() : ""
+        };
+      }
+      return null;
+    }
+
+    function ensureClosetNormalized(stateObj = appState) {
+      if (!stateObj) return [];
+      if (!Array.isArray(stateObj.closet)) {
+        stateObj.closet = [];
+        return stateObj.closet;
+      }
+      const needsNorm = stateObj.closet.some(item => !item || typeof item === "string" || !item.cat || !item.stock);
+      if (needsNorm) {
+        stateObj.closet = stateObj.closet.map((item, idx) => normalizeSupplyItem(item, idx)).filter(Boolean);
+      }
+      return stateObj.closet;
+    }
+
     function normalizeAppStateChronology(state) {
-      if (!state || !Array.isArray(state.tanks)) return state;
+      if (!state) return state;
+      ensureClosetNormalized(state);
+      if (!Array.isArray(state.tanks)) return state;
       state.tanks.forEach(tank => {
         if (Array.isArray(tank.timeline)) sortRecordsByDateDesc(tank.timeline);
         if (Array.isArray(tank.history)) {
@@ -1816,8 +2401,9 @@
       ]
     };
 
-    let appState = defaultState;
+    let appState = normalizeAppStateChronology(JSON.parse(JSON.stringify(defaultState)));
     let activeTankId = 1;
+    let closetSelectedTankId = 0;
     let currentGlobalView = "dashboard"; // dashboard, closet, global-ai
     let currentTankSubtab = "overview";
     let isInsideTank = false;
@@ -2115,6 +2701,8 @@
       appState.units = val;
       updateDynamicUnitLabels();
       if (isInsideTank) renderTankHub();
+      else if (currentGlobalView === "closet") renderGlobalClosetScreen();
+      else if (currentGlobalView === "global-ai") renderGlobalAIScreen();
       else renderGlobalDashboard();
       saveDataToStorage();
     }
@@ -2442,6 +3030,303 @@
     /* ============================================================
        3. ADAPTIVE AQUARIST AI ENGINE & TASK SCHEDULER
        ============================================================ */
+    function getAvailableSupplies() {
+      return ensureClosetNormalized().filter(item => item.stock !== "out");
+    }
+
+    function getOutOfStockSupplies() {
+      return ensureClosetNormalized().filter(item => item.stock === "out");
+    }
+
+    function detectTankSupplyConflicts(tank, catalogEntry) {
+      if (!tank || !catalogEntry || !Array.isArray(catalogEntry.conflicts) || catalogEntry.conflicts.length === 0) {
+        return null;
+      }
+      const reasons = [];
+      const hasPlants = Array.isArray(tank.plants) && tank.plants.length > 0;
+      const liveText = (tank.livestock || []).join(" ").toLowerCase();
+      const hasSnailsOrShrimp = /(snail|nerite|mystery|ramshorn|malaysian|shrimp|amano|cherry|neocaridina|caridina|crayfish)/.test(liveText);
+      const hasShrimp = /(shrimp|amano|cherry|neocaridina|caridina)/.test(liveText);
+      const hasScaleless = /(oto|otocinclus|cory|corydoras|loach|kuhli|pleco|catfish|pictus|synodontis|elephant|knifefish)/.test(liveText);
+
+      if (catalogEntry.conflicts.includes("livestock") && (tank.livestock || []).length > 0) {
+        return `Do not dose in ${tank.name}: contains live fauna (fishless cycling only)`;
+      }
+      if (catalogEntry.conflicts.includes("plants") && hasPlants) reasons.push("live plants");
+      if (catalogEntry.conflicts.includes("inverts") && hasSnailsOrShrimp) reasons.push("snails/shrimp");
+      else if (catalogEntry.conflicts.includes("shrimp") && hasShrimp) reasons.push("shrimp");
+      if (catalogEntry.conflicts.includes("scaleless") && hasScaleless) reasons.push("scaleless fish");
+
+      if (reasons.length > 0) {
+        return `Caution in ${tank.name}: contains ${reasons.join(" & ")}`;
+      }
+      return null;
+    }
+
+    function describeSupplyForTank(item, tank) {
+      const u = getUnitLabels();
+      const gal = tank && tank.vol > 0 ? tank.vol : 20;
+      const catEntry = matchSupplyCatalog(item.name);
+
+      let doseText = "";
+      if (item.notes && item.notes.trim()) {
+        doseText = item.notes.trim();
+      } else if (catEntry && typeof catEntry.tankDoseFn === "function") {
+        doseText = catEntry.tankDoseFn(gal, u);
+      } else {
+        const disp = displayVol(gal);
+        if (item.cat === "conditioner") doseText = `Follow bottle directions for ${displayVol(gal * 0.25)} ${u.vol} (25% WC) or ${disp} ${u.vol} full tank`;
+        else if (item.cat === "bacteria") doseText = `Follow starter/booster directions for ${disp} ${u.vol} water volume`;
+        else if (item.cat === "medication") doseText = `Check label dosing for ${disp} ${u.vol}; remove carbon/Purigen prior to treatment`;
+        else if (item.cat === "fertilizer") doseText = `Follow weekly plant dosing directions for ${disp} ${u.vol}`;
+        else doseText = `Shared household supply / maintenance item`;
+      }
+
+      const safetyTag = catEntry ? catEntry.safety : null;
+      const conflictText = (tank && catEntry) ? detectTankSupplyConflicts(tank, catEntry) : null;
+      return { doseText, safetyTag, conflictText, catEntry };
+    }
+
+    function findBestConditioner(galToTreat, isEmergencyFullTank = false, fullTankGal = galToTreat) {
+      const all = ensureClosetNormalized();
+      const avail = all.filter(i => i.stock !== "out");
+      const out = all.filter(i => i.stock === "out");
+      const u = getUnitLabels();
+      const targetGal = isEmergencyFullTank ? fullTankGal : Math.max(0.5, galToTreat);
+      const targetDisp = displayVol(targetGal);
+
+      // Prefer known dechlorinators (detoxCapable prioritized during emergencies)
+      const candidates = avail
+        .map(item => ({ item, meta: matchSupplyCatalog(item.name) }))
+        .filter(x => (x.meta && (x.meta.subType === "dechlorinator" || (isEmergencyFullTank && x.meta.subType === "detox"))) || (!x.meta && x.item.cat === "conditioner"));
+
+      if (isEmergencyFullTank) {
+        candidates.sort((a, b) => ((b.meta?.detoxCapable ? 1 : 0) - (a.meta?.detoxCapable ? 1 : 0)));
+      }
+
+      if (candidates.length > 0) {
+        const chosen = candidates[0];
+        const lowNote = chosen.item.stock === "low" ? " (Running Low)" : "";
+        if (chosen.item.notes) {
+          return {
+            found: true,
+            name: chosen.item.name,
+            shortDose: `${chosen.item.name} (${chosen.item.notes})`,
+            doseText: `Dose ${chosen.item.name}${lowNote}: ${chosen.item.notes}`
+          };
+        }
+        if (chosen.meta) {
+          if (chosen.meta.mgPerGal) {
+            const mg = Math.max(5, Math.round(targetGal * chosen.meta.mgPerGal));
+            const scope = isEmergencyFullTank ? "across full tank to bind toxins" : "for replacement water";
+            return {
+              found: true,
+              name: chosen.item.name,
+              shortDose: `${chosen.item.name} ~${mg} mg`,
+              doseText: `Dose ~${mg} mg ${chosen.item.name}${lowNote} ${scope}`
+            };
+          }
+          if (chosen.meta.mlPerGal) {
+            const ml = Math.max(0.1, Math.round(targetGal * chosen.meta.mlPerGal * 10) / 10);
+            const scope = isEmergencyFullTank
+              ? `across full ${displayVol(fullTankGal)} ${u.vol} tank to detoxify NH₃/NO₂`
+              : `for ${targetDisp} ${u.vol} new water`;
+            const dropHint = chosen.meta.key === "prime" ? ` (~${Math.max(2, Math.round(targetGal * 2))} drops)` : "";
+            return {
+              found: true,
+              name: chosen.item.name,
+              shortDose: `${chosen.item.name} ${ml} ml${dropHint}`,
+              doseText: `Dose ${ml} ml${dropHint} ${chosen.item.name}${lowNote} ${scope}`
+            };
+          }
+        }
+        return {
+          found: true,
+          name: chosen.item.name,
+          shortDose: `${chosen.item.name} (${targetDisp} ${u.vol} dose)`,
+          doseText: `Dose ${chosen.item.name}${lowNote} for ${targetDisp} ${u.vol} ${isEmergencyFullTank ? "full tank" : "new water"}`
+        };
+      }
+
+      const outCond = out.find(i => {
+        const m = matchSupplyCatalog(i.name);
+        return (m && m.subType === "dechlorinator") || i.cat === "conditioner";
+      });
+
+      return {
+        found: false,
+        outOfStockName: outCond ? outCond.name : null,
+        name: null,
+        shortDose: outCond ? `Standard dechlorinator (${outCond.name} is Out of Stock)` : `Standard dechlorinator (${targetDisp} ${u.vol})`,
+        doseText: outCond
+          ? `Restock ${outCond.name} (marked Out of Stock) • Dose dechlorinator for ${targetDisp} ${u.vol}`
+          : `Dose dechlorinator for ${targetDisp} ${u.vol} ${isEmergencyFullTank ? "tank volume" : "new water"}`
+      };
+    }
+
+    function findBestBacteria(tankGal, isInitialCycle = false) {
+      const avail = getAvailableSupplies();
+      for (const item of avail) {
+        const meta = matchSupplyCatalog(item.name);
+        if ((meta && meta.subType === "bacteria") || (!meta && item.cat === "bacteria" && !/ammonia/i.test(item.name))) {
+          const lowNote = item.stock === "low" ? " (Running Low)" : "";
+          if (item.notes) {
+            return { found: true, name: item.name, doseText: `Dose ${item.name}${lowNote} (${item.notes})` };
+          }
+          if (meta) {
+            const rate = isInitialCycle ? (meta.mlPerGal || 1) : (meta.boosterMlPerGal || meta.mlPerGal || 0.5);
+            const ml = Math.max(1, Math.round(tankGal * rate * 10) / 10);
+            return { found: true, name: item.name, doseText: `Add ${ml} ml ${item.name}${lowNote}` };
+          }
+          return { found: true, name: item.name, doseText: `Add booster dose of ${item.name}${lowNote}` };
+        }
+      }
+      return { found: false, name: null, doseText: "" };
+    }
+
+    function findBestAmmoniaSource(tankGal) {
+      const avail = getAvailableSupplies();
+      for (const item of avail) {
+        const meta = matchSupplyCatalog(item.name);
+        if ((meta && meta.subType === "ammonia") || /ammonium|liquid ammonia|dr\s*tim/i.test(item.name)) {
+          const drops = Math.max(4, Math.round(tankGal * 4));
+          return { found: true, name: item.name, doseText: `${drops} drops ${item.name} (targets ~2 ppm NH₃)` };
+        }
+      }
+      return { found: false, name: null, doseText: "" };
+    }
+
+    function findBestLiquidFertilizer(tankGal) {
+      const avail = getAvailableSupplies();
+      for (const item of avail) {
+        const meta = matchSupplyCatalog(item.name);
+        if (meta && (meta.subType === "root_tab" || meta.subType === "liquid_carbon")) continue;
+        if ((meta && meta.subType === "liquid_fert") || (!meta && item.cat === "fertilizer" && !/tab/i.test(item.name))) {
+          const lowNote = item.stock === "low" ? " (Low)" : "";
+          if (item.notes) {
+            return { found: true, name: item.name, shortDose: `${item.name} (${item.notes})`, doseText: `Dose ${item.name}${lowNote}: ${item.notes}` };
+          }
+          if (meta && meta.mlPerGal) {
+            const ml = Math.max(0.2, Math.round(tankGal * meta.mlPerGal * 10) / 10);
+            const pumpStr = meta.pumpsPer10Gal ? `${Math.max(0.5, Math.round((tankGal / 10) * 10) / 10)} pump(s) / ` : "";
+            return {
+              found: true,
+              name: item.name,
+              shortDose: `${pumpStr}${ml} ml ${item.name}${lowNote}`,
+              doseText: `Fertilize plants with ${pumpStr}${ml} ml ${item.name}${lowNote}`
+            };
+          }
+          return { found: true, name: item.name, shortDose: `${item.name}${lowNote}`, doseText: `Dose ${item.name}${lowNote} for live plants` };
+        }
+      }
+      return { found: false, name: null, shortDose: "", doseText: "" };
+    }
+
+    function findMatchingSpareMedia(mediaName) {
+      if (!mediaName) return null;
+      const lowerMedia = mediaName.toLowerCase();
+      const all = ensureClosetNormalized();
+      for (const item of all) {
+        const itemLower = item.name.toLowerCase();
+        if (
+          (lowerMedia.includes("purigen") && itemLower.includes("purigen")) ||
+          (lowerMedia.includes("carbon") && itemLower.includes("carbon")) ||
+          (lowerMedia.includes("cartridge") && itemLower.includes("cartridge")) ||
+          (lowerMedia.includes("floss") && itemLower.includes("floss")) ||
+          (lowerMedia.includes("sponge") && itemLower.includes("sponge")) ||
+          itemLower === lowerMedia
+        ) {
+          return item;
+        }
+      }
+      return null;
+    }
+
+    function auditHealthEventSupplies(tank, symptomsStr) {
+      if (!tank || !symptomsStr || /no visible symptoms|natural/i.test(symptomsStr)) return "";
+      const notes = [];
+      const tested = hasTankBeenTested(tank);
+      if (tested && tank.lastTest) {
+        const nh3 = parseFloat(tank.lastTest.nh3) || 0;
+        const no2 = parseFloat(tank.lastTest.no2) || 0;
+        const no3 = parseFloat(tank.lastTest.no3) || 0;
+        if (nh3 > 0 || no2 > 0) {
+          notes.push(`Water alert: NH₃ ${nh3} / NO₂ ${no2} ppm detected — perform detox water change before medicating`);
+        } else if (no3 > 40) {
+          notes.push(`Elevated NO₃ (${no3} ppm) may contribute to immune stress`);
+        }
+      } else {
+        notes.push(`Test NH₃ and NO₂ immediately to rule out toxin stress`);
+      }
+
+      const symLower = symptomsStr.toLowerCase();
+      let targetTrait = "general";
+      if (/(white spot|ich|velvet|flashing)/.test(symLower)) targetTrait = "ich";
+      else if (/(fin|rot|fray|fungus|cotton)/.test(symLower)) targetTrait = "fin";
+      else if (/(bloat|dropsy|pinecone|swollen)/.test(symLower)) targetTrait = "dropsy";
+      else if (/(gasp|gill|letharg|parasite|stringy|wasting)/.test(symLower)) targetTrait = "gill";
+
+      const availMeds = getAvailableSupplies().filter(i => i.cat === "medication");
+      const matched = [];
+      availMeds.forEach(item => {
+        const meta = matchSupplyCatalog(item.name);
+        if (meta && Array.isArray(meta.treats) && (meta.treats.includes(targetTrait) || targetTrait === "general")) {
+          const conflict = detectTankSupplyConflicts(tank, meta);
+          const desc = describeSupplyForTank(item, tank);
+          matched.push(conflict ? `${item.name} (${conflict} — use hospital bath)` : `${item.name} (${desc.doseText})`);
+        } else if (!meta && targetTrait === "general") {
+          matched.push(item.name);
+        }
+      });
+
+      if (matched.length > 0) {
+        notes.push(`On-hand shelf match: ${matched.join("; ")}`);
+      } else if (!/(aggress|nip)/i.test(symLower)) {
+        notes.push(`No targeted medication for this symptom marked In Stock in Supplies`);
+      }
+      return notes.join(" • ");
+    }
+
+    function formatSuppliesForPrompt(targetTank = null) {
+      const all = ensureClosetNormalized();
+      if (all.length === 0) return "None listed";
+      const avail = all.filter(i => i.stock !== "out");
+      const out = all.filter(i => i.stock === "out");
+
+      const availStr = avail.length > 0
+        ? avail.map(i => {
+            let s = i.name;
+            if (i.stock === "low") s += " [Running Low]";
+            if (i.notes) s += ` (Note: ${i.notes})`;
+            if (targetTank) {
+              const catEntry = matchSupplyCatalog(i.name);
+              const conflict = catEntry ? detectTankSupplyConflicts(targetTank, catEntry) : null;
+              if (conflict) s += ` [${conflict}]`;
+            }
+            return s;
+          }).join(", ")
+        : "None currently in stock";
+
+      if (out.length > 0) {
+        return `${availStr} | Out of Stock (do NOT prescribe until restocked): ${out.map(i => i.name).join(", ")}`;
+      }
+      return availStr;
+    }
+
+    function formatAllTanksForPrompt() {
+      const u = getUnitLabels();
+      if (!Array.isArray(appState.tanks) || appState.tanks.length === 0) return "No aquariums added yet";
+      return appState.tanks.map(t => {
+        const tested = hasTankBeenTested(t);
+        const p = tested && t.lastTest
+          ? `Temp ${displayTemp(t.lastTest.temp || 78)}${u.temp}, pH ${t.lastTest.ph ?? 7.2}, NH3 ${t.lastTest.nh3 ?? 0}, NO2 ${t.lastTest.no2 ?? 0}, NO3 ${t.lastTest.no3 ?? 0} ppm`
+          : "Untested";
+        const live = (t.livestock || []).join(", ") || "Empty";
+        const plants = (t.plants || []).join(", ") || "None";
+        return `${t.name} (${displayVol(t.vol)} ${u.vol}, ${t.status}; Params: ${p}; Fauna: ${live}; Flora: ${plants})`;
+      }).join(" | ");
+    }
+
     function analyzeTankWaterParameters(tank) {
       if (!tank) return null;
       const isCycling = tank.status === "Cycling";
@@ -2454,10 +3339,6 @@
       const no3 = parseFloat(t.no3) || 0;
       const ph = parseFloat(t.ph) || 7.2;
       const temp = parseFloat(t.temp) || 78;
-
-      const closet = (appState.closet || []).map(c => c.toLowerCase());
-      const hasPrime = closet.some(c => c.includes("prime"));
-      const hasBacteria = closet.some(c => c.includes("turbostart") || c.includes("stability") || c.includes("quick start"));
 
       let status = "safe";
       let statusBadge = "● All Safe";
@@ -2542,18 +3423,32 @@
         }
       }
 
+      const wcGalRaw = tank.vol * ((wcPercent || 25) / 100);
       const wcVol = displayVol(tank.vol * (wcPercent / 100));
-      let doseAdvice = "";
-      if (hasPrime) {
-        const ml = Math.round((tank.vol * 0.1) * 10) / 10;
-        const drops = Math.round(tank.vol * 2);
-        doseAdvice = `Dose ${ml} ml (≈ ${drops} drops) Seachem Prime for new water`;
+      const isEmergencyDetox = status === "danger";
+      const condRec = findBestConditioner(wcGalRaw, isEmergencyDetox, tank.vol);
+      const bacRec = findBestBacteria(tank.vol, isCycling && nh3 === 0 && no2 === 0);
+      const fertRec = (Array.isArray(tank.plants) && tank.plants.length > 0 && !isCycling && !isEmergencyDetox && no3 < 20)
+        ? findBestLiquidFertilizer(tank.vol)
+        : { found: false };
+
+      let doseParts = [];
+      if (wcNeeded || isEmergencyDetox) {
+        doseParts.push(condRec.doseText);
+      } else if (isCycling) {
+        if (bacRec.found) doseParts.push(bacRec.doseText);
+        else doseParts.push(`Hold dechlorinator until next water change`);
       } else {
-        doseAdvice = `Dose standard dechlorinator for ${wcVol || displayVol(tank.vol * 0.25)} ${u.vol} new water`;
+        doseParts.push(`Next WC (${displayVol(tank.vol * 0.15)} ${u.vol}): ${findBestConditioner(tank.vol * 0.15, false, tank.vol).shortDose}`);
       }
-      if (isCycling && hasBacteria) {
-        doseAdvice += ` • Add 1 booster dose of beneficial bacteria`;
+
+      if ((isCycling || isEmergencyDetox) && bacRec.found && !doseParts.includes(bacRec.doseText)) {
+        doseParts.push(bacRec.doseText);
       }
+      if (fertRec.found) {
+        doseParts.push(fertRec.doseText);
+      }
+      const doseAdvice = doseParts.join(" • ");
 
       return {
         status,
@@ -2871,6 +3766,15 @@
         if (daysUntilMedia <= windowDays) {
           const verb = m.cat === "cartridge" || m.cat === "chemical" ? "Replace" : (m.cat === "biological" ? "Inspect" : "Rinse");
           const doneLabel = m.cat === "cartridge" || m.cat === "chemical" ? "Replaced" : "Rinsed";
+          let mediaSub = formatTaskSubtitle(daysUntilMedia);
+          if (m.cat === "cartridge" || m.cat === "chemical") {
+            const spareMatch = findMatchingSpareMedia(m.name);
+            if (spareMatch) {
+              if (spareMatch.stock === "out") mediaSub += " • Out of Stock in Supplies";
+              else if (spareMatch.stock === "low") mediaSub += " • Running Low in Supplies";
+              else mediaSub += " • Spare In Stock";
+            }
+          }
           tasks.push({
             id: `media-${tank.id}-${mIdx}`,
             type: "filter",
@@ -2879,7 +3783,7 @@
             tankName: tank.name,
             title: `${tank.name}: ${verb} ${m.name}`,
             planTabTitle: `${verb} ${m.name}`,
-            subtitle: formatTaskSubtitle(daysUntilMedia),
+            subtitle: mediaSub,
             daysRemaining: daysUntilMedia,
             isOverdue: daysUntilMedia < 0,
             isToday: daysUntilMedia === 0,
@@ -2890,7 +3794,7 @@
         }
       });
 
-      // 5. Plant Pruning & Maintenance (Synchronized with Water Change)
+      // 5. Plant Pruning & Fertilizing (Synchronized with Water Change + Supplies Shelf)
       if (tank.plants && tank.plants.length > 0) {
         let daysUntilPlant = 0;
         if (isCycling) {
@@ -2913,14 +3817,20 @@
         }
 
         if (daysUntilPlant <= windowDays) {
+          const curNo3 = parseFloat(tank.lastTest?.no3) || 0;
+          const fertRec = (!isCycling && curNo3 <= 35) ? findBestLiquidFertilizer(tank.vol) : { found: false };
+          const plantTitleBase = fertRec.found ? "Plant Pruning & Fertilize" : "Plant Pruning & Foliage Check";
+          const plantSub = fertRec.found
+            ? `${formatTaskSubtitle(daysUntilPlant)} • Dose ${fertRec.shortDose}`
+            : formatTaskSubtitle(daysUntilPlant);
           tasks.push({
             id: `plant-${tank.id}`,
             type: "plants",
             tankId: tank.id,
             tankName: tank.name,
-            title: `${tank.name}: Plant Pruning & Foliage Check`,
-            planTabTitle: `Plant Pruning & Foliage Check`,
-            subtitle: formatTaskSubtitle(daysUntilPlant),
+            title: `${tank.name}: ${plantTitleBase}`,
+            planTabTitle: plantTitleBase,
+            subtitle: plantSub,
             daysRemaining: daysUntilPlant,
             isOverdue: daysUntilPlant < 0,
             isToday: daysUntilPlant === 0,
@@ -3200,7 +4110,12 @@
       if (!tank) return;
       const today = new Date().toISOString().split("T")[0];
       tank.lastPlantCare = today;
-      addTankTimelineEvent(tank, "Pruned plants & checked foliage health", today);
+      const curNo3 = parseFloat(tank.lastTest?.no3) || 0;
+      const fertRec = (tank.status !== "Cycling" && curNo3 <= 35) ? findBestLiquidFertilizer(tank.vol) : { found: false };
+      const logLine = fertRec.found
+        ? `Pruned plants & dosed ${fertRec.shortDose}`
+        : "Pruned plants & checked foliage health";
+      addTankTimelineEvent(tank, logLine, today);
       saveDataToStorage();
       renderDashboardTasks();
       if (isInsideTank && activeTankId == tank.id) {
@@ -3252,7 +4167,11 @@
       });
 
       const doseInput = document.getElementById("qwc-dose-input");
-      if (doseInput) doseInput.value = "";
+      if (doseInput) {
+        doseInput.value = "";
+        doseInput.dataset.autoCalculated = "true";
+        doseInput.oninput = () => { doseInput.dataset.autoCalculated = "false"; };
+      }
 
       updateQuickWcCalculations();
       openModalById("quickWcModal");
@@ -3264,7 +4183,7 @@
 
     function onQuickWcTankChange() {
       const doseInput = document.getElementById("qwc-dose-input");
-      if (doseInput) doseInput.value = "";
+      if (doseInput) doseInput.dataset.autoCalculated = "true";
       updateQuickWcCalculations();
     }
 
@@ -3272,8 +4191,6 @@
       document.getElementById("qwc-pct-input").value = pct;
       document.querySelectorAll(".quick-pct-btn").forEach(b => b.classList.remove("active"));
       if (btn) btn.classList.add("active");
-      const doseInput = document.getElementById("qwc-dose-input");
-      if (doseInput) doseInput.value = "";
       updateQuickWcCalculations();
     }
 
@@ -3291,32 +4208,30 @@
       const u = getUnitLabels();
       const galChanged = tank.vol * (pct / 100);
       const volAmt = displayVol(galChanged);
-      
+
       const calcEl = document.getElementById("qwc-vol-calc");
       if (calcEl) calcEl.value = `≈ ${volAmt} ${u.vol}`;
 
-      // Smart conditioner calculation based on supply closet (always using canonical gallons)
+      // Smart conditioner calculation synced with Household Supplies
       const doseInput = document.getElementById("qwc-dose-input");
       const hintEl = document.getElementById("qwc-dose-hint");
-      const closet = (appState.closet || []).map(s => s.toLowerCase());
+      const tested = hasTankBeenTested(tank);
+      const nh3 = tested ? (parseFloat(tank.lastTest?.nh3) || 0) : 0;
+      const no2 = tested ? (parseFloat(tank.lastTest?.no2) || 0) : 0;
+      const isEmergencyDetox = (tank.status === "Cycling" ? (nh3 >= 2.0 || no2 >= 3.0) : (nh3 > 0.25 || no2 > 0.25));
 
-      let hasPrime = closet.some(c => c.includes("prime"));
-      let recommendedDose = "";
+      const condRec = findBestConditioner(galChanged, isEmergencyDetox, tank.vol);
+      const recommendedDose = condRec.shortDose;
 
-      if (hasPrime) {
-        const ml = Math.max(0.2, Math.round((galChanged * 0.1) * 10) / 10);
-        recommendedDose = appState.units === "metric"
-          ? `Seachem Prime ${ml} ml (~2 drops per 4L)`
-          : `Seachem Prime ${ml} ml (~2 drops per gallon)`;
-      } else {
-        recommendedDose = "Standard dechlorinator dose";
-      }
-
-      if (doseInput && !doseInput.value) {
+      if (doseInput && (!doseInput.value || doseInput.dataset.autoCalculated === "true")) {
         doseInput.value = recommendedDose;
+        doseInput.dataset.autoCalculated = "true";
       }
       if (hintEl) {
-        hintEl.innerText = `Household supply recommendation: ${recommendedDose}`;
+        hintEl.style.color = condRec.outOfStockName ? "var(--alert-yellow)" : "var(--cyan)";
+        hintEl.innerText = condRec.outOfStockName
+          ? `Supply alert: ${condRec.outOfStockName} is marked Out of Stock in Supplies`
+          : `Supplies shelf calculation: ${condRec.doseText}`;
       }
     }
 
@@ -3379,35 +4294,302 @@
       }
     }
 
+    function escapeHtmlText(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function onClosetTankChange(val) {
+      closetSelectedTankId = parseInt(val, 10) || 0;
+      renderGlobalClosetScreen();
+    }
+
+    function toggleSupplyStaplesDrawer(forceState) {
+      const drawer = document.getElementById("closet-staples-drawer");
+      const btn = document.getElementById("closet-staples-btn");
+      if (!drawer) return;
+      const shouldOpen = typeof forceState === "boolean"
+        ? forceState
+        : (drawer.style.display === "none" || !drawer.style.display);
+      drawer.style.display = shouldOpen ? "block" : "none";
+      if (btn) {
+        btn.innerText = shouldOpen ? "Hide Staples" : "+ Quick-Add Staples";
+        btn.style.color = shouldOpen ? "var(--neon-green)" : "var(--cyan)";
+      }
+      if (shouldOpen) renderSupplyStaplesGrid();
+    }
+
+    function renderSupplyStaplesGrid() {
+      const grid = document.getElementById("closet-staples-grid");
+      if (!grid) return;
+      const items = ensureClosetNormalized();
+      const ownedNames = new Set(items.map(i => i.name.toLowerCase()));
+      grid.innerHTML = "";
+      COMMON_SUPPLY_STAPLES.forEach(staple => {
+        const isOwned = ownedNames.has(staple.toLowerCase());
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `staple-chip ${isOwned ? "owned" : ""}`;
+        btn.innerText = isOwned ? `✓ ${staple}` : `+ ${staple}`;
+        if (!isOwned) {
+          btn.onclick = () => quickAddStapleSupply(staple);
+        }
+        grid.appendChild(btn);
+      });
+    }
+
+    function quickAddStapleSupply(nameStr) {
+      const items = ensureClosetNormalized();
+      if (items.some(i => i.name.toLowerCase() === nameStr.toLowerCase())) {
+        showToast("Already in Supplies");
+        return;
+      }
+      items.push(normalizeSupplyItem(nameStr, items.length));
+      saveDataToStorage();
+      renderGlobalClosetScreen();
+      renderSupplyStaplesGrid();
+      showToast(`Added ${nameStr}`);
+    }
+
     function renderGlobalClosetScreen() {
-      const container = document.getElementById("global-closet-pills");
+      const container = document.getElementById("global-closet-list");
+      const badgeEl = document.getElementById("closet-summary-badge");
+      const doseBar = document.getElementById("closet-dose-bar");
+      const tankSel = document.getElementById("closet-tank-select");
       if (!container) return;
-      container.innerHTML = "";
-      (appState.closet || []).forEach((item, idx) => {
-        container.innerHTML += `
-          <div class="pill">
-            <span>${item}</span>
-            <span class="delete-x" onclick="deleteGlobalSupplyItem(${idx})">×</span>
+
+      const items = ensureClosetNormalized();
+      const u = getUnitLabels();
+
+      // Update Dose Target selector
+      let targetTank = null;
+      if (Array.isArray(appState.tanks) && appState.tanks.length > 0) {
+        if (doseBar) doseBar.style.display = "flex";
+        targetTank = appState.tanks.find(t => t.id == closetSelectedTankId)
+          || appState.tanks.find(t => t.id == activeTankId)
+          || appState.tanks[0];
+        closetSelectedTankId = targetTank.id;
+        if (tankSel) {
+          tankSel.innerHTML = appState.tanks.map(t =>
+            `<option value="${t.id}" ${t.id == targetTank.id ? "selected" : ""}>${escapeHtmlText(t.name)} (${displayVol(t.vol)} ${u.vol})</option>`
+          ).join("");
+        }
+      } else if (doseBar) {
+        doseBar.style.display = "none";
+      }
+
+      // Update Stock Summary Badge
+      const inCount = items.filter(i => i.stock === "in").length;
+      const lowCount = items.filter(i => i.stock === "low").length;
+      const outCount = items.filter(i => i.stock === "out").length;
+      if (badgeEl) {
+        if (items.length === 0) {
+          badgeEl.innerText = "Shelf Empty";
+          badgeEl.style.background = "rgba(255,255,255,0.06)";
+          badgeEl.style.color = "var(--text-muted)";
+          badgeEl.style.borderColor = "rgba(255,255,255,0.12)";
+        } else if (outCount > 0 || lowCount > 0) {
+          const alerts = [];
+          if (outCount > 0) alerts.push(`${outCount} Out`);
+          if (lowCount > 0) alerts.push(`${lowCount} Low`);
+          alerts.push(`${inCount} In Stock`);
+          badgeEl.innerText = alerts.join(" • ");
+          badgeEl.style.background = outCount > 0 ? "rgba(244,63,94,0.13)" : "rgba(245,158,11,0.14)";
+          badgeEl.style.color = outCount > 0 ? "var(--alert-red)" : "var(--alert-yellow)";
+          badgeEl.style.borderColor = outCount > 0 ? "rgba(244,63,94,0.38)" : "rgba(245,158,11,0.4)";
+        } else {
+          badgeEl.innerText = `${inCount} In Stock`;
+          badgeEl.style.background = "rgba(0,245,160,0.12)";
+          badgeEl.style.color = "var(--neon-green)";
+          badgeEl.style.borderColor = "rgba(0,245,160,0.35)";
+        }
+      }
+
+      const drawer = document.getElementById("closet-staples-drawer");
+      if (drawer && drawer.style.display === "block") {
+        renderSupplyStaplesGrid();
+      }
+
+      if (items.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:22px 12px 10px; border-top:1px solid rgba(255,255,255,0.07);">
+            <div style="font-size:13.5px; font-weight:700; color:#F8FAFC; margin-bottom:5px;">No Supplies Added Yet</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom:14px; line-height:1.45;">
+              Add your water conditioner, test kit, bacteria starter, or plant fertilizer so Aquarist AI calculates exact doses for your aquariums.
+            </div>
+            <div style="display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
+              <button type="button" class="ghost-action-btn" onclick="toggleSupplyStaplesDrawer(true)">Browse Common Staples</button>
+              <button type="button" class="ghost-action-btn" style="color:var(--neon-green); border-color:rgba(0,245,160,0.3);" onclick="restoreDefaultSupplies()">Load Starter Shelf</button>
+            </div>
           </div>
         `;
+        return;
+      }
+
+      let html = "";
+      SUPPLY_CATEGORIES.forEach(catObj => {
+        const catEntries = items
+          .map((item, idx) => ({ item, idx }))
+          .filter(x => x.item.cat === catObj.key);
+        if (catEntries.length === 0) return;
+
+        html += `
+          <div class="supply-group">
+            <div class="supply-group-header">
+              <span>${catObj.label}</span>
+              <span style="color:var(--text-muted); font-weight:600;">${catEntries.length}</span>
+            </div>
+        `;
+
+        catEntries.forEach(({ item, idx }) => {
+          const info = describeSupplyForTank(item, targetTank);
+          const stockLabel = item.stock === "out" ? "Out of Stock" : (item.stock === "low" ? "Running Low" : "In Stock");
+          let tagsHtml = "";
+          if (info.safetyTag || info.conflictText) {
+            tagsHtml += `<div class="supply-tags">`;
+            if (info.safetyTag) {
+              tagsHtml += `<span class="supply-tag ${info.safetyTag.tone}">${escapeHtmlText(info.safetyTag.label)}</span>`;
+            }
+            if (info.conflictText) {
+              tagsHtml += `<span class="supply-tag conflict">${escapeHtmlText(info.conflictText)}</span>`;
+            }
+            tagsHtml += `</div>`;
+          }
+
+          html += `
+            <div class="supply-row ${item.stock === "out" ? "out-of-stock" : ""}">
+              <div style="flex:1; min-width:0;">
+                <div class="supply-name" onclick="openEditSupplyModal(${idx})" title="Tap to edit supply details">
+                  <span>${escapeHtmlText(item.name)}</span>
+                  <span style="font-size:10.5px; font-weight:500; color:var(--text-muted);">Edit</span>
+                </div>
+                <div class="supply-dose">${escapeHtmlText(info.doseText)}</div>
+                ${tagsHtml}
+              </div>
+              <div style="display:flex; align-items:center; gap:6px; flex-shrink:0; padding-top:1px;">
+                <button type="button" class="stock-pill ${item.stock}" onclick="cycleSupplyStock(${idx})" title="Tap to cycle stock status">
+                  ${stockLabel}
+                </button>
+              </div>
+            </div>
+          `;
+        });
+
+        html += `</div>`;
       });
+
+      container.innerHTML = html;
     }
 
     function addGlobalSupplyItem() {
       const input = document.getElementById("global-closet-input");
       if (!input || !input.value.trim()) return;
-      if (!appState.closet) appState.closet = [];
-      appState.closet.push(input.value.trim());
+      const cleanName = input.value.trim();
+      const items = ensureClosetNormalized();
+      const existing = items.find(i => i.name.toLowerCase() === cleanName.toLowerCase());
+      if (existing) {
+        if (existing.stock === "out") {
+          existing.stock = "in";
+          input.value = "";
+          saveDataToStorage();
+          renderGlobalClosetScreen();
+          showToast(`Restocked ${existing.name}`);
+        } else {
+          showToast("Already in Supplies");
+        }
+        return;
+      }
+      items.push(normalizeSupplyItem(cleanName, items.length));
       input.value = "";
       saveDataToStorage();
       renderGlobalClosetScreen();
-      showToast("Item Added to Closet");
+      showToast("Added to Supplies");
+    }
+
+    function cycleSupplyStock(idx) {
+      const items = ensureClosetNormalized();
+      if (!items[idx]) return;
+      const order = ["in", "low", "out"];
+      const nextIdx = (order.indexOf(items[idx].stock) + 1) % order.length;
+      items[idx].stock = order[nextIdx];
+      saveDataToStorage();
+      renderGlobalClosetScreen();
+      const label = items[idx].stock === "in" ? "In Stock" : (items[idx].stock === "low" ? "Running Low" : "Out of Stock");
+      showToast(`${items[idx].name}: ${label}`);
+    }
+
+    function openEditSupplyModal(idx) {
+      const items = ensureClosetNormalized();
+      const item = items[idx];
+      if (!item) return;
+      document.getElementById("edit-supply-idx").value = idx;
+      document.getElementById("edit-supply-name").value = item.name;
+      document.getElementById("edit-supply-cat").value = item.cat || inferSupplyCategory(item.name);
+      document.getElementById("edit-supply-notes").value = item.notes || "";
+      selectEditSupplyStock(item.stock || "in");
+      openModalById("editSupplyModal");
+    }
+
+    function selectEditSupplyStock(stockVal) {
+      const hiddenEl = document.getElementById("edit-supply-stock");
+      const groupEl = document.getElementById("edit-supply-stock-group");
+      if (hiddenEl) hiddenEl.value = stockVal;
+      if (groupEl) {
+        groupEl.querySelectorAll(".segmented-btn").forEach(btn => {
+          const match = btn.getAttribute("data-stock") === stockVal;
+          btn.classList.remove("active", "active-green");
+          if (match) {
+            btn.classList.add(stockVal === "in" ? "active-green" : "active");
+          }
+        });
+      }
+    }
+
+    function saveEditedSupplyItem() {
+      const items = ensureClosetNormalized();
+      const idx = parseInt(document.getElementById("edit-supply-idx").value, 10);
+      const nameVal = document.getElementById("edit-supply-name").value.trim();
+      const catVal = document.getElementById("edit-supply-cat").value;
+      const stockVal = document.getElementById("edit-supply-stock").value || "in";
+      const notesVal = document.getElementById("edit-supply-notes").value.trim();
+      if (!nameVal || Number.isNaN(idx) || !items[idx]) return;
+
+      items[idx].name = nameVal;
+      items[idx].cat = catVal;
+      items[idx].stock = stockVal;
+      items[idx].notes = notesVal;
+      saveDataToStorage();
+      closeModalById("editSupplyModal");
+      renderGlobalClosetScreen();
+      showToast("Supply Updated");
+    }
+
+    function deleteSupplyFromModal() {
+      const items = ensureClosetNormalized();
+      const idx = parseInt(document.getElementById("edit-supply-idx").value, 10);
+      if (Number.isNaN(idx) || !items[idx]) return;
+      items.splice(idx, 1);
+      saveDataToStorage();
+      closeModalById("editSupplyModal");
+      renderGlobalClosetScreen();
+      showToast("Supply Removed");
     }
 
     function deleteGlobalSupplyItem(idx) {
-      appState.closet.splice(idx, 1);
+      const items = ensureClosetNormalized();
+      items.splice(idx, 1);
       saveDataToStorage();
       renderGlobalClosetScreen();
+    }
+
+    function restoreDefaultSupplies() {
+      appState.closet = defaultState.closet.map((item, idx) => normalizeSupplyItem(item, idx));
+      saveDataToStorage();
+      renderGlobalClosetScreen();
+      showToast("Starter Shelf Loaded");
     }
 
     async function callGeminiGenerate(parts) {
@@ -3461,13 +4643,19 @@
       box.innerHTML = "Aquarist AI is analyzing...";
 
       const tap = appState.tapBaseline || {};
+      const u = getUnitLabels();
       const prompt = `You are aquAssist, a helpful, reassuring, and expert aquarist AI.
-Household Context:
-- Number of Tanks: ${appState.tanks.length}
-- Global Supply Closet: ${(appState.closet || []).join(", ")}
-- Tap Baseline: pH ${tap.ph}, NO3 ${tap.no3} ppm
-Question: ${q}
-Provide practical, plain-English advice tailored to beginners.`;
+Household Context (Preferred Units: ${u.vol}, ${u.temp}):
+- Registered Aquariums: ${formatAllTanksForPrompt()}
+- Household Supplies Shelf: ${formatSuppliesForPrompt()}
+- Tap Water Baseline: pH ${tap.ph ?? 7.4}, NO3 ${tap.no3 ?? 0} ppm, GH ${tap.gh ?? 8} dGH, KH ${tap.kh ?? 4} dKH
+
+User Question: ${q}
+
+Instructions:
+1. Reference the user's actual aquariums, volumes, inhabitants, and In-Stock Household Supplies when calculating dosages or treatment steps.
+2. Never prescribe a supply marked Out of Stock unless explicitly telling the user to restock it first.
+3. Flag any live plant, snail, shrimp, or scaleless-fish safety precautions. Keep advice clear and concise.`;
 
       try {
         const reply = await callGeminiGenerate([{ text: prompt }]);
@@ -3497,17 +4685,25 @@ Provide practical, plain-English advice tailored to beginners.`;
 
       const u = getUnitLabels();
       const currentLive = (targetTank.livestock || []).join(", ");
-      const t = targetTank.lastTest || { temp: 78, ph: 7.2 };
+      const currentPlants = (targetTank.plants || []).join(", ");
+      const tested = hasTankBeenTested(targetTank);
+      const t = tested ? targetTank.lastTest : null;
       const dispVolVal = displayVol(targetTank.vol);
-      const dispTempVal = displayTemp(t.temp);
+      const dispTempVal = t ? displayTemp(t.temp) : "--";
+      const tap = appState.tapBaseline || {};
+      const suppliesCtx = formatSuppliesForPrompt(targetTank);
 
       if (appState.apiKey) {
         const prompt = `You are aquAssist Stocking Advisor.
-Candidate: ${qty}x ${species}
+Candidate Addition: ${qty}x ${species}
 Target Tank: ${targetTank.name} (${dispVolVal} ${u.vol}, ${targetTank.status})
-Current Parameters: Temp ${dispTempVal}${u.temp}, pH ${t.ph}
+Current Parameters: ${t ? `Temp ${dispTempVal}${u.temp}, pH ${t.ph}, NH3 ${t.nh3} ppm, NO2 ${t.no2} ppm, NO3 ${t.no3} ppm` : "Untested yet"}
+Tap Baseline: pH ${tap.ph ?? 7.4}, GH ${tap.gh ?? 8} dGH, KH ${tap.kh ?? 4} dKH
 Existing Livestock: ${currentLive || "Empty Tank"}
-Evaluate water parameter overlap, temperament/fin-nipping, and bioload impact. Conclude with a clear verdict.`;
+Live Plants: ${currentPlants || "None"}
+Household Supplies On Hand: ${suppliesCtx}
+
+Evaluate water parameter/hardness overlap, temperament/fin-nipping, plant/invert safety, bioload impact, and whether any supplies on hand (buffers, remineralizers, bacteria boosters, or quarantine treatments) help acclimate this species. Conclude with a clear verdict.`;
 
         try {
           const reply = await callGeminiGenerate([{ text: prompt }]);
@@ -3516,11 +4712,13 @@ Evaluate water parameter overlap, temperament/fin-nipping, and bioload impact. C
         } catch(err) {}
       }
 
-      box.innerHTML = `<b>Sandbox Evaluation for ${qty}x ${species}:</b><br>
-Target Tank: ${targetTank.name} (${dispVolVal} ${u.vol})<br>
-Current Livestock: ${currentLive || 'None'}<br>
-Water Temp: ${dispTempVal}${u.temp} • pH: ${t.ph}<br>
-<span style="font-size:11px; color:var(--text-muted);">(Connect your Gemini API Key in Settings for deep bioload and temperament calculation.)</span>`;
+      const availNames = getAvailableSupplies().map(i => i.name).join(", ") || "None in stock";
+      box.innerHTML = `<b>Sandbox Evaluation for ${qty}x ${escapeHtmlText(species)}:</b><br>
+Target Tank: ${escapeHtmlText(targetTank.name)} (${dispVolVal} ${u.vol}, ${targetTank.status})<br>
+Current Livestock: ${escapeHtmlText(currentLive || 'None')}<br>
+Water: ${t ? `${dispTempVal}${u.temp} • pH ${t.ph}` : "Baseline test pending"}<br>
+In-Stock Supplies Checked: ${escapeHtmlText(availNames)}<br>
+<span style="font-size:11px; color:var(--text-muted);">(Connect your Gemini API Key in Settings for full bioload, temperament, and acclimation analysis.)</span>`;
     }
 
     /* ============================================================
@@ -3669,27 +4867,45 @@ Water Temp: ${dispTempVal}${u.temp} • pH: ${t.ph}<br>
       let adviceAction = "";
       let isFullyCycled = false;
 
+      const u = getUnitLabels();
+      const tempIdealStr = appState.units === "metric" ? "25.5–28°C" : "78–82°F";
+      const bacRec = findBestBacteria(tank.vol, nh3 === 0 && no2 === 0);
+      const ammRec = findBestAmmoniaSource(tank.vol);
+      const condRec = findBestConditioner(tank.vol * 0.45, false, tank.vol);
+      const hasFish = Array.isArray(tank.livestock) && tank.livestock.length > 0;
+      const hasLiquidKit = getAvailableSupplies().some(i => {
+        const m = matchSupplyCatalog(i.name);
+        return m && m.isLiquidKit;
+      });
+      const testKitHint = hasLiquidKit ? " Verify with your liquid reagent test kit." : "";
+
       if (nh3 === 0 && no2 === 0 && no3 > 0) {
         stage = 3;
         isFullyCycled = true;
         stageTitle = "Stage 3: Nitrogen Cycle Complete";
         statusDesc = "Both ammonia and nitrite oxidizing bacteria are fully colonized. Nitrates are accumulating, proving robust biological filtration.";
-        adviceAction = "Perform a 40-50% water change to lower accumulated nitrates below 20 ppm, then tap below to mark this tank as Established!";
+        adviceAction = `Perform a 40–50% water change (${condRec.shortDose}) to lower accumulated nitrates below 20 ppm, then tap below to mark this tank as Established.`;
       } else if (no2 > 0) {
         stage = 2;
         stageTitle = "Stage 2: Nitrite Spike (Active)";
         statusDesc = `Ammonia is converting to Nitrite (NO₂: ${no2} ppm). Nitrobacter/Nitrospira bacteria are multiplying.`;
-        adviceAction = "Do NOT change water unless Nitrite exceeds 5 ppm. Keep temperature at 78-82°F to encourage bacteria multiplication.";
+        adviceAction = `Hold water changes unless Nitrite exceeds 3–5 ppm. Keep temperature at ${tempIdealStr} to encourage colony growth.${bacRec.found ? ` ${bacRec.doseText}.` : ""}${testKitHint}`;
       } else if (nh3 > 0) {
         stage = 1;
         stageTitle = "Stage 1: Ammonia Buildup (Active)";
         statusDesc = `Ammonia source present (NH₃: ${nh3} ppm). Waiting for first-stage bacteria (Nitrosomonas) to colonize.`;
-        adviceAction = "Maintain ammonia between 2 - 4 ppm. If ghost feeding, continue daily pinch of flakes. Nitrites should appear in 5-10 days.";
+        adviceAction = `${hasFish ? "Fish-in cycle: keep NH₃ below 0.5 ppm and dose detoxifier if needed." : "Maintain ammonia between 2–4 ppm until Nitrites appear."}${bacRec.found ? ` ${bacRec.doseText}.` : ""}${testKitHint}`;
       } else {
         stage = 1;
         stageTitle = "Stage 1: Awaiting Ammonia Source";
-        statusDesc = "Ammonia is 0 ppm. The cycle cannot start without an initial ammonia source.";
-        adviceAction = "Add liquid ammonia (to 2 ppm) or ghost feed with a pinch of fish food daily to feed beneficial bacteria.";
+        statusDesc = "Ammonia is 0 ppm. Beneficial bacteria require an ammonia source to begin colonizing.";
+        if (hasFish) {
+          adviceAction = `Feed lightly once daily and test NH₃/NO₂ every 48 hours.${bacRec.found ? ` ${bacRec.doseText} to accelerate bio-filter seeding.` : ""}`;
+        } else if (ammRec.found) {
+          adviceAction = `Dose ${ammRec.doseText} to start your fishless cycle${bacRec.found ? `, then ${bacRec.doseText.charAt(0).toLowerCase() + bacRec.doseText.slice(1)}` : ""}.`;
+        } else {
+          adviceAction = `Add liquid ammonia (to 2 ppm) or ghost feed a pinch of fish food daily.${bacRec.found ? ` ${bacRec.doseText}.` : ""}`;
+        }
       }
 
       wrap.innerHTML = `
@@ -4255,8 +5471,9 @@ Water Temp: ${dispTempVal}${u.temp} • pH: ${t.ph}<br>
             ${l.qty || 1}x ${l.species}
           </div>
           <div style="font-size:11px; color:var(--alert-yellow); margin-top:2px;">
-            Symptoms: ${l.symptoms || "Unspecified"}
+            Symptoms: ${escapeHtmlText(l.symptoms || "Unspecified")}
           </div>
+          ${l.aiAudit ? `<div style="font-size:11px; color:var(--cyan); margin-top:4px; line-height:1.38;">Aquarist AI Shelf Audit: ${escapeHtmlText(l.aiAudit)}</div>` : ""}
         `;
         list.appendChild(item);
       });
@@ -4670,7 +5887,7 @@ Water Temp: ${dispTempVal}${u.temp} • pH: ${t.ph}<br>
       const mediaStr = (activeTank.filterMedia || []).map(m => m.name).join(", ") || "Standard";
       const plantsStr = (activeTank.plants || []).join(", ") || "None";
       const decorStr = (activeTank.decor || []).join(", ") || "None";
-      const closetStr = (appState.closet || []).join(", ") || "None";
+      const closetStr = formatSuppliesForPrompt(activeTank);
       const waterBalanceLine = last
         ? `Temp ${displayTemp(last.temp || 78)}${u.temp}, pH ${last.ph ?? 7.2}, NH₃ ${last.nh3 ?? 0} ppm, NO₂ ${last.no2 ?? 0} ppm, NO₃ ${last.no3 ?? 0} ppm`
         : "Not tested yet";
@@ -4682,14 +5899,14 @@ Holistic Tank Blueprint:
 - Tap Water Baseline: pH ${tap.ph || 7.4}, NO₃ ${tap.no3 || 0} ppm, GH ${tap.gh || 8} dGH, KH ${tap.kh || 4} dKH
 - Filtration & Gear: Equipment: ${equipStr} | Media: ${mediaStr}
 - Ecosystem Biota: Livestock: ${liveStr} | Flora: ${plantsStr} | Hardscape: ${decorStr}
-- Household Supplies & Treatments Available: ${closetStr}
+- Household Supplies & Treatments: ${closetStr}
 
 User Query / Symptom Description: ${q || "Please analyze the attached image in the context of this aquarium."}
 
 Instructions:
 1. Provide a scientifically grounded, holistic assessment taking into account water parameters, filtration, bioload, and flora.
-2. If disease symptoms or water problems are identified, provide exact dosage instructions utilizing products from the user's Household Supplies first.
-3. Explicitly note invertebrate/plant safety if recommending any treatments.
+2. If disease symptoms or water problems are identified, provide exact dosage instructions utilizing In-Stock products from the user's Household Supplies first (never prescribe Out-of-Stock items unless telling them to restock).
+3. Explicitly note invertebrate, scaleless-fish, and live-plant safety if recommending any treatments.
 4. Keep the explanation concise, actionable, and encouraging for a beginner aquarist.`;
 
       try {
@@ -4717,11 +5934,12 @@ Instructions:
       const paramStr = last
         ? `NH3: ${last.nh3 ?? 0}, NO2: ${last.no2 ?? 0}, NO3: ${last.no3 ?? 0}, pH: ${last.ph ?? 7.2}, Temp: ${displayTemp(last.temp || 78)}${u.temp}`
         : "Not tested yet";
+      const availStr = getAvailableSupplies().map(i => i.stock === "low" ? `${i.name} (Low)` : i.name).join(", ") || "None";
       const text = `Quick Update for ${activeTank.name} (${activeTank.status}):
 - Age: ${calculateAge(activeTank.startDate)} • Size: ${displayVol(activeTank.vol)} ${u.vol}
 - Latest Parameters: ${paramStr}
 - Tap Water Baseline: pH ${tap.ph}, NO3 ${tap.no3} ppm
-- Available Supplies: ${(appState.closet || []).join(", ")}
+- Available Supplies: ${availStr}
 - Question: `;
       navigator.clipboard.writeText(text).then(() => showToast("Copied to Clipboard"));
     }
@@ -4797,16 +6015,20 @@ Instructions:
       }
 
       if (!activeTank.losses) activeTank.losses = [];
-      const lossRecord = { date, species: cleanSpecies, qty, symptoms };
+      const aiAudit = auditHealthEventSupplies(activeTank, symptoms);
+      const lossRecord = { date, species: cleanSpecies, qty, symptoms, aiAudit };
       activeTank.losses.unshift(lossRecord);
       sortRecordsByDateDesc(activeTank.losses);
 
-      logTankTimelineEvent(`Health event: ${qty}x ${cleanSpecies} (${symptoms})`, date);
+      const timelineMsg = aiAudit
+        ? `Health event: ${qty}x ${cleanSpecies} (${symptoms}) • ${aiAudit}`
+        : `Health event: ${qty}x ${cleanSpecies} (${symptoms})`;
+      logTankTimelineEvent(timelineMsg, date);
       saveDataToStorage();
       closeModalById("lossModal");
       renderTankLivestockTab();
       renderTankOverviewTab();
-      showToast("Health Event Recorded");
+      showToast("Health Event & Shelf Audit Logged");
     }
 
     /* Editable Livestock Management */
