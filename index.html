@@ -557,6 +557,69 @@
     .staple-chip:hover:not(.owned) { border-color: var(--cyan); color: #fff; background: rgba(56, 189, 248, 0.1); }
     .staple-chip.owned { opacity: 0.45; border-color: rgba(0, 245, 160, 0.28); color: var(--neon-green); cursor: default; }
 
+    /* Minimal AI Assistant & Markdown Thread */
+    .ai-key-notice {
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      padding: 9px 11px; margin-bottom: 14px; border-radius: 10px;
+      background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.28);
+      font-size: 12px; color: #E2E8F0; line-height: 1.35;
+    }
+    .ai-context-bar {
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .ai-context-select {
+      width: auto; min-width: 145px; max-width: 220px; padding: 5px 28px 5px 10px;
+      font-size: 12px; font-weight: 600; border-radius: 8px;
+      background-color: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #F8FAFC;
+    }
+    .ai-starters-row {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;
+    }
+    .ai-starter-chip {
+      background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.09);
+      color: var(--text-muted); font-size: 11.5px; font-weight: 500; padding: 6px 11px;
+      border-radius: 9px; cursor: pointer; transition: all 0.15s ease;
+    }
+    .ai-starter-chip:hover {
+      border-color: rgba(56, 189, 248, 0.35); color: #F8FAFC; background: rgba(56, 189, 248, 0.08);
+    }
+    .ai-thread {
+      display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px;
+      max-height: 420px; overflow-y: auto; padding-right: 2px;
+    }
+    .ai-turn-user {
+      align-self: flex-end; max-width: 86%;
+      background: rgba(56, 189, 248, 0.11); border: 1px solid rgba(56, 189, 248, 0.25);
+      color: #F8FAFC; padding: 8px 12px; border-radius: 12px 12px 3px 12px;
+      font-size: 13px; line-height: 1.45;
+    }
+    .ai-turn-user-thumb {
+      display: block; width: 64px; height: 48px; object-fit: cover;
+      border-radius: 6px; margin-bottom: 6px; border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .ai-turn-model {
+      align-self: stretch; padding: 2px 2px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 13px; line-height: 1.58; color: var(--text-main);
+    }
+    .ai-turn-model:last-child { border-bottom: none; padding-bottom: 2px; }
+    .ai-md h3, .ai-md h4 {
+      font-size: 13.5px; font-weight: 700; color: #F8FAFC;
+      margin: 10px 0 4px; letter-spacing: -0.1px;
+    }
+    .ai-md h3:first-child, .ai-md h4:first-child { margin-top: 0; }
+    .ai-md p { margin: 0 0 8px; }
+    .ai-md p:last-child { margin-bottom: 0; }
+    .ai-md ul, .ai-md ol { margin: 4px 0 8px 18px; padding: 0; }
+    .ai-md ul:last-child, .ai-md ol:last-child { margin-bottom: 0; }
+    .ai-md li { margin-bottom: 4px; }
+    .ai-md code {
+      background: rgba(255, 255, 255, 0.07); padding: 1px 5px; border-radius: 5px;
+      font-size: 12px; color: var(--cyan); font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
     /* Toast Notification */
     .toast {
       position: fixed; top: 16px; left: 50%; transform: translateX(-50%) translateY(-30px);
@@ -746,46 +809,81 @@
       </div>
     </section>
 
-    <!-- SCREEN 3: GLOBAL AI ADVISOR (Pet Store Sandbox & General Co-Pilot) -->
+    <!-- SCREEN 3: GLOBAL AI ADVISOR (Unified Ask AI & Compatibility) -->
     <section id="screen-global-ai" class="view-screen">
-      <div class="card" style="background: linear-gradient(135deg, rgba(0, 210, 255, 0.12), rgba(0, 245, 160, 0.08)); border-color: rgba(56, 189, 248, 0.35);">
-        <div class="card-header">
-          <div class="card-title">Aquatic AI Intelligence</div>
-        </div>
-        <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px; line-height:1.45;">
-          Instant, scientifically backed fishkeeping, water chemistry, and disease guidance tailored to your setup.
-        </p>
-        <div class="input-row">
-          <input type="text" id="global-ai-input" placeholder="e.g. How do I lower nitrate without stressing sensitive cherry shrimp?">
-          <button class="btn" style="width:75px;" onclick="askGlobalAI()">Ask</button>
-        </div>
-        <div id="global-ai-response" class="card" style="display:none; margin-top:12px; background:#080E1A; border-color:var(--cyan); font-size:13px; line-height:1.5;"></div>
-      </div>
-
-      <!-- Pre-Purchase Stocking Compatibility Sandbox -->
       <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Fish Store Compatibility Lab</div>
-            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Pre-purchase temperament, water parameter, and bioload check</div>
+        <div class="card-header" style="margin-bottom:12px;">
+          <div class="card-title">AI Assistant</div>
+          <div class="segmented-group compact" id="global-ai-mode-group">
+            <button type="button" class="segmented-btn active" data-mode="ask" onclick="switchGlobalAIMode('ask')">Ask AI</button>
+            <button type="button" class="segmented-btn" data-mode="compat" onclick="switchGlobalAIMode('compat')">Compatibility</button>
           </div>
         </div>
-        <div class="input-grid-2">
-          <div>
+
+        <div id="global-ai-key-notice" class="ai-key-notice" style="display:none;">
+          <span>Add a Gemini API key for live diagnostics and photo vision.</span>
+          <button type="button" class="ghost-action-btn" onclick="openSettingsModal()">Open Settings</button>
+        </div>
+
+        <!-- MODE 1: ASK AI (Multi-Turn + Photo Vision + Tank Context) -->
+        <div id="global-ai-ask-panel">
+          <div class="ai-context-bar">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:11.5px; color:var(--text-muted); font-weight:600;">Context</span>
+              <select id="global-ai-context-select" class="ai-context-select" onchange="onGlobalAIContextChange(this.value)"></select>
+            </div>
+            <button type="button" id="global-ai-clear-btn" class="ghost-action-btn" style="display:none; color:var(--text-muted);" onclick="clearGlobalAIThread()">Clear</button>
+          </div>
+
+          <div id="global-ai-starters" class="ai-starters-row">
+            <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Audit my water chemistry and upcoming care priorities.')">Audit water &amp; tasks</button>
+            <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Help diagnose a fish symptom or water issue: ', true)">Diagnose symptom or photo</button>
+            <button type="button" class="ai-starter-chip" onclick="useGlobalStarterPrompt('Review my in-stock supplies and exact dosing for my setup.')">Check supply dosing</button>
+          </div>
+
+          <div id="global-ai-thread" class="ai-thread" style="display:none;"></div>
+
+          <div style="display:flex; gap:6px; align-items:center;">
+            <input type="text" id="global-ai-input" placeholder="Ask about chemistry, symptoms, dosing..." style="flex:1;" onkeydown="if(event.key==='Enter'){event.preventDefault();askGlobalAI();}">
+            <button type="button" class="icon-btn" id="global-vision-camera-btn" onclick="document.getElementById('global-vision-file-input').click()" title="Attach photo of fish, plants, or water" style="background:rgba(0,210,255,0.12); border-color:var(--cyan); color:var(--cyan);">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </button>
+            <button type="button" class="btn btn-neon" style="width:auto; padding:10px 16px; font-size:13px;" onclick="askGlobalAI()">Ask</button>
+          </div>
+
+          <input type="file" id="global-vision-file-input" accept="image/*" style="display:none;" onchange="handleGlobalVisionSelected(event)">
+
+          <div id="global-vision-preview-chip" style="display:none; align-items:center; gap:8px; margin-top:10px; background:rgba(0,210,255,0.08); border:1px solid rgba(0,210,255,0.28); border-radius:10px; padding:6px 10px;">
+            <img id="global-vision-preview-thumb" style="width:28px; height:28px; border-radius:6px; object-fit:cover;">
+            <span style="font-size:11px; color:var(--cyan); font-weight:600; flex:1;">Photo attached</span>
+            <span class="delete-x" onclick="clearGlobalVisionAttachment()" style="font-size:16px;">×</span>
+          </div>
+        </div>
+
+        <!-- MODE 2: COMPATIBILITY CHECK -->
+        <div id="global-ai-compat-panel" style="display:none;">
+          <div style="margin-bottom:10px;">
             <label>Target Aquarium</label>
-            <select id="sandbox-tank-select"></select>
+            <select id="sandbox-tank-select" onchange="onSandboxInputChanged()"></select>
           </div>
-          <div>
-            <label>Quantity</label>
-            <input type="number" id="sandbox-qty" value="6" min="1">
+          <div style="display:grid; grid-template-columns: 1fr 84px; gap:10px; margin-bottom:12px;">
+            <div>
+              <label>Species</label>
+              <input type="text" id="sandbox-species" placeholder="e.g. Cardinal Tetra, Cherry Shrimp" oninput="onSandboxInputChanged()" onkeydown="if(event.key==='Enter'){event.preventDefault();runSandboxCompatibility();}">
+            </div>
+            <div>
+              <label>Qty</label>
+              <input type="number" id="sandbox-qty" value="6" min="1" oninput="onSandboxInputChanged()" onkeydown="if(event.key==='Enter'){event.preventDefault();runSandboxCompatibility();}">
+            </div>
+          </div>
+          <button type="button" class="btn btn-neon" onclick="runSandboxCompatibility()">Evaluate Compatibility</button>
+
+          <div id="sandbox-result-box" style="display:none; margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.08); font-size:13px; line-height:1.58;"></div>
+
+          <div id="sandbox-add-roster-wrap" style="display:none; margin-top:12px;">
+            <button type="button" id="sandbox-add-roster-btn" class="ghost-action-btn" style="width:100%; padding:9px 12px; font-size:12.5px; color:var(--neon-green); border-color:rgba(0,245,160,0.32); background:rgba(0,245,160,0.06);" onclick="addEvaluatedSpeciesToTank()"></button>
           </div>
         </div>
-        <div style="margin-bottom:12px;">
-          <label>Species Name</label>
-          <input type="text" id="sandbox-species" placeholder="e.g. Tiger Barb, Cherry Shrimp, Angelfish">
-        </div>
-        <button class="btn btn-neon" onclick="runSandboxCompatibility()">Evaluate Compatibility</button>
-        <div id="sandbox-result-box" class="card" style="display:none; margin-top:14px; background:#080E1A; border-color:var(--cyan); font-size:13px; line-height:1.5;"></div>
       </div>
     </section>
 
@@ -848,32 +946,32 @@
         <!-- Integrated Aquarist AI Lab (Consult AI + Inline Camera Vision) -->
         <div class="card" style="background: linear-gradient(135deg, rgba(0, 210, 255, 0.08), rgba(9, 18, 36, 0.95)); border-color: rgba(56, 189, 248, 0.35);">
           <div class="card-header">
-            <div>
-              <div class="card-title" style="font-size:15px;">Aquarist AI Lab</div>
-              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Holistic tank diagnostics, biology queries & camera analysis</div>
+            <div class="card-title" style="font-size:15px;">Aquarist AI Lab</div>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <button type="button" id="tank-ai-clear-btn" class="ghost-action-btn" style="display:none; padding:4px 9px; font-size:10.5px; color:var(--text-muted);" onclick="clearTankAIThread()">Clear</button>
+              <button type="button" class="btn btn-secondary" style="width:auto; padding:4px 8px; font-size:10px;" onclick="copyTankDelta()">Copy Delta</button>
             </div>
-            <button class="btn btn-secondary" style="width:auto; padding:4px 8px; font-size:10px;" onclick="copyTankDelta()">Copy Delta</button>
           </div>
+
+          <div id="tank-ai-chat-box" class="ai-thread" style="display:none; margin-bottom:12px;"></div>
           
           <!-- Unified Question Input with Inline Camera Icon Button -->
           <div style="display:flex; gap:6px; align-items:center;">
-            <input type="text" id="tank-ai-chat-input" placeholder="Ask about parameters, fish symptoms, dosing..." style="flex:1;">
-            <button class="icon-btn" id="ai-vision-camera-btn" onclick="document.getElementById('vision-file-input').click()" title="Attach photo of fish or water for AI Vision analysis" style="background:rgba(0,210,255,0.12); border-color:var(--cyan); color:var(--cyan);">
+            <input type="text" id="tank-ai-chat-input" placeholder="Ask about parameters, fish symptoms, dosing..." style="flex:1;" onkeydown="if(event.key==='Enter'){event.preventDefault();runUnifiedTankAI();}">
+            <button type="button" class="icon-btn" id="ai-vision-camera-btn" onclick="document.getElementById('vision-file-input').click()" title="Attach photo of fish or water for AI Vision analysis" style="background:rgba(0,210,255,0.12); border-color:var(--cyan); color:var(--cyan);">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
             </button>
-            <button class="btn btn-neon" style="width:auto; padding:10px 16px; font-size:13px;" onclick="runUnifiedTankAI()">Ask</button>
+            <button type="button" class="btn btn-neon" style="width:auto; padding:10px 16px; font-size:13px;" onclick="runUnifiedTankAI()">Ask</button>
           </div>
           
-          <input type="file" id="vision-file-input" accept="image/*" capture="environment" style="display:none;" onchange="handleVisionImageSelected(event)">
+          <input type="file" id="vision-file-input" accept="image/*" style="display:none;" onchange="handleVisionImageSelected(event)">
           
           <!-- Selected Image Chip Preview -->
           <div id="ai-vision-preview-chip" style="display:none; align-items:center; gap:8px; margin-top:10px; background:rgba(0,210,255,0.1); border:1px solid rgba(0,210,255,0.3); border-radius:10px; padding:6px 10px;">
             <img id="vision-preview-thumb" style="width:28px; height:28px; border-radius:6px; object-fit:cover;">
-            <span style="font-size:11px; color:var(--cyan); font-weight:600; flex:1;">Photo attached for visual analysis</span>
+            <span style="font-size:11px; color:var(--cyan); font-weight:600; flex:1;">Photo attached</span>
             <span class="delete-x" onclick="clearVisionAttachment()" style="font-size:16px;">×</span>
           </div>
-
-          <div id="tank-ai-chat-box" class="card" style="display:none; margin-top:12px; background:#080E1A; border-color:var(--cyan); font-size:13px; line-height:1.55;"></div>
         </div>
 
         <!-- Unified Activity Timeline -->
@@ -2428,6 +2526,14 @@
     let isInsideTank = false;
     let currentChartFilter = "all";
     let activeVisionBase64 = null;
+    let activeVisionDataUrl = null;
+    let globalVisionBase64 = null;
+    let globalVisionDataUrl = null;
+    let globalAiMode = "ask"; // "ask" or "compat"
+    let globalAiContextTankId = "all"; // "all" or tank id string
+    let globalAiThread = [];
+    let tankAiThreads = {};
+    let lastEvaluatedSandbox = null;
     let swRegistration = null;
     let dashboardTaskFilter = "today"; // "today" or "3days"
 
@@ -4570,15 +4676,22 @@
       showToast("Starter Shelf Loaded");
     }
 
-    async function callGeminiGenerate(parts) {
+    async function callGeminiGenerate(partsOrContents, systemText = "") {
       const models = ["gemini-2.5-flash", "gemini-2.0-flash"];
+      const isContentsArray = Array.isArray(partsOrContents) && partsOrContents.length > 0 && Array.isArray(partsOrContents[0].parts);
+      const contents = isContentsArray ? partsOrContents : [{ role: "user", parts: partsOrContents }];
+      const payload = { contents };
+      if (systemText) {
+        payload.systemInstruction = { parts: [{ text: systemText }] };
+      }
+
       let lastErr = null;
       for (const model of models) {
         try {
           const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(appState.apiKey)}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ contents: [{ parts }] })
+            body: JSON.stringify(payload)
           });
           const data = await res.json();
           if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
@@ -4592,65 +4705,430 @@
       throw lastErr || new Error("Gemini API request failed");
     }
 
-    function renderGlobalAIScreen() {
-      const sel = document.getElementById("sandbox-tank-select");
-      if (!sel) return;
-      const u = getUnitLabels();
-      sel.innerHTML = "";
-      if (appState.tanks.length === 0) {
-        sel.innerHTML = `<option value="">No aquariums added yet</option>`;
-        return;
-      }
-      appState.tanks.forEach(t => {
-        sel.innerHTML += `<option value="${t.id}">${t.name} (${displayVol(t.vol)} ${u.vol})</option>`;
+    function buildMultiTurnContents(thread) {
+      const recent = thread.slice(-8);
+      return recent.map((turn, idx) => {
+        if (turn.role === "model") {
+          return { role: "model", parts: [{ text: turn.text || "" }] };
+        }
+        const includeImage = turn.imageBase64 && idx >= recent.length - 3;
+        const promptLabel = turn.text || (turn.imageBase64 ? "Please analyze the attached aquarium photo." : "");
+        const parts = [{ text: (!includeImage && turn.imageBase64) ? `[Attached aquarium photo] ${promptLabel}` : promptLabel }];
+        if (includeImage) {
+          parts.push({ inlineData: { mimeType: "image/jpeg", data: turn.imageBase64 } });
+        }
+        return { role: "user", parts };
       });
     }
 
-    async function askGlobalAI() {
-      const q = document.getElementById("global-ai-input").value.trim();
-      const box = document.getElementById("global-ai-response");
-      if (!q) return;
-
-      if (!appState.apiKey) {
-        box.style.display = "block";
-        box.innerHTML = `<span style="color:var(--alert-yellow)">Please save your Google Gemini API Key in Settings first.</span>`;
+    function renderAiThreadElement(containerEl, clearBtnEl, thread, pendingText = "") {
+      if (!containerEl) return;
+      const hasTurns = Array.isArray(thread) && thread.length > 0;
+      if (!hasTurns && !pendingText) {
+        containerEl.style.display = "none";
+        containerEl.innerHTML = "";
+        if (clearBtnEl) clearBtnEl.style.display = "none";
         return;
       }
 
-      box.style.display = "block";
-      box.innerHTML = "Aquarist AI is analyzing...";
+      containerEl.style.display = "flex";
+      if (clearBtnEl) clearBtnEl.style.display = hasTurns ? "inline-block" : "none";
 
+      let html = "";
+      (thread || []).forEach(turn => {
+        if (turn.role === "user") {
+          const thumbHtml = turn.thumbUrl ? `<img src="${turn.thumbUrl}" class="ai-turn-user-thumb" alt="Attached photo">` : "";
+          const label = turn.text || "Attached photo for visual analysis";
+          html += `<div class="ai-turn-user">${thumbHtml}${escapeHtmlText(label)}</div>`;
+        } else {
+          const bodyHtml = turn.isError
+            ? `<span style="color:var(--alert-red);">${escapeHtmlText(turn.text)}</span>`
+            : renderMarkdownToHtml(turn.text);
+          html += `<div class="ai-turn-model">${bodyHtml}</div>`;
+        }
+      });
+
+      if (pendingText) {
+        html += `<div class="ai-turn-model" style="color:var(--text-muted);">${escapeHtmlText(pendingText)}</div>`;
+      }
+
+      containerEl.innerHTML = html;
+      containerEl.scrollTop = containerEl.scrollHeight;
+    }
+
+    function updateGlobalAIKeyNotice() {
+      const notice = document.getElementById("global-ai-key-notice");
+      if (!notice) return;
+      notice.style.display = appState.apiKey ? "none" : "flex";
+    }
+
+    function switchGlobalAIMode(mode) {
+      globalAiMode = mode === "compat" ? "compat" : "ask";
+      const askPanel = document.getElementById("global-ai-ask-panel");
+      const compatPanel = document.getElementById("global-ai-compat-panel");
+      const group = document.getElementById("global-ai-mode-group");
+      if (askPanel) askPanel.style.display = globalAiMode === "ask" ? "block" : "none";
+      if (compatPanel) compatPanel.style.display = globalAiMode === "compat" ? "block" : "none";
+      if (group) {
+        group.querySelectorAll(".segmented-btn").forEach(btn => {
+          btn.classList.toggle("active", btn.getAttribute("data-mode") === globalAiMode);
+        });
+      }
+      updateGlobalAIKeyNotice();
+    }
+
+    function onGlobalAIContextChange(val) {
+      globalAiContextTankId = val || "all";
+    }
+
+    function renderGlobalAIThreadView(pendingText = "") {
+      const threadEl = document.getElementById("global-ai-thread");
+      const clearBtn = document.getElementById("global-ai-clear-btn");
+      const startersEl = document.getElementById("global-ai-starters");
+      const hasActivity = globalAiThread.length > 0 || !!pendingText;
+      if (startersEl) startersEl.style.display = hasActivity ? "none" : "flex";
+      renderAiThreadElement(threadEl, clearBtn, globalAiThread, pendingText);
+    }
+
+    function clearGlobalAIThread() {
+      globalAiThread = [];
+      renderGlobalAIThreadView();
+    }
+
+    function useGlobalStarterPrompt(promptStr, focusOnly = false) {
+      const inputEl = document.getElementById("global-ai-input");
+      if (!inputEl) return;
+      inputEl.value = promptStr;
+      if (focusOnly) {
+        inputEl.focus();
+        inputEl.setSelectionRange(promptStr.length, promptStr.length);
+        return;
+      }
+      askGlobalAI();
+    }
+
+    function renderGlobalAIScreen() {
+      updateGlobalAIKeyNotice();
+      const u = getUnitLabels();
+
+      // Context selector (All Aquariums or specific tank)
+      const ctxSel = document.getElementById("global-ai-context-select");
+      if (ctxSel) {
+        let ctxOpts = `<option value="all">All Aquariums</option>`;
+        appState.tanks.forEach(t => {
+          ctxOpts += `<option value="${t.id}">${escapeHtmlText(t.name)} (${displayVol(t.vol)} ${u.vol})</option>`;
+        });
+        ctxSel.innerHTML = ctxOpts;
+        const exists = globalAiContextTankId === "all" || appState.tanks.some(t => String(t.id) === String(globalAiContextTankId));
+        if (!exists) globalAiContextTankId = "all";
+        ctxSel.value = String(globalAiContextTankId);
+      }
+
+      // Compatibility target selector
+      const sel = document.getElementById("sandbox-tank-select");
+      if (sel) {
+        const prevVal = sel.value;
+        sel.innerHTML = "";
+        if (appState.tanks.length === 0) {
+          sel.innerHTML = `<option value="">No aquariums added yet</option>`;
+        } else {
+          appState.tanks.forEach(t => {
+            sel.innerHTML += `<option value="${t.id}">${escapeHtmlText(t.name)} (${displayVol(t.vol)} ${u.vol})</option>`;
+          });
+          if (prevVal && appState.tanks.some(t => String(t.id) === String(prevVal))) {
+            sel.value = prevVal;
+          }
+        }
+      }
+
+      switchGlobalAIMode(globalAiMode);
+      renderGlobalAIThreadView();
+    }
+
+    function buildGlobalAISystemPrompt() {
       const tap = appState.tapBaseline || {};
       const u = getUnitLabels();
-      const prompt = `You are aquAssist, a helpful, reassuring, and expert aquarist AI.
+      const focusedTank = globalAiContextTankId !== "all"
+        ? appState.tanks.find(t => String(t.id) === String(globalAiContextTankId))
+        : null;
+
+      if (focusedTank) {
+        const tested = hasTankBeenTested(focusedTank);
+        const last = tested ? focusedTank.lastTest : null;
+        const waterLine = last
+          ? `Temp ${displayTemp(last.temp || 78)}${u.temp}, pH ${last.ph ?? 7.2}, NH3 ${last.nh3 ?? 0} ppm, NO2 ${last.no2 ?? 0} ppm, NO3 ${last.no3 ?? 0} ppm`
+          : "Not tested yet";
+        return `You are aquAssist, a calm, scientifically grounded aquarist AI.
+Selected Aquarium Focus (${u.vol}, ${u.temp}):
+- Name: ${focusedTank.name} (${displayVol(focusedTank.vol)} ${u.vol}, ${focusedTank.status}, Age: ${calculateAge(focusedTank.startDate)})
+- Water Balance: ${waterLine}
+- Filtration & Gear: ${(focusedTank.equipment || []).join(", ") || "Standard"} | Media: ${(focusedTank.filterMedia || []).map(m => m.name).join(", ") || "Standard"}
+- Livestock: ${(focusedTank.livestock || []).join(", ") || "None"}
+- Live Plants: ${(focusedTank.plants || []).join(", ") || "None"} | Hardscape: ${(focusedTank.decor || []).join(", ") || "None"}
+- Tap Water Baseline: pH ${tap.ph ?? 7.4}, NO3 ${tap.no3 ?? 0} ppm, GH ${tap.gh ?? 8} dGH, KH ${tap.kh ?? 4} dKH
+- Household Supplies Shelf: ${formatSuppliesForPrompt(focusedTank)}
+
+Instructions:
+1. Tailor dosages and guidance specifically to '${focusedTank.name}' (${displayVol(focusedTank.vol)} ${u.vol}) and its inhabitants.
+2. Prioritize In-Stock Household Supplies first; never prescribe Out-of-Stock items unless advising a restock.
+3. Flag live plant, shrimp, snail, or scaleless-fish safety precautions clearly. Keep answers concise, structured, and free of emojis.`;
+      }
+
+      return `You are aquAssist, a calm, scientifically grounded aquarist AI.
 Household Context (Preferred Units: ${u.vol}, ${u.temp}):
 - Registered Aquariums: ${formatAllTanksForPrompt()}
 - Household Supplies Shelf: ${formatSuppliesForPrompt()}
 - Tap Water Baseline: pH ${tap.ph ?? 7.4}, NO3 ${tap.no3 ?? 0} ppm, GH ${tap.gh ?? 8} dGH, KH ${tap.kh ?? 4} dKH
 
-User Question: ${q}
-
 Instructions:
-1. Reference the user's actual aquariums, volumes, inhabitants, and In-Stock Household Supplies when calculating dosages or treatment steps.
+1. Reference the user's actual aquariums, volumes, inhabitants, and In-Stock Household Supplies when calculating dosages or care steps.
 2. Never prescribe a supply marked Out of Stock unless explicitly telling the user to restock it first.
-3. Flag any live plant, snail, shrimp, or scaleless-fish safety precautions. Keep advice clear and concise.`;
+3. Flag any live plant, snail, shrimp, or scaleless-fish safety precautions. Keep advice clear, structured, concise, and free of emojis.`;
+    }
+
+    async function askGlobalAI() {
+      const inputEl = document.getElementById("global-ai-input");
+      const q = inputEl ? inputEl.value.trim() : "";
+      if (!q && !globalVisionBase64) {
+        if (inputEl) inputEl.focus();
+        return;
+      }
+
+      if (!appState.apiKey) {
+        updateGlobalAIKeyNotice();
+        showToast("Add Gemini API Key in Settings");
+        openSettingsModal();
+        return;
+      }
+
+      const attachedBase64 = globalVisionBase64;
+      const attachedThumb = globalVisionDataUrl;
+      if (inputEl) inputEl.value = "";
+      clearGlobalVisionAttachment();
+
+      if (globalAiThread.length >= 12) {
+        globalAiThread = globalAiThread.slice(-8);
+      }
+
+      const userTurn = {
+        role: "user",
+        text: q,
+        imageBase64: attachedBase64 || null,
+        thumbUrl: attachedThumb || null
+      };
+      globalAiThread.push(userTurn);
+      renderGlobalAIThreadView("Aquarist AI is analyzing...");
 
       try {
-        const reply = await callGeminiGenerate([{ text: prompt }]);
-        box.innerHTML = renderMarkdownToHtml(reply);
+        const contents = buildMultiTurnContents(globalAiThread);
+        const systemPrompt = buildGlobalAISystemPrompt();
+        const reply = await callGeminiGenerate(contents, systemPrompt);
+        globalAiThread.push({ role: "model", text: reply });
       } catch (err) {
-        box.innerHTML = `<span style="color:var(--alert-red)">Error connecting to Gemini API. Check your API key in Settings.</span>`;
+        globalAiThread.push({
+          role: "model",
+          isError: true,
+          text: `Unable to reach Gemini API (${err.message || "connection error"}). Check your API key in Settings.`
+        });
       }
+      renderGlobalAIThreadView();
+    }
+
+    function onSandboxInputChanged() {
+      lastEvaluatedSandbox = null;
+      const wrap = document.getElementById("sandbox-add-roster-wrap");
+      if (wrap) wrap.style.display = "none";
+    }
+
+    function updateSandboxAddRosterBtn(targetTank, species, qty) {
+      const wrap = document.getElementById("sandbox-add-roster-wrap");
+      const btn = document.getElementById("sandbox-add-roster-btn");
+      if (!wrap || !btn || !targetTank || !species) {
+        if (wrap) wrap.style.display = "none";
+        return;
+      }
+      lastEvaluatedSandbox = { tankId: targetTank.id, species, qty };
+      btn.disabled = false;
+      btn.style.opacity = "1";
+      btn.innerText = `+ Add ${qty}x ${species} to ${targetTank.name}`;
+      wrap.style.display = "block";
+    }
+
+    function addEvaluatedSpeciesToTank() {
+      if (!lastEvaluatedSandbox) return;
+      const targetTank = appState.tanks.find(t => t.id == lastEvaluatedSandbox.tankId);
+      if (!targetTank) return;
+
+      const { species, qty } = lastEvaluatedSandbox;
+      if (!Array.isArray(targetTank.livestock)) targetTank.livestock = [];
+      const entry = `${qty}x ${species}`;
+      targetTank.livestock.push(entry);
+
+      const today = new Date().toISOString().split("T")[0];
+      addTankTimelineEvent(targetTank, `Added ${entry} to aquarium`, today);
+      saveDataToStorage();
+
+      const btn = document.getElementById("sandbox-add-roster-btn");
+      if (btn) {
+        btn.disabled = true;
+        btn.style.opacity = "0.65";
+        btn.innerText = `✓ Added ${entry} to ${targetTank.name}`;
+      }
+      if (isInsideTank && activeTankId == targetTank.id) {
+        renderTankLivestockTab();
+        renderTankOverviewTab();
+      }
+      showToast(`Added to ${targetTank.name}`);
+    }
+
+    function buildOfflineCompatibilityHtml(targetTank, species, qty) {
+      const u = getUnitLabels();
+      const sLow = species.toLowerCase();
+      const volGal = parseFloat(targetTank.vol) || 10;
+      const dispVolVal = displayVol(volGal);
+      const tested = hasTankBeenTested(targetTank);
+      const last = tested ? targetTank.lastTest : null;
+      const nh3 = last ? (parseFloat(last.nh3) || 0) : 0;
+      const no2 = last ? (parseFloat(last.no2) || 0) : 0;
+      const ph = last ? (parseFloat(last.ph) || 7.2) : (appState.tapBaseline?.ph ?? 7.4);
+      const tempF = last ? (parseFloat(last.temp) || 78) : 78;
+      const gh = appState.tapBaseline?.gh ?? 8;
+      const existingList = targetTank.livestock || [];
+      const existingLow = existingList.join(" | ").toLowerCase();
+
+      let severity = 0; // 0 = Compatible, 1 = Caution, 2 = Not Recommended
+      const notes = [];
+
+      // 1. Cycling & Toxin Gate
+      if (targetTank.status === "Cycling" || nh3 > 0 || no2 > 0) {
+        severity = Math.max(severity, 2);
+        notes.push(`<b>Cycle Not Ready:</b> ${escapeHtmlText(targetTank.name)} is ${targetTank.status === "Cycling" ? "actively cycling" : "showing elevated toxins"} (${tested ? `NH₃ ${nh3} ppm, NO₂ ${no2} ppm` : "untested"}). Wait until Ammonia and Nitrite hold steady at 0 ppm before stocking.`);
+      } else if (!tested) {
+        severity = Math.max(severity, 1);
+        notes.push(`<b>Baseline Test Pending:</b> Log a water test for ${escapeHtmlText(targetTank.name)} to confirm 0 ppm Ammonia/Nitrite and temperature match prior to purchase.`);
+      }
+
+      // 2. Tank Volume & Adult Size Checks
+      const giantTerms = ["oscar", "common pleco", "sailfin pleco", "bala shark", "arowana", "pacu", "clown loach", "koi"];
+      const mediumLargeTerms = ["goldfish", "angelfish", "discus", "severum", "electric blue acara", "silver dollar", "rainbow shark", "red tail shark", "pictus"];
+      const activeSwimmerTerms = ["danio", "tiger barb", "rummynose", "rainbowfish", "swordtail", "molly", "congo tetra", "giant danio", "buenos aires"];
+      const shoalingTerms = ["tetra", "rasbora", "cory", "corydoras", "danio", "barb", "otocinclus", "oto", "loach", "hatchetfish", "pencilfish", "rainbowfish"];
+
+      if (giantTerms.some(k => sLow.includes(k)) && volGal < 55) {
+        severity = Math.max(severity, 2);
+        notes.push(`<b>Tank Size Exceeded:</b> ${escapeHtmlText(species)} reaches a large adult size and outgrows a ${dispVolVal} ${u.vol} aquarium.`);
+      } else if (mediumLargeTerms.some(k => sLow.includes(k)) && volGal < 29) {
+        severity = Math.max(severity, 2);
+        notes.push(`<b>Volume Constraint:</b> ${escapeHtmlText(species)} typically requires at least ${appState.units === "metric" ? "110+ L" : "29+ Gal"} for adult swimming room and bioload stability.`);
+      } else if (volGal < 5 && !["shrimp", "snail", "nerite", "mystery", "ramshorn", "amano", "neocaridina", "caridina"].some(k => sLow.includes(k))) {
+        severity = Math.max(severity, 2);
+        notes.push(`<b>Nano Volume Limit:</b> At ${dispVolVal} ${u.vol}, this tank is best suited to shrimp and snails rather than fish.`);
+      } else if (activeSwimmerTerms.some(k => sLow.includes(k)) && volGal < 15) {
+        severity = Math.max(severity, 1);
+        notes.push(`<b>Swimming Footprint:</b> ${escapeHtmlText(species)} is an active horizontal swimmer; ${dispVolVal} ${u.vol} is tight for a full group.`);
+      }
+
+      if (shoalingTerms.some(k => sLow.includes(k)) && qty < 5) {
+        severity = Math.max(severity, 1);
+        notes.push(`<b>Shoaling Group Size:</b> ${escapeHtmlText(species)} is a schooling species—keeping 6 or more reduces stress and fin-nipping (unless topping up an existing group).`);
+      }
+
+      // 3. Temperament & Predation Overlap
+      const isCandidateShrimp = ["shrimp", "neocaridina", "caridina"].some(k => sLow.includes(k)) && !sLow.includes("bamboo") && !sLow.includes("vampire");
+      const existingHasShrimp = ["shrimp", "neocaridina", "caridina"].some(k => existingLow.includes(k));
+      const shrimpPredators = ["angelfish", "cichlid", "oscar", "goldfish", "barb", "gourami", "betta", "loach", "pea puffer", "puffer", "acara", "ram"];
+      const isCandidatePredator = shrimpPredators.some(k => sLow.includes(k));
+      const existingHasPredator = shrimpPredators.some(k => existingLow.includes(k));
+
+      if (sLow.includes("betta") && existingLow.includes("betta")) {
+        severity = Math.max(severity, 2);
+        notes.push(`<b>High Aggression Risk:</b> Housing multiple Bettas together in ${escapeHtmlText(targetTank.name)} risks severe territorial fighting.`);
+      }
+      if (sLow.includes("pea puffer") && existingList.length > 0) {
+        severity = Math.max(severity, 1);
+        notes.push(`<b>Territorial Fin-Nipper:</b> Pea Puffers frequently nip slow tankmates and hunt snails/shrimp; species-only setups are safest.`);
+      }
+
+      const finNippers = ["tiger barb", "serpae", "buenos aires", "black skirt", "minor tetra"];
+      const longFinTargets = ["betta", "angelfish", "guppy", "longfin", "veil"];
+      if ((finNippers.some(k => sLow.includes(k)) && longFinTargets.some(k => existingLow.includes(k))) ||
+          (longFinTargets.some(k => sLow.includes(k)) && finNippers.some(k => existingLow.includes(k)))) {
+        severity = Math.max(severity, 2);
+        notes.push(`<b>Fin-Nipping Conflict:</b> Pairing fin-nipping schoolers with long-finned fish (Betta, Angelfish, Guppies) commonly causes fin damage and stress.`);
+      } else if ((sLow.includes("betta") && existingLow.includes("guppy")) || (sLow.includes("guppy") && existingLow.includes("betta"))) {
+        severity = Math.max(severity, 1);
+        notes.push(`<b>Display Aggression Caution:</b> Bettas often mistake colorful, flowing guppy tails for rival Bettas.`);
+      }
+
+      if (isCandidateShrimp && existingHasPredator) {
+        severity = Math.max(severity, 1);
+        notes.push(`<b>Predation Risk:</b> Existing fish in ${escapeHtmlText(targetTank.name)} may hunt juvenile or adult dwarf shrimp unless heavily planted with moss and hides.`);
+      } else if (isCandidatePredator && existingHasShrimp) {
+        severity = Math.max(severity, 1);
+        notes.push(`<b>Invertebrate Caution:</b> ${escapeHtmlText(species)} may prey on the shrimp currently living in ${escapeHtmlText(targetTank.name)}.`);
+      }
+
+      // 4. Temperature & Chemistry Overlap
+      const coldwaterTerms = ["goldfish", "white cloud", "dojo loach", "weather loach", "hillstream", "axolotl"];
+      const highHeatTerms = ["discus", "german blue ram", "sterbai"];
+      const isColdwater = coldwaterTerms.some(k => sLow.includes(k));
+      const existingHasTropical = ["betta", "tetra", "rasbora", "gourami", "angelfish", "discus", "ram", "otocinclus", "pleco"].some(k => existingLow.includes(k));
+
+      if (isColdwater && (tempF >= 75 || existingHasTropical)) {
+        severity = Math.max(severity, 2);
+        notes.push(`<b>Temperature Mismatch:</b> ${escapeHtmlText(species)} prefers cooler, well-oxygenated water (${appState.units === "metric" ? "18–22°C" : "64–72°F"}), whereas ${escapeHtmlText(targetTank.name)} runs tropical (${displayTemp(tempF)}${u.temp}).`);
+      } else if (highHeatTerms.some(k => sLow.includes(k)) && tested && tempF < 80) {
+        severity = Math.max(severity, 1);
+        notes.push(`<b>Warmth Requirement:</b> ${escapeHtmlText(species)} thrives at ${appState.units === "metric" ? "27–30°C" : "80–86°F"} (current tank temp: ${displayTemp(tempF)}${u.temp}).`);
+      }
+
+      if (["guppy", "molly", "platy", "swordtail", "african cichlid", "nerite", "mystery snail"].some(k => sLow.includes(k)) && (ph < 6.8 || gh < 5)) {
+        severity = Math.max(severity, 1);
+        notes.push(`<b>Mineral / Hardness Note:</b> ${escapeHtmlText(species)} prefers neutral-to-alkaline water with moderate GH/KH (current pH ${ph}, tap GH ${gh} dGH).`);
+      } else if (["caridina", "crystal red", "crystal black", "discus", "apistogramma"].some(k => sLow.includes(k)) && (ph > 7.4 || gh > 9)) {
+        severity = Math.max(severity, 1);
+        notes.push(`<b>Soft-Water Specialist:</b> ${escapeHtmlText(species)} prefers slightly acidic, low-GH water (current pH ${ph}, tap GH ${gh} dGH).`);
+      }
+
+      if (notes.length === 0) {
+        notes.push(`<b>Parameters &amp; Footprint Aligned:</b> ${qty}x ${escapeHtmlText(species)} fits ${escapeHtmlText(targetTank.name)} (${dispVolVal} ${u.vol}, ${tested ? `${displayTemp(tempF)}${u.temp}, pH ${ph}` : "Established"}) with current tankmates (${escapeHtmlText(existingList.join(", ") || "Empty roster")}).`);
+      }
+
+      // 5. Supplies Shelf Readiness
+      const avail = getAvailableSupplies();
+      const cond = avail.find(i => i.cat === "conditioner");
+      const bac = avail.find(i => i.cat === "bacteria");
+      const supplyBits = [];
+      if (cond) supplyBits.push(`temperature- and drip-acclimate before introducing, keeping <b>${escapeHtmlText(cond.name)}</b> ready`);
+      if (bac) supplyBits.push(`dose <b>${escapeHtmlText(bac.name)}</b> on day 1 to support the added bioload`);
+      if (supplyBits.length > 0) {
+        notes.push(`<b>Acclimation Shelf:</b> Using your in-stock supplies, ${supplyBits.join(" and ")}.`);
+      } else {
+        notes.push(`<b>Acclimation Tip:</b> Float 15–20 minutes to match temperature, drip-acclimate over 30 minutes, and test NH₃/NO₂ 24 hours after stocking.`);
+      }
+
+      const verdictLabel = severity === 2 ? "Not Recommended Yet" : (severity === 1 ? "Compatible with Caution" : "Compatible");
+      const verdictColor = severity === 2 ? "var(--alert-red)" : (severity === 1 ? "var(--alert-yellow)" : "var(--neon-green)");
+
+      return `<div class="ai-md">
+        <h4 style="color:${verdictColor}; margin-top:0;">Verdict: ${verdictLabel} — ${qty}x ${escapeHtmlText(species)}</h4>
+        <ul>${notes.map(n => `<li>${n}</li>`).join("")}</ul>
+      </div>`;
     }
 
     async function runSandboxCompatibility() {
       const tankId = document.getElementById("sandbox-tank-select").value;
       const targetTank = appState.tanks.find(t => t.id == tankId) || appState.tanks[0];
-      const species = document.getElementById("sandbox-species").value.trim();
-      const qty = parseInt(document.getElementById("sandbox-qty").value) || 1;
+      const speciesInput = document.getElementById("sandbox-species");
+      const species = speciesInput ? speciesInput.value.trim() : "";
+      const qty = Math.max(1, parseInt(document.getElementById("sandbox-qty").value, 10) || 1);
       const box = document.getElementById("sandbox-result-box");
+      const rosterWrap = document.getElementById("sandbox-add-roster-wrap");
+      if (rosterWrap) rosterWrap.style.display = "none";
+
       if (!species) {
-        alert("Please enter a fish or invertebrate species name!");
+        if (speciesInput) speciesInput.focus();
+        showToast("Enter a species name first");
         return;
       }
       if (!targetTank) {
@@ -4659,7 +5137,7 @@ Instructions:
         return;
       }
       box.style.display = "block";
-      box.innerHTML = "Evaluating compatibility...";
+      box.innerHTML = `<span style="color:var(--text-muted);">Evaluating compatibility...</span>`;
 
       const u = getUnitLabels();
       const currentLive = (targetTank.livestock || []).join(", ");
@@ -4681,22 +5159,23 @@ Existing Livestock: ${currentLive || "Empty Tank"}
 Live Plants: ${currentPlants || "None"}
 Household Supplies On Hand: ${suppliesCtx}
 
-Evaluate water parameter/hardness overlap, temperament/fin-nipping, plant/invert safety, bioload impact, and whether any supplies on hand (buffers, remineralizers, bacteria boosters, or quarantine treatments) help acclimate this species. Conclude with a clear verdict.`;
+Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution', or '### Verdict: Not Recommended'), then use short bullet points covering parameter/hardness fit, temperament/fin-nipping, plant/invert safety, bioload impact, and acclimation steps using In-Stock supplies. Do not use emojis.`;
 
         try {
           const reply = await callGeminiGenerate([{ text: prompt }]);
           box.innerHTML = renderMarkdownToHtml(reply);
+          updateSandboxAddRosterBtn(targetTank, species, qty);
           return;
-        } catch(err) {}
+        } catch (err) {
+          const fallbackHtml = buildOfflineCompatibilityHtml(targetTank, species, qty);
+          box.innerHTML = `<div style="font-size:11.5px; color:var(--alert-yellow); margin-bottom:8px;">Live Gemini check unavailable (${escapeHtmlText(err.message || "network error")}) — showing local compatibility audit:</div>${fallbackHtml}`;
+          updateSandboxAddRosterBtn(targetTank, species, qty);
+          return;
+        }
       }
 
-      const availNames = getAvailableSupplies().map(i => i.name).join(", ") || "None in stock";
-      box.innerHTML = `<b>Sandbox Evaluation for ${qty}x ${escapeHtmlText(species)}:</b><br>
-Target Tank: ${escapeHtmlText(targetTank.name)} (${dispVolVal} ${u.vol}, ${targetTank.status})<br>
-Current Livestock: ${escapeHtmlText(currentLive || 'None')}<br>
-Water: ${t ? `${dispTempVal}${u.temp} • pH ${t.ph}` : "Baseline test pending"}<br>
-In-Stock Supplies Checked: ${escapeHtmlText(availNames)}<br>
-<span style="font-size:11px; color:var(--text-muted);">(Connect your Gemini API Key in Settings for full bioload, temperament, and acclimation analysis.)</span>`;
+      box.innerHTML = buildOfflineCompatibilityHtml(targetTank, species, qty);
+      updateSandboxAddRosterBtn(targetTank, species, qty);
     }
 
     /* ============================================================
@@ -4757,6 +5236,9 @@ In-Stock Supplies Checked: ${escapeHtmlText(availNames)}<br>
       if (paramContainer) {
         paramContainer.innerHTML = buildParamGaugeInnerHtml(t, u);
       }
+
+      // Sync per-tank AI Lab conversation thread
+      renderActiveTankAIThread();
 
       // Unified Timeline - Sorted strictly by record date descending (not insertion time)
       const timelineEl = document.getElementById("tank-overview-timeline");
@@ -5791,11 +6273,9 @@ In-Stock Supplies Checked: ${escapeHtmlText(availNames)}<br>
       renderTankPlantsTab();
     }
 
-    /* Integrated Aquarist AI Lab (Vision + Prompt) */
-    function handleVisionImageSelected(e) {
-      const file = e.target.files && e.target.files[0];
+    /* Integrated Aquarist AI Lab & Shared Photo Vision */
+    function processVisionImageFile(file, onProcessed) {
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = function(evt) {
         const img = new Image();
@@ -5813,49 +6293,115 @@ In-Stock Supplies Checked: ${escapeHtmlText(availNames)}<br>
           canvas.height = h;
           ctx.drawImage(img, 0, 0, w, h);
           const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
-          activeVisionBase64 = dataUrl.split(",")[1];
-
-          // Show inline chip preview
-          const chip = document.getElementById("ai-vision-preview-chip");
-          const thumb = document.getElementById("vision-preview-thumb");
-          if (chip && thumb) {
-            thumb.src = dataUrl;
-            chip.style.display = "flex";
-          }
-          showToast("Photo Attached to AI Prompt");
+          const base64 = dataUrl.split(",")[1];
+          onProcessed(dataUrl, base64);
         };
         img.src = evt.target.result;
       };
       reader.readAsDataURL(file);
     }
 
+    function handleVisionImageSelected(e) {
+      const file = e.target.files && e.target.files[0];
+      processVisionImageFile(file, (dataUrl, base64) => {
+        activeVisionBase64 = base64;
+        activeVisionDataUrl = dataUrl;
+        const chip = document.getElementById("ai-vision-preview-chip");
+        const thumb = document.getElementById("vision-preview-thumb");
+        if (chip && thumb) {
+          thumb.src = dataUrl;
+          chip.style.display = "flex";
+        }
+        showToast("Photo Attached");
+      });
+    }
+
     function clearVisionAttachment() {
       activeVisionBase64 = null;
-      document.getElementById("vision-file-input").value = "";
+      activeVisionDataUrl = null;
+      const inputEl = document.getElementById("vision-file-input");
+      if (inputEl) inputEl.value = "";
       const chip = document.getElementById("ai-vision-preview-chip");
       if (chip) chip.style.display = "none";
     }
 
+    function handleGlobalVisionSelected(e) {
+      const file = e.target.files && e.target.files[0];
+      processVisionImageFile(file, (dataUrl, base64) => {
+        globalVisionBase64 = base64;
+        globalVisionDataUrl = dataUrl;
+        const chip = document.getElementById("global-vision-preview-chip");
+        const thumb = document.getElementById("global-vision-preview-thumb");
+        if (chip && thumb) {
+          thumb.src = dataUrl;
+          chip.style.display = "flex";
+        }
+        showToast("Photo Attached");
+      });
+    }
+
+    function clearGlobalVisionAttachment() {
+      globalVisionBase64 = null;
+      globalVisionDataUrl = null;
+      const inputEl = document.getElementById("global-vision-file-input");
+      if (inputEl) inputEl.value = "";
+      const chip = document.getElementById("global-vision-preview-chip");
+      if (chip) chip.style.display = "none";
+    }
+
+    function renderActiveTankAIThread(pendingText = "") {
+      const activeTank = getActiveTank();
+      const box = document.getElementById("tank-ai-chat-box");
+      const clearBtn = document.getElementById("tank-ai-clear-btn");
+      const thread = activeTank ? (tankAiThreads[activeTank.id] || []) : [];
+      renderAiThreadElement(box, clearBtn, thread, pendingText);
+    }
+
+    function clearTankAIThread() {
+      const activeTank = getActiveTank();
+      if (!activeTank) return;
+      tankAiThreads[activeTank.id] = [];
+      renderActiveTankAIThread();
+    }
+
     async function runUnifiedTankAI() {
       const qInput = document.getElementById("tank-ai-chat-input");
-      const q = qInput.value.trim();
-      const box = document.getElementById("tank-ai-chat-box");
+      const q = qInput ? qInput.value.trim() : "";
       if (!q && !activeVisionBase64) {
-        alert("Please type a question or attach a photo first!");
+        if (qInput) qInput.focus();
+        showToast("Type a question or attach a photo");
         return;
       }
 
       if (!appState.apiKey) {
-        box.style.display = "block";
-        box.innerHTML = `<span style="color:var(--alert-yellow)">Please save your Google Gemini API Key in Settings first!</span>`;
+        showToast("Add Gemini API Key in Settings");
+        openSettingsModal();
         return;
       }
 
-      box.style.display = "block";
-      box.innerHTML = "Aquarist AI is analyzing...";
-
       const activeTank = getActiveTank();
       if (!activeTank) return;
+
+      const attachedBase64 = activeVisionBase64;
+      const attachedThumb = activeVisionDataUrl;
+      if (qInput) qInput.value = "";
+      clearVisionAttachment();
+
+      if (!Array.isArray(tankAiThreads[activeTank.id])) {
+        tankAiThreads[activeTank.id] = [];
+      }
+      if (tankAiThreads[activeTank.id].length >= 12) {
+        tankAiThreads[activeTank.id] = tankAiThreads[activeTank.id].slice(-8);
+      }
+
+      tankAiThreads[activeTank.id].push({
+        role: "user",
+        text: q,
+        imageBase64: attachedBase64 || null,
+        thumbUrl: attachedThumb || null
+      });
+      renderActiveTankAIThread("Aquarist AI is analyzing...");
+
       const tap = appState.tapBaseline || {};
       const u = getUnitLabels();
       const tested = hasTankBeenTested(activeTank);
@@ -5867,39 +6413,36 @@ In-Stock Supplies Checked: ${escapeHtmlText(availNames)}<br>
       const decorStr = (activeTank.decor || []).join(", ") || "None";
       const closetStr = formatSuppliesForPrompt(activeTank);
       const waterBalanceLine = last
-        ? `Temp ${displayTemp(last.temp || 78)}${u.temp}, pH ${last.ph ?? 7.2}, NH₃ ${last.nh3 ?? 0} ppm, NO₂ ${last.no2 ?? 0} ppm, NO₃ ${last.no3 ?? 0} ppm`
+        ? `Temp ${displayTemp(last.temp || 78)}${u.temp}, pH ${last.ph ?? 7.2}, NH3 ${last.nh3 ?? 0} ppm, NO2 ${last.no2 ?? 0} ppm, NO3 ${last.no3 ?? 0} ppm`
         : "Not tested yet";
 
-      const promptText = `You are aquAssist, expert Aquarist AI analyzing aquarium '${activeTank.name}' (${displayVol(activeTank.vol)} ${u.vol}, ${activeTank.status}).
+      const systemPrompt = `You are aquAssist, expert Aquarist AI analyzing aquarium '${activeTank.name}' (${displayVol(activeTank.vol)} ${u.vol}, ${activeTank.status}).
 Holistic Tank Blueprint:
 - Age: ${calculateAge(activeTank.startDate)}
 - Current Water Balance: ${waterBalanceLine}
-- Tap Water Baseline: pH ${tap.ph || 7.4}, NO₃ ${tap.no3 || 0} ppm, GH ${tap.gh || 8} dGH, KH ${tap.kh || 4} dKH
+- Tap Water Baseline: pH ${tap.ph || 7.4}, NO3 ${tap.no3 || 0} ppm, GH ${tap.gh || 8} dGH, KH ${tap.kh || 4} dKH
 - Filtration & Gear: Equipment: ${equipStr} | Media: ${mediaStr}
 - Ecosystem Biota: Livestock: ${liveStr} | Flora: ${plantsStr} | Hardscape: ${decorStr}
 - Household Supplies & Treatments: ${closetStr}
-
-User Query / Symptom Description: ${q || "Please analyze the attached image in the context of this aquarium."}
 
 Instructions:
 1. Provide a scientifically grounded, holistic assessment taking into account water parameters, filtration, bioload, and flora.
 2. If disease symptoms or water problems are identified, provide exact dosage instructions utilizing In-Stock products from the user's Household Supplies first (never prescribe Out-of-Stock items unless telling them to restock).
 3. Explicitly note invertebrate, scaleless-fish, and live-plant safety if recommending any treatments.
-4. Keep the explanation concise, actionable, and encouraging for a beginner aquarist.`;
+4. Keep the explanation concise, structured, actionable, and free of emojis.`;
 
       try {
-        const parts = [{ text: promptText }];
-        if (activeVisionBase64) {
-          parts.push({
-            inlineData: { mimeType: "image/jpeg", data: activeVisionBase64 }
-          });
-        }
-
-        const reply = await callGeminiGenerate(parts);
-        box.innerHTML = renderMarkdownToHtml(reply);
+        const contents = buildMultiTurnContents(tankAiThreads[activeTank.id]);
+        const reply = await callGeminiGenerate(contents, systemPrompt);
+        tankAiThreads[activeTank.id].push({ role: "model", text: reply });
       } catch (err) {
-        box.innerHTML = `<span style="color:var(--alert-red)">Error communicating with Gemini API. Check your connection or API key in Settings.</span>`;
+        tankAiThreads[activeTank.id].push({
+          role: "model",
+          isError: true,
+          text: `Unable to reach Gemini API (${err.message || "connection error"}). Check your connection or API key in Settings.`
+        });
       }
+      renderActiveTankAIThread();
     }
 
     function copyTankDelta() {
@@ -6115,13 +6658,81 @@ Instructions:
       }
     }
 
+    function formatInlineMarkdown(escapedLine) {
+      return escapedLine
+        .replace(/`([^`]+)`/g, "<code>$1</code>")
+        .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+        .replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<i>$2</i>");
+    }
+
     function renderMarkdownToHtml(text) {
       if (!text) return "";
-      return text
-        .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
-        .replace(/\*(.*?)\*/g, "<i>$1</i>")
-        .replace(/\n- /g, "<br>• ")
-        .replace(/\n/g, "<br>");
+      const lines = String(text).replace(/\r\n/g, "\n").split("\n");
+      const out = [];
+      let listMode = null; // "ul" | "ol"
+      let paraBuf = [];
+
+      const flushPara = () => {
+        if (paraBuf.length > 0) {
+          out.push(`<p>${paraBuf.join("<br>")}</p>`);
+          paraBuf = [];
+        }
+      };
+      const closeList = () => {
+        if (listMode) {
+          out.push(`</${listMode}>`);
+          listMode = null;
+        }
+      };
+
+      for (const rawLine of lines) {
+        const trimmed = rawLine.trim();
+        if (!trimmed) {
+          flushPara();
+          closeList();
+          continue;
+        }
+
+        const headingMatch = trimmed.match(/^(#{1,4})\s+(.*)$/);
+        if (headingMatch) {
+          flushPara();
+          closeList();
+          const tag = headingMatch[1].length <= 2 ? "h3" : "h4";
+          out.push(`<${tag}>${formatInlineMarkdown(escapeHtmlText(headingMatch[2]))}</${tag}>`);
+          continue;
+        }
+
+        const ulMatch = trimmed.match(/^[-*•]\s+(.*)$/);
+        if (ulMatch) {
+          flushPara();
+          if (listMode !== "ul") {
+            closeList();
+            out.push("<ul>");
+            listMode = "ul";
+          }
+          out.push(`<li>${formatInlineMarkdown(escapeHtmlText(ulMatch[1]))}</li>`);
+          continue;
+        }
+
+        const olMatch = trimmed.match(/^\d+[.)]\s+(.*)$/);
+        if (olMatch) {
+          flushPara();
+          if (listMode !== "ol") {
+            closeList();
+            out.push("<ol>");
+            listMode = "ol";
+          }
+          out.push(`<li>${formatInlineMarkdown(escapeHtmlText(olMatch[1]))}</li>`);
+          continue;
+        }
+
+        closeList();
+        paraBuf.push(formatInlineMarkdown(escapeHtmlText(trimmed)));
+      }
+
+      flushPara();
+      closeList();
+      return `<div class="ai-md">${out.join("")}</div>`;
     }
 
     /* ============================================================
@@ -6553,6 +7164,7 @@ Instructions:
       appState.apiKey = document.getElementById("setting-api-key").value.trim();
       const apiStatusEl = document.getElementById("api-key-status");
       if (apiStatusEl) apiStatusEl.style.display = "none";
+      updateGlobalAIKeyNotice();
       saveDataToStorage();
     }
 
@@ -6564,6 +7176,7 @@ Instructions:
 
       const key = inputEl.value.trim();
       appState.apiKey = key;
+      updateGlobalAIKeyNotice();
       saveDataToStorage();
 
       if (!key) {
@@ -6601,6 +7214,9 @@ Instructions:
       }
       appState.tanks = [];
       activeTankId = 0;
+      globalAiThread = [];
+      tankAiThreads = {};
+      lastEvaluatedSandbox = null;
       saveDataToStorage();
       closeModalById("settingsModal");
       navToGlobal("dashboard", false);
