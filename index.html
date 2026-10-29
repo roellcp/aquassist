@@ -1670,8 +1670,9 @@
         <select id="edit-supply-cat">
           <option value="conditioner">Conditioner</option>
           <option value="bacteria">Bacteria &amp; Cycling</option>
-          <option value="medication">Treatment</option>
+          <option value="food">Food</option>
           <option value="fertilizer">Fertilizer</option>
+          <option value="medication">Treatment</option>
           <option value="testing">Testing &amp; Media</option>
         </select>
       </div>
@@ -1824,9 +1825,10 @@
     const SUPPLY_CATEGORIES = [
       { key: "conditioner", label: "Conditioners & Water Chemistry" },
       { key: "bacteria", label: "Bacteria & Cycling" },
+      { key: "food", label: "Food" },
+      { key: "fertilizer", label: "Plant Fertilizers" },
       { key: "medication", label: "Medications & Treatments" },
-      { key: "fertilizer", label: "Plant Fertilizers & Nutrition" },
-      { key: "testing", label: "Test Kits, Food & Spare Media" }
+      { key: "testing", label: "Testing & Spare Media" }
     ];
 
     const COMMON_SUPPLY_STAPLES = [
@@ -1837,13 +1839,17 @@
       "Fritz TurboStart 700",
       "Seachem Stability",
       "DrTim's Ammonium Chloride",
+      "Fluval Bug Bites",
+      "Hikari Micro Pellets",
+      "Algae Wafers",
+      "Frozen Bloodworms",
+      "Aquarium Co-Op Easy Green",
+      "Seachem Flourish",
+      "Root Tabs",
       "Ich-X",
       "Seachem Kanaplex",
       "Hikari PraziPro",
       "Aquarium Salt",
-      "Aquarium Co-Op Easy Green",
-      "Seachem Flourish",
-      "Root Tabs",
       "API Freshwater Master Test Kit",
       "Seachem Purigen"
     ];
@@ -2204,6 +2210,33 @@
         safety: { label: "Remove Before Medicating", tone: "caution" },
         conflicts: [],
         tankDoseFn: () => `100 ml bag polishes up to 100 Gal for ~60 days (regenerable)`
+      },
+      {
+        key: "algae_wafers",
+        keywords: ["algae wafer", "sinking wafer", "pleco wafer", "crab cuisine"],
+        cat: "food",
+        subType: "bottom_food",
+        safety: { label: "Bottom-Feeder & Snail Diet", tone: "safe" },
+        conflicts: [],
+        tankDoseFn: () => `Feed 0.5–1 wafer near lights-out; remove uneaten portion after 2 hours to prevent NH₃ spikes`
+      },
+      {
+        key: "frozen_food",
+        keywords: ["bloodworm", "brine shrimp", "daphnia", "mysis", "tubifex"],
+        cat: "food",
+        subType: "treat_food",
+        safety: { label: "High-Protein Treat", tone: "safe" },
+        conflicts: [],
+        tankDoseFn: () => `Thaw small portion in tank water and feed 1–2x weekly alongside staple diet`
+      },
+      {
+        key: "staple_food",
+        keywords: ["bug bite", "micro pellet", "vibra bite", "bio-gold", "tetramin", "fish flake", "pellets", "flakes", "repashy", "xtreme"],
+        cat: "food",
+        subType: "staple_food",
+        safety: { label: "Daily Staple Diet", tone: "safe" },
+        conflicts: [],
+        tankDoseFn: () => `Feed only what fish consume within 60–90 seconds once daily`
       }
     ];
 
@@ -2225,6 +2258,7 @@
       if (/(dechlor|conditioner|chlorine|chloramine|buffer|gh|kh|remineral|ph up|ph down|coral|ammonia detox)/.test(lower)) return "conditioner";
       if (/(bacteria|zyme|cycle|starter|nitrif|ammonia|bio-spira|biospira)/.test(lower)) return "bacteria";
       if (/(ich|salt|cure|med|fungus|parasite|antibiotic|methylene|malachite|acriflavine|levamisole|flubendazole|metroplex|focus|polyguard|melafix|pimafix)/.test(lower)) return "medication";
+      if (/(pellet|flake|wafer|food|hikari|bug bite|bloodworm|brine|daphnia|repashy|spirulina|krill|tubifex|freeze-dried|freeze dried|frozen|northfin|xtreme|granule|crisp)/.test(lower)) return "food";
       if (/(fert|plant|iron|potassium|nitrogen|phosphorus|trace|leaf zone|macro|micro|tab)/.test(lower)) return "fertilizer";
       return "testing";
     }
@@ -2268,6 +2302,11 @@
       if (needsNorm) {
         stateObj.closet = stateObj.closet.map((item, idx) => normalizeSupplyItem(item, idx)).filter(Boolean);
       }
+      stateObj.closet.forEach(item => {
+        if (item.cat === "testing" && inferSupplyCategory(item.name) === "food") {
+          item.cat = "food";
+        }
+      });
       return stateObj.closet;
     }
 
@@ -3058,6 +3097,7 @@
         if (item.cat === "conditioner") doseText = `Follow bottle directions for ${displayVol(gal * 0.25)} ${u.vol} (25% WC) or ${disp} ${u.vol} full tank`;
         else if (item.cat === "bacteria") doseText = `Follow starter/booster directions for ${disp} ${u.vol} water volume`;
         else if (item.cat === "medication") doseText = `Check label dosing for ${disp} ${u.vol}; remove carbon/Purigen prior to treatment`;
+        else if (item.cat === "food") doseText = `Feed small portions consumed within 60–90 seconds; avoid overfeeding`;
         else if (item.cat === "fertilizer") doseText = `Follow weekly plant dosing directions for ${disp} ${u.vol}`;
         else doseText = `Shared household supply / maintenance item`;
       }
@@ -4337,8 +4377,9 @@
     const SUPPLY_SHORT_CAT_LABELS = {
       conditioner: "Conditioner",
       bacteria: "Cycling",
-      medication: "Treatment",
+      food: "Food",
       fertilizer: "Fertilizer",
+      medication: "Treatment",
       testing: "Testing"
     };
 
@@ -4366,7 +4407,7 @@
         return;
       }
 
-      const catRank = { conditioner: 1, bacteria: 2, fertilizer: 3, medication: 4, testing: 5 };
+      const catRank = { conditioner: 1, bacteria: 2, food: 3, fertilizer: 4, medication: 5, testing: 6 };
       const sorted = items
         .map((item, idx) => ({ item, idx }))
         .sort((a, b) => {
