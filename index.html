@@ -1432,6 +1432,11 @@
           status: "Established",
           color: "#00F5A0",
           startDate: "2025-01-15",
+          lastWaterChange: "2026-10-25",
+          lastGlassClean: "2026-10-25",
+          lastPlantCare: "2026-10-25",
+          lastImpellerClean: "2026-10-05",
+          lastHeaterCheck: "2026-10-05",
           image: "",
           summary: "Biological filtration stable with zero Ammonia & Nitrite. Nitrates are in safe zone.",
           lastTest: { nh3: 0, no2: 0, no3: 15, ph: 7.2, temp: 78.0, date: "2026-10-25" },
@@ -1451,7 +1456,7 @@
           filterMedia: [
             { id: 101, name: "Coarse Foam Sponge", cat: "mechanical", interval: 30, lastDate: "2026-10-10" },
             { id: 102, name: "Seachem Purigen", cat: "chemical", interval: 90, lastDate: "2026-09-01" },
-            { id: 103, name: "Bio-Rings & Substrat Pro", cat: "biological", interval: 0, lastDate: "2025-01-15" }
+            { id: 103, name: "Bio-Rings & Substrat Pro", cat: "biological", interval: 90, lastDate: "2026-09-01" }
           ],
           livestock: ["12x Neon Tetra", "6x Harlequin Rasbora", "3x Otocinclus"],
           losses: [],
@@ -1465,6 +1470,11 @@
           status: "Cycling",
           color: "#38BDF8",
           startDate: "2026-10-10",
+          lastWaterChange: "2026-10-18",
+          lastGlassClean: "2026-10-24",
+          lastPlantCare: "2026-10-24",
+          lastImpellerClean: "2026-10-10",
+          lastHeaterCheck: "2026-10-10",
           image: "",
           summary: "Nitrogen cycle in progress. Nitrite conversion active.",
           lastTest: { nh3: 0.25, no2: 1.0, no3: 10, ph: 7.0, temp: 79.0, date: "2026-10-26" },
@@ -1481,7 +1491,7 @@
           equipment: ["Aquaclear 20 HOB", "50W Preset Heater"],
           filterMedia: [
             { id: 201, name: "Aquaclear Sponge", cat: "mechanical", interval: 21, lastDate: "2026-10-15" },
-            { id: 202, name: "Biomax Ceramic Rings", cat: "biological", interval: 0, lastDate: "2026-10-10" }
+            { id: 202, name: "Biomax Ceramic Rings", cat: "biological", interval: 90, lastDate: "2026-10-10" }
           ],
           livestock: ["1x Halfmoon Betta", "1x Nerite Snail"],
           losses: [],
@@ -1888,16 +1898,21 @@
         }
       }
 
+      // Tasks stat on hero card
+      const allUpcomingTasks = [];
+      appState.tanks.forEach(tank => allUpcomingTasks.push(...generateTankTasks(tank, 7)));
+      const dueNowCount = allUpcomingTasks.filter(t => t.daysRemaining <= 0).length;
+
       if (statTasksEl) {
         if (totalTanks === 0) {
           statTasksEl.innerText = "--";
           statTasksEl.style.color = "var(--text-muted)";
-        } else if (taskCount === 0) {
-          statTasksEl.innerText = "0 Due";
-          statTasksEl.style.color = "var(--neon-green)";
-        } else {
-          statTasksEl.innerText = `${taskCount} Due`;
+        } else if (dueNowCount > 0) {
+          statTasksEl.innerText = `${dueNowCount} Due`;
           statTasksEl.style.color = "var(--alert-yellow)";
+        } else {
+          statTasksEl.innerText = `${allUpcomingTasks.length} in 7d`;
+          statTasksEl.style.color = "var(--neon-green)";
         }
       }
 
@@ -1912,15 +1927,12 @@
           const tHigh = highNitrateTanks[0];
           sumEl.innerHTML = `⚠️ Nitrates in <b>${tHigh.tank.name}</b> reached <b>${tHigh.no3} ppm</b>. A 25–30% water change is recommended to keep water clean and livestock safe.`;
         } else if (cyclingTanks.length > 0 && cyclingTanks.length === totalTanks) {
-          sumEl.innerHTML = `<b>${cyclingTanks[0].name}</b> is actively cycling. Beneficial nitrifying bacteria are cultivating—no water change needed unless ammonia exceeds 2.0 ppm.`;
-        } else if (taskCount > 0) {
-          sumEl.innerHTML = `All water parameters are in the safe zone with zero detectable toxins. You have <b>${taskCount} routine task${taskCount > 1 ? 's' : ''}</b> ready for attention below.`;
-        } else if (minWcDays < 999 && nextWcTankName) {
-          if (minWcDays === 0) {
-            sumEl.innerHTML = `All tanks are healthy and biologically stable. Water change for <b>${nextWcTankName}</b> is scheduled for today.`;
-          } else {
-            sumEl.innerHTML = `All tanks are healthy and biologically balanced with zero ammonia or nitrite. Next scheduled care is for <b>${nextWcTankName}</b> in <b>${minWcDays} day${minWcDays > 1 ? 's' : ''}</b>.`;
-          }
+          sumEl.innerHTML = `<b>${cyclingTanks[0].name}</b> is actively cycling. Beneficial nitrifying bacteria are cultivating—test every 2 days and hold water changes unless ammonia exceeds 2.0 ppm.`;
+        } else if (dueNowCount > 0) {
+          sumEl.innerHTML = `All water parameters are safe. You have <b>${dueNowCount} maintenance task${dueNowCount > 1 ? 's' : ''} due today</b> across your aquariums.`;
+        } else if (allUpcomingTasks.length > 0) {
+          const nextTask = allUpcomingTasks[0];
+          sumEl.innerHTML = `All tanks are healthy and biologically balanced. Next scheduled care is <b>${nextTask.title}</b> (${nextTask.subtitle.toLowerCase()}).`;
         } else {
           sumEl.innerHTML = `All tanks are healthy and biologically balanced. Zero ammonia, zero nitrite, and all routines are on schedule.`;
         }
@@ -1997,115 +2009,330 @@
       });
     }
 
-    /* Actionable Upcoming Tasks & Maintenance Checklist (Recommendation 3) */
-    function renderDashboardTasks() {
-      const listEl = document.getElementById("dashboard-tasks-list");
-      const badgeEl = document.getElementById("dashboard-tasks-badge");
-      if (!listEl) return;
-      listEl.innerHTML = "";
+    /* ============================================================
+       3. 7-DAY TANK MAINTENANCE & SCHEDULING ENGINE
+       ============================================================ */
+    function formatTaskSubtitle(daysRemaining) {
+      if (daysRemaining < 0) {
+        return `Overdue by ${Math.abs(daysRemaining)} day${Math.abs(daysRemaining) > 1 ? 's' : ''}`;
+      } else if (daysRemaining === 0) {
+        return `Due today`;
+      } else if (daysRemaining === 1) {
+        return `Due tomorrow`;
+      } else {
+        const targetDate = new Date();
+        targetDate.setDate(targetDate.getDate() + daysRemaining);
+        const dayName = targetDate.toLocaleDateString(undefined, { weekday: 'short' });
+        return `Due in ${daysRemaining} days (${dayName})`;
+      }
+    }
 
+    function generateTankTasks(tank, windowDays = 7) {
+      if (!tank) return [];
       const u = getUnitLabels();
       const today = new Date();
       const tasks = [];
+      const isCycling = tank.status === "Cycling";
 
-      appState.tanks.forEach((tank) => {
-        // 1. Water Change Task check
+      // 1. Chemical Water Test
+      const testInterval = isCycling ? 2 : 7;
+      const lastTestDate = tank.lastTest?.date || tank.startDate;
+      let daysSinceTest = 0;
+      if (lastTestDate) {
+        daysSinceTest = Math.floor((today - new Date(lastTestDate)) / (1000 * 60 * 60 * 24));
+      }
+      const daysUntilTest = testInterval - daysSinceTest;
+      if (daysUntilTest <= windowDays) {
+        tasks.push({
+          id: `test-${tank.id}`,
+          type: "test",
+          tankId: tank.id,
+          tankName: tank.name,
+          title: `🧪 ${tank.name}: ${isCycling ? 'Cycling Water Test (NH₃ & NO₂ check)' : 'Chemical Water Test'}`,
+          planTabTitle: `🧪 ${isCycling ? 'Cycling Water Test (Ammonia & Nitrite)' : 'Chemical Water Test'}`,
+          subtitle: formatTaskSubtitle(daysUntilTest),
+          daysRemaining: daysUntilTest,
+          isOverdue: daysUntilTest < 0,
+          isToday: daysUntilTest === 0,
+          actionLabel: "🧪 Test",
+          actionFn: `enterTankHub(${tank.id}); switchTankTab('water'); openTestModalForActiveTank();`,
+          planTabActionFn: `openTestModalForActiveTank()`
+        });
+      }
+
+      // 2. Water Change & Gravel Vacuum
+      if (isCycling) {
+        // In cycling tanks, routine water changes are suppressed to let nitrifying bacteria cultivate.
+        // Only schedule an emergency water change if ammonia >= 2.0 ppm or nitrite >= 3.0 ppm.
+        const nh3Val = tank.lastTest ? parseFloat(tank.lastTest.nh3 || 0) : 0;
+        const no2Val = tank.lastTest ? parseFloat(tank.lastTest.no2 || 0) : 0;
+        if (nh3Val >= 2.0 || no2Val >= 3.0) {
+          tasks.push({
+            id: `wc-${tank.id}`,
+            type: "wc",
+            tankId: tank.id,
+            tankName: tank.name,
+            title: `💧 ${tank.name}: Cycling Safety Water Change (Ammonia/Nitrite Spike)`,
+            planTabTitle: `💧 Safety Water Change (~${Math.round(tank.vol * 0.25)} ${u.vol} due to high NH₃/NO₂)`,
+            subtitle: `Due today (Toxic Spike)`,
+            daysRemaining: 0,
+            isOverdue: false,
+            isToday: true,
+            actionLabel: "💧 Log Change",
+            actionFn: `openQuickWcModal(${tank.id})`,
+            planTabActionFn: `openQuickWcForActiveTank()`
+          });
+        }
+      } else {
         let lastWcDate = tank.lastWaterChange;
-        if (!lastWcDate && tank.history) {
-          const wcEntry = tank.history.find(h => h.wc && h.wc > 0);
-          if (wcEntry) lastWcDate = wcEntry.date;
+        if (!lastWcDate && tank.history && tank.history.length > 0) {
+          const wcEntries = tank.history.filter(h => h.wc && h.wc > 0);
+          if (wcEntries.length > 0) {
+            lastWcDate = wcEntries.map(e => e.date).sort().reverse()[0];
+          }
         }
         if (!lastWcDate) lastWcDate = tank.startDate;
-
         let daysSinceWc = 0;
         if (lastWcDate) {
           daysSinceWc = Math.floor((today - new Date(lastWcDate)) / (1000 * 60 * 60 * 24));
         }
-
-        if (daysSinceWc >= 7) {
-          const isOverdue = daysSinceWc >= 10;
+        const daysUntilWc = 7 - daysSinceWc;
+        if (daysUntilWc <= windowDays) {
           tasks.push({
+            id: `wc-${tank.id}`,
             type: "wc",
             tankId: tank.id,
             tankName: tank.name,
-            title: `💧 ${tank.name}: Weekly Water Change (~${Math.round(tank.vol * 0.25)} ${u.vol})`,
-            subtitle: `${daysSinceWc} days since last change${isOverdue ? ' • Overdue' : ''}`,
-            isOverdue: isOverdue,
+            title: `💧 ${tank.name}: Routine Water Change (~${Math.round(tank.vol * 0.25)} ${u.vol})`,
+            planTabTitle: `💧 Routine Water Change (~${Math.round(tank.vol * 0.25)} ${u.vol})`,
+            subtitle: formatTaskSubtitle(daysUntilWc),
+            daysRemaining: daysUntilWc,
+            isOverdue: daysUntilWc < 0,
+            isToday: daysUntilWc === 0,
             actionLabel: "💧 Log Change",
-            actionFn: `openQuickWcModal(${tank.id})`
+            actionFn: `openQuickWcModal(${tank.id})`,
+            planTabActionFn: `openQuickWcForActiveTank()`
           });
         }
+      }
 
-        // 2. Filter Media Lifecycle check
-        (tank.filterMedia || []).forEach((media, mIdx) => {
-          if (media.interval > 0 && media.lastDate) {
-            const daysSince = Math.floor((today - new Date(media.lastDate)) / (1000 * 60 * 60 * 24));
-            const daysRemaining = media.interval - daysSince;
-            if (daysRemaining <= 3) {
-              const isOverdue = daysRemaining <= 0;
-              tasks.push({
-                type: "filter",
-                tankId: tank.id,
-                tankName: tank.name,
-                title: `🧽 ${tank.name}: Rinse ${media.name}`,
-                subtitle: isOverdue ? `Overdue by ${Math.abs(daysRemaining)} days` : `Due in ${daysRemaining} day(s)`,
-                isOverdue: isOverdue,
-                actionLabel: "✓ Done",
-                actionFn: `markFilterRinsedFromDashboard(${tank.id}, ${mIdx})`
-              });
-            }
-          }
+      // 3. Glass Algae Wipe & Scraping
+      let lastGlass = tank.lastGlassClean || tank.lastWaterChange || (tank.lastTest ? tank.lastTest.date : null);
+      let daysSinceGlass = 0;
+      if (lastGlass) {
+        daysSinceGlass = Math.floor((today - new Date(lastGlass)) / (1000 * 60 * 60 * 24));
+      } else {
+        daysSinceGlass = 3;
+      }
+      const daysUntilGlass = 7 - daysSinceGlass;
+      if (daysUntilGlass <= windowDays) {
+        tasks.push({
+          id: `glass-${tank.id}`,
+          type: "glass",
+          tankId: tank.id,
+          tankName: tank.name,
+          title: `🪟 ${tank.name}: Wipe Glass & Clean Algae`,
+          planTabTitle: `🪟 Wipe Glass & Clean Algae`,
+          subtitle: formatTaskSubtitle(daysUntilGlass),
+          daysRemaining: daysUntilGlass,
+          isOverdue: daysUntilGlass < 0,
+          isToday: daysUntilGlass === 0,
+          actionLabel: "✓ Done",
+          actionFn: `markGlassCleaned(${tank.id})`,
+          planTabActionFn: `markGlassCleaned(${tank.id})`
         });
+      }
 
-        // 3. Water Test check
-        const lastTestDate = tank.lastTest?.date || tank.startDate;
-        if (lastTestDate) {
-          const daysSinceTest = Math.floor((today - new Date(lastTestDate)) / (1000 * 60 * 60 * 24));
-          if (daysSinceTest >= 8) {
-            tasks.push({
-              type: "test",
-              tankId: tank.id,
-              tankName: tank.name,
-              title: `🧪 ${tank.name}: Chemical Water Test`,
-              subtitle: `${daysSinceTest} days since last test`,
-              isOverdue: daysSinceTest >= 12,
-              actionLabel: "🧪 Test",
-              actionFn: `enterTankHub(${tank.id}); switchTankTab('water');`
-            });
+      // 4. Filter Media Care
+      (tank.filterMedia || []).forEach((m, mIdx) => {
+        let interval = m.interval;
+        if (!interval || interval <= 0) {
+          if (m.cat === "cartridge") interval = 28;
+          else if (m.cat === "chemical") interval = 60;
+          else if (m.cat === "biological") interval = 90;
+          else interval = 21;
+        }
+        let daysSinceMedia = 0;
+        if (m.lastDate) {
+          daysSinceMedia = Math.floor((today - new Date(m.lastDate)) / (1000 * 60 * 60 * 24));
+          if (m.cat === "biological" && daysSinceMedia > interval) {
+            daysSinceMedia = interval - 5;
           }
+        } else {
+          daysSinceMedia = Math.max(0, interval - 5);
+        }
+        const daysUntilMedia = interval - daysSinceMedia;
+        if (daysUntilMedia <= windowDays) {
+          const verb = m.cat === "cartridge" || m.cat === "chemical" ? "Replace" : (m.cat === "biological" ? "Inspect" : "Rinse");
+          const doneLabel = m.cat === "cartridge" || m.cat === "chemical" ? "✓ Replaced" : "✓ Rinsed";
+          tasks.push({
+            id: `media-${tank.id}-${mIdx}`,
+            type: "filter",
+            tankId: tank.id,
+            tankName: tank.name,
+            title: `🧽 ${tank.name}: ${verb} ${m.name}`,
+            planTabTitle: `🧽 ${verb} ${m.name}`,
+            subtitle: formatTaskSubtitle(daysUntilMedia),
+            daysRemaining: daysUntilMedia,
+            isOverdue: daysUntilMedia < 0,
+            isToday: daysUntilMedia === 0,
+            actionLabel: doneLabel,
+            actionFn: `markFilterRinsedFromDashboard(${tank.id}, ${mIdx})`,
+            planTabActionFn: `resetMediaTimer(${mIdx})`
+          });
         }
       });
 
+      // 5. Plant Pruning & Maintenance (if tank has live plants)
+      if (tank.plants && tank.plants.length > 0) {
+        let lastPlant = tank.lastPlantCare || tank.lastWaterChange || (tank.lastTest ? tank.lastTest.date : null);
+        let daysSincePlant = 0;
+        if (lastPlant) {
+          daysSincePlant = Math.floor((today - new Date(lastPlant)) / (1000 * 60 * 60 * 24));
+        } else {
+          daysSincePlant = 3;
+        }
+        const daysUntilPlant = 7 - daysSincePlant;
+        if (daysUntilPlant <= windowDays) {
+          tasks.push({
+            id: `plant-${tank.id}`,
+            type: "plants",
+            tankId: tank.id,
+            tankName: tank.name,
+            title: `🌿 ${tank.name}: Plant Pruning & Foliage Check`,
+            planTabTitle: `🌿 Plant Pruning & Foliage Check`,
+            subtitle: formatTaskSubtitle(daysUntilPlant),
+            daysRemaining: daysUntilPlant,
+            isOverdue: daysUntilPlant < 0,
+            isToday: daysUntilPlant === 0,
+            actionLabel: "✓ Done",
+            actionFn: `markPlantCareDone(${tank.id})`,
+            planTabActionFn: `markPlantCareDone(${tank.id})`
+          });
+        }
+      }
+
+      // 6. Filter Intake & Impeller Maintenance (every 30 days)
+      let lastImpeller = tank.lastImpellerClean;
+      let daysSinceImpeller = 0;
+      if (lastImpeller) {
+        daysSinceImpeller = Math.floor((today - new Date(lastImpeller)) / (1000 * 60 * 60 * 24));
+      } else {
+        daysSinceImpeller = 24;
+      }
+      const daysUntilImpeller = 30 - daysSinceImpeller;
+      if (daysUntilImpeller <= windowDays) {
+        tasks.push({
+          id: `impeller-${tank.id}`,
+          type: "impeller",
+          tankId: tank.id,
+          tankName: tank.name,
+          title: `⚙️ ${tank.name}: Clean Filter Intake & Check Impeller`,
+          planTabTitle: `⚙️ Clean Filter Intake & Check Impeller`,
+          subtitle: formatTaskSubtitle(daysUntilImpeller),
+          daysRemaining: daysUntilImpeller,
+          isOverdue: daysUntilImpeller < 0,
+          isToday: daysUntilImpeller === 0,
+          actionLabel: "✓ Done",
+          actionFn: `markImpellerCleaned(${tank.id})`,
+          planTabActionFn: `markImpellerCleaned(${tank.id})`
+        });
+      }
+
+      // 7. Heater Calibration & Thermometer Check (every 30 days)
+      let lastHeater = tank.lastHeaterCheck;
+      let daysSinceHeater = 0;
+      if (lastHeater) {
+        daysSinceHeater = Math.floor((today - new Date(lastHeater)) / (1000 * 60 * 60 * 24));
+      } else {
+        daysSinceHeater = 24;
+      }
+      const daysUntilHeater = 30 - daysSinceHeater;
+      if (daysUntilHeater <= windowDays) {
+        tasks.push({
+          id: `heater-${tank.id}`,
+          type: "heater",
+          tankId: tank.id,
+          tankName: tank.name,
+          title: `🌡️ ${tank.name}: Verify Temperature & Heater Calibration`,
+          planTabTitle: `🌡️ Verify Temperature & Heater Calibration`,
+          subtitle: formatTaskSubtitle(daysUntilHeater),
+          daysRemaining: daysUntilHeater,
+          isOverdue: daysUntilHeater < 0,
+          isToday: daysUntilHeater === 0,
+          actionLabel: "✓ Done",
+          actionFn: `markHeaterChecked(${tank.id})`,
+          planTabActionFn: `markHeaterChecked(${tank.id})`
+        });
+      }
+
+      // Sort by urgency: most overdue first, then due today, then closest days remaining
+      tasks.sort((a, b) => a.daysRemaining - b.daysRemaining);
+
+      return tasks;
+    }
+
+    function renderDashboardTasks() {
+      const listEl = document.getElementById("dashboard-tasks-list");
+      const badgeEl = document.getElementById("dashboard-tasks-badge");
+      if (!listEl) return 0;
+      listEl.innerHTML = "";
+
+      const allTasks = [];
+      appState.tanks.forEach(tank => {
+        const tankTasks = generateTankTasks(tank, 7);
+        allTasks.push(...tankTasks);
+      });
+
+      allTasks.sort((a, b) => a.daysRemaining - b.daysRemaining);
+
+      const overdueCount = allTasks.filter(t => t.daysRemaining < 0).length;
+      const todayCount = allTasks.filter(t => t.daysRemaining === 0).length;
+
       if (badgeEl) {
-        if (tasks.length === 0) {
+        if (allTasks.length === 0) {
           badgeEl.innerText = "All Clear";
           badgeEl.style.background = "rgba(0, 245, 160, 0.15)";
           badgeEl.style.color = "var(--neon-green)";
           badgeEl.style.borderColor = "var(--neon-green)";
-        } else {
-          badgeEl.innerText = `${tasks.length} Action${tasks.length > 1 ? 's' : ''} Due`;
+        } else if (overdueCount > 0) {
+          badgeEl.innerText = `${overdueCount} Overdue • ${allTasks.length} in 7 Days`;
+          badgeEl.style.background = "rgba(244, 63, 94, 0.15)";
+          badgeEl.style.color = "var(--alert-red)";
+          badgeEl.style.borderColor = "var(--alert-red)";
+        } else if (todayCount > 0) {
+          badgeEl.innerText = `${todayCount} Due Today • ${allTasks.length} in 7 Days`;
           badgeEl.style.background = "rgba(245, 158, 11, 0.15)";
           badgeEl.style.color = "var(--alert-yellow)";
           badgeEl.style.borderColor = "var(--alert-yellow)";
+        } else {
+          badgeEl.innerText = `${allTasks.length} in Next 7 Days`;
+          badgeEl.style.background = "rgba(56, 189, 248, 0.15)";
+          badgeEl.style.color = "var(--cyan)";
+          badgeEl.style.borderColor = "var(--cyan)";
         }
       }
 
-      if (tasks.length === 0) {
+      if (allTasks.length === 0) {
         listEl.innerHTML = `
           <div style="font-size:12px; color:var(--text-muted); padding:6px 2px; display:flex; align-items:center; gap:8px;">
             <span style="color:var(--neon-green); font-size:16px;">✓</span>
-            All aquariums are maintained and up to date! Next routine scheduled in ~3-5 days.
+            No maintenance tasks scheduled in the next 7 days.
           </div>
         `;
         return 0;
       }
 
-      tasks.forEach((t) => {
+      allTasks.forEach(t => {
+        let subColor = "var(--text-muted)";
+        if (t.isOverdue) subColor = "var(--alert-red)";
+        else if (t.isToday) subColor = "var(--alert-yellow)";
+
         listEl.innerHTML += `
           <div class="task-item-row ${t.isOverdue ? 'overdue' : ''}">
             <div style="flex:1;">
               <div class="task-info-title">${t.title}</div>
-              <div class="task-info-sub">${t.subtitle}</div>
+              <div class="task-info-sub" style="color:${subColor}; font-weight:${t.isOverdue || t.isToday ? '600' : 'normal'};">${t.subtitle}</div>
             </div>
             <button class="btn btn-secondary" style="width:auto; padding:5px 12px; font-size:11px; white-space:nowrap; ${t.isOverdue ? 'border-color:var(--alert-red); color:#fff;' : 'color:var(--cyan);'}" onclick="${t.actionFn}">
               ${t.actionLabel}
@@ -2113,7 +2340,8 @@
           </div>
         `;
       });
-      return tasks.length;
+
+      return allTasks.length;
     }
 
     function markFilterRinsedFromDashboard(tankId, mIdx) {
@@ -2129,7 +2357,75 @@
       });
       saveDataToStorage();
       renderDashboardTasks();
+      if (isInsideTank && activeTankId == tank.id) {
+        renderTankPlanTab();
+        renderTankOverviewTab();
+      }
       showToast(`Rinsed ${media.name}!`);
+    }
+
+    function markGlassCleaned(tankId) {
+      const tank = appState.tanks.find(t => t.id == tankId);
+      if (!tank) return;
+      const today = new Date().toISOString().split("T")[0];
+      tank.lastGlassClean = today;
+      if (!tank.timeline) tank.timeline = [];
+      tank.timeline.unshift({ date: today, text: "🪟 Cleaned algae from aquarium glass" });
+      saveDataToStorage();
+      renderDashboardTasks();
+      if (isInsideTank && activeTankId == tank.id) {
+        renderTankPlanTab();
+        renderTankOverviewTab();
+      }
+      showToast("Glass Cleaning Logged");
+    }
+
+    function markImpellerCleaned(tankId) {
+      const tank = appState.tanks.find(t => t.id == tankId);
+      if (!tank) return;
+      const today = new Date().toISOString().split("T")[0];
+      tank.lastImpellerClean = today;
+      if (!tank.timeline) tank.timeline = [];
+      tank.timeline.unshift({ date: today, text: "⚙️ Cleaned filter intake & inspected impeller" });
+      saveDataToStorage();
+      renderDashboardTasks();
+      if (isInsideTank && activeTankId == tank.id) {
+        renderTankPlanTab();
+        renderTankOverviewTab();
+      }
+      showToast("Filter Intake & Impeller Cleaned");
+    }
+
+    function markPlantCareDone(tankId) {
+      const tank = appState.tanks.find(t => t.id == tankId);
+      if (!tank) return;
+      const today = new Date().toISOString().split("T")[0];
+      tank.lastPlantCare = today;
+      if (!tank.timeline) tank.timeline = [];
+      tank.timeline.unshift({ date: today, text: "🌿 Pruned plants & checked foliage health" });
+      saveDataToStorage();
+      renderDashboardTasks();
+      if (isInsideTank && activeTankId == tank.id) {
+        renderTankPlanTab();
+        renderTankOverviewTab();
+      }
+      showToast("Plant Care Logged");
+    }
+
+    function markHeaterChecked(tankId) {
+      const tank = appState.tanks.find(t => t.id == tankId);
+      if (!tank) return;
+      const today = new Date().toISOString().split("T")[0];
+      tank.lastHeaterCheck = today;
+      if (!tank.timeline) tank.timeline = [];
+      tank.timeline.unshift({ date: today, text: "🌡️ Verified water temperature & heater thermostat" });
+      saveDataToStorage();
+      renderDashboardTasks();
+      if (isInsideTank && activeTankId == tank.id) {
+        renderTankPlanTab();
+        renderTankOverviewTab();
+      }
+      showToast("Heater Check Logged");
     }
 
     /* Decoupled Quick Water Change Engine (Recommendation 1) */
@@ -2961,57 +3257,36 @@ Water Temp: ${t.temp}${u.temp} • pH: ${t.ph}<br>
 
       const activeTank = getActiveTank();
       if (!activeTank) return;
-      const u = getUnitLabels();
-      const today = new Date();
-      const tasks = [];
 
-      // 1. Water change check
-      let lastWcDate = activeTank.lastWaterChange;
-      if (!lastWcDate && activeTank.history) {
-        const wcEntry = activeTank.history.find(h => h.wc && h.wc > 0);
-        if (wcEntry) lastWcDate = wcEntry.date;
+      const tasks = generateTankTasks(activeTank, 7);
+
+      if (tasks.length === 0) {
+        listEl.innerHTML = `
+          <div style="font-size:12px; color:var(--text-muted); padding:10px 0; display:flex; align-items:center; gap:8px;">
+            <span style="color:var(--neon-green); font-size:16px;">✓</span>
+            All maintenance is current. No tasks scheduled for this aquarium in the next 7 days.
+          </div>
+        `;
+        return;
       }
-      if (!lastWcDate) lastWcDate = activeTank.startDate;
-      let daysSinceWc = 0;
-      if (lastWcDate) {
-        daysSinceWc = Math.floor((today - new Date(lastWcDate)) / (1000 * 60 * 60 * 24));
-      }
-      const daysUntilWc = Math.max(0, 7 - daysSinceWc);
-      tasks.push({
-        title: `Routine Water Change (~${Math.round(activeTank.vol * 0.25)} ${u.vol})`,
-        sub: daysUntilWc === 0 ? "Due today" : `Scheduled in ${daysUntilWc} day${daysUntilWc > 1 ? 's' : ''}`,
-        isOverdue: daysSinceWc >= 10,
-        action: () => openQuickWcForActiveTank(),
-        btnText: "Log Change"
-      });
 
-      // 2. Filter media checks
-      (activeTank.filterMedia || []).forEach((m, idx) => {
-        if (m.interval > 0 && m.lastDate) {
-          const diff = Math.floor((today - new Date(m.lastDate)) / (1000 * 60 * 60 * 24));
-          const left = m.interval - diff;
-          tasks.push({
-            title: `${m.cat === 'cartridge' || m.cat === 'chemical' ? 'Replace' : 'Rinse'} ${m.name}`,
-            sub: left <= 0 ? `Overdue by ${Math.abs(left)} days` : `Due in ${left} days`,
-            isOverdue: left < 0,
-            action: () => resetMediaTimer(idx),
-            btnText: "Done"
-          });
-        }
-      });
-
-      // Render tasks
       tasks.forEach(t => {
+        let subColor = "var(--text-muted)";
+        if (t.isOverdue) subColor = "var(--alert-red)";
+        else if (t.isToday) subColor = "var(--alert-yellow)";
+
         const row = document.createElement("div");
         row.className = `task-item-row ${t.isOverdue ? 'overdue' : ''}`;
         row.innerHTML = `
-          <div>
-            <div class="task-info-title">${t.title}</div>
-            <div class="task-info-sub">${t.sub}</div>
+          <div style="flex:1;">
+            <div class="task-info-title">${t.planTabTitle}</div>
+            <div class="task-info-sub" style="color:${subColor}; font-weight:${t.isOverdue || t.isToday ? '600' : 'normal'};">${t.subtitle}</div>
           </div>
-          <button class="btn btn-secondary" style="width:auto; font-size:11px; padding:6px 12px;">${t.btnText}</button>
+          <button class="btn btn-secondary" style="width:auto; font-size:11px; padding:6px 12px; white-space:nowrap; ${t.isOverdue ? 'border-color:var(--alert-red); color:#fff;' : 'color:var(--cyan);'}">${t.actionLabel}</button>
         `;
-        row.querySelector("button").onclick = t.action;
+        row.querySelector("button").onclick = () => {
+          eval(t.planTabActionFn);
+        };
         listEl.appendChild(row);
       });
     }
