@@ -677,6 +677,10 @@
       background: rgba(255, 255, 255, 0.025); border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 12px; padding: 8px 12px; margin-bottom: 12px; display: none;
     }
+    .ai-sessions-drawer.open {
+      display: block;
+      animation: modalFade 0.18s ease-out;
+    }
     .ai-session-row {
       display: flex; justify-content: space-between; align-items: center; gap: 10px;
       padding: 8px 2px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); cursor: pointer;
@@ -1070,7 +1074,7 @@
         <!-- Nitrogen Cycling Roadmap (Rendered dynamically when tank is in Cycling status) -->
         <div id="tank-cycling-roadmap-wrap"></div>
 
-        <!-- Unified Aquarist AI Ecosystem Assessment + Care Plan Strip + Quick Chat Entry -->
+        <!-- Unified Aquarist AI Ecosystem Assessment + Quick Chat Entry -->
         <div class="card" id="tank-ai-card" style="background: linear-gradient(135deg, rgba(0, 245, 160, 0.07), rgba(6, 12, 24, 0.95)); border-color: rgba(0, 245, 160, 0.3);">
           <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px;">
             <div style="font-size: 11px; font-weight: 800; color: var(--neon-green); text-transform: uppercase; letter-spacing: 0.8px;">
@@ -1079,17 +1083,6 @@
             <button type="button" id="tank-open-ai-chat-btn" class="ghost-action-btn" style="padding:3px 10px; font-size:11px;" onclick="openTankFocusedChat()">Open Chat</button>
           </div>
           <div id="tank-overview-summary" style="font-size: 13.5px; line-height: 1.55; color: var(--text-main);"></div>
-
-          <div class="care-plan-strip" id="overview-care-strip">
-            <div class="care-plan-cell">
-              <div class="care-plan-lbl">Next Water Change</div>
-              <div id="action-wc-plan" class="care-plan-val"></div>
-            </div>
-            <div class="care-plan-cell">
-              <div class="care-plan-lbl">Conditioning &amp; Dosing</div>
-              <div id="action-dose-plan" class="care-plan-val"></div>
-            </div>
-          </div>
 
           <div style="margin-top:12px; padding-top:11px; border-top:1px solid rgba(255,255,255,0.07);">
             <div id="ai-vision-preview-chip" style="display:none; align-items:center; gap:8px; margin-bottom:8px; background:rgba(0,210,255,0.08); border:1px solid rgba(0,210,255,0.28); border-radius:10px; padding:6px 10px;">
@@ -1127,9 +1120,12 @@
 
         <!-- Upcoming Care Checklist (Folded cleanly from Plan) -->
         <div class="card" id="overview-tasks-card">
-          <div class="card-header" id="overview-tasks-header">
+          <div class="card-header" id="overview-tasks-header" style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
             <div class="card-title">Upcoming Care</div>
-            <span id="overview-tasks-meta" style="font-size:11px; color:var(--text-muted); font-weight:600;">Next 7 days</span>
+            <div class="segmented-group compact">
+              <button type="button" id="tank-task-filter-today" class="segmented-btn active" onclick="setTankTaskFilter('today')">Today</button>
+              <button type="button" id="tank-task-filter-7days" class="segmented-btn" onclick="setTankTaskFilter('7days')">7 Days</button>
+            </div>
           </div>
           <div id="tank-plan-tasks-list"></div>
         </div>
@@ -2811,10 +2807,16 @@
     let lastEvaluatedSandbox = null;
     let swRegistration = null;
     let dashboardTaskFilter = "today"; // "today" or "3days"
+    let tankTaskFilter = "today"; // "today" or "7days"
 
     function setDashboardTaskFilter(filter) {
       dashboardTaskFilter = filter;
       renderDashboardTasks();
+    }
+
+    function setTankTaskFilter(filter) {
+      tankTaskFilter = filter;
+      renderTankPlanTab();
     }
 
     /* ============================================================
@@ -5197,13 +5199,25 @@
 
     function toggleAiSessionsDrawer(forceState) {
       const drawer = document.getElementById("global-ai-sessions-drawer");
+      const btn = document.getElementById("global-ai-history-btn");
       if (!drawer) return;
-      const shouldOpen = typeof forceState === "boolean" ? forceState : !drawer.classList.contains("open");
+      const isOpen = drawer.classList.contains("open") || drawer.style.display === "block";
+      const shouldOpen = typeof forceState === "boolean" ? forceState : !isOpen;
       if (shouldOpen) {
         renderAiSessionsDrawer();
         drawer.classList.add("open");
+        drawer.style.display = "block";
+        if (btn) {
+          btn.style.borderColor = "rgba(0, 210, 255, 0.45)";
+          btn.style.color = "var(--cyan)";
+        }
       } else {
         drawer.classList.remove("open");
+        drawer.style.display = "none";
+        if (btn) {
+          btn.style.borderColor = "";
+          btn.style.color = "var(--text-muted)";
+        }
       }
     }
 
@@ -6787,55 +6801,25 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
     function renderSmartActionCard() {
       const activeTank = getActiveTank();
       const aiCard = document.getElementById("tank-ai-card");
-      const wcPlan = document.getElementById("action-wc-plan");
-      const dosePlan = document.getElementById("action-dose-plan");
-      if (!activeTank || !wcPlan || !dosePlan) return;
+      if (!activeTank || !aiCard) return;
 
-      const u = getUnitLabels();
       const tested = hasTankBeenTested(activeTank);
 
       if (!tested) {
-        if (aiCard) {
-          aiCard.style.borderColor = "rgba(0, 245, 160, 0.28)";
-        }
-        wcPlan.innerHTML = `Baseline Test Pending<br><span style="font-size:11px; color:var(--text-muted); font-weight:normal;">Record test to calibrate schedule</span>`;
-        const refGal = activeTank.vol * 0.25;
-        const condRec = findBestConditioner(refGal, false, activeTank.vol);
-        const bacRec = activeTank.status === "Cycling" ? findBestBacteria(activeTank.vol, true) : { found: false };
-        const doseParts = [`25% WC (${displayVol(refGal)} ${u.vol}): ${escapeHtmlText(condRec.shortDose)}`];
-        if (bacRec.found) doseParts.push(escapeHtmlText(bacRec.doseText));
-        dosePlan.innerHTML = doseParts.join(" • ");
+        aiCard.style.borderColor = "rgba(0, 245, 160, 0.28)";
         return;
       }
 
       const analysis = analyzeTankWaterParameters(activeTank);
       if (!analysis) return;
 
-      if (aiCard) {
-        if (analysis.status === "danger") {
-          aiCard.style.borderColor = "rgba(239, 68, 68, 0.48)";
-        } else if (analysis.status === "warning" || analysis.status === "caution" || analysis.status === "cycling") {
-          aiCard.style.borderColor = "rgba(245, 158, 11, 0.38)";
-        } else {
-          aiCard.style.borderColor = "rgba(0, 245, 160, 0.3)";
-        }
-      }
-
-      let nextWcText = "";
-      if (analysis.wcNeeded) {
-        const when = analysis.wcDays === 0 ? "Today / Immediately" : `In ${analysis.wcDays} days`;
-        const color = analysis.wcDays === 0 ? "var(--alert-red)" : "var(--cyan)";
-        nextWcText = `${when}<br><span style="font-size:11px; color:${color}; font-weight:normal;">${analysis.wcPercent}% (${analysis.wcGallons} ${u.vol})</span>`;
+      if (analysis.status === "danger") {
+        aiCard.style.borderColor = "rgba(239, 68, 68, 0.48)";
+      } else if (analysis.status === "warning" || analysis.status === "caution" || analysis.status === "cycling") {
+        aiCard.style.borderColor = "rgba(245, 158, 11, 0.38)";
       } else {
-        if (activeTank.status === "Cycling") {
-          nextWcText = `Only if NH₃ &gt; 2.0 ppm<br><span style="font-size:11px; color:var(--text-muted); font-weight:normal;">Protect bacteria colonization</span>`;
-        } else {
-          nextWcText = `Not Needed This Week<br><span style="font-size:11px; color:var(--neon-green); font-weight:normal;">Nitrates safe (NO₃ &lt; 20 ppm)</span>`;
-        }
+        aiCard.style.borderColor = "rgba(0, 245, 160, 0.3)";
       }
-
-      wcPlan.innerHTML = nextWcText;
-      dosePlan.innerHTML = escapeHtmlText(analysis.doseAdvice);
     }
 
     function openTestModalForTank(tankId, editIdx = -1) {
@@ -7083,31 +7067,48 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       renderSmartActionCard();
       const tasksCard = document.getElementById("overview-tasks-card");
       const tasksHeader = document.getElementById("overview-tasks-header");
-      const tasksMeta = document.getElementById("overview-tasks-meta");
       const listEl = document.getElementById("tank-plan-tasks-list");
+      const btnToday = document.getElementById("tank-task-filter-today");
+      const btn7Days = document.getElementById("tank-task-filter-7days");
       if (!listEl) return;
       listEl.innerHTML = "";
 
       const activeTank = getActiveTank();
       if (!activeTank) return;
 
-      const tasks = generateTankTasks(activeTank, 7);
+      if (btnToday && btn7Days) {
+        btnToday.classList.toggle("active", tankTaskFilter === "today");
+        btn7Days.classList.toggle("active", tankTaskFilter !== "today");
+      }
+
+      const windowDays = (tankTaskFilter === "today") ? 0 : 7;
+      const tasks = generateTankTasks(activeTank, windowDays);
 
       if (tasks.length === 0) {
         if (tasksCard) tasksCard.style.padding = "12px 16px";
         if (tasksHeader) tasksHeader.style.marginBottom = "6px";
-        if (tasksMeta) tasksMeta.innerText = "All caught up";
-        listEl.innerHTML = `
-          <div style="font-size:12px; color:var(--text-muted); padding:2px 0 0;">
-            All maintenance is current for the next 7 days.
-          </div>
-        `;
+        if (tankTaskFilter === "today") {
+          const next7dCount = generateTankTasks(activeTank, 7).length;
+          const nextHint = next7dCount > 0
+            ? ` · <span style="color:var(--cyan); font-weight:600; cursor:pointer;" onclick="setTankTaskFilter('7days')">${next7dCount} in next 7 days →</span>`
+            : ` · Clear for next 7 days`;
+          listEl.innerHTML = `
+            <div style="font-size:12px; color:var(--text-muted); padding:2px 0 0;">
+              All caught up for today${nextHint}
+            </div>
+          `;
+        } else {
+          listEl.innerHTML = `
+            <div style="font-size:12px; color:var(--text-muted); padding:2px 0 0;">
+              All maintenance is current for the next 7 days.
+            </div>
+          `;
+        }
         return;
       }
 
-      if (tasksCard) tasksCard.style.padding = "16px 18px";
+      if (tasksCard) tasksCard.style.padding = "15px 18px";
       if (tasksHeader) tasksHeader.style.marginBottom = "10px";
-      if (tasksMeta) tasksMeta.innerText = `${tasks.length} scheduled · 7d`;
 
       tasks.forEach((t, tIdx) => {
         let subColor = "var(--text-muted)";
