@@ -920,17 +920,6 @@
         </div>
       </div>
 
-      <!-- Automated Backup Reminder Banner -->
-      <div id="dashboard-backup-reminder" style="display:none; background:rgba(56,189,248,0.06); border:1px solid rgba(56,189,248,0.22); border-radius:14px; padding:12px 16px; margin-bottom:18px; justify-content:space-between; align-items:center; gap:12px;">
-        <div style="font-size:12.5px; color:var(--text-main); line-height:1.4;">
-          <span style="color:var(--cyan); font-weight:700;">✦ Backup Reminder:</span> It has been <span id="backup-reminder-days">14</span> days since your last JSON backup export.
-        </div>
-        <div style="display:flex; gap:6px; flex-shrink:0;">
-          <button type="button" class="btn btn-primary" style="padding:5px 12px; font-size:11.5px; width:auto;" onclick="exportDataJSON()">Export Now</button>
-          <button type="button" class="ghost-action-btn" style="padding:5px 9px; font-size:11.5px;" onclick="dismissBackupReminder()">Later</button>
-        </div>
-      </div>
-
       <!-- Actionable Upcoming Tasks & Routines Checklist -->
       <div class="card" id="dashboard-tasks-card" style="margin-bottom: 18px; border-color: rgba(56, 189, 248, 0.28); padding: 15px 18px;">
         <div class="card-header" id="dashboard-tasks-header" style="margin-bottom: 10px; display:flex; justify-content:space-between; align-items:center; gap:8px;">
@@ -4637,6 +4626,43 @@
       return tasks;
     }
 
+    function getGlobalBackupTask() {
+      if (!appState) return null;
+      const intervalSetting = appState.backupInterval || "7";
+      if (intervalSetting === "never") return null;
+
+      const intervalDays = parseInt(intervalSetting, 10) || 7;
+
+      try {
+        const snoozedUntil = parseInt(localStorage.getItem("aquassist_backup_reminder_snoozed"), 10);
+        if (snoozedUntil && Date.now() < snoozedUntil) {
+          return null;
+        }
+      } catch(e) {}
+
+      let lastExport = appState.lastExportDate;
+      if (!lastExport) {
+        lastExport = appState.tanks && appState.tanks[0] ? appState.tanks[0].startDate : null;
+      }
+      if (!lastExport) return null;
+
+      const elapsedDays = Math.floor((Date.now() - new Date(lastExport).getTime()) / (1000 * 60 * 60 * 24));
+      if (elapsedDays < intervalDays) return null;
+
+      const isOverdue = elapsedDays >= (intervalDays + 3);
+      return {
+        tankId: 0,
+        type: "backup",
+        title: "Ecosystem Data Backup",
+        subtitle: `Safety archive due · ${elapsedDays} days since last backup`,
+        isOverdue: isOverdue,
+        isToday: !isOverdue,
+        daysRemaining: isOverdue ? -1 : 0,
+        actionLabel: "Export",
+        actionFn: "exportDataJSON()"
+      };
+    }
+
     function renderDashboardTasks() {
       const tasksCard = document.getElementById("dashboard-tasks-card");
       const tasksHeader = document.getElementById("dashboard-tasks-header");
@@ -4662,6 +4688,11 @@
         const tankTasks = generateTankTasks(tank, windowDays);
         allTasks.push(...tankTasks);
       });
+
+      const backupTask = getGlobalBackupTask();
+      if (backupTask) {
+        allTasks.push(backupTask);
+      }
 
       allTasks.sort((a, b) => a.daysRemaining - b.daysRemaining);
 
@@ -4697,8 +4728,12 @@
         if (t.isOverdue) subColor = "var(--alert-red)";
         else if (t.isToday) subColor = "var(--alert-yellow)";
 
+        const dismissCall = t.type === "backup"
+          ? "dismissBackupReminder()"
+          : `dismissTankTask(${t.tankId}, '${t.type}', ${t.mediaIdx !== undefined ? t.mediaIdx : -1})`;
+
         const dismissBtnHtml = (t.isOverdue || t.isToday)
-          ? `<button class="btn-task-dismiss" title="Dismiss this task for this cycle" onclick="dismissTankTask(${t.tankId}, '${t.type}', ${t.mediaIdx !== undefined ? t.mediaIdx : -1})" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); color:var(--text-muted); border-radius:8px; width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px; font-weight:700; transition:all 0.15s ease;" onmouseover="this.style.color='var(--alert-red)'; this.style.borderColor='var(--alert-red)'; this.style.background='rgba(239,68,68,0.12)'" onmouseout="this.style.color='var(--text-muted)'; this.style.borderColor='rgba(255,255,255,0.14)'; this.style.background='rgba(255,255,255,0.06)'">✕</button>`
+          ? `<button class="btn-task-dismiss" title="Dismiss this task for this cycle" onclick="${dismissCall}" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); color:var(--text-muted); border-radius:8px; width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px; font-weight:700; transition:all 0.15s ease;" onmouseover="this.style.color='var(--alert-red)'; this.style.borderColor='var(--alert-red)'; this.style.background='rgba(239,68,68,0.12)'" onmouseout="this.style.color='var(--text-muted)'; this.style.borderColor='rgba(255,255,255,0.14)'; this.style.background='rgba(255,255,255,0.06)'">✕</button>`
           : ``;
 
         listEl.innerHTML += `
@@ -9041,57 +9076,22 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
     }
 
     function checkBackupReminder() {
-      const el = document.getElementById("dashboard-backup-reminder");
-      const daysEl = document.getElementById("backup-reminder-days");
-      if (!el) return;
-
-      const intervalSetting = appState.backupInterval || "7";
-      if (intervalSetting === "never") {
-        el.style.display = "none";
-        return;
-      }
-
-      const intervalDays = parseInt(intervalSetting, 10) || 7;
-
-      try {
-        const snoozedUntil = parseInt(localStorage.getItem("aquassist_backup_reminder_snoozed"), 10);
-        if (snoozedUntil && Date.now() < snoozedUntil) {
-          el.style.display = "none";
-          return;
-        }
-      } catch(e) {}
-
-      let lastExport = appState.lastExportDate;
-      if (!lastExport) {
-        lastExport = appState.tanks && appState.tanks[0] ? appState.tanks[0].startDate : null;
-      }
-
-      if (!lastExport) {
-        el.style.display = "none";
-        return;
-      }
-
-      const elapsedDays = Math.floor((Date.now() - new Date(lastExport).getTime()) / (1000 * 60 * 60 * 24));
-      if (elapsedDays >= intervalDays) {
-        if (daysEl) daysEl.innerText = elapsedDays > 0 ? elapsedDays : intervalDays;
-        el.style.display = "flex";
-      } else {
-        el.style.display = "none";
-      }
+      renderDashboardTasks();
     }
 
     function dismissBackupReminder() {
       try {
         localStorage.setItem("aquassist_backup_reminder_snoozed", Date.now() + 3 * 24 * 60 * 60 * 1000);
       } catch(e) {}
-      const el = document.getElementById("dashboard-backup-reminder");
-      if (el) el.style.display = "none";
+      renderDashboardTasks();
+      showToast("Backup Reminder Snoozed");
     }
 
     function updateBackupReminderInterval(val) {
       appState.backupInterval = val;
       saveDataToStorage(appState, true);
-      checkBackupReminder();
+      renderDashboardTasks();
+      renderSettingsBackupSection();
       showToast("Reminder updated");
     }
 
@@ -9183,8 +9183,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         document.body.removeChild(a);
         appState.lastExportDate = new Date().toISOString();
         saveDataToStorage(appState, true);
-        const reminderEl = document.getElementById("dashboard-backup-reminder");
-        if (reminderEl) reminderEl.style.display = "none";
+        renderDashboardTasks();
         renderSettingsBackupSection();
         showToast("Backup Exported");
       } catch (err) {
