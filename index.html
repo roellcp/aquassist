@@ -554,7 +554,21 @@
       background: rgba(255,255,255,0.05); border: 1px solid var(--card-border);
       border-radius: 12px; padding: 8px 12px; font-size: 13px; display: flex; align-items: center; gap: 8px;
     }
-    .delete-x { color: var(--alert-red); cursor: pointer; font-weight: 700; font-size: 16px; padding: 0 4px; }
+    .delete-x {
+      color: var(--alert-red); cursor: pointer; font-weight: 700; font-size: 16px;
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 30px; min-height: 30px; padding: 4px; border-radius: 6px;
+      transition: background 0.15s ease, transform 0.1s ease; user-select: none;
+    }
+    .delete-x:hover { background: rgba(239, 68, 68, 0.12); }
+    .delete-x:active { transform: scale(0.9); }
+    .action-link {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 28px; padding: 2px 6px; font-size: 11px; color: var(--cyan);
+      cursor: pointer; font-weight: 600; border-radius: 5px;
+      transition: background 0.15s ease; user-select: none;
+    }
+    .action-link:hover { background: rgba(0, 210, 255, 0.1); }
 
     /* Minimal Supplies List */
     .supply-row {
@@ -1152,9 +1166,16 @@
 
         <!-- Unified Activity Timeline -->
         <div class="card">
-          <div class="card-header">
+          <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
             <div class="card-title">Care &amp; Activity Timeline</div>
             <button type="button" class="ghost-action-btn" onclick="openTimelineNoteModal(-1)">+ Note</button>
+          </div>
+          <div class="chart-filter-bar" id="tank-timeline-filter-bar" style="margin-bottom:10px;">
+            <button type="button" class="chart-pill-btn active" data-filter="all" onclick="setTimelineFilter('all', this)">All</button>
+            <button type="button" class="chart-pill-btn" data-filter="test" onclick="setTimelineFilter('test', this)">Tests</button>
+            <button type="button" class="chart-pill-btn" data-filter="wc" onclick="setTimelineFilter('wc', this)">Water Changes</button>
+            <button type="button" class="chart-pill-btn" data-filter="note" onclick="setTimelineFilter('note', this)">Notes</button>
+            <button type="button" class="chart-pill-btn" data-filter="health" onclick="setTimelineFilter('health', this)">Health</button>
           </div>
           <div id="tank-overview-timeline"></div>
         </div>
@@ -1176,9 +1197,12 @@
 
         <!-- Visual Parameter Trend Graph (F-12) -->
         <div class="card">
-          <div class="card-header">
-            <div class="card-title">Chemistry Trends</div>
-            <span id="water-chart-scale-note" style="font-size:11px; color:var(--text-muted); font-weight:600;"></span>
+          <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div class="card-title">Chemistry Trends</div>
+              <span id="water-chart-scale-note" style="font-size:11px; color:var(--text-muted); font-weight:600;"></span>
+            </div>
+            <button type="button" class="ghost-action-btn" style="padding:4px 9px; font-size:11px; color:var(--neon-green); border-color:rgba(0,245,160,0.32); white-space:nowrap;" onclick="openTestModalForActiveTank()">+ Log Test</button>
           </div>
 
           <div class="chart-filter-bar" id="water-chart-filter-bar">
@@ -1843,6 +1867,14 @@
       <div style="margin-bottom:12px;">
         <label>Date Completed</label>
         <input type="date" id="qwc-date-input">
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <label>Refill Method &amp; Dosing Strategy</label>
+        <div class="segmented-group compact" style="margin-top:4px;">
+          <button type="button" class="segmented-btn active" id="qwc-mode-bucket" onclick="setQuickWcRefillMode('bucket')">Bucket Mix (New Water)</button>
+          <button type="button" class="segmented-btn" id="qwc-mode-hose" onclick="setQuickWcRefillMode('hose')">Direct Hose (Full Tank)</button>
+        </div>
       </div>
 
       <div style="margin-bottom:16px;">
@@ -3147,6 +3179,25 @@
 
     function closeAllModals(triggerBack = false) {
       document.querySelectorAll(".modal-overlay.open").forEach(m => m.classList.remove("open"));
+    }
+
+    // Global Modal Backdrop Click & Escape Key Dismissal Engine
+    if (typeof window !== "undefined" && window.addEventListener) {
+      window.addEventListener("click", (e) => {
+        if (e.target && e.target.classList && e.target.classList.contains("modal-overlay") && e.target.classList.contains("open")) {
+          closeModalById(e.target.id);
+        }
+      });
+
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          const openModals = document.querySelectorAll(".modal-overlay.open");
+          if (openModals.length > 0) {
+            const topModal = openModals[openModals.length - 1];
+            closeModalById(topModal.id);
+          }
+        }
+      });
     }
 
     // Android Back-Gesture & Browser Popstate Engine
@@ -4820,8 +4871,23 @@
         }
       }
 
+      quickWcRefillMode = "bucket";
+      document.getElementById("qwc-mode-bucket")?.classList.add("active");
+      document.getElementById("qwc-mode-hose")?.classList.remove("active");
+
       updateQuickWcCalculations();
       openModalById("quickWcModal");
+    }
+
+    let quickWcRefillMode = "bucket";
+
+    function setQuickWcRefillMode(mode) {
+      quickWcRefillMode = mode;
+      document.getElementById("qwc-mode-bucket")?.classList.toggle("active", mode === "bucket");
+      document.getElementById("qwc-mode-hose")?.classList.toggle("active", mode === "hose");
+      const doseInput = document.getElementById("qwc-dose-input");
+      if (doseInput) doseInput.dataset.autoCalculated = "true";
+      updateQuickWcCalculations();
     }
 
     function openQuickWcForActiveTank(editIdx = -1) {
@@ -4859,7 +4925,7 @@
       const calcEl = document.getElementById("qwc-vol-calc");
       if (calcEl) calcEl.value = `≈ ${volAmt} ${u.vol}`;
 
-      // Smart conditioner calculation synced with Household Supplies
+      // Smart conditioner calculation synced with Household Supplies & Refill Mode
       const doseInput = document.getElementById("qwc-dose-input");
       const hintEl = document.getElementById("qwc-dose-hint");
       const tested = hasTankBeenTested(tank);
@@ -4867,7 +4933,9 @@
       const no2 = tested ? (parseFloat(tank.lastTest?.no2) || 0) : 0;
       const isEmergencyDetox = (tank.status === "Cycling" ? (nh3 >= 2.0 || no2 >= 3.0) : (nh3 > 0.25 || no2 > 0.25));
 
-      const condRec = findBestConditioner(galChanged, isEmergencyDetox, tank.vol);
+      const isDirectHose = quickWcRefillMode === "hose";
+      const treatGal = isDirectHose ? tank.vol : galChanged;
+      const condRec = findBestConditioner(treatGal, isEmergencyDetox || isDirectHose, tank.vol);
       const recommendedDose = condRec.shortDose;
 
       if (doseInput && (!doseInput.value || doseInput.dataset.autoCalculated === "true")) {
@@ -4878,7 +4946,9 @@
         hintEl.style.color = condRec.outOfStockName ? "var(--alert-yellow)" : "var(--cyan)";
         hintEl.innerText = condRec.outOfStockName
           ? `Supply alert: ${condRec.outOfStockName} is marked Out of Stock in Supplies`
-          : `Supplies shelf calculation: ${condRec.doseText}`;
+          : (isDirectHose
+              ? `✦ Direct Hose Dosing: ${condRec.doseText}`
+              : `✦ Bucket Pre-Mix Dosing: ${condRec.doseText}`);
       }
     }
 
@@ -6305,43 +6375,71 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       // Upcoming Care Checklist (7-day window)
       renderTankPlanTab();
 
-      // Unified Timeline - Sorted strictly by record date descending (not insertion time)
+      // Unified Timeline with Category Filtering - Sorted strictly by record date descending
       const timelineEl = document.getElementById("tank-overview-timeline");
       if (timelineEl) {
         timelineEl.innerHTML = "";
         if (!tank.timeline) tank.timeline = [];
         sortRecordsByDateDesc(tank.timeline);
         const events = tank.timeline;
-        if (events.length === 0) {
-          timelineEl.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:4px 0;">No activities recorded yet. Tap "+ Note" to log an observation.</div>`;
+
+        document.querySelectorAll("#tank-timeline-filter-bar .chart-pill-btn").forEach(b => {
+          b.classList.toggle("active", b.getAttribute("data-filter") === currentTimelineFilter);
+        });
+
+        let filtered = events;
+        if (currentTimelineFilter === "test") {
+          filtered = events.filter(e => /chemistry|test|temp|ph|nh3|no2|no3|reagent/i.test(e.text));
+        } else if (currentTimelineFilter === "wc") {
+          filtered = events.filter(e => /water change|dosed|serviced/i.test(e.text));
+        } else if (currentTimelineFilter === "note") {
+          filtered = events.filter(e => !/chemistry|test|water change|health|loss|illness/i.test(e.text) || /note:|observation|trimmed|installed|added/i.test(e.text));
+        } else if (currentTimelineFilter === "health") {
+          filtered = events.filter(e => /health|illness|treatment|loss|death|symptom|medicat/i.test(e.text));
+        }
+
+        if (filtered.length === 0) {
+          const filterName = currentTimelineFilter === "all" ? "activities" : currentTimelineFilter;
+          timelineEl.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:6px 0;">No ${filterName} entries recorded yet.</div>`;
         } else {
           const showAll = !!window.showAllTimelineEvents;
-          const visibleEvents = showAll ? events : events.slice(0, 12);
-          visibleEvents.forEach((e, idx) => {
+          const visibleEvents = showAll ? filtered : filtered.slice(0, 12);
+          visibleEvents.forEach((e) => {
+            const originalIdx = events.indexOf(e);
             timelineEl.innerHTML += `
               <div class="timeline-entry">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                   <div class="timeline-entry-date" style="font-weight:600; color:var(--cyan);">${escapeHtmlText(e.date)}</div>
                   <div style="display:flex; gap:8px; align-items:center;">
-                    <span style="font-size:11px; color:var(--text-muted); cursor:pointer;" onclick="openTimelineNoteModal(${idx})">Edit</span>
-                    <span class="delete-x" onclick="deleteTimelineEvent(${idx})" title="Delete event">×</span>
+                    <span class="action-link" onclick="openTimelineNoteModal(${originalIdx})">Edit</span>
+                    <span class="delete-x" onclick="deleteTimelineEvent(${originalIdx})" title="Delete event">×</span>
                   </div>
                 </div>
                 <div>${escapeHtmlText(e.text)}</div>
               </div>
             `;
           });
-          if (events.length > 12) {
+          if (filtered.length > 12) {
             timelineEl.innerHTML += `
               <div style="padding-top:6px; text-align:center;">
                 <button type="button" class="ghost-action-btn" onclick="window.showAllTimelineEvents = !window.showAllTimelineEvents; renderTankOverviewTab();">
-                  ${showAll ? "Show Recent Only" : `View All ${events.length} Records`}
+                  ${showAll ? "Show Recent Only" : `View All ${filtered.length} Filtered Records`}
                 </button>
               </div>
             `;
           }
         }
       }
+    }
+
+    let currentTimelineFilter = "all";
+
+    function setTimelineFilter(filterKey, btn) {
+      currentTimelineFilter = filterKey;
+      document.querySelectorAll("#tank-timeline-filter-bar .chart-pill-btn").forEach(b => {
+        b.classList.toggle("active", b.getAttribute("data-filter") === filterKey);
+      });
+      renderTankOverviewTab();
     }
 
     function deleteTimelineEvent(idx) {
@@ -7148,7 +7246,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
             <span style="font-size:11px; color:var(--text-muted); font-weight:600;">${escapeHtmlText(h.date)}</span>
             <div style="display:flex; gap:8px; align-items:center;">
-              <span style="font-size:11px; color:var(--cyan); cursor:pointer;" onclick="${editCall}">Edit</span>
+              <span class="action-link" onclick="${editCall}">Edit</span>
               <span class="delete-x" onclick="deleteWaterLog(${idx})" title="Delete this log">×</span>
             </div>
           </div>
@@ -7351,7 +7449,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <span style="font-size:11px; color:var(--text-muted);">${escapeHtmlText(l.date)}</span>
             <div style="display:flex; gap:8px; align-items:center;">
-              <span style="font-size:11px; color:var(--cyan); cursor:pointer;" onclick="editLossRecordPrompt(${idx})">Edit</span>
+              <span class="action-link" onclick="editLossRecordPrompt(${idx})">Edit</span>
               <span class="delete-x" onclick="deleteLossRecord(${idx})" title="Delete record">×</span>
             </div>
           </div>
@@ -7520,7 +7618,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
               <span class="badge" style="font-size:10px; padding:2px 7px; background:rgba(0,210,255,0.08); color:var(--cyan); border:1px solid rgba(0,210,255,0.2); border-radius:6px; flex-shrink:0;">${catName}</span>
             </div>
             <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
-              <span style="font-size:11px; color:var(--cyan); cursor:pointer; font-weight:600;" onclick="openEditMediaModal(${idx})">Edit</span>
+              <span class="action-link" onclick="openEditMediaModal(${idx})">Edit</span>
               <span class="delete-x" onclick="deleteFilterMedia(${idx})" title="Remove media">×</span>
             </div>
           </div>
