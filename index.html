@@ -837,11 +837,11 @@
     </div>
 
     <!-- Contextual Tank Navigation (Shows when inside a specific tank) -->
-    <div id="header-tank-nav" style="display:none; align-items:center; gap:8px;">
-      <button type="button" class="btn btn-secondary" style="width:auto; padding:6px 11px; font-size:12px;" onclick="exitTankHub()">
+    <div id="header-tank-nav" style="display:none; align-items:center; gap:8px; min-width:0; flex:1;">
+      <button type="button" class="btn btn-secondary" style="width:auto; padding:6px 11px; font-size:12px; white-space:nowrap; flex-shrink:0;" onclick="exitTankHub()">
         ← Home
       </button>
-      <select id="header-tank-switcher" class="ai-context-select" style="display:none; max-width:175px;" onchange="switchActiveTankFromHeader(this.value)" title="Switch aquarium"></select>
+      <select id="header-tank-switcher" class="ai-context-select" style="display:none; flex:1; max-width:240px; min-width:0;" onchange="switchActiveTankFromHeader(this.value)" title="Switch aquarium"></select>
     </div>
 
     <div style="display:flex; align-items:center; gap:8px;">
@@ -1194,8 +1194,12 @@
 
         <!-- Test & Water Change Log History -->
         <div class="card">
-          <div class="card-header">
+          <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
             <div class="card-title">Water &amp; Test History</div>
+            <div style="display:flex; gap:6px; flex-shrink:0;">
+              <button type="button" class="ghost-action-btn" style="padding:3px 8px; font-size:11px;" onclick="openQuickWcForActiveTank()">+ Water Change</button>
+              <button type="button" class="ghost-action-btn" style="padding:3px 8px; font-size:11px; color:var(--neon-green); border-color:rgba(0,245,160,0.32);" onclick="openTestModalForActiveTank()">+ Test</button>
+            </div>
           </div>
           <div id="water-history-list"></div>
         </div>
@@ -1204,8 +1208,11 @@
       <!-- TANK SUB-TAB 3: LIVESTOCK -->
       <div id="tanksub-livestock" class="tanksub-content" style="display:none;">
         <div class="card">
-          <div class="card-header" style="gap:8px;">
-            <div class="card-title">Livestock Roster</div>
+          <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div class="card-title">Livestock Roster</div>
+              <div id="tank-livestock-bioload-badge"></div>
+            </div>
             <button type="button" class="ghost-action-btn" onclick="openCompatibilityForActiveTank()">Check Compatibility →</button>
           </div>
           <div class="input-row">
@@ -1250,6 +1257,46 @@
             <button type="button" class="btn" style="width:70px;" onclick="addTankDecor()">Add</button>
           </div>
           <div id="tank-decor-list" class="pill-list"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Plant Care &amp; Lighting</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Photoperiod, CO₂ system &amp; fertilizing routine</div>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-top:8px;">
+            <div>
+              <label style="font-size:11px; font-weight:600; color:var(--text-muted); display:block; margin-bottom:4px;">Photoperiod</label>
+              <select id="tank-plant-photoperiod" class="ai-context-select" style="width:100%; min-width:0; max-width:none; padding:6px 10px; font-size:12px;" onchange="savePlantedCareSpecs()">
+                <option value="6 hrs/day">6 hrs/day</option>
+                <option value="7 hrs/day">7 hrs/day</option>
+                <option value="8 hrs/day">8 hrs/day</option>
+                <option value="9 hrs/day">9 hrs/day</option>
+                <option value="10 hrs/day">10 hrs/day</option>
+                <option value="No Schedule">No Schedule</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px; font-weight:600; color:var(--text-muted); display:block; margin-bottom:4px;">CO₂ System</label>
+              <select id="tank-plant-co2" class="ai-context-select" style="width:100%; min-width:0; max-width:none; padding:6px 10px; font-size:12px;" onchange="savePlantedCareSpecs()">
+                <option value="None (Low Tech)">None (Low Tech)</option>
+                <option value="Pressurized CO₂">Pressurized CO₂</option>
+                <option value="Liquid Carbon (Excel)">Liquid Carbon</option>
+                <option value="DIY Yeast CO₂">DIY Yeast</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px; font-weight:600; color:var(--text-muted); display:block; margin-bottom:4px;">Fertilizer Routine</label>
+              <select id="tank-plant-fert" class="ai-context-select" style="width:100%; min-width:0; max-width:none; padding:6px 10px; font-size:12px;" onchange="savePlantedCareSpecs()">
+                <option value="None">None</option>
+                <option value="All-in-One Liquid (1-2x/wk)">Liquid (1-2x/wk)</option>
+                <option value="Root Tabs Only">Root Tabs Only</option>
+                <option value="EI Dosing (High Tech)">EI Dosing</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -7193,6 +7240,41 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       if (!activeTank) return;
       renderPillList("livestock", "tank-live-list", activeTank.livestock || [], "deleteTankLivestock");
       renderLossHistory();
+
+      const liveList = activeTank.livestock || [];
+      let totalCount = 0;
+      liveList.forEach(item => {
+        const match = String(item).match(/^(\d+)\s*x/i);
+        totalCount += match ? parseInt(match[1]) : 1;
+      });
+
+      const badgeEl = document.getElementById("tank-livestock-bioload-badge");
+      if (badgeEl) {
+        if (totalCount === 0) {
+          badgeEl.innerHTML = `<span style="font-size:11px; color:var(--text-muted); font-weight:600;">0 specimens</span>`;
+        } else {
+          const vol = activeTank.vol || 20;
+          const ratio = totalCount / vol;
+          let loadLabel = "Light Bio-Load";
+          let loadColor = "var(--cyan)";
+          let dotColor = "var(--cyan)";
+          if (ratio > 1.2) {
+            loadLabel = "Heavy Bio-Load";
+            loadColor = "var(--alert-yellow)";
+            dotColor = "var(--alert-yellow)";
+          } else if (ratio > 0.6) {
+            loadLabel = "Balanced Bio-Load";
+            loadColor = "var(--neon-green)";
+            dotColor = "var(--neon-green)";
+          }
+          badgeEl.innerHTML = `
+            <span style="display:inline-flex; align-items:center; gap:5px; font-size:10.5px; font-weight:600; color:${loadColor}; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); padding:2px 8px; border-radius:12px;">
+              <span class="legend-dot" style="background:${dotColor}; width:6px; height:6px;"></span>
+              ${loadLabel} (${totalCount} spec.)
+            </span>
+          `;
+        }
+      }
     }
 
     function addTankLivestock() {
@@ -7569,6 +7651,29 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       if (!activeTank) return;
       renderPillList("plants", "tank-plant-list", activeTank.plants || [], "deleteTankPlant");
       renderPillList("decor", "tank-decor-list", activeTank.decor || [], "deleteTankDecor");
+
+      const care = activeTank.plantedCare || {};
+      const photoEl = document.getElementById("tank-plant-photoperiod");
+      const co2El = document.getElementById("tank-plant-co2");
+      const fertEl = document.getElementById("tank-plant-fert");
+      if (photoEl) photoEl.value = care.photoperiod || "8 hrs/day";
+      if (co2El) co2El.value = care.co2 || "None (Low Tech)";
+      if (fertEl) fertEl.value = care.fert || "None";
+    }
+
+    function savePlantedCareSpecs() {
+      const activeTank = getActiveTank();
+      if (!activeTank) return;
+      const photoEl = document.getElementById("tank-plant-photoperiod");
+      const co2El = document.getElementById("tank-plant-co2");
+      const fertEl = document.getElementById("tank-plant-fert");
+      activeTank.plantedCare = {
+        photoperiod: photoEl ? photoEl.value : "8 hrs/day",
+        co2: co2El ? co2El.value : "None (Low Tech)",
+        fert: fertEl ? fertEl.value : "None"
+      };
+      saveDataToStorage();
+      showToast("Planted Specs Saved");
     }
 
     function addTankPlant() {
