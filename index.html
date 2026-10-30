@@ -2896,6 +2896,8 @@
             }
           }
           if (Array.isArray(tank.losses)) sortRecordsByDateDesc(tank.losses);
+          if (!tank.lastPruning) tank.lastPruning = tank.lastPlantCare || tank.startDate;
+          if (!tank.lastFertilizing) tank.lastFertilizing = tank.lastPlantCare || tank.startDate;
         });
       }
       ensureAiSessionsNormalized(state);
@@ -2924,6 +2926,8 @@
           lastWaterChange: "2026-10-25",
           lastGlassClean: "2026-10-25",
           lastPlantCare: "2026-10-25",
+          lastPruning: "2026-10-25",
+          lastFertilizing: "2026-10-25",
           lastImpellerClean: "2026-10-05",
           lastHeaterCheck: "2026-10-05",
           image: "",
@@ -2962,6 +2966,8 @@
           lastWaterChange: "2026-10-18",
           lastGlassClean: "2026-10-24",
           lastPlantCare: "2026-10-24",
+          lastPruning: "2026-10-24",
+          lastFertilizing: "2026-10-24",
           lastImpellerClean: "2026-10-10",
           lastHeaterCheck: "2026-10-10",
           image: "",
@@ -4129,6 +4135,7 @@
 
     function analyzeTankWaterParameters(tank) {
       if (!tank) return null;
+      const today = new Date();
       const isCycling = tank.status === "Cycling";
       const t = tank.lastTest || { nh3: 0, no2: 0, no3: 15, ph: 7.2, temp: 78, date: new Date().toISOString().split("T")[0] };
       const tap = appState.tapBaseline || { ph: 7.4, no3: 5 };
@@ -4175,7 +4182,16 @@
           actionSummary = "Hold Water Changes • Retest in 48 Hours";
         }
       } else {
-        // Established aquarium
+        // Established aquarium: Water change cadence based on nitrate bio-accumulation & days since last change
+        let daysSinceWc = 0;
+        if (tank.lastWaterChange) {
+          daysSinceWc = Math.floor((today - new Date(tank.lastWaterChange)) / (1000 * 60 * 60 * 24));
+          if (daysSinceWc < 0) daysSinceWc = 0;
+          if (daysSinceWc > 60) daysSinceWc = 14;
+        } else {
+          daysSinceWc = 7;
+        }
+
         if (nh3 > 0.25 || no2 > 0.25) {
           status = "danger";
           statusBadge = "● Toxin Spike Detected";
@@ -4203,23 +4219,37 @@
           status = "caution";
           statusBadge = "● Moderate Nitrates";
           statusColor = "var(--cyan)";
-          wcNeeded = true;
+          const daysLeft = Math.max(0, 7 - daysSinceWc);
           wcPercent = 25;
-          wcDays = 3;
+          wcDays = daysLeft;
+          wcNeeded = true;
           nextTestDays = 7;
           headline = `Balanced Parameters (${no3} ppm Nitrate)`;
-          aiAdvice = `Water parameters are safe with zero toxins. Nitrates are in the normal accumulation zone (${no3} ppm). Standard 25% water change is scheduled in 3 days. Next chemistry test in 7 days.`;
-          actionSummary = "25% Water Change in 3 Days • Next Test in 7 Days";
+          if (daysLeft === 0) {
+            aiAdvice = `Water parameters are safe with zero toxins. Nitrates are in the moderate accumulation zone (${no3} ppm). A routine 25% water change is due today to keep nitrates in check. Next chemistry test in 7 days.`;
+            actionSummary = "25% Water Change Today • Next Test in 7 Days";
+          } else {
+            aiAdvice = `Water parameters are safe with zero toxins. Nitrates are in the normal accumulation zone (${no3} ppm). Standard 25% water change is scheduled in ${daysLeft} day${daysLeft === 1 ? '' : 's'}. Next chemistry test in 7 days.`;
+            actionSummary = `25% Water Change in ${daysLeft} Day${daysLeft === 1 ? '' : 's'} • Next Test in 7 Days`;
+          }
         } else {
           status = "pristine";
           statusBadge = "● Pristine Quality";
           statusColor = "var(--neon-green)";
-          wcNeeded = false;
-          wcDays = 7;
+          const daysLeft = Math.max(0, 14 - daysSinceWc);
+          wcPercent = 15;
+          wcDays = daysLeft;
           nextTestDays = 7;
           headline = `Water is Pristine (${no3} ppm Nitrate)`;
-          aiAdvice = `Nitrate is very low (${no3} ppm) with zero ammonia or nitrite. Your plants and bio-filter are handling the bio-load effortlessly. No water change needed this week! Next chemistry test in 7 days.`;
-          actionSummary = "Skip Water Change This Week • Next Test in 7 Days";
+          if (daysLeft === 0) {
+            wcNeeded = true;
+            aiAdvice = `Nitrate remains pristine (${no3} ppm). It has been ${daysSinceWc} days since your last water change. A light 15% water change is due today to replenish trace minerals, vacuum detritus, and maintain buffer stability. Next chemistry test in 7 days.`;
+            actionSummary = "Light 15% Water Change Today • Next Test in 7 Days";
+          } else {
+            wcNeeded = false;
+            aiAdvice = `Nitrate is very low (${no3} ppm) with zero ammonia or nitrite. Your plants and bio-filter are handling the bio-load effortlessly. No water change needed today! Next light mineral refresh (~15%) scheduled in ${daysLeft} day${daysLeft === 1 ? '' : 's'}. Next chemistry test in 7 days.`;
+            actionSummary = `No Water Change Needed • Next in ${daysLeft} Day${daysLeft === 1 ? '' : 's'}`;
+          }
         }
       }
 
@@ -4339,6 +4369,62 @@
       }
     }
 
+    /* Intelligent Livestock Roster Normalization & Deduplicating Merge */
+    function parseLivestockEntry(entry) {
+      if (!entry) return { count: 1, species: "" };
+      const m = String(entry).trim().match(/^(\d+)\s*x\s*(.*)$/i);
+      if (m) {
+        return { count: parseInt(m[1], 10) || 1, species: m[2].trim() };
+      }
+      return { count: 1, species: String(entry).trim() };
+    }
+
+    function cleanSpeciesKey(name) {
+      if (!name) return "";
+      let s = name.toLowerCase().trim().replace(/\s+/g, " ");
+      if (s.endsWith("ies") && s.length > 4) {
+        return s.slice(0, -3) + "y";
+      }
+      if (s.endsWith("shes") || s.endsWith("ches") || s.endsWith("xes")) {
+        return s.slice(0, -2);
+      }
+      const singularExemptions = ["corydoras", "discus", "otocinclus", "puntius"];
+      if (singularExemptions.includes(s) || s.endsWith("ss") || s.endsWith("us") || s.endsWith("is")) {
+        return s;
+      }
+      if (s.endsWith("s") && s.length > 2) {
+        return s.slice(0, -1);
+      }
+      return s;
+    }
+
+    function addOrMergeLivestock(tank, count, speciesName) {
+      if (!tank) return { merged: false, newTotal: 0, displayName: speciesName, addedCount: 0 };
+      if (!Array.isArray(tank.livestock)) tank.livestock = [];
+
+      const parsedInput = parseLivestockEntry(speciesName);
+      const parsedCount = parseInt(count, 10);
+      const addCount = (!isNaN(parsedCount) && parsedCount > 0) ? parsedCount : (parsedInput.count || 1);
+      const rawSpecies = (parsedInput.species && parsedInput.species.length > 0) ? parsedInput.species : String(speciesName).trim();
+      const targetKey = cleanSpeciesKey(rawSpecies);
+
+      const existingIdx = tank.livestock.findIndex(item => {
+        const existingParsed = parseLivestockEntry(item);
+        return cleanSpeciesKey(existingParsed.species) === targetKey;
+      });
+
+      if (existingIdx >= 0) {
+        const existing = parseLivestockEntry(tank.livestock[existingIdx]);
+        const newTotal = existing.count + addCount;
+        const finalSpecies = existing.species || rawSpecies;
+        tank.livestock[existingIdx] = `${newTotal}x ${finalSpecies}`;
+        return { merged: true, newTotal, displayName: finalSpecies, addedCount: addCount };
+      } else {
+        tank.livestock.push(`${addCount}x ${rawSpecies}`);
+        return { merged: false, newTotal: addCount, displayName: rawSpecies, addedCount: addCount };
+      }
+    }
+
     function generateTankTasks(tank, windowDays = 7) {
       if (!tank) return [];
       const u = getUnitLabels();
@@ -4422,75 +4508,43 @@
         }
       } else {
         // Established tank: Check last water change date & analysis recommendations
-        let lastWcDate = tank.lastWaterChange;
-        if (!lastWcDate && tank.history && tank.history.length > 0) {
-          const wcEntries = tank.history.filter(h => h.wc && h.wc > 0);
-          if (wcEntries.length > 0) {
-            lastWcDate = wcEntries.map(e => e.date).sort().reverse()[0];
-          }
-        }
-        let daysSinceWc = 4;
-        if (lastWcDate) {
-          daysSinceWc = Math.floor((today - new Date(lastWcDate)) / (1000 * 60 * 60 * 24));
-          if (daysSinceWc > 30) daysSinceWc = 7;
-        }
-
-        if (analysis && analysis.wcNeeded) {
-          if (analysis.wcDays === 0) {
-            daysUntilWc = 0;
-            const urgencyLabel = analysis.status === "danger" ? "Emergency Detox" : "High Nitrate Dilution";
-            tasks.push({
-              id: `wc-${tank.id}`,
-              type: "wc",
-              tankId: tank.id,
-              tankName: tank.name,
-              title: `${tank.name}: ${urgencyLabel} (~${analysis.wcPercent}% / ${analysis.wcGallons} ${u.vol})`,
-              planTabTitle: `${urgencyLabel} (~${analysis.wcPercent}% / ${analysis.wcGallons} ${u.vol})`,
-              subtitle: `Due today (${analysis.actionSummary})`,
-              daysRemaining: 0,
-              isOverdue: false,
-              isToday: true,
-              actionLabel: "Log Change",
-              actionFn: `openQuickWcModal(${tank.id})`,
-              planTabActionFn: `openQuickWcForActiveTank()`
-            });
-          } else {
-            daysUntilWc = Math.min(analysis.wcDays, Math.max(0, 7 - daysSinceWc));
-            if (daysUntilWc <= windowDays) {
-              const routineVol = analysis.wcGallons || displayVol(tank.vol * 0.25);
-              tasks.push({
-                id: `wc-${tank.id}`,
-                type: "wc",
-                tankId: tank.id,
-                tankName: tank.name,
-                title: `${tank.name}: Routine Water Change (~${analysis.wcPercent || 25}% / ${routineVol} ${u.vol})`,
-                planTabTitle: `Routine Water Change (~${analysis.wcPercent || 25}% / ${routineVol} ${u.vol})`,
-                subtitle: formatTaskSubtitle(daysUntilWc),
-                daysRemaining: daysUntilWc,
-                isOverdue: daysUntilWc < 0,
-                isToday: daysUntilWc === 0,
-                actionLabel: "Log Change",
-                actionFn: `openQuickWcModal(${tank.id})`,
-                planTabActionFn: `openQuickWcForActiveTank()`
-              });
-            }
-          }
-        } else {
-          // Water is pristine (NO3 < 20 ppm) - standard 7-day routine cadence
-          daysUntilWc = Math.max(0, 7 - daysSinceWc);
+        if (analysis) {
+          daysUntilWc = analysis.wcDays;
           if (daysUntilWc <= windowDays) {
             const isNow = daysUntilWc === 0;
-            const lightVol = displayVol(tank.vol * 0.15);
+            const isDanger = analysis.status === "danger" || analysis.status === "warning";
+            const isPristine = (parseFloat(tank.lastTest?.no3) || 0) < 20 && !isDanger;
+            const routineVol = analysis.wcGallons || displayVol(tank.vol * ((analysis.wcPercent || 25) / 100));
+
+            let title = "";
+            let planTitle = "";
+            let subText = "";
+
+            if (isDanger) {
+              const urgencyLabel = analysis.status === "danger" ? "Emergency Detox" : "High Nitrate Dilution";
+              title = `${tank.name}: ${urgencyLabel} (~${analysis.wcPercent}% / ${routineVol} ${u.vol})`;
+              planTitle = `${urgencyLabel} (~${analysis.wcPercent}% / ${routineVol} ${u.vol})`;
+              subText = isNow ? `Due today (${analysis.actionSummary})` : formatTaskSubtitle(daysUntilWc);
+            } else if (isPristine) {
+              title = `${tank.name}: Light Water Change / Mineral Refresh (~15% / ${routineVol} ${u.vol})`;
+              planTitle = `Light Water Change (~15% / ${routineVol} ${u.vol})`;
+              subText = isNow ? `Due today (Replenish minerals & vac detritus)` : formatTaskSubtitle(daysUntilWc);
+            } else {
+              title = `${tank.name}: Routine Water Change (~${analysis.wcPercent || 25}% / ${routineVol} ${u.vol})`;
+              planTitle = `Routine Water Change (~${analysis.wcPercent || 25}% / ${routineVol} ${u.vol})`;
+              subText = isNow ? `Due today (Routine weekly nitrate export)` : formatTaskSubtitle(daysUntilWc);
+            }
+
             tasks.push({
               id: `wc-${tank.id}`,
               type: "wc",
               tankId: tank.id,
               tankName: tank.name,
-              title: `${tank.name}: Light Water Change / Gravel Vac (~15% / ${lightVol} ${u.vol})`,
-              planTabTitle: `Light Water Change (~15% / ${lightVol} ${u.vol})`,
-              subtitle: isNow ? `Due today (Water is clean: NO₃ < 20 ppm)` : formatTaskSubtitle(daysUntilWc),
+              title: title,
+              planTabTitle: planTitle,
+              subtitle: subText,
               daysRemaining: daysUntilWc,
-              isOverdue: false,
+              isOverdue: daysUntilWc < 0,
               isToday: isNow,
               actionLabel: "Log Change",
               actionFn: `openQuickWcModal(${tank.id})`,
@@ -4500,26 +4554,14 @@
         }
       }
 
-      // 3. Glass Algae Wipe & Scraping (Synchronized with Water Change)
-      let daysUntilGlass = 0;
-      if (isCycling || daysUntilWc > 14) {
-        let lastGlass = tank.lastGlassClean;
-        let daysSinceGlass = 3;
-        if (lastGlass) {
-          daysSinceGlass = Math.floor((today - new Date(lastGlass)) / (1000 * 60 * 60 * 24));
-          if (daysSinceGlass > 30) daysSinceGlass = 4;
-        }
-        daysUntilGlass = 7 - daysSinceGlass;
-      } else {
-        let daysSinceGlass = 999;
-        if (tank.lastGlassClean) {
-          daysSinceGlass = Math.floor((today - new Date(tank.lastGlassClean)) / (1000 * 60 * 60 * 24));
-        }
-        daysUntilGlass = daysUntilWc;
-        if (daysSinceGlass < 3 && daysUntilWc <= 1) {
-          daysUntilGlass = daysUntilWc + 7;
-        }
+      // 3. Glass Algae Wipe & Scraping (Independent 7-day routine)
+      let daysSinceGlass = 7;
+      if (tank.lastGlassClean) {
+        daysSinceGlass = Math.floor((today - new Date(tank.lastGlassClean)) / (1000 * 60 * 60 * 24));
+        if (daysSinceGlass < 0) daysSinceGlass = 0;
+        if (daysSinceGlass > 60) daysSinceGlass = 7;
       }
+      const daysUntilGlass = Math.max(0, 7 - daysSinceGlass);
 
       if (daysUntilGlass <= windowDays) {
         tasks.push({
@@ -4591,49 +4633,64 @@
         }
       });
 
-      // 5. Plant Pruning & Fertilizing (Synchronized with Water Change + Supplies Shelf)
+      // 5. Plant Pruning & Maintenance (Independent 14-day routine)
       if (tank.plants && tank.plants.length > 0) {
-        let daysUntilPlant = 0;
-        if (isCycling) {
-          let lastPlant = tank.lastPlantCare;
-          let daysSincePlant = 3;
-          if (lastPlant) {
-            daysSincePlant = Math.floor((today - new Date(lastPlant)) / (1000 * 60 * 60 * 24));
-            if (daysSincePlant > 30) daysSincePlant = 4;
-          }
-          daysUntilPlant = 7 - daysSincePlant;
-        } else {
-          let daysSincePlant = 999;
-          if (tank.lastPlantCare) {
-            daysSincePlant = Math.floor((today - new Date(tank.lastPlantCare)) / (1000 * 60 * 60 * 24));
-          }
-          daysUntilPlant = daysUntilWc;
-          if (daysSincePlant < 3 && daysUntilWc <= 1) {
-            daysUntilPlant = daysUntilWc + 7;
-          }
+        let lastPrune = tank.lastPruning || tank.lastPlantCare;
+        let daysSincePrune = 14;
+        if (lastPrune) {
+          daysSincePrune = Math.floor((today - new Date(lastPrune)) / (1000 * 60 * 60 * 24));
+          if (daysSincePrune < 0) daysSincePrune = 0;
+          if (daysSincePrune > 60) daysSincePrune = 14;
         }
-
-        if (daysUntilPlant <= windowDays) {
-          const curNo3 = parseFloat(tank.lastTest?.no3) || 0;
-          const fertRec = (!isCycling && curNo3 <= 35) ? findBestLiquidFertilizer(tank.vol) : { found: false };
-          const plantTitleBase = fertRec.found ? "Plant Pruning & Fertilize" : "Plant Pruning & Foliage Check";
-          const plantSub = fertRec.found
-            ? `${formatTaskSubtitle(daysUntilPlant)} • Dose ${fertRec.shortDose}`
-            : formatTaskSubtitle(daysUntilPlant);
+        const daysUntilPrune = Math.max(0, 14 - daysSincePrune);
+        if (daysUntilPrune <= windowDays) {
           tasks.push({
-            id: `plant-${tank.id}`,
-            type: "plants",
+            id: `pruning-${tank.id}`,
+            type: "pruning",
             tankId: tank.id,
             tankName: tank.name,
-            title: `${tank.name}: ${plantTitleBase}`,
-            planTabTitle: plantTitleBase,
-            subtitle: plantSub,
-            daysRemaining: daysUntilPlant,
-            isOverdue: daysUntilPlant < 0,
-            isToday: daysUntilPlant === 0,
+            title: `${tank.name}: Plant Pruning & Foliage Care`,
+            planTabTitle: `Plant Pruning & Foliage Care`,
+            subtitle: formatTaskSubtitle(daysUntilPrune),
+            daysRemaining: daysUntilPrune,
+            isOverdue: daysUntilPrune < 0,
+            isToday: daysUntilPrune === 0,
             actionLabel: "Done",
-            actionFn: `markPlantCareDone(${tank.id})`,
-            planTabActionFn: `markPlantCareDone(${tank.id})`
+            actionFn: `markPlantPruningDone(${tank.id})`,
+            planTabActionFn: `markPlantPruningDone(${tank.id})`
+          });
+        }
+
+        // 6. Liquid Fertilizer (Independent 7-day routine)
+        let lastFert = tank.lastFertilizing || tank.lastPlantCare;
+        let daysSinceFert = 7;
+        if (lastFert) {
+          daysSinceFert = Math.floor((today - new Date(lastFert)) / (1000 * 60 * 60 * 24));
+          if (daysSinceFert < 0) daysSinceFert = 0;
+          if (daysSinceFert > 60) daysSinceFert = 7;
+        }
+        const daysUntilFert = Math.max(0, 7 - daysSinceFert);
+        if (daysUntilFert <= windowDays) {
+          const curNo3 = parseFloat(tank.lastTest?.no3) || 0;
+          const fertRec = (!isCycling && curNo3 <= 35) ? findBestLiquidFertilizer(tank.vol) : { found: false };
+          const fertTitle = fertRec.found ? `Dose Liquid Fertilizer (${fertRec.shortDose})` : `Dose Liquid Fertilizer`;
+          const fertSub = fertRec.found
+            ? `${formatTaskSubtitle(daysUntilFert)} • Dose ${fertRec.shortDose}`
+            : formatTaskSubtitle(daysUntilFert);
+          tasks.push({
+            id: `fertilizer-${tank.id}`,
+            type: "fertilizer",
+            tankId: tank.id,
+            tankName: tank.name,
+            title: `${tank.name}: ${fertTitle}`,
+            planTabTitle: fertTitle,
+            subtitle: fertSub,
+            daysRemaining: daysUntilFert,
+            isOverdue: daysUntilFert < 0,
+            isToday: daysUntilFert === 0,
+            actionLabel: "Dosed",
+            actionFn: `markPlantFertilizingDone(${tank.id})`,
+            planTabActionFn: `markPlantFertilizingDone(${tank.id})`
           });
         }
       }
@@ -4850,10 +4907,20 @@
         tank.lastGlassClean = today;
         taskName = "Glass algae wipe";
         addTankTimelineEvent(tank, "Skipped glass cleaning", today);
-      } else if (taskType === "plants") {
-        tank.lastPlantCare = today;
+      } else if (taskType === "pruning") {
+        tank.lastPruning = today;
         taskName = "Plant pruning";
-        addTankTimelineEvent(tank, "Skipped plant pruning", today);
+        addTankTimelineEvent(tank, "Skipped plant pruning for this cycle", today);
+      } else if (taskType === "fertilizer") {
+        tank.lastFertilizing = today;
+        taskName = "Liquid fertilizer";
+        addTankTimelineEvent(tank, "Skipped liquid fertilizer for this cycle", today);
+      } else if (taskType === "plants") {
+        tank.lastPruning = today;
+        tank.lastFertilizing = today;
+        tank.lastPlantCare = today;
+        taskName = "Plant care";
+        addTankTimelineEvent(tank, "Skipped plant care", today);
       } else if (taskType === "impeller") {
         tank.lastImpellerClean = today;
         taskName = "Impeller check";
@@ -4934,16 +5001,31 @@
       showToast("Filter Intake & Impeller Cleaned");
     }
 
-    function markPlantCareDone(tankId) {
+    function markPlantPruningDone(tankId) {
       const tank = appState.tanks.find(t => t.id == tankId);
       if (!tank) return;
       const today = new Date().toISOString().split("T")[0];
-      tank.lastPlantCare = today;
+      tank.lastPruning = today;
+      addTankTimelineEvent(tank, "Pruned aquatic plants & checked foliage health", today);
+      saveDataToStorage();
+      renderDashboardTasks();
+      if (isInsideTank && activeTankId == tank.id) {
+        renderTankPlanTab();
+        renderTankOverviewTab();
+      }
+      showToast("Plant Pruning Logged");
+    }
+
+    function markPlantFertilizingDone(tankId) {
+      const tank = appState.tanks.find(t => t.id == tankId);
+      if (!tank) return;
+      const today = new Date().toISOString().split("T")[0];
+      tank.lastFertilizing = today;
       const curNo3 = parseFloat(tank.lastTest?.no3) || 0;
       const fertRec = (tank.status !== "Cycling" && curNo3 <= 35) ? findBestLiquidFertilizer(tank.vol) : { found: false };
       const logLine = fertRec.found
-        ? `Pruned plants & dosed ${fertRec.shortDose}`
-        : "Pruned plants & checked foliage health";
+        ? `Dosed liquid fertilizer (${fertRec.shortDose})`
+        : "Dosed liquid fertilizer for aquatic plants";
       addTankTimelineEvent(tank, logLine, today);
       saveDataToStorage();
       renderDashboardTasks();
@@ -4951,7 +5033,12 @@
         renderTankPlanTab();
         renderTankOverviewTab();
       }
-      showToast("Plant Care Logged");
+      showToast("Fertilizer Dosing Logged");
+    }
+
+    function markPlantCareDone(tankId) {
+      markPlantPruningDone(tankId);
+      markPlantFertilizingDone(tankId);
     }
 
     function markHeaterChecked(tankId) {
@@ -5771,9 +5858,12 @@
           addTankTimelineEvent(tank, `Added hardscape/decor: ${val}`, today);
         }
       } else if (action.type === "add_livestock") {
-        if (!Array.isArray(tank.livestock)) tank.livestock = [];
-        tank.livestock.push(val);
-        addTankTimelineEvent(tank, `Added ${val} to aquarium`, today);
+        const parsed = parseLivestockEntry(val);
+        const res = addOrMergeLivestock(tank, parsed.count, parsed.species);
+        const logMsg = res.merged
+          ? `Added ${res.addedCount}x ${res.displayName} (Total now: ${res.newTotal}x)`
+          : `Added ${res.newTotal}x ${res.displayName} to aquarium`;
+        addTankTimelineEvent(tank, logMsg, today);
       } else if (action.type === "add_equipment") {
         if (!Array.isArray(tank.equipment)) tank.equipment = [];
         if (!tank.equipment.some(e => e.toLowerCase() === val.toLowerCase())) {
@@ -6269,25 +6359,26 @@ ${actionsInstruction}`;
       if (!targetTank) return;
 
       const { species, qty } = lastEvaluatedSandbox;
-      if (!Array.isArray(targetTank.livestock)) targetTank.livestock = [];
-      const entry = `${qty}x ${species}`;
-      targetTank.livestock.push(entry);
+      const res = addOrMergeLivestock(targetTank, qty, species);
 
       const today = new Date().toISOString().split("T")[0];
-      addTankTimelineEvent(targetTank, `Added ${entry} to aquarium`, today);
+      const logMsg = res.merged
+        ? `Added ${res.addedCount}x ${res.displayName} (Total now: ${res.newTotal}x)`
+        : `Added ${res.newTotal}x ${res.displayName} to aquarium`;
+      addTankTimelineEvent(targetTank, logMsg, today);
       saveDataToStorage();
 
       const btn = document.getElementById("sandbox-add-roster-btn");
       if (btn) {
         btn.disabled = true;
         btn.style.opacity = "0.65";
-        btn.innerText = `✓ Added ${entry} to ${targetTank.name}`;
+        btn.innerText = `✓ Added ${res.displayName} to ${targetTank.name}`;
       }
       if (isInsideTank && activeTankId == targetTank.id) {
         renderTankLivestockTab();
         renderTankOverviewTab();
       }
-      showToast(`Added to ${targetTank.name}`);
+      showToast(res.merged ? `Updated to ${res.newTotal}x ${res.displayName}` : `Added to ${targetTank.name}`);
     }
 
     function buildOfflineCompatibilityHtml(targetTank, species, qty) {
@@ -6540,10 +6631,16 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       // Summary Assessment Box
       const summaryEl = document.getElementById("tank-overview-summary");
       if (summaryEl) {
-        summaryEl.innerText =
-          tank.summary || (!tested
-            ? "No water chemistry test recorded yet. Log an initial test below so Aquarist AI can calibrate your care schedule."
-            : (tank.status === "Cycling" ? "Aquarium is currently cycling. Biological filtration is cultivating." : "Water parameters are balanced and in the safe zone."));
+        if (!tested) {
+          summaryEl.innerText = "No water chemistry test recorded yet. Log an initial test below so Aquarist AI can calibrate your care schedule.";
+        } else if (tank.status === "Cycling") {
+          summaryEl.innerText = tank.summary || "Aquarium is currently cycling. Biological filtration is cultivating.";
+        } else {
+          const currentAnalysis = analyzeTankWaterParameters(tank);
+          summaryEl.innerText = (currentAnalysis && currentAnalysis.aiAdvice)
+            ? currentAnalysis.aiAdvice
+            : (tank.summary || "Water parameters are balanced and in the safe zone.");
+        }
       }
 
       // Care Plan Strip inside Aquarist AI card
@@ -7472,6 +7569,10 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         } else {
           markFilterRinsedFromDashboard(t.tankId, t.mediaIdx);
         }
+      } else if (t.type === "pruning") {
+        markPlantPruningDone(t.tankId);
+      } else if (t.type === "fertilizer") {
+        markPlantFertilizingDone(t.tankId);
       } else if (t.type === "plants") {
         markPlantCareDone(t.tankId);
       } else if (t.type === "impeller") {
@@ -7607,15 +7708,19 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       const count = parseInt(document.getElementById("tank-live-count").value) || 1;
       if (!name) return;
       const activeTank = getActiveTank();
-      if (!activeTank.livestock) activeTank.livestock = [];
-      const entry = `${count}x ${name}`;
-      activeTank.livestock.push(entry);
+      if (!activeTank) return;
+      const res = addOrMergeLivestock(activeTank, count, name);
       document.getElementById("tank-live-name").value = "";
+      document.getElementById("tank-live-count").value = "1";
 
-      logTankTimelineEvent(`Added ${entry} to aquarium`);
+      const logMsg = res.merged
+        ? `Added ${res.addedCount}x ${res.displayName} (Total now: ${res.newTotal}x)`
+        : `Added ${res.newTotal}x ${res.displayName} to aquarium`;
+      logTankTimelineEvent(logMsg);
       saveDataToStorage();
       renderTankLivestockTab();
       renderTankOverviewTab();
+      showToast(res.merged ? `Updated to ${res.newTotal}x ${res.displayName}` : `Added ${res.displayName}`);
     }
 
     function deleteTankLivestock(idx) {
@@ -8348,14 +8453,28 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       const idx = parseInt(document.getElementById("edit-live-idx").value);
       const count = parseInt(document.getElementById("edit-live-count").value) || 1;
       const species = document.getElementById("edit-live-species").value.trim();
-      if (!species || !activeTank || isNaN(idx)) return;
+      if (!species || !activeTank || isNaN(idx) || !activeTank.livestock) return;
 
-      activeTank.livestock[idx] = `${count}x ${species}`;
+      const targetKey = cleanSpeciesKey(species);
+      const otherIdx = activeTank.livestock.findIndex((entry, i) => {
+        if (i === idx) return false;
+        return cleanSpeciesKey(parseLivestockEntry(entry).species) === targetKey;
+      });
+
+      if (otherIdx >= 0) {
+        const other = parseLivestockEntry(activeTank.livestock[otherIdx]);
+        const mergedTotal = other.count + count;
+        activeTank.livestock[otherIdx] = `${mergedTotal}x ${other.species || species}`;
+        activeTank.livestock.splice(idx, 1);
+        showToast(`Merged into existing ${mergedTotal}x ${other.species || species}`);
+      } else {
+        activeTank.livestock[idx] = `${count}x ${species}`;
+        showToast("Livestock Updated");
+      }
       saveDataToStorage();
       closeModalById("editLivestockModal");
       renderTankLivestockTab();
       renderTankOverviewTab();
-      showToast("Livestock Updated");
     }
 
     function deleteActiveLivestockFromModal() {
