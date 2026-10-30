@@ -727,6 +727,33 @@
     .ai-session-meta {
       font-size: 10.5px; color: var(--text-muted); white-space: nowrap;
     }
+    .ai-session-icon-btn {
+      background: transparent; border: none; color: var(--text-muted);
+      cursor: pointer; padding: 2px 6px; font-size: 13px; line-height: 1;
+      border-radius: 4px; transition: all 0.15s ease; display: inline-flex;
+      align-items: center; justify-content: center;
+    }
+    .ai-session-icon-btn:hover { color: var(--cyan); background: rgba(0,210,255,0.08); }
+    .ai-session-icon-btn.danger:hover { color: var(--alert-red); background: rgba(239,68,68,0.1); }
+    .ai-turn-user-wrap {
+      display: flex; flex-direction: column; align-items: flex-end; margin-bottom: 8px; width: 100%;
+    }
+    .ai-turn-user-actions, .ai-turn-model-actions {
+      display: flex; gap: 6px; margin-top: 4px;
+    }
+    .ai-turn-action-btn {
+      background: transparent; border: none; color: var(--text-muted);
+      font-size: 11px; cursor: pointer; padding: 2px 6px; border-radius: 4px;
+      transition: all 0.15s ease; display: inline-flex; align-items: center; gap: 4px;
+    }
+    .ai-turn-action-btn:hover { color: var(--cyan); background: rgba(0,210,255,0.08); }
+    .ai-turn-action-btn.danger:hover { color: var(--alert-red); background: rgba(239,68,68,0.1); }
+    .ai-turn-edit-textarea {
+      width: 100%; box-sizing: border-box; background: rgba(15,23,42,0.85);
+      border: 1px solid var(--cyan); border-radius: 10px; color: #F8FAFC;
+      padding: 8px 10px; font-size: 13.5px; line-height: 1.48; resize: vertical;
+      font-family: inherit; outline: none; margin-bottom: 2px;
+    }
     .ai-composer-wrap { margin-top: auto; padding-top: 6px; }
     
     /* Native Chat Viewport Lock (Prevents blank space below composer) */
@@ -1063,6 +1090,7 @@
             </div>
             <div id="global-ai-actions-row" class="ai-context-actions-row">
               <button type="button" id="global-ai-history-btn" class="ghost-action-btn" style="display:none; font-size:11px; padding:4px 9px; color:var(--text-muted);" onclick="toggleAiSessionsDrawer()">Chats</button>
+              <button type="button" id="global-ai-rename-btn" class="ghost-action-btn" style="display:none; font-size:11px; padding:4px 9px; color:var(--text-muted);" onclick="openRenameActiveAiSessionModal()" title="Rename this conversation">✎ Rename</button>
               <button type="button" id="global-ai-clear-btn" class="ghost-action-btn" style="display:none; font-size:11px; padding:4px 9px;" onclick="clearGlobalAIThread()">+ New</button>
             </div>
           </div>
@@ -1783,6 +1811,25 @@
       </div>
       <div id="tank-item-modal-delete-wrap" style="display:none; border-top:1px solid rgba(255,255,255,0.08); margin-top:12px; padding-top:10px; justify-content:flex-end;">
         <button type="button" class="btn btn-danger" style="width:auto; font-size:11px; padding:6px 12px;" onclick="deleteFromTankItemModal()">Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: RENAME AI CHAT CONVERSATION ================= -->
+  <div class="modal-overlay" id="renameChatModal">
+    <div class="modal-box" style="max-width:380px;">
+      <div class="card-header" style="margin-bottom:12px;">
+        <h3 style="font-size:17px; margin:0;">Rename Conversation</h3>
+        <button type="button" class="icon-btn" style="width:28px;height:28px;" onclick="closeModalById('renameChatModal')">×</button>
+      </div>
+      <input type="hidden" id="rename-chat-session-id">
+      <div style="margin-bottom:16px;">
+        <label>Chat Title</label>
+        <input type="text" id="rename-chat-input" maxlength="60" placeholder="e.g. 40G Aquascape Ideas" onkeydown="if(event.key==='Enter'){event.preventDefault();saveRenamedAiSession();}">
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="btn btn-secondary" onclick="closeModalById('renameChatModal')">Cancel</button>
+        <button type="button" class="btn btn-neon" onclick="saveRenamedAiSession()">Save</button>
       </div>
     </div>
   </div>
@@ -3017,6 +3064,7 @@
     let tankItemModalState = null;
     let editingWcHistoryIdx = -1;
     let isAiGenerating = false;
+    let activeEditingUserTurnIdx = -1;
     let closetRestockOnly = false;
     let lastEvaluatedSandbox = null;
     let swRegistration = null;
@@ -5655,6 +5703,7 @@
       appState.aiSessions.unshift(fresh);
       appState.aiSessions = appState.aiSessions.slice(0, 10);
       appState.activeAiSessionId = sid;
+      activeEditingUserTurnIdx = -1;
       globalAiContextTankId = cleanFocus;
       appState.aiThread = fresh.messages;
       globalAiThread = fresh.messages;
@@ -5704,20 +5753,70 @@
         const isActive = s.id === appState.activeAiSessionId;
         const focusLbl = formatSessionFocusLabel(s.focusTankId);
         const turnCount = Math.max(1, Math.ceil((s.messages || []).filter(m => m.role === "user").length));
-        return `<div class="ai-session-row ${isActive ? "active" : ""}" onclick="selectAiSession('${escapeHtmlText(s.id)}')">
-          <div style="min-width:0; flex:1;">
+        return `<div class="ai-session-row ${isActive ? "active" : ""}">
+          <div style="min-width:0; flex:1;" onclick="selectAiSession('${escapeHtmlText(s.id)}')">
             <div class="ai-session-title">${escapeHtmlText(s.title || "Conversation")}</div>
             <div class="ai-session-meta">${escapeHtmlText(focusLbl)} · ${turnCount} ${turnCount === 1 ? "prompt" : "prompts"}</div>
           </div>
-          <span class="delete-x" title="Delete chat" onclick="deleteAiSession('${escapeHtmlText(s.id)}', event)">×</span>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <button type="button" class="ai-session-icon-btn" title="Rename chat" onclick="openRenameAiSessionModal('${escapeHtmlText(s.id)}', event)">✎</button>
+            <button type="button" class="ai-session-icon-btn danger" title="Delete chat" onclick="deleteAiSession('${escapeHtmlText(s.id)}', event)">×</button>
+          </div>
         </div>`;
       }).join("");
+    }
+
+    function openRenameAiSessionModal(sessionId, evt) {
+      if (evt && evt.stopPropagation) evt.stopPropagation();
+      ensureAiSessionsNormalized(appState);
+      const sess = appState.aiSessions.find(s => s.id === sessionId);
+      if (!sess) return;
+      const idInput = document.getElementById("rename-chat-session-id");
+      const nameInput = document.getElementById("rename-chat-input");
+      if (idInput) idInput.value = sess.id;
+      if (nameInput) nameInput.value = sess.title || "Conversation";
+      openModalById("renameChatModal");
+      setTimeout(() => {
+        if (nameInput) {
+          nameInput.focus();
+          nameInput.select();
+        }
+      }, 50);
+    }
+
+    function openRenameActiveAiSessionModal() {
+      const active = getActiveAiSession();
+      if (!active) return;
+      openRenameAiSessionModal(active.id);
+    }
+
+    function saveRenamedAiSession() {
+      const idInput = document.getElementById("rename-chat-session-id");
+      const nameInput = document.getElementById("rename-chat-input");
+      const sid = idInput ? idInput.value : "";
+      const newTitle = (nameInput ? nameInput.value : "").trim();
+      if (!sid || !newTitle) {
+        showToast("Title cannot be empty");
+        return;
+      }
+      ensureAiSessionsNormalized(appState);
+      const sess = appState.aiSessions.find(s => s.id === sid);
+      if (sess) {
+        sess.title = newTitle;
+        sess.updatedAt = Date.now();
+        saveDataToStorage();
+        closeModalById("renameChatModal");
+        renderAiSessionsDrawer();
+        renderGlobalAIThreadView();
+        showToast("Chat Renamed");
+      }
     }
 
     function selectAiSession(sessionId) {
       ensureAiSessionsNormalized(appState);
       const target = appState.aiSessions.find(s => s.id === sessionId);
       if (!target) return;
+      activeEditingUserTurnIdx = -1;
       appState.activeAiSessionId = target.id;
       const validFocus = target.focusTankId === "all" || appState.tanks.some(t => String(t.id) === String(target.focusTankId));
       globalAiContextTankId = validFocus ? String(target.focusTankId) : "all";
@@ -5733,6 +5832,7 @@
       ensureAiSessionsNormalized(appState);
       appState.aiSessions = appState.aiSessions.filter(s => s.id !== sessionId);
       ensureAiSessionsNormalized(appState);
+      activeEditingUserTurnIdx = -1;
       const active = getActiveAiSession();
       globalAiContextTankId = (active.focusTankId === "all" || appState.tanks.some(t => String(t.id) === String(active.focusTankId)))
         ? String(active.focusTankId)
@@ -5922,8 +6022,31 @@
       (thread || []).forEach((turn, turnIdx) => {
         if (turn.role === "user") {
           const thumbHtml = turn.thumbUrl ? `<img src="${turn.thumbUrl}" class="ai-turn-user-thumb" alt="Attached photo">` : "";
-          const label = turn.text || "Attached photo for visual analysis";
-          html += `<div class="ai-turn-user">${thumbHtml}${escapeHtmlText(label)}</div>`;
+          if (activeEditingUserTurnIdx === turnIdx) {
+            html += `
+              <div class="ai-turn-user-wrap" style="align-self:stretch; width:100%;">
+                <div class="ai-turn-user editing" style="max-width:100%; width:100%; box-sizing:border-box;">
+                  ${thumbHtml}
+                  <textarea id="ai-turn-edit-input-${turnIdx}" class="ai-turn-edit-textarea" rows="3" placeholder="Edit your prompt..." onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();submitEditedUserTurn(${turnIdx});} if(event.key==='Escape'){event.preventDefault();cancelEditingUserTurn();}">${escapeHtmlText(turn.text || "")}</textarea>
+                  <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:6px;">
+                    <button type="button" class="btn btn-secondary" style="width:auto; font-size:11px; padding:4px 10px;" onclick="cancelEditingUserTurn()">Cancel</button>
+                    <button type="button" class="btn btn-neon" style="width:auto; font-size:11px; padding:4px 14px;" onclick="submitEditedUserTurn(${turnIdx})">Update &amp; Send</button>
+                  </div>
+                </div>
+              </div>
+            `;
+          } else {
+            const label = turn.text || "Attached photo for visual analysis";
+            html += `
+              <div class="ai-turn-user-wrap">
+                <div class="ai-turn-user">${thumbHtml}${escapeHtmlText(label)}</div>
+                <div class="ai-turn-user-actions">
+                  <button type="button" class="ai-turn-action-btn" title="Edit prompt and re-generate from here" onclick="startEditingUserTurn(${turnIdx})">✎ Edit</button>
+                  <button type="button" class="ai-turn-action-btn danger" title="Delete this prompt and everything after it" onclick="deleteMessagesFromTurn(${turnIdx})">Delete from here</button>
+                </div>
+              </div>
+            `;
+          }
         } else {
           const bodyHtml = turn.isError
             ? `<span style="color:var(--alert-red);">${escapeHtmlText(turn.text)}</span>`
@@ -5935,7 +6058,17 @@
               return `<button type="button" class="ai-action-chip${appliedCls}" ${act.applied ? "disabled" : ""} onclick="applyAiSuggestedAction(${turnIdx}, ${actIdx})">${escapeHtmlText(formatAiActionChipLabel(act))}</button>`;
             }).join("")}</div>`;
           }
-          html += `<div class="ai-turn-model"><div class="ai-model-label">✦ Aquarist AI</div>${bodyHtml}${actionsHtml}</div>`;
+          html += `
+            <div class="ai-turn-model">
+              <div class="ai-model-label">✦ Aquarist AI</div>
+              ${bodyHtml}
+              ${actionsHtml}
+              <div class="ai-turn-model-actions">
+                <button type="button" class="ai-turn-action-btn" title="Copy response to clipboard" onclick="copyAiTurnText(${turnIdx})">Copy</button>
+                <button type="button" class="ai-turn-action-btn danger" title="Delete this response and everything after it" onclick="deleteMessagesFromTurn(${turnIdx})">Delete from here</button>
+              </div>
+            </div>
+          `;
         }
       });
 
@@ -6084,17 +6217,24 @@
         }
       }
 
+      const renameBtn = document.getElementById("global-ai-rename-btn");
+      if (renameBtn) {
+        renameBtn.style.display = hasActivity ? "inline-block" : "none";
+      }
+
       renderAiThreadElement(threadEl, clearBtn, thread, pendingText);
 
       const actionsRow = document.getElementById("global-ai-actions-row");
       if (actionsRow) {
         const hasHistory = historyBtn && historyBtn.style.display !== "none";
         const hasClear = clearBtn && clearBtn.style.display !== "none";
-        actionsRow.style.display = (hasHistory || hasClear) ? "flex" : "none";
+        const hasRename = renameBtn && renameBtn.style.display !== "none";
+        actionsRow.style.display = (hasHistory || hasClear || hasRename) ? "flex" : "none";
       }
     }
 
     function clearGlobalAIThread() {
+      activeEditingUserTurnIdx = -1;
       const active = getActiveAiSession();
       if (active.messages && active.messages.length > 0) {
         syncAiSessionState();
@@ -6217,10 +6357,41 @@ Conversational Guidelines:
 ${actionsInstruction}`;
     }
 
+    async function generateGeminiReplyForActiveSession() {
+      const sess = getActiveAiSession();
+      const thread = sess.messages;
+      const sendBtn = document.getElementById("global-ai-send-btn");
+      isAiGenerating = true;
+      if (sendBtn) sendBtn.disabled = true;
+      renderGlobalAIThreadView("Thinking...");
+
+      try {
+        const contents = buildMultiTurnContents(thread);
+        const systemPrompt = buildGlobalAISystemPrompt();
+        const rawReply = await callGeminiGenerate(contents, systemPrompt);
+        const parsed = extractAiReplyAndActions(rawReply);
+        const modelTurn = { role: "model", text: parsed.text };
+        if (parsed.actions.length > 0) modelTurn.actions = parsed.actions;
+        thread.push(modelTurn);
+      } catch (err) {
+        thread.push({
+          role: "model",
+          isError: true,
+          text: `Unable to reach Gemini API (${err.message || "connection error"}). Check your API key in Settings.`
+        });
+      } finally {
+        isAiGenerating = false;
+        if (sendBtn) sendBtn.disabled = false;
+      }
+      sess.updatedAt = Date.now();
+      syncAiSessionState();
+      saveDataToStorage();
+      renderGlobalAIThreadView();
+    }
+
     async function askGlobalAI() {
       if (isAiGenerating) return;
       const inputEl = document.getElementById("global-ai-input");
-      const sendBtn = document.getElementById("global-ai-send-btn");
       const q = inputEl ? inputEl.value.trim() : "";
       if (!q && !globalVisionBase64) {
         if (inputEl) inputEl.focus();
@@ -6233,9 +6404,6 @@ ${actionsInstruction}`;
         openSettingsModal();
         return;
       }
-
-      isAiGenerating = true;
-      if (sendBtn) sendBtn.disabled = true;
 
       const attachedBase64 = globalVisionBase64;
       const attachedThumb = globalVisionDataUrl;
@@ -6261,30 +6429,83 @@ ${actionsInstruction}`;
         sess.title = deriveAiSessionTitle(thread);
       }
       sess.updatedAt = Date.now();
-      renderGlobalAIThreadView("Thinking...");
 
-      try {
-        const contents = buildMultiTurnContents(thread);
-        const systemPrompt = buildGlobalAISystemPrompt();
-        const rawReply = await callGeminiGenerate(contents, systemPrompt);
-        const parsed = extractAiReplyAndActions(rawReply);
-        const modelTurn = { role: "model", text: parsed.text };
-        if (parsed.actions.length > 0) modelTurn.actions = parsed.actions;
-        thread.push(modelTurn);
-      } catch (err) {
-        thread.push({
-          role: "model",
-          isError: true,
-          text: `Unable to reach Gemini API (${err.message || "connection error"}). Check your API key in Settings.`
-        });
-      } finally {
-        isAiGenerating = false;
-        if (sendBtn) sendBtn.disabled = false;
+      await generateGeminiReplyForActiveSession();
+    }
+
+    function startEditingUserTurn(turnIdx) {
+      if (isAiGenerating) return;
+      activeEditingUserTurnIdx = turnIdx;
+      renderGlobalAIThreadView();
+      setTimeout(() => {
+        const el = document.getElementById(`ai-turn-edit-input-${turnIdx}`);
+        if (el) {
+          el.focus();
+          el.setSelectionRange(el.value.length, el.value.length);
+        }
+      }, 50);
+    }
+
+    function cancelEditingUserTurn() {
+      activeEditingUserTurnIdx = -1;
+      renderGlobalAIThreadView();
+    }
+
+    async function submitEditedUserTurn(turnIdx) {
+      if (isAiGenerating) return;
+      const inputEl = document.getElementById(`ai-turn-edit-input-${turnIdx}`);
+      const newText = inputEl ? inputEl.value.trim() : "";
+      if (!newText) {
+        showToast("Message cannot be empty");
+        return;
       }
+      if (!appState.apiKey) {
+        updateGlobalAIKeyNotice();
+        showToast("Add Gemini API Key in Settings");
+        openSettingsModal();
+        return;
+      }
+
+      const sess = getActiveAiSession();
+      const thread = sess.messages;
+      if (!thread[turnIdx] || thread[turnIdx].role !== "user") return;
+
+      thread[turnIdx].text = newText;
+      thread.splice(turnIdx + 1);
+      activeEditingUserTurnIdx = -1;
+      sess.updatedAt = Date.now();
+      syncAiSessionState();
+      saveDataToStorage();
+
+      await generateGeminiReplyForActiveSession();
+      showToast("Conversation Updated");
+    }
+
+    function deleteMessagesFromTurn(turnIdx) {
+      if (isAiGenerating) return;
+      const sess = getActiveAiSession();
+      const thread = sess.messages;
+      if (!Array.isArray(thread) || turnIdx < 0 || turnIdx >= thread.length) return;
+
+      const deletedCount = thread.length - turnIdx;
+      thread.splice(turnIdx);
+      activeEditingUserTurnIdx = -1;
       sess.updatedAt = Date.now();
       syncAiSessionState();
       saveDataToStorage();
       renderGlobalAIThreadView();
+      showToast(deletedCount === 1 ? "Message deleted" : `Deleted ${deletedCount} messages from this point`);
+    }
+
+    function copyAiTurnText(turnIdx) {
+      const sess = getActiveAiSession();
+      const turn = sess.messages[turnIdx];
+      if (!turn || !turn.text) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(turn.text).then(() => {
+          showToast("Copied to clipboard");
+        }).catch(() => {});
+      }
     }
 
     function onSandboxInputChanged() {
