@@ -1258,8 +1258,8 @@
         <div class="card">
           <div class="card-header" style="gap:8px;">
             <div>
-              <div class="card-title">Filter Media &amp; Care</div>
-              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Automated rinse, inspection &amp; replacement cycles</div>
+              <div class="card-title">Filter Media Setup</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Filtration media layers and auto-scheduled maintenance routines</div>
             </div>
             <button type="button" class="ghost-action-btn" onclick="openAddMediaModal()">+ Add Media</button>
           </div>
@@ -1282,11 +1282,15 @@
 
   </main>
 
-  <!-- Global Bottom Navigation Bar (Shown on Home Level) -->
+  <!-- Global Bottom Navigation Bar -->
   <nav class="bottom-nav" id="global-bottom-nav">
     <button class="nav-tab active" onclick="navToGlobal('dashboard')" id="nav-btn-dashboard">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
       Home
+    </button>
+    <button class="nav-tab" onclick="navToGlobal('tanks')" id="nav-btn-tanks">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="5" width="18" height="14" rx="2.5" stroke-width="2"/><path d="M3 10c3 1.5 6-1.5 9 0s6 1.5 9 0" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="14.5" r="1" fill="currentColor"/><circle cx="15.5" cy="13.5" r="1.5" fill="currentColor"/></svg>
+      Aquariums
     </button>
     <button class="nav-tab" onclick="navToGlobal('closet')" id="nav-btn-closet">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
@@ -1526,16 +1530,16 @@
       <div style="margin-bottom:14px;">
         <label>Media Category</label>
         <select id="m-media-cat" onchange="onMediaCategoryChange(this.value)">
-          <option value="mechanical">Mechanical Sponge / Floss (Auto-schedule 21d rinse)</option>
-          <option value="cartridge">Filter Cartridge (Floss & Carbon, Auto-schedule 28d replacement)</option>
-          <option value="chemical">Chemical Media (Purigen / Carbon, Auto-schedule 60d replacement)</option>
-          <option value="biological">Biological Media (Ceramic Rings / Matrix, 90d inspection)</option>
+          <option value="mechanical">Mechanical (Sponge, Foam, Filter Floss)</option>
+          <option value="cartridge">Filter Cartridge (Floss &amp; Carbon)</option>
+          <option value="chemical">Chemical (Purigen, Activated Carbon)</option>
+          <option value="biological">Biological (Ceramic Rings, Matrix, Bio-Balls)</option>
         </select>
       </div>
 
-      <!-- Auto-Schedule Expert Explanation Box -->
+      <!-- Auto-Schedule Notice -->
       <div id="media-schedule-explanation" style="background:rgba(0,210,255,0.06); border:1px solid rgba(0,210,255,0.2); border-radius:12px; padding:10px 12px; font-size:11.5px; color:var(--text-main); margin-bottom:16px; line-height:1.45;">
-        <b>Aquarist AI Auto-Schedule:</b> Mechanical sponge will automatically be queued for gentle rinse in tank water every <b>21 days</b> to prevent filter bypass.
+        ✦ <b>Auto-Schedule:</b> Mechanical sponge will automatically be scheduled for a gentle rinse in tank water every <b>21 days</b>.
       </div>
 
       <div style="display:flex; gap:10px;">
@@ -1560,10 +1564,10 @@
       <div style="margin-bottom:14px;">
         <label>Media Category</label>
         <select id="edit-m-media-cat" onchange="onEditMediaCategoryChange(this.value)">
-          <option value="mechanical">Mechanical Sponge / Floss (Auto-schedule 21d rinse)</option>
-          <option value="cartridge">Filter Cartridge (Floss & Carbon, Auto-schedule 28d replacement)</option>
-          <option value="chemical">Chemical Media (Purigen / Carbon, Auto-schedule 60d replacement)</option>
-          <option value="biological">Biological Media (Ceramic Rings / Matrix, 90d inspection)</option>
+          <option value="mechanical">Mechanical (Sponge, Foam, Filter Floss)</option>
+          <option value="cartridge">Filter Cartridge (Floss &amp; Carbon)</option>
+          <option value="chemical">Chemical (Purigen, Activated Carbon)</option>
+          <option value="biological">Biological (Ceramic Rings, Matrix, Bio-Balls)</option>
         </select>
       </div>
       <div id="edit-media-schedule-explanation" style="background:rgba(0,210,255,0.06); border:1px solid rgba(0,210,255,0.2); border-radius:12px; padding:10px 12px; font-size:11.5px; color:var(--text-main); margin-bottom:16px; line-height:1.45;">
@@ -2895,6 +2899,21 @@
        3. NAVIGATION, LEVEL 1/2 ROUTING & ANDROID BACK GESTURE
        ============================================================ */
     function navToGlobal(viewName, pushHistory = true, keepReturnTank = false) {
+      if (viewName === "tanks") {
+        if (Array.isArray(appState.tanks) && appState.tanks.length > 0) {
+          const targetId = activeTankId || appState.tanks[0].id;
+          if (isInsideTank && String(activeTankId) === String(targetId)) {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            return;
+          }
+          enterTankHub(targetId, pushHistory);
+          return;
+        } else {
+          openAddTankModal();
+          return;
+        }
+      }
+
       closeAllModals(false);
       isInsideTank = false;
       currentGlobalView = viewName;
@@ -2990,10 +3009,13 @@
       document.getElementById("header-tank-nav").style.display = "flex";
       syncHeaderTankSwitcher();
       document.getElementById("header-edit-tank-btn").style.display = "flex";
-      document.getElementById("global-bottom-nav").style.display = "none";
+      document.getElementById("global-bottom-nav").style.display = "flex";
 
       document.querySelectorAll(".view-screen").forEach(s => s.classList.remove("active"));
       document.getElementById("screen-tank-hub").classList.add("active");
+      document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
+      const tankNavBtn = document.getElementById("nav-btn-tanks");
+      if (tankNavBtn) tankNavBtn.classList.add("active");
 
       if (pushHistory) {
         history.pushState({ level: "tank", tankId: tankId, subtab: currentTankSubtab || "overview" }, "");
@@ -7315,27 +7337,24 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         const interval = m.interval || (m.cat === "biological" ? 90 : (m.cat === "chemical" ? 60 : (m.cat === "cartridge" ? 28 : 21)));
 
         let statusText = "";
-        let fillPct = 100;
         let barColor = "var(--neon-green)";
         let actionBtnText = "Log Rinsed";
 
         if (m.cat === "biological") {
           const daysLeft = interval - diffDays;
-          fillPct = Math.max(8, Math.min(100, Math.round((daysLeft / interval) * 100)));
           if (daysLeft < 0) {
-            statusText = `Inspection overdue by ${Math.abs(daysLeft)} days • Swish gently in tank water (never replace)`;
+            statusText = `Overdue for inspection (${Math.abs(daysLeft)}d overdue) • Swish gently in tank water`;
             barColor = "var(--alert-yellow)";
           } else if (daysLeft <= 10) {
             statusText = `Permanent Bio-Media • Gentle inspection in ${daysLeft} days`;
             barColor = "var(--alert-yellow)";
           } else {
-            statusText = `Permanent Bio-Media • Inspect in ${daysLeft} days (90-day cycle)`;
+            statusText = `Permanent Bio-Media • Next inspection in ${daysLeft} days (90d cycle)`;
             barColor = "var(--neon-green)";
           }
           actionBtnText = "Log Inspected";
         } else if (m.cat === "cartridge") {
           const daysLeft = interval - diffDays;
-          fillPct = Math.max(5, Math.min(100, Math.round(((interval - diffDays) / interval) * 100)));
           if (daysLeft < 0) {
             statusText = `Exhausted • Overdue by ${Math.abs(daysLeft)} days`;
             barColor = "var(--alert-red)";
@@ -7343,13 +7362,12 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
             statusText = `Replace cartridge in ${daysLeft} days`;
             barColor = "var(--alert-yellow)";
           } else {
-            statusText = `Active • Replace in ${daysLeft} days (28-day schedule)`;
+            statusText = `Active • Replace in ${daysLeft} days (28d cycle)`;
             barColor = "var(--neon-green)";
           }
           actionBtnText = "Log Replaced";
         } else if (m.cat === "chemical") {
           const daysLeft = interval - diffDays;
-          fillPct = Math.max(5, Math.min(100, Math.round(((interval - diffDays) / interval) * 100)));
           if (daysLeft < 0) {
             statusText = `Exhausted • Overdue by ${Math.abs(daysLeft)} days`;
             barColor = "var(--alert-red)";
@@ -7357,14 +7375,13 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
             statusText = `Replace / Recharge in ${daysLeft} days`;
             barColor = "var(--alert-yellow)";
           } else {
-            statusText = `Active • Replace in ${daysLeft} days (60-day schedule)`;
+            statusText = `Active • Replace in ${daysLeft} days (60d cycle)`;
             barColor = "var(--neon-green)";
           }
           actionBtnText = "Log Replaced";
         } else {
           // Mechanical sponge / floss
           const daysLeft = interval - diffDays;
-          fillPct = Math.max(5, Math.min(100, Math.round(((interval - diffDays) / interval) * 100)));
           if (daysLeft < 0) {
             statusText = `Rinse overdue by ${Math.abs(daysLeft)} days`;
             barColor = "var(--alert-red)";
@@ -7372,31 +7389,40 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
             statusText = `Rinse in tank water due in ${daysLeft} days`;
             barColor = "var(--alert-yellow)";
           } else {
-            statusText = `Optimal flow • Rinse in ${daysLeft} days (${interval}-day schedule)`;
+            statusText = `Optimal flow • Rinse in ${daysLeft} days (${interval}d cycle)`;
             barColor = "var(--neon-green)";
           }
           actionBtnText = "Log Rinsed";
         }
 
+        const catLabels = {
+          mechanical: "Mechanical",
+          cartridge: "Cartridge",
+          chemical: "Chemical",
+          biological: "Biological"
+        };
+        const catName = catLabels[m.cat] || "Media";
+
         const div = document.createElement("div");
         div.className = "media-card";
         div.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div style="font-weight:700; font-size:14px; color:#fff; display:flex; align-items:center; gap:8px;">
-              <span>${escapeHtmlText(m.name)}</span>
-              <span style="font-size:11px; color:var(--cyan); cursor:pointer; font-weight:normal;" onclick="openEditMediaModal(${idx})">Edit</span>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+              <span style="font-weight:700; font-size:13.5px; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtmlText(m.name)}</span>
+              <span class="badge" style="font-size:10px; padding:2px 7px; background:rgba(0,210,255,0.08); color:var(--cyan); border:1px solid rgba(0,210,255,0.2); border-radius:6px; flex-shrink:0;">${catName}</span>
             </div>
-            <span class="delete-x" onclick="deleteFilterMedia(${idx})" title="Remove media">×</span>
+            <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+              <span style="font-size:11px; color:var(--cyan); cursor:pointer; font-weight:600;" onclick="openEditMediaModal(${idx})">Edit</span>
+              <span class="delete-x" onclick="deleteFilterMedia(${idx})" title="Remove media">×</span>
+            </div>
           </div>
-          <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
-            ${statusText}
-          </div>
-          <div class="media-progress-bar">
-            <div class="media-progress-fill" style="width:${fillPct}%; background:${barColor};"></div>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-            <span style="font-size:11px; color:var(--text-muted);">Last serviced: ${escapeHtmlText(m.lastDate || "Recently")}</span>
-            <button type="button" class="btn btn-secondary" style="width:auto; padding:4px 10px; font-size:11px;" onclick="resetMediaTimer(${idx})">${actionBtnText}</button>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:11px; color:var(--text-muted); line-height:1.4;">
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <span style="color:${barColor}; font-weight:600;">${statusText}</span>
+              <span>Last serviced: <b>${escapeHtmlText(m.lastDate || "Recently")}</b></span>
+            </div>
+            <button type="button" class="ghost-action-btn" style="padding:4px 9px; font-size:11px; color:var(--text-main); white-space:nowrap; flex-shrink:0;" onclick="resetMediaTimer(${idx})">${actionBtnText}</button>
           </div>
         `;
         listEl.appendChild(div);
@@ -7439,13 +7465,13 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       const exp = document.getElementById("media-schedule-explanation");
       if (!exp) return;
       if (val === "mechanical") {
-        exp.innerHTML = `<b>Aquarist AI Auto-Schedule:</b> Mechanical sponge will automatically be queued for gentle rinse in tank water every <b>21 days</b> to prevent filter bypass.`;
+        exp.innerHTML = `✦ <b>Auto-Schedule:</b> Mechanical sponge will automatically be scheduled for a gentle rinse in tank water every <b>21 days</b>.`;
       } else if (val === "cartridge") {
-        exp.innerHTML = `<b>Aquarist AI Auto-Schedule:</b> All-in-one cartridge floss and carbon exhausts within 4 weeks. Queued for replacement every <b>28 days</b>.`;
+        exp.innerHTML = `✦ <b>Auto-Schedule:</b> Cartridge floss and carbon will automatically be scheduled for replacement every <b>28 days</b>.`;
       } else if (val === "chemical") {
-        exp.innerHTML = `<b>Aquarist AI Auto-Schedule:</b> Chemical resins/carbon absorb organics for 2 months. Queued for recharge/replacement every <b>60 days</b>.`;
+        exp.innerHTML = `✦ <b>Auto-Schedule:</b> Chemical resins and carbon will automatically be scheduled for replacement or recharge every <b>60 days</b>.`;
       } else if (val === "biological") {
-        exp.innerHTML = `<b>Aquarist AI Auto-Schedule:</b> Biological media holds your beneficial nitrifying colonies permanently. Gentle inspection scheduled every <b>90 days</b> (never replace!).`;
+        exp.innerHTML = `✦ <b>Auto-Schedule:</b> Permanent bio-media holds beneficial nitrifying colonies. Gentle inspection scheduled every <b>90 days</b> (never replace).`;
       }
     }
 
@@ -7464,13 +7490,13 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       const exp = document.getElementById("edit-media-schedule-explanation");
       if (!exp) return;
       if (val === "mechanical") {
-        exp.innerHTML = `<b>Aquarist AI Auto-Schedule:</b> Mechanical sponge will automatically be queued for gentle rinse in tank water every <b>21 days</b>.`;
+        exp.innerHTML = `✦ <b>Auto-Schedule:</b> Mechanical sponge will automatically be scheduled for a gentle rinse in tank water every <b>21 days</b>.`;
       } else if (val === "cartridge") {
-        exp.innerHTML = `<b>Aquarist AI Auto-Schedule:</b> Cartridge floss and carbon exhausts within 4 weeks. Queued for replacement every <b>28 days</b>.`;
+        exp.innerHTML = `✦ <b>Auto-Schedule:</b> Cartridge floss and carbon will automatically be scheduled for replacement every <b>28 days</b>.`;
       } else if (val === "chemical") {
-        exp.innerHTML = `<b>Aquarist AI Auto-Schedule:</b> Chemical resins/carbon absorb organics for 2 months. Queued for recharge/replacement every <b>60 days</b>.`;
+        exp.innerHTML = `✦ <b>Auto-Schedule:</b> Chemical resins and carbon will automatically be scheduled for replacement or recharge every <b>60 days</b>.`;
       } else if (val === "biological") {
-        exp.innerHTML = `<b>Aquarist AI Auto-Schedule:</b> Biological media holds your beneficial nitrifying colonies permanently. Gentle inspection scheduled every <b>90 days</b>.`;
+        exp.innerHTML = `✦ <b>Auto-Schedule:</b> Permanent bio-media holds beneficial nitrifying colonies. Gentle inspection scheduled every <b>90 days</b> (never replace).`;
       }
     }
 
