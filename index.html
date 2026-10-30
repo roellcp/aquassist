@@ -728,6 +728,71 @@
       font-size: 10.5px; color: var(--text-muted); white-space: nowrap;
     }
     .ai-composer-wrap { margin-top: auto; padding-top: 6px; }
+    
+    /* Native Chat Viewport Lock (Prevents blank space below composer) */
+    body.ai-screen-active {
+      overflow: hidden;
+      padding-bottom: var(--bottom-nav-height);
+    }
+    body.ai-screen-active .container {
+      padding: 10px 16px 0;
+      height: calc(100vh - 64px - var(--bottom-nav-height));
+      height: calc(100dvh - 64px - var(--bottom-nav-height));
+      max-height: calc(100vh - 64px - var(--bottom-nav-height));
+      max-height: calc(100dvh - 64px - var(--bottom-nav-height));
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+    }
+    body.ai-screen-active #screen-global-ai {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    body.ai-screen-active #screen-global-ai > .card {
+      flex: 1;
+      min-height: 0;
+      margin-bottom: 0;
+      padding: 14px 16px 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+    body.ai-screen-active .ai-chat-shell {
+      flex: 1;
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    body.ai-screen-active .ai-thread.global-stream {
+      flex: 1;
+      min-height: 0;
+      max-height: none;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+    body.ai-screen-active .ai-empty-state {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    body.ai-screen-active .ai-composer-wrap {
+      margin-top: auto;
+      padding-top: 8px;
+      padding-bottom: 2px;
+      flex-shrink: 0;
+    }
+    body.ai-screen-active #global-ai-compat-panel {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
     .ai-composer-box {
       display: flex; align-items: flex-end; gap: 6px;
       background: rgba(7, 15, 30, 0.92); border: 1px solid rgba(255, 255, 255, 0.13);
@@ -3060,6 +3125,10 @@
         aiReturnSubtab = "overview";
       }
 
+      if (typeof document !== "undefined" && document.body && document.body.classList) {
+        document.body.classList.toggle("ai-screen-active", viewName === "global-ai");
+      }
+
       // Update UI elements for Global Level
       document.getElementById("header-brand").style.display = "flex";
       document.getElementById("header-tank-nav").style.display = "none";
@@ -3128,6 +3197,9 @@
       closeAllModals(false);
       isInsideTank = true;
       activeTankId = tankId;
+      if (typeof document !== "undefined" && document.body && document.body.classList) {
+        document.body.classList.remove("ai-screen-active");
+      }
 
       const tank = getActiveTank();
       if (!tank) return;
