@@ -920,6 +920,17 @@
         </div>
       </div>
 
+      <!-- Automated Backup Reminder Banner -->
+      <div id="dashboard-backup-reminder" style="display:none; background:rgba(56,189,248,0.06); border:1px solid rgba(56,189,248,0.22); border-radius:14px; padding:12px 16px; margin-bottom:18px; justify-content:space-between; align-items:center; gap:12px;">
+        <div style="font-size:12.5px; color:var(--text-main); line-height:1.4;">
+          <span style="color:var(--cyan); font-weight:700;">✦ Backup Reminder:</span> It has been <span id="backup-reminder-days">14</span> days since your last JSON backup export.
+        </div>
+        <div style="display:flex; gap:6px; flex-shrink:0;">
+          <button type="button" class="btn btn-primary" style="padding:5px 12px; font-size:11.5px; width:auto;" onclick="exportDataJSON()">Export Now</button>
+          <button type="button" class="ghost-action-btn" style="padding:5px 9px; font-size:11.5px;" onclick="dismissBackupReminder()">Later</button>
+        </div>
+      </div>
+
       <!-- Actionable Upcoming Tasks & Routines Checklist -->
       <div class="card" id="dashboard-tasks-card" style="margin-bottom: 18px; border-color: rgba(56, 189, 248, 0.28); padding: 15px 18px;">
         <div class="card-header" id="dashboard-tasks-header" style="margin-bottom: 10px; display:flex; justify-content:space-between; align-items:center; gap:8px;">
@@ -2002,17 +2013,49 @@
       <div class="settings-section">
         <div style="margin-bottom:9px;">
           <div class="settings-title">Data &amp; Backup</div>
-          <div class="settings-sub">Export or restore your aquariums as a local JSON file</div>
+          <div class="settings-sub">Export, restore, or manage automated safety snapshots</div>
         </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-          <button class="btn btn-secondary" style="font-size:12px; font-weight:600; padding:9px 12px; border-radius:10px;" onclick="exportDataJSON()">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
+          <button type="button" class="btn btn-secondary" style="font-size:12px; font-weight:600; padding:9px 12px; border-radius:10px;" onclick="exportDataJSON()">
             Export Backup
           </button>
-          <button class="btn btn-secondary" style="font-size:12px; font-weight:600; padding:9px 12px; border-radius:10px;" onclick="document.getElementById('importFile').click()">
+          <button type="button" class="btn btn-secondary" style="font-size:12px; font-weight:600; padding:9px 12px; border-radius:10px;" onclick="document.getElementById('importFile').click()">
             Restore Backup
           </button>
           <input type="file" id="importFile" accept=".json,application/json" style="display:none;" onchange="importDataJSON(event)">
         </div>
+        <div id="folder-sync-row" style="margin-bottom:12px; display:none;">
+          <button type="button" class="ghost-action-btn" style="width:100%; justify-content:center; padding:7px 10px; font-size:11.5px; border-color:rgba(56,189,248,0.25);" onclick="backupToLocalFolder()">
+            ✦ Save Directly to PC Folder (Google Drive / Documents)
+          </button>
+        </div>
+
+        <!-- Automated Snapshots Sub-Section -->
+        <div style="background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:12px; margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div>
+              <div style="font-size:12px; font-weight:700; color:var(--text-main);">Automated Snapshots</div>
+              <div style="font-size:11px; color:var(--text-muted);">Internal rolling checkpoints saved on this device</div>
+            </div>
+            <button type="button" class="ghost-action-btn" style="font-size:11px; padding:3px 8px; flex-shrink:0;" onclick="createManualSnapshot()">+ Snapshot Now</button>
+          </div>
+          <div id="settings-snapshots-list"></div>
+        </div>
+
+        <!-- Backup Reminder Cadence -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div>
+            <div style="font-size:12px; font-weight:600; color:var(--text-main);">Export Reminder</div>
+            <div style="font-size:11px; color:var(--text-muted);" id="settings-last-export-label">Last export: Never</div>
+          </div>
+          <select id="setting-backup-interval" style="width:auto; font-size:11.5px; padding:5px 8px; border-radius:8px;" onchange="updateBackupReminderInterval(this.value)">
+            <option value="7">Every 7 Days</option>
+            <option value="14">Every 14 Days</option>
+            <option value="30">Every 30 Days</option>
+            <option value="never">Never</option>
+          </select>
+        </div>
+
         <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
           <span style="font-size:11px; color:var(--text-muted);">Start fresh with an empty tank list</span>
           <button type="button" class="ghost-action-btn" style="color:var(--alert-red); border-color:rgba(244,63,94,0.28); font-size:11px; padding:4px 10px;" onclick="resetAppDataPrompt()">Reset Aquariums</button>
@@ -2779,6 +2822,8 @@
     function normalizeAppStateChronology(state) {
       if (!state) return state;
       ensureClosetNormalized(state);
+      if (!state.backupInterval) state.backupInterval = "7";
+      if (state.lastExportDate === undefined) state.lastExportDate = null;
       if (Array.isArray(state.tanks)) {
         state.tanks.forEach(tank => {
           if (Array.isArray(tank.timeline)) sortRecordsByDateDesc(tank.timeline);
@@ -2809,6 +2854,8 @@
       version: 8,
       units: "us",
       apiKey: "",
+      backupInterval: "7",
+      lastExportDate: null,
       aiThread: [],
       aiSessions: [],
       activeAiSessionId: "",
@@ -2937,6 +2984,10 @@
 
     function openDatabase() {
       return new Promise((resolve, reject) => {
+        if (typeof indexedDB === "undefined") {
+          reject(new Error("indexedDB is not defined"));
+          return;
+        }
         const req = indexedDB.open(DB_NAME, DB_VERSION);
         req.onupgradeneeded = (e) => {
           const db = e.target.result;
@@ -2977,6 +3028,9 @@
         const store = tx.objectStore(STORE_NAME);
         store.put(dataToSave, "state");
         if (!silent) showToast("Saved");
+        if (typeof createSnapshot === "function") {
+          createSnapshot("Auto Snapshot (Daily)", false).catch(() => {});
+        }
       } catch (err) {
         console.error("Storage save failed:", err);
       }
@@ -3430,6 +3484,7 @@
        ============================================================ */
     function renderGlobalDashboard() {
       updateDynamicUnitLabels();
+      checkBackupReminder();
       const container = document.getElementById("tank-card-list");
       if (!container) return;
       container.innerHTML = "";
@@ -8757,6 +8812,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       }
 
       updateNotificationStatusDisplay();
+      renderSettingsBackupSection();
       openModalById("settingsModal");
     }
 
@@ -8833,10 +8889,291 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       }
     }
 
-    function resetAppDataPrompt() {
-      if (!confirm("Clear all aquariums and activity logs from this device? Your unit preference, tap water profile, and API key will be kept.")) {
+    /* ============================================================
+       AUTOMATED SNAPSHOT & BACKUP SYSTEM
+       ============================================================ */
+    const SNAPSHOTS_STORE_KEY = "auto_snapshots";
+    const MAX_SNAPSHOTS = 5;
+
+    async function getSnapshotsFromStorage() {
+      try {
+        const db = await openDatabase();
+        return new Promise((resolve) => {
+          const tx = db.transaction(STORE_NAME, "readonly");
+          const store = tx.objectStore(STORE_NAME);
+          const req = store.get(SNAPSHOTS_STORE_KEY);
+          req.onsuccess = () => {
+            if (Array.isArray(req.result)) {
+              resolve(req.result);
+            } else {
+              try {
+                const raw = localStorage.getItem("aquassist_snapshots_backup");
+                resolve(raw ? JSON.parse(raw) : []);
+              } catch(e) { resolve([]); }
+            }
+          };
+          req.onerror = () => resolve([]);
+        });
+      } catch (err) {
+        try {
+          const raw = localStorage.getItem("aquassist_snapshots_backup");
+          return raw ? JSON.parse(raw) : [];
+        } catch(e) { return []; }
+      }
+    }
+
+    async function saveSnapshotsToStorage(snapshots) {
+      try {
+        const db = await openDatabase();
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        const store = tx.objectStore(STORE_NAME);
+        store.put(snapshots, SNAPSHOTS_STORE_KEY);
+      } catch (err) {
+        if (typeof indexedDB !== "undefined") {
+          console.error("Snapshot storage save failed:", err);
+        }
+      }
+      try {
+        localStorage.setItem("aquassist_snapshots_backup", JSON.stringify(snapshots.slice(0, 3)));
+      } catch(e) {}
+    }
+
+    async function createSnapshot(label = "Auto Snapshot", force = false) {
+      if (!appState || !Array.isArray(appState.tanks)) return null;
+      const snapshots = await getSnapshotsFromStorage();
+
+      const now = Date.now();
+      const totalLogs = appState.tanks.reduce((sum, t) => sum + (Array.isArray(t.history) ? t.history.length : 0), 0);
+      if (!force && snapshots.length > 0) {
+        const latest = snapshots[0];
+        const hoursSince = (now - new Date(latest.timestamp).getTime()) / (1000 * 60 * 60);
+        if (hoursSince < 12 && latest.tankCount === appState.tanks.length && latest.logCount === totalLogs) {
+          return null;
+        }
+      }
+
+      const newSnap = {
+        id: "snap_" + now,
+        timestamp: new Date().toISOString(),
+        label: label,
+        tankCount: appState.tanks.length,
+        logCount: totalLogs,
+        data: JSON.parse(JSON.stringify(appState))
+      };
+
+      snapshots.unshift(newSnap);
+      const trimmed = snapshots.slice(0, MAX_SNAPSHOTS);
+      await saveSnapshotsToStorage(trimmed);
+      return newSnap;
+    }
+
+    async function createManualSnapshot() {
+      await createSnapshot("Manual Snapshot", true);
+      showToast("Snapshot Created");
+      renderSettingsBackupSection();
+    }
+
+    async function restoreSnapshotPrompt(snapshotId) {
+      const snapshots = await getSnapshotsFromStorage();
+      const snap = snapshots.find(s => s.id === snapshotId);
+      if (!snap || !snap.data) {
+        alert("Snapshot data not found.");
         return;
       }
+      const d = new Date(snap.timestamp);
+      const dateStr = isNaN(d.getTime()) ? snap.timestamp : d.toLocaleString();
+      if (!confirm(`Restore aquarium data from ${dateStr} (${snap.tankCount} tank${snap.tankCount === 1 ? "" : "s"}, ${snap.logCount} log${snap.logCount === 1 ? "" : "s"})? Current data will be replaced. A safety snapshot of your current state will be saved first.`)) {
+        return;
+      }
+
+      await createSnapshot("Pre-Restore Safety Snapshot", true);
+      appState = normalizeAppStateChronology(JSON.parse(JSON.stringify(snap.data)));
+      await saveDataToStorage(appState, true);
+      closeModalById("settingsModal");
+      renderGlobalDashboard();
+      showToast("Restored from Snapshot");
+    }
+
+    async function exportSnapshotJSON(snapshotId) {
+      const snapshots = await getSnapshotsFromStorage();
+      const snap = snapshots.find(s => s.id === snapshotId);
+      if (!snap || !snap.data) {
+        alert("Snapshot data not found.");
+        return;
+      }
+      try {
+        const exportObj = {
+          exportDate: snap.timestamp,
+          snapshotLabel: snap.label,
+          appState: snap.data
+        };
+        const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: "application/json" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `aquassist_snapshot_${snap.timestamp.split("T")[0]}_${snap.id}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast("Snapshot Exported");
+      } catch (err) {
+        alert("Export failed: " + err.message);
+      }
+    }
+
+    async function deleteSnapshotPrompt(snapshotId) {
+      const snapshots = await getSnapshotsFromStorage();
+      const filtered = snapshots.filter(s => s.id !== snapshotId);
+      await saveSnapshotsToStorage(filtered);
+      showToast("Snapshot Removed");
+      renderSettingsBackupSection();
+    }
+
+    function checkBackupReminder() {
+      const el = document.getElementById("dashboard-backup-reminder");
+      const daysEl = document.getElementById("backup-reminder-days");
+      if (!el) return;
+
+      const intervalSetting = appState.backupInterval || "7";
+      if (intervalSetting === "never") {
+        el.style.display = "none";
+        return;
+      }
+
+      const intervalDays = parseInt(intervalSetting, 10) || 7;
+
+      try {
+        const snoozedUntil = parseInt(localStorage.getItem("aquassist_backup_reminder_snoozed"), 10);
+        if (snoozedUntil && Date.now() < snoozedUntil) {
+          el.style.display = "none";
+          return;
+        }
+      } catch(e) {}
+
+      let lastExport = appState.lastExportDate;
+      if (!lastExport) {
+        lastExport = appState.tanks && appState.tanks[0] ? appState.tanks[0].startDate : null;
+      }
+
+      if (!lastExport) {
+        el.style.display = "none";
+        return;
+      }
+
+      const elapsedDays = Math.floor((Date.now() - new Date(lastExport).getTime()) / (1000 * 60 * 60 * 24));
+      if (elapsedDays >= intervalDays) {
+        if (daysEl) daysEl.innerText = elapsedDays > 0 ? elapsedDays : intervalDays;
+        el.style.display = "flex";
+      } else {
+        el.style.display = "none";
+      }
+    }
+
+    function dismissBackupReminder() {
+      try {
+        localStorage.setItem("aquassist_backup_reminder_snoozed", Date.now() + 3 * 24 * 60 * 60 * 1000);
+      } catch(e) {}
+      const el = document.getElementById("dashboard-backup-reminder");
+      if (el) el.style.display = "none";
+    }
+
+    function updateBackupReminderInterval(val) {
+      appState.backupInterval = val;
+      saveDataToStorage(appState, true);
+      checkBackupReminder();
+      showToast("Reminder updated");
+    }
+
+    async function renderSettingsBackupSection() {
+      const lastExportLabel = document.getElementById("settings-last-export-label");
+      const intervalSelect = document.getElementById("setting-backup-interval");
+      const folderSyncRow = document.getElementById("folder-sync-row");
+      const snapshotsList = document.getElementById("settings-snapshots-list");
+
+      if (intervalSelect) {
+        intervalSelect.value = appState.backupInterval || "7";
+      }
+
+      if (lastExportLabel) {
+        if (appState.lastExportDate) {
+          const days = Math.floor((Date.now() - new Date(appState.lastExportDate).getTime()) / (1000 * 60 * 60 * 24));
+          lastExportLabel.innerText = "Last export: " + (days === 0 ? "Today" : days === 1 ? "Yesterday" : `${days} days ago`);
+        } else {
+          lastExportLabel.innerText = "Last export: Never";
+        }
+      }
+
+      if (folderSyncRow) {
+        folderSyncRow.style.display = (typeof window !== "undefined" && "showDirectoryPicker" in window) ? "block" : "none";
+      }
+
+      if (snapshotsList) {
+        snapshotsList.innerHTML = `<div style="font-size:11px; color:var(--text-muted); font-style:italic;">Loading snapshots...</div>`;
+        const snapshots = await getSnapshotsFromStorage();
+        if (!snapshots || snapshots.length === 0) {
+          snapshotsList.innerHTML = `<div style="font-size:11.5px; color:var(--text-muted); font-style:italic; padding:4px 0;">No snapshots yet. An automatic snapshot is saved daily as you log activities.</div>`;
+          return;
+        }
+
+        snapshotsList.innerHTML = snapshots.map(s => {
+          const d = new Date(s.timestamp);
+          const formattedDate = isNaN(d.getTime()) ? s.timestamp : d.toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+          const label = escapeHtmlText(s.label || "Auto Snapshot");
+          return `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:8px; margin-bottom:6px;">
+              <div>
+                <div style="font-size:12px; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:6px;">
+                  <span>${label}</span>
+                  <span style="font-size:10.5px; color:var(--text-muted); font-weight:400;">● ${formattedDate}</span>
+                </div>
+                <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+                  ${s.tankCount} aquarium${s.tankCount === 1 ? "" : "s"} ● ${s.logCount} log${s.logCount === 1 ? "" : "s"}
+                </div>
+              </div>
+              <div style="display:flex; gap:5px; align-items:center;">
+                <button type="button" class="ghost-action-btn action-link" style="font-size:11px; padding:2px 7px; color:var(--cyan); border-color:rgba(56,189,248,0.3);" onclick="restoreSnapshotPrompt('${s.id}')">Restore</button>
+                <button type="button" class="ghost-action-btn action-link" style="font-size:11px; padding:2px 7px;" onclick="exportSnapshotJSON('${s.id}')">Export</button>
+                <button type="button" class="delete-x" style="width:26px; height:26px; min-width:26px; min-height:26px; font-size:14px;" onclick="deleteSnapshotPrompt('${s.id}')">×</button>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+    }
+
+    async function backupToLocalFolder() {
+      if (typeof window === "undefined" || !("showDirectoryPicker" in window)) {
+        alert("Folder direct-saving is available on desktop Chrome and Edge. On mobile browsers, use Export Backup JSON.");
+        return;
+      }
+      try {
+        const dirHandle = await window.showDirectoryPicker();
+        const fileName = `aquassist_backup_${new Date().toISOString().split("T")[0]}.json`;
+        const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
+        const writable = await fileHandle.createWritable();
+        const exportObj = {
+          exportDate: new Date().toISOString(),
+          appState: appState
+        };
+        await writable.write(JSON.stringify(exportObj, null, 2));
+        await writable.close();
+        appState.lastExportDate = new Date().toISOString();
+        saveDataToStorage(appState, true);
+        const reminderEl = document.getElementById("dashboard-backup-reminder");
+        if (reminderEl) reminderEl.style.display = "none";
+        renderSettingsBackupSection();
+        showToast("Saved to Folder");
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          alert("Folder sync error: " + err.message);
+        }
+      }
+    }
+
+    async function resetAppDataPrompt() {
+      if (!confirm("Clear all aquariums and activity logs from this device? Your unit preference, tap water profile, and API key will be kept. A safety snapshot will be created automatically.")) {
+        return;
+      }
+      await createSnapshot("Pre-Reset Safety Snapshot", true);
       appState.tanks = [];
       appState.aiThread = [];
       appState.aiSessions = [];
@@ -8867,6 +9204,11 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+        appState.lastExportDate = new Date().toISOString();
+        saveDataToStorage(appState, true);
+        const reminderEl = document.getElementById("dashboard-backup-reminder");
+        if (reminderEl) reminderEl.style.display = "none";
+        renderSettingsBackupSection();
         showToast("Backup Exported");
       } catch (err) {
         alert("Export failed: " + err.message);
@@ -8878,14 +9220,15 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = function(evt) {
+      reader.onload = async function(evt) {
         try {
           const parsed = JSON.parse(evt.target.result);
           const imported = parsed.appState || parsed;
           if (!imported || !Array.isArray(imported.tanks)) {
             throw new Error("Invalid backup format. Missing aquariums data.");
           }
-          if (confirm(`Restore ${imported.tanks.length} aquarium(s)? This will replace your local state with this backup file.`)) {
+          if (confirm(`Restore ${imported.tanks.length} aquarium(s)? This will replace your local state with this backup file. A safety snapshot of your current state will be saved first.`)) {
+            await createSnapshot("Pre-Restore Safety Snapshot", true);
             appState = normalizeAppStateChronology(imported);
             saveDataToStorage();
             closeModalById("settingsModal");
@@ -9028,6 +9371,10 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       appState = await loadDataFromStorage();
       activeTankId = appState.tanks[0] ? appState.tanks[0].id : 1;
       navToGlobal("dashboard", false);
+      if (typeof createSnapshot === "function") {
+        createSnapshot("Auto Snapshot", false).catch(() => {});
+      }
+      checkBackupReminder();
 
       if ("serviceWorker" in navigator) {
         try {
