@@ -2011,11 +2011,13 @@
 
       <!-- 5. Local Backup & Restore -->
       <div class="settings-section">
-        <div style="margin-bottom:9px;">
+        <div style="margin-bottom:12px;">
           <div class="settings-title">Data &amp; Backup</div>
-          <div class="settings-sub">Export, restore, or manage automated safety snapshots</div>
+          <div class="settings-sub">Export or restore your full aquarium records</div>
         </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
+
+        <!-- Primary Backup Actions -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;">
           <button type="button" class="btn btn-secondary" style="font-size:12px; font-weight:600; padding:9px 12px; border-radius:10px;" onclick="exportDataJSON()">
             Export Backup
           </button>
@@ -2024,29 +2026,12 @@
           </button>
           <input type="file" id="importFile" accept=".json,application/json" style="display:none;" onchange="importDataJSON(event)">
         </div>
-        <div id="folder-sync-row" style="margin-bottom:12px; display:none;">
-          <button type="button" class="ghost-action-btn" style="width:100%; justify-content:center; padding:7px 10px; font-size:11.5px; border-color:rgba(56,189,248,0.25);" onclick="backupToLocalFolder()">
-            ✦ Save Directly to PC Folder (Google Drive / Documents)
-          </button>
-        </div>
 
-        <!-- Automated Snapshots Sub-Section -->
-        <div style="background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:12px; margin-bottom:12px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <div>
-              <div style="font-size:12px; font-weight:700; color:var(--text-main);">Automated Snapshots</div>
-              <div style="font-size:11px; color:var(--text-muted);">Internal rolling checkpoints saved on this device</div>
-            </div>
-            <button type="button" class="ghost-action-btn" style="font-size:11px; padding:3px 8px; flex-shrink:0;" onclick="createManualSnapshot()">+ Snapshot Now</button>
-          </div>
-          <div id="settings-snapshots-list"></div>
-        </div>
-
-        <!-- Backup Reminder Cadence -->
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <!-- Export Reminder Setting -->
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:10px; margin-bottom:14px;">
           <div>
-            <div style="font-size:12px; font-weight:600; color:var(--text-main);">Export Reminder</div>
-            <div style="font-size:11px; color:var(--text-muted);" id="settings-last-export-label">Last export: Never</div>
+            <div style="font-size:12px; font-weight:600; color:var(--text-main);">Backup Reminder</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;" id="settings-last-export-label">Last export: Never</div>
           </div>
           <select id="setting-backup-interval" style="width:auto; font-size:11.5px; padding:5px 8px; border-radius:8px;" onchange="updateBackupReminderInterval(this.value)">
             <option value="7">Every 7 Days</option>
@@ -2056,7 +2041,20 @@
           </select>
         </div>
 
-        <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
+        <!-- Safety Snapshots Card -->
+        <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:12px; margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div>
+              <div style="font-size:12px; font-weight:700; color:var(--text-main);">Device Snapshots</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:1px;">Rolling safety checkpoints</div>
+            </div>
+            <button type="button" class="ghost-action-btn" style="font-size:11px; padding:4px 9px;" onclick="createManualSnapshot()">+ Take Snapshot</button>
+          </div>
+          <div id="settings-snapshots-list" style="display:flex; flex-direction:column; gap:6px;"></div>
+        </div>
+
+        <!-- Danger Zone: Reset -->
+        <div style="display:flex; justify-content:space-between; align-items:center; padding-top:4px;">
           <span style="font-size:11px; color:var(--text-muted);">Start fresh with an empty tank list</span>
           <button type="button" class="ghost-action-btn" style="color:var(--alert-red); border-color:rgba(244,63,94,0.28); font-size:11px; padding:4px 10px;" onclick="resetAppDataPrompt()">Reset Aquariums</button>
         </div>
@@ -9086,7 +9084,6 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
     async function renderSettingsBackupSection() {
       const lastExportLabel = document.getElementById("settings-last-export-label");
       const intervalSelect = document.getElementById("setting-backup-interval");
-      const folderSyncRow = document.getElementById("folder-sync-row");
       const snapshotsList = document.getElementById("settings-snapshots-list");
 
       if (intervalSelect) {
@@ -9102,15 +9099,11 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         }
       }
 
-      if (folderSyncRow) {
-        folderSyncRow.style.display = (typeof window !== "undefined" && "showDirectoryPicker" in window) ? "block" : "none";
-      }
-
       if (snapshotsList) {
         snapshotsList.innerHTML = `<div style="font-size:11px; color:var(--text-muted); font-style:italic;">Loading snapshots...</div>`;
         const snapshots = await getSnapshotsFromStorage();
         if (!snapshots || snapshots.length === 0) {
-          snapshotsList.innerHTML = `<div style="font-size:11.5px; color:var(--text-muted); font-style:italic; padding:4px 0;">No snapshots yet. An automatic snapshot is saved daily as you log activities.</div>`;
+          snapshotsList.innerHTML = `<div style="font-size:11.5px; color:var(--text-muted); font-style:italic; padding:6px 2px;">No snapshots yet. An automatic checkpoint is saved as you update your aquariums.</div>`;
           return;
         }
 
@@ -9119,53 +9112,23 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
           const formattedDate = isNaN(d.getTime()) ? s.timestamp : d.toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
           const label = escapeHtmlText(s.label || "Auto Snapshot");
           return `
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:8px; margin-bottom:6px;">
-              <div>
-                <div style="font-size:12px; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:6px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.05); border-radius:9px;">
+              <div style="min-width:0; flex:1; padding-right:8px;">
+                <div style="font-size:12px; font-weight:700; color:#fff; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
                   <span>${label}</span>
                   <span style="font-size:10.5px; color:var(--text-muted); font-weight:400;">● ${formattedDate}</span>
                 </div>
                 <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
-                  ${s.tankCount} aquarium${s.tankCount === 1 ? "" : "s"} ● ${s.logCount} log${s.logCount === 1 ? "" : "s"}
+                  ${s.tankCount} aquarium${s.tankCount === 1 ? "" : "s"} &bull; ${s.logCount} log${s.logCount === 1 ? "" : "s"}
                 </div>
               </div>
-              <div style="display:flex; gap:5px; align-items:center;">
-                <button type="button" class="ghost-action-btn action-link" style="font-size:11px; padding:2px 7px; color:var(--cyan); border-color:rgba(56,189,248,0.3);" onclick="restoreSnapshotPrompt('${s.id}')">Restore</button>
-                <button type="button" class="ghost-action-btn action-link" style="font-size:11px; padding:2px 7px;" onclick="exportSnapshotJSON('${s.id}')">Export</button>
-                <button type="button" class="delete-x" style="width:26px; height:26px; min-width:26px; min-height:26px; font-size:14px;" onclick="deleteSnapshotPrompt('${s.id}')">×</button>
+              <div style="display:flex; gap:6px; align-items:center; flex-shrink:0;">
+                <button type="button" class="ghost-action-btn action-link" style="font-size:11px; padding:3px 9px; color:var(--cyan); border-color:rgba(56,189,248,0.3);" onclick="restoreSnapshotPrompt('${s.id}')">Restore</button>
+                <button type="button" class="delete-x" title="Delete snapshot" style="width:26px; height:26px; min-width:26px; min-height:26px; font-size:14px;" onclick="deleteSnapshotPrompt('${s.id}')">✕</button>
               </div>
             </div>
           `;
         }).join("");
-      }
-    }
-
-    async function backupToLocalFolder() {
-      if (typeof window === "undefined" || !("showDirectoryPicker" in window)) {
-        alert("Folder direct-saving is available on desktop Chrome and Edge. On mobile browsers, use Export Backup JSON.");
-        return;
-      }
-      try {
-        const dirHandle = await window.showDirectoryPicker();
-        const fileName = `aquassist_backup_${new Date().toISOString().split("T")[0]}.json`;
-        const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
-        const writable = await fileHandle.createWritable();
-        const exportObj = {
-          exportDate: new Date().toISOString(),
-          appState: appState
-        };
-        await writable.write(JSON.stringify(exportObj, null, 2));
-        await writable.close();
-        appState.lastExportDate = new Date().toISOString();
-        saveDataToStorage(appState, true);
-        const reminderEl = document.getElementById("dashboard-backup-reminder");
-        if (reminderEl) reminderEl.style.display = "none";
-        renderSettingsBackupSection();
-        showToast("Saved to Folder");
-      } catch (err) {
-        if (err.name !== "AbortError") {
-          alert("Folder sync error: " + err.message);
-        }
       }
     }
 
@@ -9295,7 +9258,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         if (permission === "granted") {
           sendSystemNotification("aquAssist: Alerts Enabled", {
             body: "You will now receive native pop-up reminders for scheduled water changes and filter care.",
-            icon: "icon.svg"
+            icon: "icon-192.png"
           });
         }
       } catch (err) {
@@ -9306,8 +9269,8 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
     function sendSystemNotification(title, options = {}) {
       if (!("Notification" in window) || Notification.permission !== "granted") return;
       const notifOptions = {
-        icon: "icon.svg",
-        badge: "icon.svg",
+        icon: "icon-192.png",
+        badge: "icon-192.png",
         vibrate: [200, 100, 200],
         ...options
       };
@@ -9328,7 +9291,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       const tankLabel = activeTank ? activeTank.name : "Your Aquarium";
       sendSystemNotification("aquAssist: Care Reminder", {
         body: `${tankLabel}: Water test and routine care reminders are active on this device.`,
-        icon: "icon.svg"
+        icon: "icon-192.png"
       });
       showToast("Test Alert Sent");
     }
@@ -9357,7 +9320,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         ? `${top.title} (+${extraCount} more scheduled today)`
         : `${top.title} — ${top.subtitle}`;
 
-      sendSystemNotification(title, { body, icon: "icon.svg" });
+      sendSystemNotification(title, { body, icon: "icon-192.png" });
       try {
         localStorage.setItem("aquassist_last_notif_day", todayStr);
       } catch (err) {}
