@@ -306,6 +306,18 @@
       background: rgba(0, 210, 255, 0.18); border-color: var(--cyan); color: #fff;
       box-shadow: 0 0 10px rgba(0, 210, 255, 0.25);
     }
+    .plant-chip-btn {
+      padding: 5px 11px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 9px; font-size: 11.5px; font-weight: 600; color: var(--text-muted); cursor: pointer;
+      white-space: nowrap; transition: all 0.15s ease; user-select: none;
+    }
+    .plant-chip-btn:hover {
+      background: rgba(255, 255, 255, 0.07); color: #fff;
+    }
+    .plant-chip-btn.active {
+      background: rgba(0, 210, 255, 0.14); border-color: rgba(0, 210, 255, 0.45); color: var(--cyan);
+      box-shadow: 0 0 10px rgba(0, 210, 255, 0.18);
+    }
     .chart-legend {
       display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; font-size: 11px; color: var(--text-muted);
     }
@@ -1266,7 +1278,7 @@
               <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Photoperiod, CO₂ system &amp; fertilizing routine</div>
             </div>
           </div>
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-top:8px;">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:8px;">
             <div>
               <label style="font-size:11px; font-weight:600; color:var(--text-muted); display:block; margin-bottom:4px;">Photoperiod</label>
               <select id="tank-plant-photoperiod" class="ai-context-select" style="width:100%; min-width:0; max-width:none; padding:6px 10px; font-size:12px;" onchange="savePlantedCareSpecs()">
@@ -1275,6 +1287,7 @@
                 <option value="8 hrs/day">8 hrs/day</option>
                 <option value="9 hrs/day">9 hrs/day</option>
                 <option value="10 hrs/day">10 hrs/day</option>
+                <option value="12 hrs/day">12 hrs/day</option>
                 <option value="No Schedule">No Schedule</option>
               </select>
             </div>
@@ -1287,14 +1300,19 @@
                 <option value="DIY Yeast CO₂">DIY Yeast</option>
               </select>
             </div>
-            <div>
-              <label style="font-size:11px; font-weight:600; color:var(--text-muted); display:block; margin-bottom:4px;">Fertilizer Routine</label>
-              <select id="tank-plant-fert" class="ai-context-select" style="width:100%; min-width:0; max-width:none; padding:6px 10px; font-size:12px;" onchange="savePlantedCareSpecs()">
-                <option value="None">None</option>
-                <option value="All-in-One Liquid (1-2x/wk)">Liquid (1-2x/wk)</option>
-                <option value="Root Tabs Only">Root Tabs Only</option>
-                <option value="EI Dosing (High Tech)">EI Dosing</option>
-              </select>
+          </div>
+
+          <div style="margin-top:12px; padding-top:11px; border-top:1px solid rgba(255,255,255,0.06);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:4px;">
+              <label style="font-size:11px; font-weight:600; color:var(--text-muted);">Fertilizers &amp; Nutrients (Select all used)</label>
+              <span id="tank-plant-fert-summary" style="font-size:10.5px; color:var(--cyan); font-weight:600;"></span>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:6px;" id="tank-plant-fert-chips">
+              <button type="button" class="plant-chip-btn" data-val="liquid" onclick="togglePlantedFertOption('liquid')">Liquid All-in-One</button>
+              <button type="button" class="plant-chip-btn" data-val="roottabs" onclick="togglePlantedFertOption('roottabs')">Root Tabs</button>
+              <button type="button" class="plant-chip-btn" data-val="iron" onclick="togglePlantedFertOption('iron')">Iron / Trace</button>
+              <button type="button" class="plant-chip-btn" data-val="potassium" onclick="togglePlantedFertOption('potassium')">Potassium (K)</button>
+              <button type="button" class="plant-chip-btn" data-val="ei" onclick="togglePlantedFertOption('ei')">EI Dry Salts</button>
             </div>
           </div>
         </div>
@@ -3917,11 +3935,19 @@
       const upcomingTasks = generateTankTasks(tank, 7).slice(0, 5)
         .map(tk => `${tk.planTabTitle} (${tk.subtitle})`).join("; ") || "All routines on schedule";
 
+      const plantedCare = tank.plantedCare || {};
+      const plantedSpecs = [
+        plantedCare.photoperiod ? `Photoperiod: ${plantedCare.photoperiod}` : null,
+        plantedCare.co2 ? `CO2: ${plantedCare.co2}` : null,
+        plantedCare.fert ? `Fertilizers: ${plantedCare.fert}` : null
+      ].filter(Boolean).join(" | ");
+
       return `Aquarium "${tank.name}" [Tank ID: ${tank.id}] (${displayVol(tank.vol)} ${u.vol}, Status: ${tank.status}, Setup: ${tank.startDate || "unknown"}, Age: ${calculateAge(tank.startDate)}):
   - Current Water Chemistry: ${latestParams}
   - Water & WC History Logs: ${recentHistory}
   - Livestock / Fauna: ${(tank.livestock || []).join(", ") || "Empty / None"}
   - Plants / Flora: ${(tank.plants || []).join(", ") || "None"}
+  - Plant Care & Lighting: ${plantedSpecs || "Standard / None configured"}
   - Hardscape & Decor: ${(tank.decor || []).join(", ") || "None"}
   - Gear & Equipment: ${(tank.equipment || []).join(", ") || "Standard"}${tank.filterType ? ` (Filter type: ${tank.filterType})` : ""}
   - Filter Media & Service: ${mediaDetails}
@@ -7646,6 +7672,14 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
     }
 
     /* TANK SUB-TAB 5: PLANTS & DECOR */
+    const PLANT_FERT_NAMES = {
+      liquid: "Liquid All-in-One",
+      roottabs: "Root Tabs",
+      iron: "Iron / Trace",
+      potassium: "Potassium (K)",
+      ei: "EI Dry Salts"
+    };
+
     function renderTankPlantsTab() {
       const activeTank = getActiveTank();
       if (!activeTank) return;
@@ -7655,23 +7689,75 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       const care = activeTank.plantedCare || {};
       const photoEl = document.getElementById("tank-plant-photoperiod");
       const co2El = document.getElementById("tank-plant-co2");
-      const fertEl = document.getElementById("tank-plant-fert");
       if (photoEl) photoEl.value = care.photoperiod || "8 hrs/day";
       if (co2El) co2El.value = care.co2 || "None (Low Tech)";
-      if (fertEl) fertEl.value = care.fert || "None";
+
+      let ferts = [];
+      if (Array.isArray(care.ferts)) {
+        ferts = [...care.ferts];
+      } else if (care.fert && typeof care.fert === "string") {
+        if (/liquid/i.test(care.fert)) ferts.push("liquid");
+        if (/root/i.test(care.fert)) ferts.push("roottabs");
+        if (/iron|trace/i.test(care.fert)) ferts.push("iron");
+        if (/potassium/i.test(care.fert)) ferts.push("potassium");
+        if (/ei/i.test(care.fert)) ferts.push("ei");
+      }
+
+      document.querySelectorAll("#tank-plant-fert-chips .plant-chip-btn").forEach(btn => {
+        const val = btn.getAttribute("data-val");
+        btn.classList.toggle("active", ferts.includes(val));
+      });
+
+      const summaryEl = document.getElementById("tank-plant-fert-summary");
+      if (summaryEl) {
+        if (ferts.length === 0) {
+          summaryEl.innerText = "No fertilizers selected";
+          summaryEl.style.color = "var(--text-muted)";
+        } else {
+          summaryEl.innerText = ferts.map(f => PLANT_FERT_NAMES[f] || f).join(" + ");
+          summaryEl.style.color = "var(--cyan)";
+        }
+      }
+    }
+
+    function togglePlantedFertOption(key) {
+      const activeTank = getActiveTank();
+      if (!activeTank) return;
+      if (!activeTank.plantedCare) activeTank.plantedCare = {};
+
+      let ferts = [];
+      if (Array.isArray(activeTank.plantedCare.ferts)) {
+        ferts = [...activeTank.plantedCare.ferts];
+      } else if (activeTank.plantedCare.fert && typeof activeTank.plantedCare.fert === "string") {
+        if (/liquid/i.test(activeTank.plantedCare.fert)) ferts.push("liquid");
+        if (/root/i.test(activeTank.plantedCare.fert)) ferts.push("roottabs");
+        if (/iron|trace/i.test(activeTank.plantedCare.fert)) ferts.push("iron");
+        if (/potassium/i.test(activeTank.plantedCare.fert)) ferts.push("potassium");
+        if (/ei/i.test(activeTank.plantedCare.fert)) ferts.push("ei");
+      }
+
+      const idx = ferts.indexOf(key);
+      if (idx >= 0) {
+        ferts.splice(idx, 1);
+      } else {
+        ferts.push(key);
+      }
+
+      activeTank.plantedCare.ferts = ferts;
+      activeTank.plantedCare.fert = ferts.map(f => PLANT_FERT_NAMES[f] || f).join(" + ") || "None";
+      saveDataToStorage();
+      renderTankPlantsTab();
+      showToast(ferts.length > 0 ? "Fertilizer Routine Updated" : "Fertilizers Cleared");
     }
 
     function savePlantedCareSpecs() {
       const activeTank = getActiveTank();
       if (!activeTank) return;
+      if (!activeTank.plantedCare) activeTank.plantedCare = {};
       const photoEl = document.getElementById("tank-plant-photoperiod");
       const co2El = document.getElementById("tank-plant-co2");
-      const fertEl = document.getElementById("tank-plant-fert");
-      activeTank.plantedCare = {
-        photoperiod: photoEl ? photoEl.value : "8 hrs/day",
-        co2: co2El ? co2El.value : "None (Low Tech)",
-        fert: fertEl ? fertEl.value : "None"
-      };
+      activeTank.plantedCare.photoperiod = photoEl ? photoEl.value : "8 hrs/day";
+      activeTank.plantedCare.co2 = co2El ? co2El.value : "None (Low Tech)";
       saveDataToStorage();
       showToast("Planted Specs Saved");
     }
