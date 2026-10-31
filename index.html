@@ -1412,16 +1412,6 @@
             </div>
           </div>
 
-          <!-- ACTIVE CHAT TOOLS -->
-          <div class="ai-sidebar-section" id="ai-sidebar-active-tools">
-            <div class="ai-sidebar-section-title">
-              <span>Active Chat</span>
-            </div>
-            <button type="button" id="global-ai-rename-btn" class="ghost-action-btn" style="width:100%; display:flex; align-items:center; justify-content:center; gap:6px; padding:7px 10px; font-size:12px; border-radius:8px;" onclick="openRenameActiveAiSessionModal()">
-              <span>✎ Rename Active Chat</span>
-            </button>
-          </div>
-
           <!-- RECENT CHATS LIST -->
           <div class="ai-sidebar-section" style="flex:1; display:flex; flex-direction:column; min-height:0; margin-bottom:0;">
             <div class="ai-sidebar-section-title">
@@ -6296,11 +6286,6 @@
       if (focusTag) {
         focusTag.textContent = formatSessionFocusLabel(globalAiContextTankId);
       }
-      const toolsSec = document.getElementById("ai-sidebar-active-tools");
-      if (toolsSec) {
-        const hasMsgs = active && Array.isArray(active.messages) && active.messages.length > 0;
-        toolsSec.style.display = hasMsgs ? "block" : "none";
-      }
       const ctxSel = document.getElementById("global-ai-context-select");
       if (ctxSel && ctxSel.value !== String(globalAiContextTankId)) {
         ctxSel.value = String(globalAiContextTankId);
@@ -8572,7 +8557,24 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
     }
 
     function calculateTankWeightedBioload(tank) {
-      if (!tank) return { totalSpecimens: 0, totalWasteUnits: 0, baseCapacity: 20, effectiveCapacity: 20, plantBonusPct: 0, percent: 0, label: "Empty Roster", color: "var(--text-muted)", dotColor: "var(--text-muted)", contributors: [] };
+      if (!tank) return {
+        totalSpecimens: 0,
+        totalWasteUnits: 0,
+        baseCapacity: 20,
+        effectiveCapacity: 20,
+        plantBonusPct: 0,
+        filterBonusPct: 0,
+        filterHardwareBonus: 0,
+        bioMediaBonus: 0,
+        filterName: "Standard",
+        bioMediaNames: [],
+        totalBonusPct: 0,
+        percent: 0,
+        label: "Empty Roster",
+        color: "var(--text-muted)",
+        dotColor: "var(--text-muted)",
+        contributors: []
+      };
 
       const liveList = Array.isArray(tank.livestock) ? tank.livestock : [];
       let totalSpecimens = 0;
@@ -8598,10 +8600,58 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
 
       contributors.sort((a, b) => b.wasteUnits - a.wasteUnits);
 
+      // 1. Base Dilution Volume
       const baseCapacity = parseFloat(tank.vol) || 20;
+
+      // 2. Live Plants Nitrate & Ammonium Sink Bonus (up to +25%)
       const plantCount = Array.isArray(tank.plants) ? tank.plants.length : 0;
       const plantBonusPct = Math.min(25, plantCount * 5);
-      const effectiveCapacity = Math.round((baseCapacity * (1 + plantBonusPct / 100)) * 10) / 10;
+
+      // 3. Filter Hardware & Biological Media Nitrification Bonus
+      const fType = typeof inferTankFilterType === "function" ? inferTankFilterType(tank) : (tank.filterType || "hob");
+      let filterHardwareBonus = 0;
+      let filterName = "HOB Filter";
+      if (fType === "canister") {
+        filterHardwareBonus = 20;
+        filterName = "Canister Filter";
+      } else if (fType === "hob") {
+        filterHardwareBonus = 12;
+        filterName = "HOB Filter";
+      } else if (fType === "sponge") {
+        filterHardwareBonus = 8;
+        filterName = "Sponge Filter";
+      } else if (fType === "none") {
+        filterHardwareBonus = 0;
+        filterName = "Unfiltered";
+      } else {
+        filterHardwareBonus = 10;
+        filterName = "Power Filter";
+      }
+
+      // Check media items for dedicated high-surface-area biological media (bio-balls, ceramic rings, matrix, sintered glass, etc.)
+      const mediaList = Array.isArray(tank.filterMedia) ? tank.filterMedia : [];
+      let bioMediaBonus = 0;
+      const bioMediaNames = [];
+
+      mediaList.forEach(m => {
+        const mName = String(m.name || "").trim();
+        const mCat = String(m.cat || "").toLowerCase();
+        const isBio = mCat === "biological" || /bio|ceramic|matrix|rings|balls|substrat|biohome|k1|lava/i.test(mName);
+        if (isBio) {
+          bioMediaBonus += 10;
+          bioMediaNames.push(mName || "Bio-Media");
+        }
+      });
+
+      // Cap bio-media bonus at 30%
+      bioMediaBonus = Math.min(30, bioMediaBonus);
+
+      // Total filter bonus capped at 45% (0% if unfiltered)
+      const filterBonusPct = fType === "none" ? 0 : Math.min(45, filterHardwareBonus + bioMediaBonus);
+
+      // Total system capacity bonus
+      const totalBonusPct = plantBonusPct + filterBonusPct;
+      const effectiveCapacity = Math.round((baseCapacity * (1 + totalBonusPct / 100)) * 10) / 10;
 
       const percent = totalSpecimens === 0 ? 0 : Math.round((totalWasteUnits / effectiveCapacity) * 100);
 
@@ -8635,6 +8685,12 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         baseCapacity: Math.round(baseCapacity * 10) / 10,
         effectiveCapacity,
         plantBonusPct,
+        filterBonusPct,
+        filterHardwareBonus,
+        bioMediaBonus,
+        filterName,
+        bioMediaNames,
+        totalBonusPct,
         percent,
         label,
         color,
@@ -8683,7 +8739,14 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         } else {
           const breakdownHtml = showBioloadBreakdown ? `
             <div style="margin-top:10px; padding-top:9px; border-top:1px solid rgba(255,255,255,0.06);">
-              <div style="font-size:11px; font-weight:700; color:var(--cyan); margin-bottom:5px;">Metabolic Waste Breakdown:</div>
+              <div style="font-size:11px; font-weight:700; color:var(--cyan); margin-bottom:5px;">Biological Processing Breakdown:</div>
+              <div style="font-size:10.5px; color:var(--text-muted); margin-bottom:8px; line-height:1.45; background:rgba(255,255,255,0.03); padding:7px 9px; border-radius:8px; border:1px solid rgba(255,255,255,0.06);">
+                <div>✦ <b>Base Dilution Volume:</b> ${bioload.baseCapacity} units (${displayVol(bioload.baseCapacity)})</div>
+                ${bioload.plantBonusPct > 0 ? `<div style="color:var(--neon-green); margin-top:2px;">✦ <b>Live Flora Absorption:</b> +${bioload.plantBonusPct}% (${bioload.plantBonusPct / 5} plant species uptake ammonium/nitrate)</div>` : ""}
+                ${bioload.filterBonusPct > 0 ? `<div style="color:var(--cyan); margin-top:2px;">✦ <b>Biological Filtration:</b> +${bioload.filterBonusPct}% (${bioload.filterName}${bioload.bioMediaNames.length ? ` with ${bioload.bioMediaNames.join(", ")}` : ""})</div>` : ""}
+                <div style="font-weight:700; color:#F8FAFC; margin-top:3px; padding-top:3px; border-top:1px dashed rgba(255,255,255,0.08);">= Effective Bio-Capacity: ${bioload.effectiveCapacity} units</div>
+              </div>
+              <div style="font-size:11px; font-weight:700; color:#CBD5E1; margin-bottom:4px;">Metabolic Waste Output:</div>
               <div style="display:flex; flex-direction:column; gap:4px; max-height:160px; overflow-y:auto;">
                 ${bioload.contributors.map(c => `
                   <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; padding:3px 6px; background:rgba(255,255,255,0.02); border-radius:6px;">
@@ -8695,7 +8758,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
               <div style="font-size:10.5px; color:var(--text-dim); margin-top:7px; line-height:1.4;">
                 ${bioload.percent > 85
                   ? "Elevated biological waste output. Maintain weekly water changes and monitor nitrates regularly."
-                  : "Biological load is sustainable. Beneficial nitrifying bacteria can handle this waste output comfortably."}
+                  : "Biological load is sustainable. Beneficial nitrifying colonies on your bio-media and live flora neutralize waste comfortably."}
               </div>
             </div>
           ` : "";
@@ -8715,7 +8778,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
               </div>
               <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); font-weight:600;">
                 <span>${bioload.totalWasteUnits} waste units / ${bioload.effectiveCapacity} cap</span>
-                ${bioload.plantBonusPct > 0 ? `<span style="color:var(--neon-green);">+${bioload.plantBonusPct}% from live flora</span>` : `<span>${bioload.totalSpecimens} specimens</span>`}
+                ${bioload.totalBonusPct > 0 ? `<span style="color:var(--neon-green);">+${bioload.totalBonusPct}% boosted (plants &amp; bio-filtration)</span>` : `<span>${bioload.totalSpecimens} specimens</span>`}
               </div>
               ${breakdownHtml}
             </div>
