@@ -762,7 +762,10 @@
       padding-bottom: var(--bottom-nav-height);
     }
     body.ai-screen-active .container {
-      padding: 10px 16px 0;
+      padding: 0 !important;
+      max-width: 100% !important;
+      width: 100% !important;
+      margin: 0 !important;
       height: calc(100vh - 64px - var(--bottom-nav-height));
       height: calc(100dvh - 64px - var(--bottom-nav-height));
       max-height: calc(100vh - 64px - var(--bottom-nav-height));
@@ -776,23 +779,217 @@
       min-height: 0;
       display: flex;
       flex-direction: column;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      background: var(--bg-dark, #070D18);
     }
-    body.ai-screen-active #screen-global-ai > .card {
+
+    /* AI Top Bar */
+    .ai-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 14px;
+      background: rgba(11, 19, 36, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+      z-index: 10;
+    }
+    .ai-topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
       flex: 1;
-      min-height: 0;
-      margin-bottom: 0;
-      padding: 14px 16px 12px;
+    }
+    .ai-sidebar-toggle-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.18s ease;
+    }
+    .ai-sidebar-toggle-btn:hover {
+      background: rgba(0, 210, 255, 0.12);
+      border-color: rgba(0, 210, 255, 0.35);
+      color: var(--cyan);
+    }
+    .ai-topbar-title-wrap {
       display: flex;
       flex-direction: column;
-      overflow: hidden;
-      box-sizing: border-box;
+      min-width: 0;
+      cursor: pointer;
+      user-select: none;
     }
+    .ai-topbar-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #F8FAFC;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      letter-spacing: -0.15px;
+    }
+    .ai-topbar-focus-tag {
+      font-size: 10.5px;
+      color: var(--cyan);
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ai-topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .ai-topbar-new-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 245, 160, 0.3);
+      background: rgba(0, 245, 160, 0.08);
+      color: var(--neon-green);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.18s ease;
+    }
+    .ai-topbar-new-btn:hover {
+      background: rgba(0, 245, 160, 0.18);
+      border-color: rgba(0, 245, 160, 0.6);
+      transform: scale(1.04);
+    }
+
+    /* Collapsible Sidebar Overlay & Drawer */
+    .ai-sidebar-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.68);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 240;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .ai-sidebar-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .ai-sidebar {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 310px;
+      max-width: 86vw;
+      background: #08101E;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 8px 0 32px rgba(0, 0, 0, 0.65);
+      z-index: 250;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(-100%);
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .ai-sidebar.open {
+      transform: translateX(0);
+    }
+    .ai-sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .ai-sidebar-close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+    }
+    .ai-sidebar-close-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .ai-sidebar-content {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 14px 14px 16px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ai-sidebar-section {
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 12px;
+      padding: 11px 12px;
+      margin-bottom: 12px;
+    }
+    .ai-sidebar-section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .ai-sidebar-select {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #F8FAFC;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 8px 10px;
+      border-radius: 8px;
+      outline: none;
+      cursor: pointer;
+    }
+    .ai-sidebar-select:focus {
+      border-color: var(--cyan);
+    }
+    .ai-sidebar-sessions-list {
+      flex: 1;
+      min-height: 60px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-right: 2px;
+    }
+
     body.ai-screen-active .ai-chat-shell {
       flex: 1;
       min-height: 0;
       height: 100%;
       display: flex;
       flex-direction: column;
+      position: relative;
+      background: transparent;
     }
     body.ai-screen-active .ai-thread.global-stream {
       flex: 1;
@@ -801,24 +998,61 @@
       overflow-y: auto;
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
+      padding: 14px 16px 8px;
+      max-width: 820px;
+      margin: 0 auto;
+      width: 100%;
+      box-sizing: border-box;
     }
     body.ai-screen-active .ai-empty-state {
       flex: 1;
       min-height: 0;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 24px 20px;
+      max-width: 620px;
+      margin: 0 auto;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    body.ai-screen-active .ai-empty-sub {
+      max-width: 460px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    body.ai-screen-active .ai-starters-row {
+      justify-content: center;
     }
     body.ai-screen-active .ai-composer-wrap {
       margin-top: auto;
-      padding-top: 8px;
-      padding-bottom: 2px;
+      padding: 8px 14px 10px;
       flex-shrink: 0;
+      background: rgba(7, 13, 24, 0.94);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    body.ai-screen-active .ai-composer-inner {
+      max-width: 820px;
+      margin: 0 auto;
+      width: 100%;
+      box-sizing: border-box;
     }
     body.ai-screen-active #global-ai-compat-panel {
       flex: 1;
       min-height: 0;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
+      max-width: 820px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 16px;
+      box-sizing: border-box;
     }
     .ai-composer-box {
       display: flex; align-items: flex-end; gap: 6px;
@@ -932,6 +1166,81 @@
     }
     .quick-pct-btn.active {
       background: var(--cyan) !important; color: #070D18 !important; border-color: var(--cyan) !important;
+    }
+
+    /* Water Chemistry Stepped Chips (1. Wet-Fingers Test Steppers) */
+    .test-stepper-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 5px;
+    }
+    .test-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-muted);
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+      flex: 1 1 auto;
+      text-align: center;
+      min-width: 38px;
+      line-height: 1;
+    }
+    .test-chip:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    .test-chip.active {
+      background: rgba(0, 210, 255, 0.22);
+      border-color: var(--cyan);
+      color: #fff;
+      box-shadow: 0 0 10px rgba(0, 210, 255, 0.35);
+    }
+    .test-chip.chip-safe.active {
+      background: rgba(0, 245, 160, 0.22);
+      border-color: var(--neon-green);
+      color: var(--neon-green);
+      box-shadow: 0 0 10px rgba(0, 245, 160, 0.35);
+    }
+    .test-chip.chip-warn.active {
+      background: rgba(245, 158, 11, 0.22);
+      border-color: var(--alert-yellow);
+      color: var(--alert-yellow);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+    }
+    .test-chip.chip-danger.active {
+      background: rgba(239, 68, 68, 0.22);
+      border-color: var(--alert-red);
+      color: var(--alert-red);
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.35);
+    }
+
+    /* Bioload Capacity Meter (2. Weighted Capacity Screen) */
+    .bioload-meter-card {
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 11px 13px;
+      margin-bottom: 12px;
+    }
+    .bioload-bar-track {
+      width: 100%;
+      height: 7px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      overflow: hidden;
+      margin: 8px 0 6px;
+      position: relative;
+    }
+    .bioload-bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      transition: width 0.35s ease, background 0.35s ease;
     }
   </style>
 </head>
@@ -1062,58 +1371,110 @@
       </div>
     </section>
 
-    <!-- SCREEN 3: AQUARIST AI (Ongoing Conversation & Stocking Compatibility) -->
+    <!-- SCREEN 3: AQUARIST AI (Full-Bleed View with Collapsible Navigation Sidebar) -->
     <section id="screen-global-ai" class="view-screen">
-      <div class="card">
-        <div class="card-header" style="margin-bottom:12px;">
-          <div class="card-title">Aquarist AI</div>
+      <!-- SIDEBAR BACKDROP OVERLAY -->
+      <div id="global-ai-sidebar-backdrop" class="ai-sidebar-backdrop" onclick="toggleAiSidebar(false)"></div>
+
+      <!-- COLLAPSIBLE SIDEBAR DRAWER -->
+      <aside id="global-ai-sidebar" class="ai-sidebar" aria-label="Aquarist AI Conversations & Focus">
+        <div class="ai-sidebar-header">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:16px;">✨</span>
+            <div>
+              <div style="font-size:13.5px; font-weight:700; color:#F8FAFC; letter-spacing:-0.2px;">Aquarist AI</div>
+              <div style="font-size:10.5px; color:var(--text-muted);">Conversations &amp; Settings</div>
+            </div>
+          </div>
+          <button type="button" class="ai-sidebar-close-btn" onclick="toggleAiSidebar(false)" aria-label="Close Sidebar" title="Close Sidebar">✕</button>
+        </div>
+
+        <div class="ai-sidebar-content">
+          <!-- NEW CONVERSATION BUTTON -->
+          <div style="margin-bottom:14px;">
+            <button type="button" id="global-ai-clear-btn" class="btn btn-neon" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:9px 12px; font-size:13px; font-weight:700; border-radius:10px;" onclick="clearGlobalAIThread()">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>New Conversation</span>
+            </button>
+          </div>
+
+          <!-- TANK FOCUS SCOPE -->
+          <div class="ai-sidebar-section">
+            <div class="ai-sidebar-section-title">
+              <span>Aquarium Focus</span>
+              <span style="font-size:10px; color:var(--cyan); font-weight:600;">ACTIVE SCOPE</span>
+            </div>
+            <div style="position:relative;">
+              <select id="global-ai-context-select" class="ai-sidebar-select" onchange="onGlobalAIContextChange(this.value); syncAiTopbar();"></select>
+            </div>
+            <div style="font-size:10.5px; color:var(--text-muted); margin-top:5px; line-height:1.4;">
+              Scopes recommendations, bioload, and chemistry to a specific aquarium or across your full setup.
+            </div>
+          </div>
+
+          <!-- ACTIVE CHAT TOOLS -->
+          <div class="ai-sidebar-section" id="ai-sidebar-active-tools">
+            <div class="ai-sidebar-section-title">
+              <span>Active Chat</span>
+            </div>
+            <button type="button" id="global-ai-rename-btn" class="ghost-action-btn" style="width:100%; display:flex; align-items:center; justify-content:center; gap:6px; padding:7px 10px; font-size:12px; border-radius:8px;" onclick="openRenameActiveAiSessionModal()">
+              <span>✎ Rename Active Chat</span>
+            </button>
+          </div>
+
+          <!-- RECENT CHATS LIST -->
+          <div class="ai-sidebar-section" style="flex:1; display:flex; flex-direction:column; min-height:0; margin-bottom:0;">
+            <div class="ai-sidebar-section-title">
+              <span>Recent Conversations</span>
+              <span id="ai-sessions-count-pill" style="font-size:10px; color:var(--text-muted);"></span>
+            </div>
+            <div id="global-ai-sessions-list" class="ai-sidebar-sessions-list"></div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- AI TOP BAR -->
+      <div class="ai-topbar" id="global-ai-topbar">
+        <div class="ai-topbar-left">
+          <button type="button" class="ai-sidebar-toggle-btn" id="global-ai-sidebar-toggle-btn" onclick="toggleAiSidebar()" aria-label="Toggle Conversations Sidebar" title="Conversations & Focus">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="16" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div class="ai-topbar-title-wrap" onclick="toggleAiSidebar()" title="Tap to switch conversation or tank focus">
+            <div class="ai-topbar-title" id="ai-topbar-title">Aquarist AI</div>
+            <div class="ai-topbar-focus-tag" id="ai-topbar-focus-tag">All Aquariums</div>
+          </div>
+        </div>
+        <div class="ai-topbar-right">
+          <button type="button" id="global-ai-back-tank-btn" class="ghost-action-btn" style="display:none; padding:4px 9px; font-size:11px; color:var(--text-main); white-space:nowrap;" onclick="backFromAiToTank()"></button>
           <div class="segmented-group compact" id="global-ai-mode-group">
             <button type="button" class="segmented-btn active" data-mode="ask" onclick="switchGlobalAIMode('ask')">Chat</button>
             <button type="button" class="segmented-btn" data-mode="compat" onclick="switchGlobalAIMode('compat')">Compatibility</button>
           </div>
+          <button type="button" class="ai-topbar-new-btn" onclick="clearGlobalAIThread()" title="New Chat" aria-label="New Chat">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="global-ai-key-notice" class="ai-key-notice" style="display:none; margin:10px 14px 0;">
+        <span>Add a Gemini API key to chat with Aquarist AI and analyze photos.</span>
+        <button type="button" class="ghost-action-btn" onclick="openSettingsModal()">Open Settings</button>
+      </div>
+
+      <!-- MODE 1: ONGOING GEMINI CONVERSATION -->
+      <div id="global-ai-ask-panel" class="ai-chat-shell">
+        <div id="global-ai-empty" class="ai-empty-state">
+          <div id="global-ai-empty-title" class="ai-empty-title">What are we working on?</div>
+          <div id="global-ai-empty-sub" class="ai-empty-sub">
+            Bounce aquascape or stocking ideas, talk through logs, or troubleshoot—Aquarist AI factors in your tanks, plants, livestock, decor, gear, logs, and supplies.
+          </div>
+          <div id="global-ai-starters" class="ai-starters-row"></div>
         </div>
 
-        <div id="global-ai-key-notice" class="ai-key-notice" style="display:none;">
-          <span>Add a Gemini API key to chat with Aquarist AI and analyze photos.</span>
-          <button type="button" class="ghost-action-btn" onclick="openSettingsModal()">Open Settings</button>
-        </div>
+        <div id="global-ai-thread" class="ai-thread global-stream" style="display:none;"></div>
 
-        <!-- MODE 1: ONGOING GEMINI CONVERSATION -->
-        <div id="global-ai-ask-panel" class="ai-chat-shell">
-          <div class="ai-context-bar">
-            <div class="ai-context-main-row">
-              <button type="button" id="global-ai-back-tank-btn" class="ghost-action-btn" style="display:none; padding:4px 9px; font-size:11px; color:var(--text-main); white-space:nowrap;" onclick="backFromAiToTank()"></button>
-              <div style="display:flex; align-items:center; gap:8px; min-width:0; flex:1;">
-                <span style="font-size:11.5px; color:var(--text-muted); font-weight:600; flex-shrink:0;">Focus</span>
-                <select id="global-ai-context-select" class="ai-context-select" onchange="onGlobalAIContextChange(this.value)"></select>
-              </div>
-            </div>
-            <div id="global-ai-actions-row" class="ai-context-actions-row">
-              <button type="button" id="global-ai-history-btn" class="ghost-action-btn" style="display:none; font-size:11px; padding:4px 9px; color:var(--text-muted);" onclick="toggleAiSessionsDrawer()">Chats</button>
-              <button type="button" id="global-ai-rename-btn" class="ghost-action-btn" style="display:none; font-size:11px; padding:4px 9px; color:var(--text-muted);" onclick="openRenameActiveAiSessionModal()" title="Rename this conversation">✎ Rename</button>
-              <button type="button" id="global-ai-clear-btn" class="ghost-action-btn" style="display:none; font-size:11px; padding:4px 9px;" onclick="clearGlobalAIThread()">+ New</button>
-            </div>
-          </div>
-
-          <div id="global-ai-sessions-drawer" class="ai-sessions-drawer">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-              <span style="font-size:11px; font-weight:600; color:var(--text-muted);">Recent Conversations</span>
-              <span style="font-size:11px; color:var(--cyan); cursor:pointer; font-weight:600;" onclick="toggleAiSessionsDrawer(false)">Close</span>
-            </div>
-            <div id="global-ai-sessions-list"></div>
-          </div>
-
-          <div id="global-ai-empty" class="ai-empty-state">
-            <div id="global-ai-empty-title" class="ai-empty-title">What are we working on?</div>
-            <div id="global-ai-empty-sub" class="ai-empty-sub">
-              Bounce aquascape or stocking ideas, talk through logs, or troubleshoot—Aquarist AI factors in your tanks, plants, livestock, decor, gear, logs, and supplies.
-            </div>
-            <div id="global-ai-starters" class="ai-starters-row"></div>
-          </div>
-
-          <div id="global-ai-thread" class="ai-thread global-stream" style="display:none;"></div>
-
-          <div class="ai-composer-wrap">
+        <div class="ai-composer-wrap">
+          <div class="ai-composer-inner">
             <div id="global-vision-preview-chip" style="display:none; align-items:center; gap:8px; margin-bottom:8px; background:rgba(0,210,255,0.08); border:1px solid rgba(0,210,255,0.28); border-radius:11px; padding:6px 10px;">
               <img id="global-vision-preview-thumb" style="width:30px; height:30px; border-radius:6px; object-fit:cover;">
               <span style="font-size:11.5px; color:var(--cyan); font-weight:600; flex:1;">Photo attached</span>
@@ -1126,41 +1487,41 @@
               </button>
               <textarea id="global-ai-input" class="ai-composer-textarea" rows="1" placeholder="Message Aquarist AI..." oninput="autoGrowAiInput(this)" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();askGlobalAI();}"></textarea>
               <button type="button" class="ai-send-btn" id="global-ai-send-btn" onclick="askGlobalAI()" title="Send message">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               </button>
             </div>
             <input type="file" id="global-vision-file-input" accept="image/*" style="display:none;" onchange="handleGlobalVisionSelected(event)">
           </div>
         </div>
+      </div>
 
-        <!-- MODE 2: COMPATIBILITY CHECK -->
-        <div id="global-ai-compat-panel" style="display:none;">
-          <div style="margin-bottom:10px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-              <label style="margin:0;">Target Aquarium</label>
-              <button type="button" id="global-ai-compat-back-btn" class="ghost-action-btn" style="display:none; padding:4px 9px; font-size:11px; color:var(--text-main);" onclick="backFromAiToTank()"></button>
-            </div>
-            <select id="sandbox-tank-select" onchange="onSandboxInputChanged()"></select>
+      <!-- MODE 2: COMPATIBILITY CHECK -->
+      <div id="global-ai-compat-panel" style="display:none;">
+        <div style="margin-bottom:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <label style="margin:0;">Target Aquarium</label>
+            <button type="button" id="global-ai-compat-back-btn" class="ghost-action-btn" style="display:none; padding:4px 9px; font-size:11px; color:var(--text-main);" onclick="backFromAiToTank()"></button>
           </div>
-          <div style="display:grid; grid-template-columns: 1fr 84px; gap:10px; margin-bottom:12px;">
-            <div>
-              <label>Species</label>
-              <input type="text" id="sandbox-species" placeholder="e.g. Cardinal Tetra, Cherry Shrimp" oninput="onSandboxInputChanged()" onkeydown="if(event.key==='Enter'){event.preventDefault();runSandboxCompatibility();}">
-            </div>
-            <div>
-              <label>Qty</label>
-              <input type="number" id="sandbox-qty" value="6" min="1" oninput="onSandboxInputChanged()" onkeydown="if(event.key==='Enter'){event.preventDefault();runSandboxCompatibility();}">
-            </div>
+          <select id="sandbox-tank-select" onchange="onSandboxInputChanged()"></select>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 84px; gap:10px; margin-bottom:12px;">
+          <div>
+            <label>Species</label>
+            <input type="text" id="sandbox-species" placeholder="e.g. Cardinal Tetra, Cherry Shrimp" oninput="onSandboxInputChanged()" onkeydown="if(event.key==='Enter'){event.preventDefault();runSandboxCompatibility();}">
           </div>
-          <button type="button" class="btn btn-neon" onclick="runSandboxCompatibility()">Evaluate Compatibility</button>
+          <div>
+            <label>Qty</label>
+            <input type="number" id="sandbox-qty" value="6" min="1" oninput="onSandboxInputChanged()" onkeydown="if(event.key==='Enter'){event.preventDefault();runSandboxCompatibility();}">
+          </div>
+        </div>
+        <button type="button" class="btn btn-neon" onclick="runSandboxCompatibility()">Evaluate Compatibility</button>
 
-          <div id="sandbox-result-box" style="display:none; margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.08); font-size:13px; line-height:1.58;"></div>
+        <div id="sandbox-result-box" style="display:none; margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.08); font-size:13px; line-height:1.58;"></div>
 
-          <div id="sandbox-add-roster-wrap" style="display:none; margin-top:12px;">
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
-              <button type="button" id="sandbox-discuss-btn" class="ghost-action-btn" style="flex:1; min-width:140px; padding:9px 12px; font-size:12.5px;" onclick="discussCompatibilityInChat()">Discuss in Chat</button>
-              <button type="button" id="sandbox-add-roster-btn" class="ghost-action-btn" style="flex:1.4; min-width:180px; padding:9px 12px; font-size:12.5px; color:var(--neon-green); border-color:rgba(0,245,160,0.32); background:rgba(0,245,160,0.06);" onclick="addEvaluatedSpeciesToTank()"></button>
-            </div>
+        <div id="sandbox-add-roster-wrap" style="display:none; margin-top:12px;">
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" id="sandbox-discuss-btn" class="ghost-action-btn" style="flex:1; min-width:140px; padding:9px 12px; font-size:12.5px;" onclick="discussCompatibilityInChat()">Discuss in Chat</button>
+            <button type="button" id="sandbox-add-roster-btn" class="ghost-action-btn" style="flex:1.4; min-width:180px; padding:9px 12px; font-size:12.5px; color:var(--neon-green); border-color:rgba(0,245,160,0.32); background:rgba(0,245,160,0.06);" onclick="addEvaluatedSpeciesToTank()"></button>
           </div>
         </div>
       </div>
@@ -1344,6 +1705,8 @@
             </div>
             <button type="button" class="ghost-action-btn" onclick="openCompatibilityForActiveTank()">Check Compatibility →</button>
           </div>
+          <!-- 2. Weighted Bio-Capacity Gauge & Breakdown -->
+          <div id="tank-bioload-capacity-box"></div>
           <div class="input-row">
             <input type="text" id="tank-live-name" placeholder="Species / Fish Name (e.g. Neon Tetra)" onkeydown="if(event.key==='Enter'){event.preventDefault();addTankLivestock();}">
             <input type="number" id="tank-live-count" placeholder="Qty" style="width:70px;" value="1" min="1" onkeydown="if(event.key==='Enter'){event.preventDefault();addTankLivestock();}">
@@ -1670,7 +2033,7 @@
         </div>
       </div>
 
-      <div style="margin-bottom:12px;">
+      <div style="margin-bottom:10px;">
         <label>Observed Symptoms</label>
         <select id="loss-symptoms" onchange="onSymptomSelectChange(this.value)">
           <option value="No visible symptoms / Natural">No visible symptoms / Natural</option>
@@ -1681,13 +2044,41 @@
           <option value="Aggression / Nipped by tank mates">Aggression / Nipped by tank mates</option>
           <option value="__CUSTOM__">Other / Custom symptom...</option>
         </select>
+        <!-- Symptom Quick Chips -->
+        <div class="test-stepper-wrap" style="margin-top:6px;">
+          <button type="button" class="test-chip active" data-symptom="No visible symptoms / Natural" onclick="setLossSymptomPreset('No visible symptoms / Natural', this)">Natural</button>
+          <button type="button" class="test-chip chip-danger" data-symptom="White spots on body/fins (Ich / Velvet)" onclick="setLossSymptomPreset('White spots on body/fins (Ich / Velvet)', this)">Ich / Spots</button>
+          <button type="button" class="test-chip chip-warn" data-symptom="Frayed fins / Tail rot" onclick="setLossSymptomPreset('Frayed fins / Tail rot', this)">Fin Rot</button>
+          <button type="button" class="test-chip chip-danger" data-symptom="Bloat / Pinecone scales (Dropsy)" onclick="setLossSymptomPreset('Bloat / Pinecone scales (Dropsy)', this)">Dropsy / Bloat</button>
+          <button type="button" class="test-chip chip-warn" data-symptom="Gasping at surface / Lethargy" onclick="setLossSymptomPreset('Gasping at surface / Lethargy', this)">Gasping</button>
+          <button type="button" class="test-chip" data-symptom="Aggression / Nipped by tank mates" onclick="setLossSymptomPreset('Aggression / Nipped by tank mates', this)">Nipped</button>
+        </div>
       </div>
 
       <!-- Custom Symptom Input (Revealed if custom chosen) -->
-      <div id="loss-symptoms-custom-wrap" style="display:none; margin-bottom:16px;">
+      <div id="loss-symptoms-custom-wrap" style="display:none; margin-bottom:12px;">
         <label>Describe Custom Symptom</label>
-        <input type="text" id="loss-symptoms-custom" placeholder="e.g. Swollen eye, flashing against rocks, clamped fins">
+        <input type="text" id="loss-symptoms-custom" placeholder="e.g. Swollen eye, flashing against rocks, clamped fins" oninput="updateLossLiveTriage(this.value)">
       </div>
+
+      <!-- 3. Guided Vision & Symptom Photo Attachment -->
+      <div style="margin-bottom:12px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:10px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:11.5px; font-weight:700; color:var(--text-main);">Symptom Photo (Optional)</span>
+          <button type="button" class="ghost-action-btn" style="font-size:11px; padding:3px 9px;" onclick="document.getElementById('loss-photo-input').click()">
+            📷 Attach Photo
+          </button>
+        </div>
+        <input type="file" id="loss-photo-input" accept="image/*" style="display:none;" onchange="handleLossPhotoSelected(event)">
+        <div id="loss-photo-preview-chip" style="display:none; align-items:center; gap:8px; margin-top:8px; background:rgba(0,210,255,0.08); border:1px solid rgba(0,210,255,0.25); border-radius:8px; padding:5px 9px;">
+          <img id="loss-photo-thumb" style="width:28px; height:28px; border-radius:5px; object-fit:cover;">
+          <span style="font-size:11px; color:var(--cyan); font-weight:600; flex:1;">Compressed photo attached (<span id="loss-photo-size">~80 KB</span>)</span>
+          <span class="delete-x" onclick="clearLossPhotoAttachment()" style="font-size:16px;">×</span>
+        </div>
+      </div>
+
+      <!-- Live Clinical Shelf Triage Card -->
+      <div id="loss-live-triage-card" style="display:none; margin-bottom:14px; background:rgba(0,245,160,0.06); border:1px solid rgba(0,245,160,0.25); border-radius:10px; padding:9px 12px; font-size:11.5px; line-height:1.45;"></div>
 
       <div style="display:flex; gap:10px;">
         <button class="btn btn-secondary" onclick="closeModalById('lossModal')">Cancel</button>
@@ -1851,37 +2242,86 @@
         <b>Adaptive Scheduling:</b> Test before changing water. The AI analyzes your bio-load to determine if a water change is needed, the exact volume %, and when to test next.
       </div>
 
-      <div class="input-grid-2">
-        <div>
-          <label>Test Date</label>
-          <input type="date" id="m-test-date">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:8px;">
+        <div style="flex:1;">
+          <label style="margin-bottom:3px;">Test Date</label>
+          <input type="date" id="m-test-date" style="padding:6px 10px; font-size:12.5px;">
         </div>
-        <div>
-          <label>Water Temp (<span class="unit-temp-label">°F</span>)</label>
-          <input type="number" id="m-test-temp" step="0.5" placeholder="78.0">
+        <button type="button" class="ghost-action-btn" style="margin-top:16px; font-size:11px; padding:6px 10px;" onclick="document.getElementById('m-test-date').valueAsDate = new Date();">Today</button>
+      </div>
+
+      <!-- Water Temp -->
+      <div style="margin-bottom:11px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:9px 11px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+          <label style="margin:0; font-weight:700; font-size:12px;">Water Temp (<span class="unit-temp-label">°F</span>)</label>
+          <input type="number" id="m-test-temp" step="0.5" placeholder="78.0" style="width:76px; text-align:right; padding:4px 8px; font-size:13px; font-weight:700;" oninput="syncTestChips('temp')">
+        </div>
+        <div class="test-stepper-wrap" id="m-test-chips-temp"></div>
+      </div>
+
+      <!-- pH -->
+      <div style="margin-bottom:11px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:9px 11px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+          <label style="margin:0; font-weight:700; font-size:12px;">pH Level</label>
+          <input type="number" id="m-test-ph" step="0.1" placeholder="7.2" style="width:76px; text-align:right; padding:4px 8px; font-size:13px; font-weight:700;" oninput="syncTestChips('ph')">
+        </div>
+        <div class="test-stepper-wrap" id="m-test-chips-ph">
+          <button type="button" class="test-chip" data-val="6.4" onclick="selectTestChip('ph', 6.4, this)">6.4</button>
+          <button type="button" class="test-chip" data-val="6.8" onclick="selectTestChip('ph', 6.8, this)">6.8</button>
+          <button type="button" class="test-chip" data-val="7.0" onclick="selectTestChip('ph', 7.0, this)">7.0</button>
+          <button type="button" class="test-chip" data-val="7.2" onclick="selectTestChip('ph', 7.2, this)">7.2</button>
+          <button type="button" class="test-chip" data-val="7.4" onclick="selectTestChip('ph', 7.4, this)">7.4</button>
+          <button type="button" class="test-chip" data-val="7.6" onclick="selectTestChip('ph', 7.6, this)">7.6</button>
+          <button type="button" class="test-chip" data-val="8.0" onclick="selectTestChip('ph', 8.0, this)">8.0</button>
+          <button type="button" class="test-chip" data-val="8.2" onclick="selectTestChip('ph', 8.2, this)">8.2</button>
         </div>
       </div>
 
-      <!-- Water Chemistry Order: Temp, pH, Ammonia, Nitrite, Nitrate -->
-      <div class="input-grid-2">
-        <div>
-          <label>pH</label>
-          <input type="number" id="m-test-ph" step="0.1" placeholder="7.2">
+      <!-- Ammonia (NH3) -->
+      <div style="margin-bottom:11px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:9px 11px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+          <label style="margin:0; font-weight:700; font-size:12px;">Ammonia (NH₃ ppm)</label>
+          <input type="number" id="m-test-nh3" step="0.25" placeholder="0" style="width:76px; text-align:right; padding:4px 8px; font-size:13px; font-weight:700;" oninput="syncTestChips('nh3')">
         </div>
-        <div>
-          <label>Ammonia (NH₃ ppm)</label>
-          <input type="number" id="m-test-nh3" step="0.25" placeholder="0">
+        <div class="test-stepper-wrap" id="m-test-chips-nh3">
+          <button type="button" class="test-chip chip-safe" data-val="0" onclick="selectTestChip('nh3', 0, this)">0</button>
+          <button type="button" class="test-chip chip-warn" data-val="0.25" onclick="selectTestChip('nh3', 0.25, this)">0.25</button>
+          <button type="button" class="test-chip chip-danger" data-val="0.5" onclick="selectTestChip('nh3', 0.5, this)">0.5</button>
+          <button type="button" class="test-chip chip-danger" data-val="1.0" onclick="selectTestChip('nh3', 1.0, this)">1.0</button>
+          <button type="button" class="test-chip chip-danger" data-val="2.0" onclick="selectTestChip('nh3', 2.0, this)">2.0</button>
+          <button type="button" class="test-chip chip-danger" data-val="4.0" onclick="selectTestChip('nh3', 4.0, this)">4.0+</button>
         </div>
       </div>
 
-      <div class="input-grid-2">
-        <div>
-          <label>Nitrite (NO₂ ppm)</label>
-          <input type="number" id="m-test-no2" step="0.25" placeholder="0">
+      <!-- Nitrite (NO2) -->
+      <div style="margin-bottom:11px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:9px 11px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+          <label style="margin:0; font-weight:700; font-size:12px;">Nitrite (NO₂ ppm)</label>
+          <input type="number" id="m-test-no2" step="0.25" placeholder="0" style="width:76px; text-align:right; padding:4px 8px; font-size:13px; font-weight:700;" oninput="syncTestChips('no2')">
         </div>
-        <div>
-          <label>Nitrate (NO₃ ppm)</label>
-          <input type="number" id="m-test-no3" step="5" placeholder="20">
+        <div class="test-stepper-wrap" id="m-test-chips-no2">
+          <button type="button" class="test-chip chip-safe" data-val="0" onclick="selectTestChip('no2', 0, this)">0</button>
+          <button type="button" class="test-chip chip-warn" data-val="0.25" onclick="selectTestChip('no2', 0.25, this)">0.25</button>
+          <button type="button" class="test-chip chip-danger" data-val="0.5" onclick="selectTestChip('no2', 0.5, this)">0.5</button>
+          <button type="button" class="test-chip chip-danger" data-val="1.0" onclick="selectTestChip('no2', 1.0, this)">1.0</button>
+          <button type="button" class="test-chip chip-danger" data-val="2.0" onclick="selectTestChip('no2', 2.0, this)">2.0</button>
+          <button type="button" class="test-chip chip-danger" data-val="5.0" onclick="selectTestChip('no2', 5.0, this)">5.0+</button>
+        </div>
+      </div>
+
+      <!-- Nitrate (NO3) -->
+      <div style="margin-bottom:11px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:9px 11px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+          <label style="margin:0; font-weight:700; font-size:12px;">Nitrate (NO₃ ppm)</label>
+          <input type="number" id="m-test-no3" step="5" placeholder="20" style="width:76px; text-align:right; padding:4px 8px; font-size:13px; font-weight:700;" oninput="syncTestChips('no3')">
+        </div>
+        <div class="test-stepper-wrap" id="m-test-chips-no3">
+          <button type="button" class="test-chip chip-safe" data-val="0" onclick="selectTestChip('no3', 0, this)">0</button>
+          <button type="button" class="test-chip chip-safe" data-val="5" onclick="selectTestChip('no3', 5, this)">5</button>
+          <button type="button" class="test-chip chip-safe" data-val="10" onclick="selectTestChip('no3', 10, this)">10</button>
+          <button type="button" class="test-chip chip-safe" data-val="20" onclick="selectTestChip('no3', 20, this)">20</button>
+          <button type="button" class="test-chip chip-warn" data-val="40" onclick="selectTestChip('no3', 40, this)">40</button>
+          <button type="button" class="test-chip chip-danger" data-val="80" onclick="selectTestChip('no3', 80, this)">80+</button>
         </div>
       </div>
 
@@ -1974,6 +2414,8 @@
             <input type="text" id="qwc-vol-calc" readonly style="background:rgba(255,255,255,0.04); font-weight:700; color:var(--cyan);">
           </div>
         </div>
+        <!-- 4. Real-Time Water Change Impact Preview (Zero extra clicks) -->
+        <div id="qwc-impact-preview"></div>
       </div>
 
       <div style="margin-bottom:12px;">
@@ -3345,6 +3787,7 @@
     }
 
     function closeAllModals(triggerBack = false) {
+      if (typeof toggleAiSidebar === "function") toggleAiSidebar(false);
       document.querySelectorAll(".modal-overlay.open").forEach(m => m.classList.remove("open"));
     }
 
@@ -3358,6 +3801,11 @@
 
       window.addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
+          const aiSidebar = document.getElementById("global-ai-sidebar");
+          if (aiSidebar && aiSidebar.classList.contains("open")) {
+            if (typeof toggleAiSidebar === "function") toggleAiSidebar(false);
+            return;
+          }
           const openModals = document.querySelectorAll(".modal-overlay.open");
           if (openModals.length > 0) {
             const topModal = openModals[openModals.length - 1];
@@ -3369,6 +3817,13 @@
 
     // Android Back-Gesture & Browser Popstate Engine
     window.addEventListener("popstate", (e) => {
+      // 0. If AI sidebar is open, close it first!
+      const aiSidebar = document.getElementById("global-ai-sidebar");
+      if (aiSidebar && aiSidebar.classList.contains("open")) {
+        if (typeof toggleAiSidebar === "function") toggleAiSidebar(false);
+        return;
+      }
+
       // 1. If any modal was open, close it and stay in the current view!
       const openModals = document.querySelectorAll(".modal-overlay.open");
       if (openModals.length > 0) {
@@ -3477,6 +3932,10 @@
       if (addVolInput) addVolInput.placeholder = isMetric ? "200" : "55";
       const testTempInput = document.getElementById("m-test-temp");
       if (testTempInput) testTempInput.placeholder = isMetric ? "25.5" : "78.0";
+      if (typeof renderTempTestChips === "function") {
+        renderTempTestChips();
+        syncTestChips("temp");
+      }
     }
 
     function onUnitsChange(val) {
@@ -4106,12 +4565,71 @@
       return availStr;
     }
 
+    /* 5. Substrate & Mineral Hardness / Chemistry Awareness */
+    function analyzeTankSubstrateAndHardscape(tank) {
+      if (!tank) return { acidSubstrates: [], alkalineRocks: [], tanninWoods: [], fineSands: [], roughGravels: [], hasAcid: false, hasAlkaline: false, hasTannins: false, hasFineSand: false, hasRoughGravel: false };
+      const decor = Array.isArray(tank.decor) ? tank.decor : [];
+      const plants = Array.isArray(tank.plants) ? tank.plants : [];
+      const allItems = [...decor, ...plants];
+
+      const acidSubstrates = [];
+      const alkalineRocks = [];
+      const tanninWoods = [];
+      const fineSands = [];
+      const roughGravels = [];
+
+      allItems.forEach(item => {
+        const s = String(item).toLowerCase();
+        if (/aqua\s*soil|amazonia|stratum|controsoil|tropica\s*soil|plant\s*soil|shrimp\s*soil|peat/i.test(s)) {
+          if (!acidSubstrates.includes(item)) acidSubstrates.push(item);
+        }
+        if (/seiryu|aragonite|crushed\s*coral|coral\s*sand|wonder\s*shell|limestone|holey\s*rock|cichlid\s*sand|dolomite/i.test(s)) {
+          if (!alkalineRocks.includes(item)) alkalineRocks.push(item);
+        }
+        if (/driftwood|mopani|bogwood|cholla|alder|almond\s*leaf|catappa|botanical/i.test(s)) {
+          if (!tanninWoods.includes(item)) tanninWoods.push(item);
+        }
+        if (/sand|silica\s*sand|play\s*sand|pool\s*filter/i.test(s)) {
+          if (!fineSands.includes(item)) fineSands.push(item);
+        }
+        if (/sharp\s*gravel|rough\s*gravel|lava\s*rock|crushed\s*lava/i.test(s)) {
+          if (!roughGravels.includes(item)) roughGravels.push(item);
+        }
+      });
+
+      return {
+        acidSubstrates,
+        alkalineRocks,
+        tanninWoods,
+        fineSands,
+        roughGravels,
+        hasAcid: acidSubstrates.length > 0,
+        hasAlkaline: alkalineRocks.length > 0,
+        hasTannins: tanninWoods.length > 0,
+        hasFineSand: fineSands.length > 0,
+        hasRoughGravel: roughGravels.length > 0
+      };
+    }
+
     function buildTankEcosystemDossier(tank) {
       if (!tank) return "";
       const u = getUnitLabels();
       const tested = hasTankBeenTested(tank);
       const freshness = formatTestFreshness(tank);
       const last = tested ? tank.lastTest : null;
+
+      const subInfo = analyzeTankSubstrateAndHardscape(tank);
+      const subDesc = [
+        subInfo.hasAcid ? `Active Acidic Soil (${subInfo.acidSubstrates.join(", ")})` : null,
+        subInfo.hasAlkaline ? `Alkaline Buffering Rocks (${subInfo.alkalineRocks.join(", ")})` : null,
+        subInfo.hasTannins ? `Tannin Driftwood (${subInfo.tanninWoods.join(", ")})` : null,
+        subInfo.hasFineSand ? "Fine Sand" : null,
+        subInfo.hasRoughGravel ? "Coarse/Rough Gravel" : null
+      ].filter(Boolean).join(" | ") || "Inert / Standard";
+
+      const bioload = typeof calculateTankWeightedBioload === "function"
+        ? calculateTankWeightedBioload(tank)
+        : { percent: 50, label: "Normal", totalWasteUnits: 10, effectiveCapacity: 20 };
 
       const latestParams = last
         ? `${freshness.text} (${last.date || "recent"}): Temp ${displayTemp(last.temp || 78)}${u.temp}, pH ${last.ph ?? 7.2}, NH3 ${last.nh3 ?? 0} ppm, NO2 ${last.no2 ?? 0} ppm, NO3 ${last.no3 ?? 0} ppm`
@@ -4168,6 +4686,8 @@
   - Plants / Flora: ${(tank.plants || []).join(", ") || "None"}
   - Plant Care & Lighting: ${plantedSpecs || "Standard / None configured"}
   - Hardscape & Decor: ${(tank.decor || []).join(", ") || "None"}
+  - Substrate & Buffering Chemistry: ${subDesc}
+  - Bio-Load Capacity: ${bioload.percent}% (${bioload.label}, ${bioload.totalWasteUnits} waste units vs ${bioload.effectiveCapacity} capacity)
   - Gear & Equipment: ${(tank.equipment || []).join(", ") || "Standard"}${tank.filterType ? ` (Filter type: ${tank.filterType})` : ""}
   - Filter Media & Service: ${mediaDetails}
   - Routine Care Timestamps: ${careDates}
@@ -5220,6 +5740,35 @@
       const calcEl = document.getElementById("qwc-vol-calc");
       if (calcEl) calcEl.value = `≈ ${volAmt} ${u.vol}`;
 
+      // 4. Real-time Water Change Impact Preview (Zero extra clicks)
+      const impactEl = document.getElementById("qwc-impact-preview");
+      if (impactEl) {
+        const tested = hasTankBeenTested(tank);
+        const curNo3 = tested ? (parseFloat(tank.lastTest?.no3) || 15) : 15;
+        const tapNo3 = appState.tapBaseline?.no3 ?? 5;
+        const curPh = tested ? (parseFloat(tank.lastTest?.ph) || 7.2) : 7.2;
+        const tapPh = appState.tapBaseline?.ph ?? 7.4;
+
+        const fraction = Math.max(0, Math.min(1, pct / 100));
+        const projNo3 = Math.max(0, Math.round((curNo3 * (1 - fraction)) + (tapNo3 * fraction)));
+        const projPh = Math.round(((curPh * (1 - fraction)) + (tapPh * fraction)) * 10) / 10;
+        const phShift = Math.round(Math.abs(projPh - curPh) * 10) / 10;
+        const deltaNo3 = curNo3 - projNo3;
+
+        impactEl.innerHTML = `
+          <div style="background:rgba(0,210,255,0.06); border:1px solid rgba(0,210,255,0.22); border-radius:10px; padding:8px 11px; margin-top:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; font-weight:700;">
+              <span style="color:#fff;">Projected Impact:</span>
+              <span style="color:${projNo3 <= 25 ? 'var(--neon-green)' : (projNo3 <= 40 ? 'var(--cyan)' : 'var(--alert-yellow)')};">NO₃: ${curNo3} ➔ ${projNo3} ppm</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:10.5px; color:var(--text-muted); margin-top:3px;">
+              <span>Dilution: -${deltaNo3} ppm (tap: ${tapNo3} ppm)</span>
+              <span style="${phShift > 0.4 ? 'color:var(--alert-yellow); font-weight:700;' : 'color:var(--text-muted);'}">pH: ${curPh} ➔ ${projPh} ${phShift > 0.4 ? '⚠️ (Large swing)' : ''}</span>
+            </div>
+          </div>
+        `;
+      }
+
       // Smart conditioner calculation synced with Household Supplies & Refill Mode
       const doseInput = document.getElementById("qwc-dose-input");
       const hintEl = document.getElementById("qwc-dose-hint");
@@ -5716,27 +6265,45 @@
       return found ? found.name : "Aquarium";
     }
 
-    function toggleAiSessionsDrawer(forceState) {
-      const drawer = document.getElementById("global-ai-sessions-drawer");
-      const btn = document.getElementById("global-ai-history-btn");
-      if (!drawer) return;
-      const isOpen = drawer.classList.contains("open") || drawer.style.display === "block";
+    function toggleAiSidebar(forceState) {
+      const sidebar = document.getElementById("global-ai-sidebar");
+      const backdrop = document.getElementById("global-ai-sidebar-backdrop");
+      if (!sidebar) return;
+      const isOpen = sidebar.classList.contains("open");
       const shouldOpen = typeof forceState === "boolean" ? forceState : !isOpen;
       if (shouldOpen) {
         renderAiSessionsDrawer();
-        drawer.classList.add("open");
-        drawer.style.display = "block";
-        if (btn) {
-          btn.style.borderColor = "rgba(0, 210, 255, 0.45)";
-          btn.style.color = "var(--cyan)";
-        }
+        syncAiTopbar();
+        sidebar.classList.add("open");
+        if (backdrop) backdrop.classList.add("open");
       } else {
-        drawer.classList.remove("open");
-        drawer.style.display = "none";
-        if (btn) {
-          btn.style.borderColor = "";
-          btn.style.color = "var(--text-muted)";
-        }
+        sidebar.classList.remove("open");
+        if (backdrop) backdrop.classList.remove("open");
+      }
+    }
+
+    function toggleAiSessionsDrawer(forceState) {
+      toggleAiSidebar(forceState);
+    }
+
+    function syncAiTopbar() {
+      const active = getActiveAiSession();
+      const titleEl = document.getElementById("ai-topbar-title");
+      const focusTag = document.getElementById("ai-topbar-focus-tag");
+      if (titleEl) {
+        titleEl.textContent = (active && active.title) ? active.title : "Aquarist AI";
+      }
+      if (focusTag) {
+        focusTag.textContent = formatSessionFocusLabel(globalAiContextTankId);
+      }
+      const toolsSec = document.getElementById("ai-sidebar-active-tools");
+      if (toolsSec) {
+        const hasMsgs = active && Array.isArray(active.messages) && active.messages.length > 0;
+        toolsSec.style.display = hasMsgs ? "block" : "none";
+      }
+      const ctxSel = document.getElementById("global-ai-context-select");
+      if (ctxSel && ctxSel.value !== String(globalAiContextTankId)) {
+        ctxSel.value = String(globalAiContextTankId);
       }
     }
 
@@ -5745,8 +6312,10 @@
       if (!listEl) return;
       ensureAiSessionsNormalized(appState);
       const saved = appState.aiSessions.filter(s => Array.isArray(s.messages) && s.messages.length > 0);
+      const countPill = document.getElementById("ai-sessions-count-pill");
+      if (countPill) countPill.textContent = saved.length ? `(${saved.length})` : "";
       if (saved.length === 0) {
-        listEl.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:6px 4px;">No saved conversations yet.</div>`;
+        listEl.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:16px 4px; text-align:center;">No saved conversations yet.</div>`;
         return;
       }
       listEl.innerHTML = saved.map(s => {
@@ -5808,6 +6377,7 @@
         closeModalById("renameChatModal");
         renderAiSessionsDrawer();
         renderGlobalAIThreadView();
+        syncAiTopbar();
         showToast("Chat Renamed");
       }
     }
@@ -5822,7 +6392,7 @@
       globalAiContextTankId = validFocus ? String(target.focusTankId) : "all";
       appState.aiThread = target.messages;
       globalAiThread = target.messages;
-      toggleAiSessionsDrawer(false);
+      toggleAiSidebar(false);
       saveDataToStorage();
       renderGlobalAIScreen();
     }
@@ -5840,6 +6410,7 @@
       saveDataToStorage();
       renderAiSessionsDrawer();
       renderGlobalAIScreen();
+      syncAiTopbar();
     }
 
     function extractAiReplyAndActions(rawText) {
@@ -6219,7 +6790,7 @@
 
       const renameBtn = document.getElementById("global-ai-rename-btn");
       if (renameBtn) {
-        renameBtn.style.display = hasActivity ? "inline-block" : "none";
+        renameBtn.style.display = hasActivity ? "flex" : "none";
       }
 
       renderAiThreadElement(threadEl, clearBtn, thread, pendingText);
@@ -6231,6 +6802,7 @@
         const hasRename = renameBtn && renameBtn.style.display !== "none";
         actionsRow.style.display = (hasHistory || hasClear || hasRename) ? "flex" : "none";
       }
+      syncAiTopbar();
     }
 
     function clearGlobalAIThread() {
@@ -6241,8 +6813,9 @@
         createFreshAiSession(globalAiContextTankId);
         saveDataToStorage();
       }
-      toggleAiSessionsDrawer(false);
+      toggleAiSidebar(false);
       renderGlobalAIThreadView();
+      syncAiTopbar();
       const inputEl = document.getElementById("global-ai-input");
       if (inputEl) inputEl.focus();
       showToast("New Chat Started");
@@ -6303,6 +6876,7 @@
 
       switchGlobalAIMode(globalAiMode);
       renderGlobalAIThreadView();
+      syncAiTopbar();
     }
 
     function buildGlobalAISystemPrompt() {
@@ -6711,6 +7285,42 @@ ${actionsInstruction}`;
         notes.push(`<b>Soft-Water Specialist:</b> ${escapeHtmlText(species)} prefers slightly acidic, low-GH water (current pH ${ph}, tap GH ${gh} dGH).`);
       }
 
+      // 4b. Substrate & Rock Buffering Chemistry (5. Substrate & Chemistry Awareness)
+      const subInfo = analyzeTankSubstrateAndHardscape(targetTank);
+      const isSoftwaterLover = ["discus", "german blue ram", "ram", "apistogramma", "cardinal", "neon tetra", "rummynose", "ember tetra", "chili rasbora", "caridina", "crystal red", "crystal black", "bee shrimp", "chocolate gourami"].some(k => sLow.includes(k));
+      const isHardwaterLover = ["african cichlid", "mbuna", "peacock", "frontosa", "guppy", "molly", "platy", "swordtail", "endler", "mystery snail", "nerite", "rabbit snail", "sulawesi"].some(k => sLow.includes(k));
+      const isBottomSifter = ["corydoras", "cory", "kuhli loach", "horseface loach", "hillstream", "geophagus", "banjo catfish"].some(k => sLow.includes(k));
+
+      if (isSoftwaterLover && subInfo.hasAlkaline) {
+        severity = Math.max(severity, 2);
+        notes.push(`<b>Substrate & Rock Chemistry Conflict:</b> ${escapeHtmlText(species)} requires soft, acidic-to-neutral water (pH 5.5–6.8, GH < 6 dGH). ${escapeHtmlText(targetTank.name)} contains alkaline-buffering hardscape (${escapeHtmlText(subInfo.alkalineRocks.join(", "))}), which dissolves carbonate minerals into the water, continuously raising pH & GH (7.6–8.2+) and inducing osmotic stress.`);
+      } else if (isHardwaterLover && subInfo.hasAcid) {
+        severity = Math.max(severity, 1);
+        notes.push(`<b>Substrate Buffer Conflict:</b> ${escapeHtmlText(species)} thrives in mineral-rich, alkaline water (GH 6–15 dGH, KH 4+ dKH, pH 7.5–8.2). Your active plant soil (${escapeHtmlText(subInfo.acidSubstrates.join(", "))}) actively strips carbonate hardness to lower pH below 6.8, which erodes snail shells and compromises livebearer osmoregulation.`);
+      }
+
+      if (isBottomSifter && subInfo.hasRoughGravel && !subInfo.hasFineSand) {
+        severity = Math.max(severity, 1);
+        notes.push(`<b>Substrate Texture Note:</b> ${escapeHtmlText(species)} naturally sifts bottom substrate for food. Coarse or sharp gravel (${escapeHtmlText(subInfo.roughGravels.join(", "))}) can wear down sensitive barbels; smooth fine sand is strongly recommended.`);
+      }
+
+      if (isSoftwaterLover && subInfo.hasTannins && !subInfo.hasAlkaline) {
+        notes.push(`<b>Hardscape Chemistry Synergy:</b> Botanicals and driftwood in ${escapeHtmlText(targetTank.name)} (${escapeHtmlText(subInfo.tanninWoods.join(", "))}) release natural humic acids and tannins, creating an optimal blackwater environment for ${escapeHtmlText(species)}.`);
+      }
+
+      // 4c. Bio-Load Impact Check (2. Weighted Capacity)
+      const curBioload = calculateTankWeightedBioload(targetTank);
+      const addedWaste = qty * getSpeciesWasteWeight(species);
+      const projectedUnits = Math.round((curBioload.totalWasteUnits + addedWaste) * 10) / 10;
+      const projectedPct = Math.round((projectedUnits / Math.max(1, curBioload.effectiveCapacity)) * 100);
+
+      if (projectedPct > 110) {
+        severity = Math.max(severity, 1);
+        notes.push(`<b>Bio-Load Surge Warning:</b> Adding ${qty}x ${escapeHtmlText(species)} (+${Math.round(addedWaste * 10) / 10} waste units) pushes ${escapeHtmlText(targetTank.name)} to <b>${projectedPct}% Bio-Capacity</b> (Overstocked). More frequent water changes and heavy biological filtration will be required.`);
+      } else {
+        notes.push(`<b>Bio-Capacity Fit:</b> Adding ${qty}x ${escapeHtmlText(species)} brings total bio-load to <b>${projectedPct}% capacity</b> (currently ${curBioload.percent}%).`);
+      }
+
       if (notes.length === 0) {
         notes.push(`<b>Parameters &amp; Footprint Aligned:</b> ${qty}x ${escapeHtmlText(species)} fits ${escapeHtmlText(targetTank.name)} (${dispVolVal} ${u.vol}, ${tested ? `${displayTemp(tempF)}${u.temp}, pH ${ph}` : "Established"}) with current tankmates (${escapeHtmlText(existingList.join(", ") || "Empty roster")}).`);
       }
@@ -6769,6 +7379,7 @@ ${actionsInstruction}`;
       const dispTempVal = t ? displayTemp(t.temp) : "--";
       const tap = appState.tapBaseline || {};
       const suppliesCtx = formatSuppliesForPrompt(targetTank);
+      const bioload = calculateTankWeightedBioload(targetTank);
 
       if (appState.apiKey) {
         const prompt = `You are aquAssist Stocking Advisor.
@@ -6778,9 +7389,11 @@ Current Parameters: ${t ? `Temp ${dispTempVal}${u.temp}, pH ${t.ph}, NH3 ${t.nh3
 Tap Baseline: pH ${tap.ph ?? 7.4}, GH ${tap.gh ?? 8} dGH, KH ${tap.kh ?? 4} dKH
 Existing Livestock: ${currentLive || "Empty Tank"}
 Live Plants: ${currentPlants || "None"}
+Substrate & Hardscape: ${(targetTank.decor || []).join(", ") || "Standard / Inert"}
+Current Bioload: ${bioload.percent}% capacity (${bioload.label})
 Household Supplies On Hand: ${suppliesCtx}
 
-Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution', or '### Verdict: Not Recommended'), then use short bullet points covering parameter/hardness fit, temperament/fin-nipping, plant/invert safety, bioload impact, and acclimation steps using In-Stock supplies. Do not use emojis.`;
+Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution', or '### Verdict: Not Recommended'), then use short bullet points covering parameter/hardness fit, substrate/hardscape buffering chemistry (e.g. active soils buffering acidic vs. Seiryu stone or crushed coral leaching carbonates/raising GH/KH, and substrate texture for bottom sifters), temperament/fin-nipping, plant/invert safety, bioload impact, and acclimation steps using In-Stock supplies. Do not use emojis.`;
 
         try {
           const reply = await callGeminiGenerate([{ text: prompt }]);
@@ -7558,6 +8171,51 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       }
     }
 
+    /* 1. Fast Water Test Stepped Chip Controls */
+    function renderTempTestChips() {
+      const wrap = document.getElementById("m-test-chips-temp");
+      if (!wrap) return;
+      const isMetric = appState.units === "metric";
+      const temps = isMetric ? [23, 24, 25, 26, 27, 28] : [74, 76, 78, 80, 82];
+      wrap.innerHTML = temps.map(t => `
+        <button type="button" class="test-chip" data-val="${t}" onclick="selectTestChip('temp', ${t}, this)">${t}°</button>
+      `).join("");
+    }
+
+    function selectTestChip(paramKey, val, btnEl) {
+      const inputEl = document.getElementById("m-test-" + paramKey);
+      if (inputEl) {
+        inputEl.value = val;
+      }
+      const wrap = document.getElementById("m-test-chips-" + paramKey);
+      if (wrap) {
+        wrap.querySelectorAll(".test-chip").forEach(c => c.classList.remove("active"));
+      }
+      if (btnEl) {
+        btnEl.classList.add("active");
+      }
+    }
+
+    function syncTestChips(paramKey) {
+      const inputEl = document.getElementById("m-test-" + paramKey);
+      const wrap = document.getElementById("m-test-chips-" + paramKey);
+      if (!inputEl || !wrap) return;
+      const val = parseFloat(inputEl.value);
+      wrap.querySelectorAll(".test-chip").forEach(c => {
+        const chipVal = parseFloat(c.getAttribute("data-val"));
+        if (!isNaN(val) && Math.abs(val - chipVal) < 0.05) {
+          c.classList.add("active");
+        } else {
+          c.classList.remove("active");
+        }
+      });
+    }
+
+    function syncAllTestChips() {
+      renderTempTestChips();
+      ["temp", "ph", "nh3", "no2", "no3"].forEach(p => syncTestChips(p));
+    }
+
     function openTestModalForTank(tankId, editIdx = -1) {
       const targetTank = appState.tanks.find(t => t.id == tankId) || getActiveTank();
       if (!targetTank) {
@@ -7600,6 +8258,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         document.getElementById("m-test-no3").value = last.no3 ?? 10;
         document.getElementById("m-test-notes").value = "";
       }
+      syncAllTestChips();
       openModalById("recordTestModal");
     }
 
@@ -7881,6 +8540,115 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       if (t) executeTankTaskAction(t);
     }
 
+    /* 2. Weighted Bioload Calculation Engine & Breakdown */
+    function getSpeciesWasteWeight(speciesName) {
+      if (!speciesName || typeof speciesName !== "string") return 1.0;
+      const s = speciesName.toLowerCase().trim();
+
+      // 1. Invertebrates / Micro-fauna (negligible bioload)
+      if (/shrimp|neocaridina|caridina|amano|ghost\s*shrimp|cherry\s*shrimp/i.test(s)) return 0.15;
+      if (/nerite|ramshorn|bladder\s*snail|trumpet\s*snail|assassin\s*snail/i.test(s)) return 0.2;
+      if (/mystery\s*snail|apple\s*snail/i.test(s)) return 0.8;
+      if (/snail/i.test(s)) return 0.3;
+
+      // 2. Heavy Waste Producers / Monsters
+      if (/oscar|koi|arowana|pacu|sailfin\s*pleco|common\s*pleco|clown\s*loach|red\s*tail\s*shark|bala\s*shark/i.test(s)) return 16.0;
+      if (/goldfish|fancy\s*goldfish|oranda|ranchu|ryukin|black\s*moor/i.test(s)) return 12.0;
+      if (/severum|discus|electric\s*blue\s*acara|green\s*terror|jack\s*dempsey|cichlid/i.test(s)) return 8.0;
+      if (/bristlenose|ancistrus|bushy\s*nose|rubber\s*lip|pleco/i.test(s)) return 7.0;
+
+      // 3. Medium Community / Medium Cichlids
+      if (/angelfish|angel\s*fish/i.test(s)) return 5.0;
+      if (/ram|apistogramma|dwarf\s*cichlid|pearl\s*gourami|three\s*spot|blue\s*gourami|opaline/i.test(s)) return 3.5;
+      if (/molly|swordtail|platy/i.test(s)) return 2.5;
+      if (/dwarf\s*gourami|honey\s*gourami|betta/i.test(s)) return 2.0;
+      if (/corydoras|cory|otocinclus|oto|loach|kuhli|hillstream/i.test(s)) return 1.3;
+
+      // 4. Nano Schoolers / Micro fish
+      if (/chili\s*rasbora|boraras|mosquito\s*rasbora|microdevario|pygmy\s*cory|habrosus|hastatus|celestial\s*pearl|cpd|green\s*neon/i.test(s)) return 0.5;
+      if (/tetra|rasbora|danio|barb|guppy|endler|pencilfish|hatchetfish|killifish/i.test(s)) return 1.0;
+
+      return 1.2;
+    }
+
+    function calculateTankWeightedBioload(tank) {
+      if (!tank) return { totalSpecimens: 0, totalWasteUnits: 0, baseCapacity: 20, effectiveCapacity: 20, plantBonusPct: 0, percent: 0, label: "Empty Roster", color: "var(--text-muted)", dotColor: "var(--text-muted)", contributors: [] };
+
+      const liveList = Array.isArray(tank.livestock) ? tank.livestock : [];
+      let totalSpecimens = 0;
+      let totalWasteUnits = 0;
+      const contributors = [];
+
+      liveList.forEach(item => {
+        const match = String(item).match(/^(\d+)\s*x\s*(.*)$/i);
+        const count = match ? parseInt(match[1], 10) : 1;
+        const name = match ? match[2].trim() : String(item).trim();
+        const weight = getSpeciesWasteWeight(name);
+        const waste = Math.round(count * weight * 10) / 10;
+        totalSpecimens += count;
+        totalWasteUnits += waste;
+        contributors.push({
+          raw: item,
+          name,
+          count,
+          weight,
+          wasteUnits: waste
+        });
+      });
+
+      contributors.sort((a, b) => b.wasteUnits - a.wasteUnits);
+
+      const baseCapacity = parseFloat(tank.vol) || 20;
+      const plantCount = Array.isArray(tank.plants) ? tank.plants.length : 0;
+      const plantBonusPct = Math.min(25, plantCount * 5);
+      const effectiveCapacity = Math.round((baseCapacity * (1 + plantBonusPct / 100)) * 10) / 10;
+
+      const percent = totalSpecimens === 0 ? 0 : Math.round((totalWasteUnits / effectiveCapacity) * 100);
+
+      let label = "Empty Roster";
+      let color = "var(--text-muted)";
+      let dotColor = "var(--text-muted)";
+
+      if (totalSpecimens > 0) {
+        if (percent <= 45) {
+          label = "Light Bio-Load";
+          color = "var(--cyan)";
+          dotColor = "var(--cyan)";
+        } else if (percent <= 85) {
+          label = "Balanced Bio-Load";
+          color = "var(--neon-green)";
+          dotColor = "var(--neon-green)";
+        } else if (percent <= 110) {
+          label = "Heavy Bio-Load";
+          color = "var(--alert-yellow)";
+          dotColor = "var(--alert-yellow)";
+        } else {
+          label = "Overstocked Warning";
+          color = "var(--alert-red)";
+          dotColor = "var(--alert-red)";
+        }
+      }
+
+      return {
+        totalSpecimens,
+        totalWasteUnits: Math.round(totalWasteUnits * 10) / 10,
+        baseCapacity: Math.round(baseCapacity * 10) / 10,
+        effectiveCapacity,
+        plantBonusPct,
+        percent,
+        label,
+        color,
+        dotColor,
+        contributors
+      };
+    }
+
+    let showBioloadBreakdown = false;
+    function toggleBioloadBreakdown() {
+      showBioloadBreakdown = !showBioloadBreakdown;
+      renderTankLivestockTab();
+    }
+
     /* TANK SUB-TAB 3: LIVESTOCK */
     function renderTankLivestockTab() {
       const activeTank = getActiveTank();
@@ -7888,37 +8656,69 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       renderPillList("livestock", "tank-live-list", activeTank.livestock || [], "deleteTankLivestock");
       renderLossHistory();
 
-      const liveList = activeTank.livestock || [];
-      let totalCount = 0;
-      liveList.forEach(item => {
-        const match = String(item).match(/^(\d+)\s*x/i);
-        totalCount += match ? parseInt(match[1]) : 1;
-      });
+      const bioload = calculateTankWeightedBioload(activeTank);
 
       const badgeEl = document.getElementById("tank-livestock-bioload-badge");
       if (badgeEl) {
-        if (totalCount === 0) {
+        if (bioload.totalSpecimens === 0) {
           badgeEl.innerHTML = `<span style="font-size:11px; color:var(--text-muted); font-weight:600;">0 specimens</span>`;
         } else {
-          const vol = activeTank.vol || 20;
-          const ratio = totalCount / vol;
-          let loadLabel = "Light Bio-Load";
-          let loadColor = "var(--cyan)";
-          let dotColor = "var(--cyan)";
-          if (ratio > 1.2) {
-            loadLabel = "Heavy Bio-Load";
-            loadColor = "var(--alert-yellow)";
-            dotColor = "var(--alert-yellow)";
-          } else if (ratio > 0.6) {
-            loadLabel = "Balanced Bio-Load";
-            loadColor = "var(--neon-green)";
-            dotColor = "var(--neon-green)";
-          }
           badgeEl.innerHTML = `
-            <span style="display:inline-flex; align-items:center; gap:5px; font-size:10.5px; font-weight:600; color:${loadColor}; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); padding:2px 8px; border-radius:12px;">
-              <span class="legend-dot" style="background:${dotColor}; width:6px; height:6px;"></span>
-              ${loadLabel} (${totalCount} spec.)
+            <span style="display:inline-flex; align-items:center; gap:5px; font-size:10.5px; font-weight:600; color:${bioload.color}; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); padding:2px 8px; border-radius:12px;">
+              <span class="legend-dot" style="background:${bioload.dotColor}; width:6px; height:6px;"></span>
+              ${bioload.label} (${bioload.percent}%)
             </span>
+          `;
+        }
+      }
+
+      const capBox = document.getElementById("tank-bioload-capacity-box");
+      if (capBox) {
+        if (bioload.totalSpecimens === 0) {
+          capBox.innerHTML = `
+            <div class="bioload-meter-card" style="font-size:11.5px; color:var(--text-muted); text-align:center; padding:10px;">
+              No livestock entered yet. Add fish, shrimp, or snails below to track biological waste capacity.
+            </div>
+          `;
+        } else {
+          const breakdownHtml = showBioloadBreakdown ? `
+            <div style="margin-top:10px; padding-top:9px; border-top:1px solid rgba(255,255,255,0.06);">
+              <div style="font-size:11px; font-weight:700; color:var(--cyan); margin-bottom:5px;">Metabolic Waste Breakdown:</div>
+              <div style="display:flex; flex-direction:column; gap:4px; max-height:160px; overflow-y:auto;">
+                ${bioload.contributors.map(c => `
+                  <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; padding:3px 6px; background:rgba(255,255,255,0.02); border-radius:6px;">
+                    <span style="color:#fff;">${escapeHtmlText(c.raw)}</span>
+                    <span style="color:var(--text-muted); font-weight:600;">${c.wasteUnits} units (${Math.round((c.wasteUnits / Math.max(0.1, bioload.totalWasteUnits)) * 100)}%)</span>
+                  </div>
+                `).join("")}
+              </div>
+              <div style="font-size:10.5px; color:var(--text-dim); margin-top:7px; line-height:1.4;">
+                ${bioload.percent > 85
+                  ? "Elevated biological waste output. Maintain weekly water changes and monitor nitrates regularly."
+                  : "Biological load is sustainable. Beneficial nitrifying bacteria can handle this waste output comfortably."}
+              </div>
+            </div>
+          ` : "";
+
+          capBox.innerHTML = `
+            <div class="bioload-meter-card">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="font-size:12px; font-weight:700; color:#fff;">
+                  Bio-Capacity: <span style="color:${bioload.color}">${bioload.percent}% (${bioload.label})</span>
+                </div>
+                <button type="button" class="ghost-action-btn" style="font-size:10.5px; padding:2px 7px;" onclick="toggleBioloadBreakdown()">
+                  ${showBioloadBreakdown ? "Hide Details ▲" : "Waste Details ▾"}
+                </button>
+              </div>
+              <div class="bioload-bar-track">
+                <div class="bioload-bar-fill" style="width:${Math.min(100, bioload.percent)}%; background:${bioload.color};"></div>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); font-weight:600;">
+                <span>${bioload.totalWasteUnits} waste units / ${bioload.effectiveCapacity} cap</span>
+                ${bioload.plantBonusPct > 0 ? `<span style="color:var(--neon-green);">+${bioload.plantBonusPct}% from live flora</span>` : `<span>${bioload.totalSpecimens} specimens</span>`}
+              </div>
+              ${breakdownHtml}
+            </div>
           `;
         }
       }
@@ -7986,6 +8786,11 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
           <div style="font-size:11px; color:var(--alert-yellow); margin-top:2px;">
             Symptoms: ${escapeHtmlText(l.symptoms || "Unspecified")}
           </div>
+          ${l.photo ? `
+            <div style="margin-top:6px;">
+              <img src="${l.photo}" alt="Symptom photo" style="width:48px; height:48px; object-fit:cover; border-radius:6px; border:1px solid rgba(0,210,255,0.3); cursor:pointer;" onclick="window.open('${l.photo}', '_blank')" title="View attached symptom photo">
+            </div>
+          ` : ""}
           ${l.aiAudit ? `<div style="font-size:11px; color:var(--cyan); margin-top:4px; line-height:1.38;">Aquarist AI Shelf Audit: ${escapeHtmlText(l.aiAudit)}</div>` : ""}
         `;
         list.appendChild(item);
@@ -8567,6 +9372,76 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       await askGlobalAI();
     }
 
+    /* 3. Guided Vision & Symptom Photo Attachment Engine */
+    let activeLossPhotoBase64 = null;
+    let activeLossPhotoDataUrl = null;
+
+    function handleLossPhotoSelected(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      processVisionImageFile(file, (dataUrl, base64) => {
+        activeLossPhotoBase64 = base64;
+        activeLossPhotoDataUrl = dataUrl;
+        const chip = document.getElementById("loss-photo-preview-chip");
+        const thumb = document.getElementById("loss-photo-thumb");
+        const sizeEl = document.getElementById("loss-photo-size");
+        if (chip && thumb) {
+          thumb.src = dataUrl;
+          if (sizeEl) {
+            const kb = Math.round((base64.length * 0.75) / 1024);
+            sizeEl.innerText = `${kb} KB`;
+          }
+          chip.style.display = "flex";
+        }
+        showToast("Photo Compressed & Attached");
+      });
+    }
+
+    function clearLossPhotoAttachment() {
+      activeLossPhotoBase64 = null;
+      activeLossPhotoDataUrl = null;
+      const inputEl = document.getElementById("loss-photo-input");
+      if (inputEl) inputEl.value = "";
+      const chip = document.getElementById("loss-photo-preview-chip");
+      if (chip) chip.style.display = "none";
+    }
+
+    function setLossSymptomPreset(val, btn) {
+      const sel = document.getElementById("loss-symptoms");
+      if (sel) sel.value = val;
+      const wrap = document.getElementById("loss-symptoms-custom-wrap");
+      if (wrap) wrap.style.display = (val === "__CUSTOM__") ? "block" : "none";
+      document.querySelectorAll("#lossModal .test-chip").forEach(c => c.classList.remove("active"));
+      if (btn) btn.classList.add("active");
+      updateLossLiveTriage(val);
+    }
+
+    function updateLossLiveTriage(symptomsStr) {
+      const activeTank = getActiveTank();
+      const triageCard = document.getElementById("loss-live-triage-card");
+      if (!triageCard || !activeTank) return;
+
+      if (!symptomsStr || symptomsStr.includes("No visible symptoms") || symptomsStr.includes("Natural")) {
+        triageCard.style.display = "none";
+        return;
+      }
+
+      const audit = auditHealthEventSupplies(activeTank, symptomsStr);
+      if (audit) {
+        triageCard.style.display = "block";
+        triageCard.innerHTML = `
+          <div style="font-weight:700; color:var(--neon-green); margin-bottom:4px; display:flex; align-items:center; gap:5px;">
+            <span>✦</span> Clinical Care Protocol:
+          </div>
+          <div style="color:var(--text-main); font-size:11.5px; line-height:1.45;">
+            ${escapeHtmlText(audit)}
+          </div>
+        `;
+      } else {
+        triageCard.style.display = "none";
+      }
+    }
+
     /* Health Event & Hybrid Symptoms Handler */
     function onSymptomSelectChange(val) {
       const wrap = document.getElementById("loss-symptoms-custom-wrap");
@@ -8577,6 +9452,10 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       } else {
         wrap.style.display = "none";
       }
+      document.querySelectorAll("#lossModal .test-chip").forEach(c => {
+        c.classList.toggle("active", c.getAttribute("data-symptom") === val);
+      });
+      updateLossLiveTriage(val);
     }
 
     /* Discreet Fauna Loss & Health Event Tracker */
@@ -8600,6 +9479,13 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       document.getElementById("loss-symptoms").value = "No visible symptoms / Natural";
       document.getElementById("loss-symptoms-custom-wrap").style.display = "none";
       document.getElementById("loss-symptoms-custom").value = "";
+
+      clearLossPhotoAttachment();
+      document.querySelectorAll("#lossModal .test-chip").forEach((c, idx) => {
+        c.classList.toggle("active", idx === 0);
+      });
+      updateLossLiveTriage("No visible symptoms / Natural");
+
       openModalById("lossModal");
     }
 
@@ -8639,19 +9525,22 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
 
       if (!activeTank.losses) activeTank.losses = [];
       const aiAudit = auditHealthEventSupplies(activeTank, symptoms);
-      const lossRecord = { date, species: cleanSpecies, qty, symptoms, aiAudit };
+      const photoToSave = activeLossPhotoDataUrl;
+      const lossRecord = { date, species: cleanSpecies, qty, symptoms, aiAudit, photo: photoToSave };
       activeTank.losses.unshift(lossRecord);
       sortRecordsByDateDesc(activeTank.losses);
 
+      const photoTag = photoToSave ? " [📷 Photo archived]" : "";
       const timelineMsg = aiAudit
-        ? `Health event: ${qty}x ${cleanSpecies} (${symptoms}) • ${aiAudit}`
-        : `Health event: ${qty}x ${cleanSpecies} (${symptoms})`;
+        ? `Health event: ${qty}x ${cleanSpecies} (${symptoms})${photoTag} • ${aiAudit}`
+        : `Health event: ${qty}x ${cleanSpecies} (${symptoms})${photoTag}`;
       logTankTimelineEvent(timelineMsg, date);
+      clearLossPhotoAttachment();
       saveDataToStorage();
       closeModalById("lossModal");
       renderTankLivestockTab();
       renderTankOverviewTab();
-      showToast("Health Event & Shelf Audit Logged");
+      showToast("Health Event & Care Protocol Saved");
     }
 
     /* Editable Livestock Management */

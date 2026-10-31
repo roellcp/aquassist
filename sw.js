@@ -1,4 +1,4 @@
-const CACHE_NAME = "aquassist-cache-v47";
+const CACHE_NAME = "aquassist-cache-v50";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
