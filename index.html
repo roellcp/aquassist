@@ -47,6 +47,7 @@
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       min-height: 100vh;
       overflow-x: hidden;
+      overscroll-behavior-y: contain;
       padding-bottom: calc(var(--bottom-nav-height) + 24px);
     }
 
@@ -3587,6 +3588,30 @@
     /* ============================================================
        3. NAVIGATION, LEVEL 1/2 ROUTING & ANDROID BACK GESTURE
        ============================================================ */
+    function persistActiveRoute(route) {
+      try {
+        if (route && typeof route === "object" && route.level) {
+          sessionStorage.setItem("aquassist_active_route", JSON.stringify({
+            level: route.level,
+            view: route.view || null,
+            tankId: route.tankId || null,
+            subtab: route.subtab || null
+          }));
+        }
+      } catch (e) {}
+    }
+
+    function getPersistedRoute() {
+      if (history.state && history.state.level) {
+        return history.state;
+      }
+      try {
+        const raw = sessionStorage.getItem("aquassist_active_route");
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return null;
+    }
+
     function navToGlobal(viewName, pushHistory = true, keepReturnTank = false) {
       if (viewName === "tanks") {
         if (Array.isArray(appState.tanks) && appState.tanks.length > 0) {
@@ -3629,9 +3654,13 @@
       if (targetScreen) targetScreen.classList.add("active");
       if (targetBtn) targetBtn.classList.add("active");
 
+      const routeState = { level: "global", view: viewName };
       if (pushHistory) {
-        history.pushState({ level: "global", view: viewName }, "");
+        history.pushState(routeState, "");
+      } else {
+        history.replaceState(routeState, "");
       }
+      persistActiveRoute(routeState);
 
       if (viewName === "dashboard") renderGlobalDashboard();
       if (viewName === "closet") renderGlobalClosetScreen();
@@ -3713,9 +3742,13 @@
       const tankNavBtn = document.getElementById("nav-btn-tanks");
       if (tankNavBtn) tankNavBtn.classList.add("active");
 
+      const routeState = { level: "tank", tankId: tankId, subtab: currentTankSubtab || "overview" };
       if (pushHistory) {
-        history.pushState({ level: "tank", tankId: tankId, subtab: currentTankSubtab || "overview" }, "");
+        history.pushState(routeState, "");
+      } else {
+        history.replaceState(routeState, "");
       }
+      persistActiveRoute(routeState);
 
       renderTankHub();
       window.scrollTo(0, 0);
@@ -3739,8 +3772,10 @@
           }
         });
       }
-      if (isInsideTank && activeTankId && (!history.state || history.state.level === "tank")) {
-        history.replaceState({ level: "tank", tankId: activeTankId, subtab: currentTankSubtab }, "");
+      if (isInsideTank && activeTankId) {
+        const routeState = { level: "tank", tankId: activeTankId, subtab: currentTankSubtab };
+        history.replaceState(routeState, "");
+        persistActiveRoute(routeState);
       }
       document.querySelectorAll(".tanksub-content").forEach(c => c.style.display = "none");
       const target = document.getElementById("tanksub-" + tabName);
@@ -3823,20 +3858,24 @@
 
       // 2. If history state points to a specific screen, restore it cleanly
       if (e.state && e.state.level === "tank" && e.state.tankId) {
+        persistActiveRoute(e.state);
         enterTankHub(e.state.tankId, false, e.state.subtab || null);
         return;
       }
       if (e.state && e.state.level === "global" && e.state.view) {
+        persistActiveRoute(e.state);
         navToGlobal(e.state.view, false);
         return;
       }
 
       // 3. Fallback back-gesture handling
       if (isInsideTank) {
+        persistActiveRoute({ level: "global", view: "dashboard" });
         navToGlobal("dashboard", false);
         return;
       }
       if (currentGlobalView !== "dashboard") {
+        persistActiveRoute({ level: "global", view: "dashboard" });
         navToGlobal("dashboard", false);
       }
     });
@@ -10733,10 +10772,34 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
        8. SERVICE WORKER & APP STARTUP
        ============================================================ */
     async function initApp() {
-      history.replaceState({ level: "global", view: "dashboard" }, "");
+      const restoredRoute = getPersistedRoute();
       appState = await loadDataFromStorage();
       activeTankId = appState.tanks[0] ? appState.tanks[0].id : 1;
-      navToGlobal("dashboard", false);
+
+      let routed = false;
+      if (restoredRoute) {
+        if (restoredRoute.level === "tank" && restoredRoute.tankId) {
+          const found = appState.tanks.find(t => String(t.id) === String(restoredRoute.tankId));
+          if (found) {
+            enterTankHub(found.id, false, restoredRoute.subtab || "overview");
+            routed = true;
+          }
+        } else if (restoredRoute.level === "global" && restoredRoute.view && restoredRoute.view !== "tanks") {
+          const targetScreen = document.getElementById("screen-" + restoredRoute.view);
+          if (targetScreen) {
+            navToGlobal(restoredRoute.view, false);
+            routed = true;
+          }
+        }
+      }
+
+      if (!routed) {
+        const defRoute = { level: "global", view: "dashboard" };
+        history.replaceState(defRoute, "");
+        persistActiveRoute(defRoute);
+        navToGlobal("dashboard", false);
+      }
+
       if (typeof createSnapshot === "function") {
         createSnapshot("Auto Snapshot", false).catch(() => {});
       }
