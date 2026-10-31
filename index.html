@@ -1412,10 +1412,10 @@
             </div>
           </div>
 
-          <!-- RECENT CHATS LIST -->
+          <!-- CONVERSATIONS LIST -->
           <div class="ai-sidebar-section" style="flex:1; display:flex; flex-direction:column; min-height:0; margin-bottom:0;">
             <div class="ai-sidebar-section-title">
-              <span>Recent Conversations</span>
+              <span>Conversations</span>
               <span id="ai-sessions-count-pill" style="font-size:10px; color:var(--text-muted);"></span>
             </div>
             <div id="global-ai-sessions-list" class="ai-sidebar-sessions-list"></div>
@@ -6306,11 +6306,10 @@
       listEl.innerHTML = saved.map(s => {
         const isActive = s.id === appState.activeAiSessionId;
         const focusLbl = formatSessionFocusLabel(s.focusTankId);
-        const turnCount = Math.max(1, Math.ceil((s.messages || []).filter(m => m.role === "user").length));
         return `<div class="ai-session-row ${isActive ? "active" : ""}">
           <div style="min-width:0; flex:1;" onclick="selectAiSession('${escapeHtmlText(s.id)}')">
             <div class="ai-session-title">${escapeHtmlText(s.title || "Conversation")}</div>
-            <div class="ai-session-meta">${escapeHtmlText(focusLbl)} · ${turnCount} ${turnCount === 1 ? "prompt" : "prompts"}</div>
+            <div class="ai-session-meta">${escapeHtmlText(focusLbl)}</div>
           </div>
           <div style="display:flex; align-items:center; gap:6px;">
             <button type="button" class="ai-session-icon-btn" title="Rename chat" onclick="openRenameAiSessionModal('${escapeHtmlText(s.id)}', event)">✎</button>
