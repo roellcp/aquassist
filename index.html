@@ -258,7 +258,7 @@
 
     /* High-Tech Visual Micro-Telemetry Gauges */
     .param-strip {
-      display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(50px, 1fr)); gap: 6px;
       margin-top: 12px; padding-top: 12px;
       border-top: 1px solid rgba(255, 255, 255, 0.07);
     }
@@ -1655,6 +1655,8 @@
             <button type="button" class="chart-pill-btn" data-filter="nh3" onclick="setChartFilter('nh3', this)">NH₃</button>
             <button type="button" class="chart-pill-btn" data-filter="no2" onclick="setChartFilter('no2', this)">NO₂</button>
             <button type="button" class="chart-pill-btn" data-filter="no3" onclick="setChartFilter('no3', this)">NO₃</button>
+            <button type="button" class="chart-pill-btn" data-filter="gh" onclick="setChartFilter('gh', this)">GH</button>
+            <button type="button" class="chart-pill-btn" data-filter="kh" onclick="setChartFilter('kh', this)">KH</button>
           </div>
 
           <div class="chart-container">
@@ -1667,6 +1669,8 @@
             <div class="chart-legend-item"><span class="legend-dot" style="background:var(--alert-red);"></span> NH₃</div>
             <div class="chart-legend-item"><span class="legend-dot" style="background:var(--alert-yellow);"></span> NO₂</div>
             <div class="chart-legend-item"><span class="legend-dot" style="background:var(--cyan);"></span> NO₃</div>
+            <div class="chart-legend-item"><span class="legend-dot" style="background:#38BDF8;"></span> GH</div>
+            <div class="chart-legend-item"><span class="legend-dot" style="background:#F59E0B;"></span> KH</div>
             <div class="chart-legend-item"><svg viewBox="0 0 12 14" width="10" height="11" fill="#38BDF8" style="display:inline-block; flex-shrink:0;"><path d="M6 1C8.8 4.4 9.5 7.2 9.5 9C9.5 10.9 7.9 12.5 6 12.5C4.1 12.5 2.5 10.9 2.5 9C2.5 7.2 3.2 4.4 6 1Z"/></svg> Water Change</div>
           </div>
         </div>
@@ -2311,6 +2315,44 @@
           <button type="button" class="test-chip chip-safe" data-val="20" onclick="selectTestChip('no3', 20, this)">20</button>
           <button type="button" class="test-chip chip-warn" data-val="40" onclick="selectTestChip('no3', 40, this)">40</button>
           <button type="button" class="test-chip chip-danger" data-val="80" onclick="selectTestChip('no3', 80, this)">80+</button>
+        </div>
+      </div>
+
+      <!-- Optional Hardness: GH (General Hardness) -->
+      <div style="margin-bottom:11px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:9px 11px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <label style="margin:0; font-weight:700; font-size:12px;">General Hardness (GH)</label>
+            <span style="font-size:10px; color:var(--text-muted); font-weight:600;">Optional (°dGH)</span>
+          </div>
+          <input type="number" id="m-test-gh" step="1" placeholder="--" style="width:76px; text-align:right; padding:4px 8px; font-size:13px; font-weight:700;" oninput="syncTestChips('gh')">
+        </div>
+        <div class="test-stepper-wrap" id="m-test-chips-gh">
+          <button type="button" class="test-chip" data-val="3" onclick="selectTestChip('gh', 3, this)">3°</button>
+          <button type="button" class="test-chip" data-val="5" onclick="selectTestChip('gh', 5, this)">5°</button>
+          <button type="button" class="test-chip" data-val="7" onclick="selectTestChip('gh', 7, this)">7°</button>
+          <button type="button" class="test-chip" data-val="9" onclick="selectTestChip('gh', 9, this)">9°</button>
+          <button type="button" class="test-chip" data-val="12" onclick="selectTestChip('gh', 12, this)">12°</button>
+          <button type="button" class="test-chip" data-val="16" onclick="selectTestChip('gh', 16, this)">16°+</button>
+        </div>
+      </div>
+
+      <!-- Optional Hardness: KH (Carbonate Hardness) -->
+      <div style="margin-bottom:11px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:9px 11px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <label style="margin:0; font-weight:700; font-size:12px;">Carbonate Hardness (KH)</label>
+            <span style="font-size:10px; color:var(--text-muted); font-weight:600;">Optional (°dKH)</span>
+          </div>
+          <input type="number" id="m-test-kh" step="1" placeholder="--" style="width:76px; text-align:right; padding:4px 8px; font-size:13px; font-weight:700;" oninput="syncTestChips('kh')">
+        </div>
+        <div class="test-stepper-wrap" id="m-test-chips-kh">
+          <button type="button" class="test-chip" data-val="1" onclick="selectTestChip('kh', 1, this)">1°</button>
+          <button type="button" class="test-chip" data-val="3" onclick="selectTestChip('kh', 3, this)">3°</button>
+          <button type="button" class="test-chip" data-val="5" onclick="selectTestChip('kh', 5, this)">5°</button>
+          <button type="button" class="test-chip" data-val="8" onclick="selectTestChip('kh', 8, this)">8°</button>
+          <button type="button" class="test-chip" data-val="11" onclick="selectTestChip('kh', 11, this)">11°</button>
+          <button type="button" class="test-chip" data-val="14" onclick="selectTestChip('kh', 14, this)">14°+</button>
         </div>
       </div>
 
@@ -3370,6 +3412,8 @@
                   temp: newestChem.temp ?? 78.0,
                   date: newestChem.date
                 };
+                if (newestChem.gh !== undefined && newestChem.gh !== null && newestChem.gh !== "") tank.lastTest.gh = newestChem.gh;
+                if (newestChem.kh !== undefined && newestChem.kh !== null && newestChem.kh !== "") tank.lastTest.kh = newestChem.kh;
               }
             }
           }
@@ -4035,7 +4079,7 @@
       const phStatus = (ph < 6.4 || ph > 8.2) ? "caution" : "safe";
       const tempStatus = (tempF < 72 || tempF > 82) ? "caution" : "safe";
 
-      return `
+      let html = `
         <div class="param-chip status-${tempStatus}">
           <div class="param-chip-header">
             <span class="param-chip-dot ${tempStatus}"></span>
@@ -4072,6 +4116,36 @@
           <div class="param-chip-val">${t.no3 ?? 0}</div>
         </div>
       `;
+
+      if (t.gh !== undefined && t.gh !== null && t.gh !== "") {
+        const ghNum = parseFloat(t.gh);
+        const ghStatus = (ghNum < 3 || ghNum > 18) ? "caution" : "safe";
+        html += `
+          <div class="param-chip status-${ghStatus}">
+            <div class="param-chip-header">
+              <span class="param-chip-dot ${ghStatus}"></span>
+              <span class="param-chip-label">GH</span>
+            </div>
+            <div class="param-chip-val">${ghNum}°</div>
+          </div>
+        `;
+      }
+
+      if (t.kh !== undefined && t.kh !== null && t.kh !== "") {
+        const khNum = parseFloat(t.kh);
+        const khStatus = khNum < 2 ? "alert" : (khNum < 3 ? "caution" : "safe");
+        html += `
+          <div class="param-chip status-${khStatus}">
+            <div class="param-chip-header">
+              <span class="param-chip-dot ${khStatus}"></span>
+              <span class="param-chip-label">KH</span>
+            </div>
+            <div class="param-chip-val">${khNum}°</div>
+          </div>
+        `;
+      }
+
+      return html;
     }
 
     function buildParamGaugeStripHtml(t, u) {
@@ -4659,14 +4733,17 @@
         : { percent: 50, label: "Normal", totalWasteUnits: 10, effectiveCapacity: 20 };
 
       const latestParams = last
-        ? `${freshness.text} (${last.date || "recent"}): Temp ${displayTemp(last.temp || 78)}${u.temp}, pH ${last.ph ?? 7.2}, NH3 ${last.nh3 ?? 0} ppm, NO2 ${last.no2 ?? 0} ppm, NO3 ${last.no3 ?? 0} ppm`
+        ? `${freshness.text} (${last.date || "recent"}): Temp ${displayTemp(last.temp || 78)}${u.temp}, pH ${last.ph ?? 7.2}, NH3 ${last.nh3 ?? 0} ppm, NO2 ${last.no2 ?? 0} ppm, NO3 ${last.no3 ?? 0} ppm${last.gh !== undefined && last.gh !== null && last.gh !== "" ? `, GH ${last.gh}°` : ""}${last.kh !== undefined && last.kh !== null && last.kh !== "" ? `, KH ${last.kh}°` : ""}`
         : "Not tested yet";
 
       const recentHistory = Array.isArray(tank.history) && tank.history.length > 0
         ? tank.history.slice(0, 6).map(h => {
             const parts = [h.date || "undated"];
             if (!h.wcOnly) {
-              parts.push(`Temp ${displayTemp(h.temp || 78)}${u.temp}, pH ${h.ph ?? 7.2}, NH3 ${h.nh3 ?? 0}, NO2 ${h.no2 ?? 0}, NO3 ${h.no3 ?? 0} ppm`);
+              let chemStr = `Temp ${displayTemp(h.temp || 78)}${u.temp}, pH ${h.ph ?? 7.2}, NH3 ${h.nh3 ?? 0}, NO2 ${h.no2 ?? 0}, NO3 ${h.no3 ?? 0} ppm`;
+              if (h.gh !== undefined && h.gh !== null && h.gh !== "") chemStr += `, GH ${h.gh}°`;
+              if (h.kh !== undefined && h.kh !== null && h.kh !== "") chemStr += `, KH ${h.kh}°`;
+              parts.push(chemStr);
             }
             if (h.wc) parts.push(`WC ${h.wc}%`);
             if (h.dose) parts.push(`Dose: ${h.dose}`);
@@ -4845,6 +4922,19 @@
             aiAdvice = `Nitrate is very low (${no3} ppm) with zero ammonia or nitrite. Your plants and bio-filter are handling the bio-load effortlessly. No water change needed today! Next light mineral refresh (~15%) scheduled in ${daysLeft} day${daysLeft === 1 ? '' : 's'}. Next chemistry test in 7 days.`;
             actionSummary = `No Water Change Needed • Next in ${daysLeft} Day${daysLeft === 1 ? '' : 's'}`;
           }
+        }
+      }
+
+      if (t.kh !== undefined && t.kh !== null && t.kh !== "") {
+        const khVal = parseFloat(t.kh);
+        if (!isNaN(khVal) && khVal < 2) {
+          aiAdvice += ` Note: Low Carbonate Hardness (${khVal}°dKH) leaves minimal acid buffer, risking rapid pH drops.`;
+        }
+      }
+      if (t.gh !== undefined && t.gh !== null && t.gh !== "") {
+        const ghVal = parseFloat(t.gh);
+        if (!isNaN(ghVal) && ghVal < 3) {
+          aiAdvice += ` Very soft water (${ghVal}°dGH); consider supplemental calcium/magnesium if keeping ornamental shrimp or snails.`;
         }
       }
 
@@ -7406,7 +7496,7 @@ ${actionsInstruction}`;
         const prompt = `You are aquAssist Stocking Advisor.
 Candidate Addition: ${qty}x ${species}
 Target Tank: ${targetTank.name} (${dispVolVal} ${u.vol}, ${targetTank.status})
-Current Parameters: ${t ? `Temp ${dispTempVal}${u.temp}, pH ${t.ph}, NH3 ${t.nh3} ppm, NO2 ${t.no2} ppm, NO3 ${t.no3} ppm` : "Untested yet"}
+Current Parameters: ${t ? `Temp ${dispTempVal}${u.temp}, pH ${t.ph}, NH3 ${t.nh3} ppm, NO2 ${t.no2} ppm, NO3 ${t.no3} ppm${t.gh !== undefined && t.gh !== null && t.gh !== "" ? `, GH ${t.gh}°` : ""}${t.kh !== undefined && t.kh !== null && t.kh !== "" ? `, KH ${t.kh}°` : ""}` : "Untested yet"}
 Tap Baseline: pH ${tap.ph ?? 7.4}, GH ${tap.gh ?? 8} dGH, KH ${tap.kh ?? 4} dKH
 Existing Livestock: ${currentLive || "Empty Tank"}
 Live Plants: ${currentPlants || "None"}
@@ -7948,6 +8038,8 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         if (currentChartFilter === "all") scaleNoteEl.innerText = "Normalized ranges";
         else if (currentChartFilter === "temp") scaleNoteEl.innerText = u.temp;
         else if (currentChartFilter === "ph") scaleNoteEl.innerText = "pH scale";
+        else if (currentChartFilter === "gh") scaleNoteEl.innerText = "°dGH";
+        else if (currentChartFilter === "kh") scaleNoteEl.innerText = "°dKH";
         else scaleNoteEl.innerText = "ppm";
       }
 
@@ -7981,6 +8073,10 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       const maxNo2Data = Math.max(...history.map(h => parseFloat(h.no2) || 0), 2);
       const tempValues = history.map(h => displayTemp(h.temp !== undefined ? h.temp : 78));
       const phValues = history.map(h => parseFloat(h.ph !== undefined ? h.ph : 7.2) || 7.2);
+      const ghValues = history.filter(h => h.gh !== undefined && h.gh !== null && h.gh !== "").map(h => parseFloat(h.gh) || 0);
+      const khValues = history.filter(h => h.kh !== undefined && h.kh !== null && h.kh !== "").map(h => parseFloat(h.kh) || 0);
+      const maxGhData = ghValues.length > 0 ? Math.max(...ghValues, 12) : 16;
+      const maxKhData = khValues.length > 0 ? Math.max(...khValues, 8) : 12;
 
       const seriesDomains = {
         no3: { min: 0, max: Math.max(40, Math.ceil(maxNo3Data / 10) * 10) },
@@ -7990,7 +8086,9 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         temp: {
           min: Math.min(isMetric ? 18 : 65, Math.floor(Math.min(...tempValues) - 1)),
           max: Math.max(isMetric ? 31 : 86, Math.ceil(Math.max(...tempValues) + 1))
-        }
+        },
+        gh: { min: 0, max: Math.max(16, Math.ceil(maxGhData * 1.2)) },
+        kh: { min: 0, max: Math.max(12, Math.ceil(maxKhData * 1.2)) }
       };
 
       const activeDomain = seriesDomains[currentChartFilter] || seriesDomains.no3;
@@ -8030,6 +8128,14 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
           const safeY1 = getYForDomain(isMetric ? 27 : 80, activeDomain);
           const safeY2 = getYForDomain(isMetric ? 23 : 74, activeDomain);
           svgHtml += `<rect x="${padL}" y="${safeY1}" width="${plotW}" height="${Math.max(0, safeY2 - safeY1)}" fill="url(#safeZoneGrad)" rx="4"/>`;
+        } else if (currentChartFilter === "gh") {
+          const safeY1 = getYForDomain(12, activeDomain);
+          const safeY2 = getYForDomain(4, activeDomain);
+          svgHtml += `<rect x="${padL}" y="${safeY1}" width="${plotW}" height="${Math.max(0, safeY2 - safeY1)}" fill="url(#safeZoneGrad)" rx="4"/>`;
+        } else if (currentChartFilter === "kh") {
+          const safeY1 = getYForDomain(8, activeDomain);
+          const safeY2 = getYForDomain(3, activeDomain);
+          svgHtml += `<rect x="${padL}" y="${safeY1}" width="${plotW}" height="${Math.max(0, safeY2 - safeY1)}" fill="url(#safeZoneGrad)" rx="4"/>`;
         }
       }
 
@@ -8062,7 +8168,9 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         { key: "ph", label: "pH", color: "var(--purple)", filter: "ph" },
         { key: "nh3", label: "NH₃", color: "var(--alert-red)", filter: "nh3" },
         { key: "no2", label: "NO₂", color: "var(--alert-yellow)", filter: "no2" },
-        { key: "no3", label: "NO₃", color: "var(--cyan)", filter: "no3" }
+        { key: "no3", label: "NO₃", color: "var(--cyan)", filter: "no3" },
+        { key: "gh", label: "GH", color: "#38BDF8", filter: "gh", optional: true },
+        { key: "kh", label: "KH", color: "#F59E0B", filter: "kh", optional: true }
       ];
 
       const endLabels = [];
@@ -8071,13 +8179,31 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         if (!isNormalizedAll && currentChartFilter !== series.filter) return;
         const dom = isNormalizedAll ? seriesDomains[series.key] : activeDomain;
 
-        const coords = history.map((h, idx) => {
+        const coords = [];
+        history.forEach((h, idx) => {
+          if (series.optional) {
+            if (h[series.key] === undefined || h[series.key] === null || h[series.key] === "" || isNaN(parseFloat(h[series.key]))) {
+              return;
+            }
+          }
           const rawVal = (h[series.key] !== undefined) ? parseFloat(h[series.key]) || 0 : 0;
           const val = series.key === "temp" ? displayTemp(h.temp !== undefined ? h.temp : 78) : rawVal;
           const x = getX(idx);
           const y = getYForDomain(val, dom);
-          return { x, y, val };
+          coords.push({ x, y, val });
         });
+
+        if (!isNormalizedAll && currentChartFilter === series.filter && coords.length === 0) {
+          svgHtml += `
+            <text x="250" y="105" text-anchor="middle" fill="#64748B" font-size="12">
+              No ${series.label} (${series.key.toUpperCase()}) measurements recorded yet.
+            </text>
+            <text x="250" y="125" text-anchor="middle" fill="#38BDF8" font-size="11">
+              Add an optional ${series.label} reading when logging a test above.
+            </text>
+          `;
+          return;
+        }
 
         if (coords.length > 1) {
           svgHtml += `<polyline points="${coords.map(c => `${c.x},${c.y}`).join(" ")}" fill="none" stroke="${series.color}" stroke-width="${isNormalizedAll ? 2 : 2.5}" stroke-linecap="round" stroke-linejoin="round"/>`;
@@ -8089,11 +8215,11 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
 
         if (isNormalizedAll && coords.length > 0) {
           const lastPt = coords[coords.length - 1];
-          const formattedVal = series.key === "temp" ? `${lastPt.val}${u.temp}` : `${lastPt.val}`;
+          const unitSuffix = series.key === "temp" ? u.temp : (series.key === "gh" || series.key === "kh" ? "°" : "");
           endLabels.push({
             y: lastPt.y,
             color: series.color,
-            text: `${series.label} ${formattedVal}`
+            text: `${series.label} ${lastPt.val}${unitSuffix}`
           });
         }
       });
@@ -8205,10 +8331,15 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
 
     function selectTestChip(paramKey, val, btnEl) {
       const inputEl = document.getElementById("m-test-" + paramKey);
+      const wrap = document.getElementById("m-test-chips-" + paramKey);
+      if (btnEl && btnEl.classList.contains("active") && (paramKey === "gh" || paramKey === "kh")) {
+        btnEl.classList.remove("active");
+        if (inputEl) inputEl.value = "";
+        return;
+      }
       if (inputEl) {
         inputEl.value = val;
       }
-      const wrap = document.getElementById("m-test-chips-" + paramKey);
       if (wrap) {
         wrap.querySelectorAll(".test-chip").forEach(c => c.classList.remove("active"));
       }
@@ -8234,7 +8365,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
 
     function syncAllTestChips() {
       renderTempTestChips();
-      ["temp", "ph", "nh3", "no2", "no3"].forEach(p => syncTestChips(p));
+      ["temp", "ph", "nh3", "no2", "no3", "gh", "kh"].forEach(p => syncTestChips(p));
     }
 
     function openTestModalForTank(tankId, editIdx = -1) {
@@ -8266,6 +8397,10 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         document.getElementById("m-test-nh3").value = item.nh3 !== undefined ? item.nh3 : 0;
         document.getElementById("m-test-no2").value = item.no2 !== undefined ? item.no2 : 0;
         document.getElementById("m-test-no3").value = item.no3 !== undefined ? item.no3 : 10;
+        const ghInput = document.getElementById("m-test-gh");
+        if (ghInput) ghInput.value = (item.gh !== undefined && item.gh !== null) ? item.gh : "";
+        const khInput = document.getElementById("m-test-kh");
+        if (khInput) khInput.value = (item.kh !== undefined && item.kh !== null) ? item.kh : "";
         document.getElementById("m-test-notes").value = item.notes || item.note || "";
       } else {
         if (modalTitle) modalTitle.innerText = "Record Water Chemistry Test";
@@ -8277,6 +8412,10 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         document.getElementById("m-test-nh3").value = last.nh3 ?? 0;
         document.getElementById("m-test-no2").value = last.no2 ?? 0;
         document.getElementById("m-test-no3").value = last.no3 ?? 10;
+        const ghInput = document.getElementById("m-test-gh");
+        if (ghInput) ghInput.value = (last.gh !== undefined && last.gh !== null) ? last.gh : "";
+        const khInput = document.getElementById("m-test-kh");
+        if (khInput) khInput.value = (last.kh !== undefined && last.kh !== null) ? last.kh : "";
         document.getElementById("m-test-notes").value = "";
       }
       syncAllTestChips();
@@ -8301,6 +8440,10 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       const nh3 = parseFloat(document.getElementById("m-test-nh3").value) || 0;
       const no2 = parseFloat(document.getElementById("m-test-no2").value) || 0;
       const no3 = parseFloat(document.getElementById("m-test-no3").value) || 0;
+      const ghRaw = document.getElementById("m-test-gh") ? document.getElementById("m-test-gh").value.trim() : "";
+      const gh = ghRaw !== "" && !isNaN(parseFloat(ghRaw)) ? parseFloat(ghRaw) : null;
+      const khRaw = document.getElementById("m-test-kh") ? document.getElementById("m-test-kh").value.trim() : "";
+      const kh = khRaw !== "" && !isNaN(parseFloat(khRaw)) ? parseFloat(khRaw) : null;
       const notes = document.getElementById("m-test-notes").value.trim();
       const u = getUnitLabels();
 
@@ -8316,15 +8459,21 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         existing.nh3 = nh3;
         existing.no2 = no2;
         existing.no3 = no3;
+        if (gh !== null) existing.gh = gh; else delete existing.gh;
+        if (kh !== null) existing.kh = kh; else delete existing.kh;
         existing.notes = notes;
         sortRecordsByDateDesc(targetTank.history);
       } else {
         const newLog = { date, temp, nh3, no2, no3, ph, wc: 0, dose: "", notes };
+        if (gh !== null) newLog.gh = gh;
+        if (kh !== null) newLog.kh = kh;
         if (!targetTank.history) targetTank.history = [];
         targetTank.history.unshift(newLog);
         sortRecordsByDateDesc(targetTank.history);
 
         let eventText = `Logged Chemistry: Temp ${displayTemp(temp)}${u.temp}, pH ${ph}, NH₃ ${nh3}, NO₂ ${no2}, NO₃ ${no3} ppm`;
+        if (gh !== null) eventText += `, GH ${gh}°`;
+        if (kh !== null) eventText += `, KH ${kh}°`;
         if (notes) eventText += ` • ${notes}`;
         addTankTimelineEvent(targetTank, eventText, date);
       }
@@ -8340,8 +8489,12 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
           temp: newestChem.temp ?? 78.0,
           date: newestChem.date
         };
+        if (newestChem.gh !== undefined && newestChem.gh !== null && newestChem.gh !== "") targetTank.lastTest.gh = newestChem.gh;
+        if (newestChem.kh !== undefined && newestChem.kh !== null && newestChem.kh !== "") targetTank.lastTest.kh = newestChem.kh;
       } else {
         targetTank.lastTest = { nh3, no2, no3, ph, temp, date };
+        if (gh !== null) targetTank.lastTest.gh = gh;
+        if (kh !== null) targetTank.lastTest.kh = kh;
       }
 
       // Analyze new readings with Aquarist AI engine
@@ -8384,6 +8537,8 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
           temp: newestChem.temp ?? 78.0,
           date: newestChem.date
         };
+        if (newestChem.gh !== undefined && newestChem.gh !== null && newestChem.gh !== "") activeTank.lastTest.gh = newestChem.gh;
+        if (newestChem.kh !== undefined && newestChem.kh !== null && newestChem.kh !== "") activeTank.lastTest.kh = newestChem.kh;
       } else {
         activeTank.lastTest = null;
       }
@@ -8432,9 +8587,16 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
             ${noteText ? `<div style="font-size:11px; color:var(--text-muted); margin-top:3px;">${escapeHtmlText(noteText)}</div>` : ""}
           `;
         } else {
+          let paramText = `Temp: <b>${displayTemp(h.temp ?? 78)}${u.temp}</b> • pH: <b>${escapeHtmlText(h.ph)}</b> • NH₃: <b>${escapeHtmlText(h.nh3)}</b> • NO₂: <b>${escapeHtmlText(h.no2)}</b> • NO₃: <b>${escapeHtmlText(h.no3)}</b>`;
+          if (h.gh !== undefined && h.gh !== null && h.gh !== "") {
+            paramText += ` • GH: <b>${escapeHtmlText(h.gh)}°</b>`;
+          }
+          if (h.kh !== undefined && h.kh !== null && h.kh !== "") {
+            paramText += ` • KH: <b>${escapeHtmlText(h.kh)}°</b>`;
+          }
           bodyHtml = `
             <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
-              <span>Temp: <b>${displayTemp(h.temp ?? 78)}${u.temp}</b> • pH: <b>${escapeHtmlText(h.ph)}</b> • NH₃: <b>${escapeHtmlText(h.nh3)}</b> • NO₂: <b>${escapeHtmlText(h.no2)}</b> • NO₃: <b>${escapeHtmlText(h.no3)}</b></span>
+              <span>${paramText}</span>
             </div>
             ${noteText ? `<div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${escapeHtmlText(noteText)}</div>` : ""}
             ${h.wc ? `<div style="font-size:11px; color:var(--cyan); margin-top:2px;">Water Change: ${escapeHtmlText(h.wc)}%${h.dose ? ` • Dosed: ${escapeHtmlText(h.dose)}` : ""}</div>` : ""}
