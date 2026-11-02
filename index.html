@@ -2232,7 +2232,7 @@
         Enter current test tube or digital readings. Aquarist AI will audit bio-filtration balance.
       </p>
       <div style="font-size:11px; color:var(--cyan); margin-bottom:14px; background:rgba(0,210,255,0.08); border:1px solid rgba(0,210,255,0.2); border-radius:8px; padding:7px 10px; line-height:1.4;">
-        <b>Adaptive Scheduling:</b> Test before changing water. The AI analyzes your bio-load to determine if a water change is needed, the exact volume %, and when to test next.
+        <b>Adaptive Scheduling:</b> Test before changing water. The AI analyzes your bioload to determine if a water change is needed, the exact volume %, and when to test next.
       </div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:8px;">
@@ -2323,17 +2323,17 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
           <div style="display:flex; align-items:center; gap:6px;">
             <label style="margin:0; font-weight:700; font-size:12px;">General Hardness (GH)</label>
-            <span style="font-size:10px; color:var(--text-muted); font-weight:600;">Optional (°dGH)</span>
+            <span style="font-size:10px; color:var(--text-muted); font-weight:600;">Optional (dGH)</span>
           </div>
           <input type="number" id="m-test-gh" step="1" placeholder="--" style="width:76px; text-align:right; padding:4px 8px; font-size:13px; font-weight:700;" oninput="syncTestChips('gh')">
         </div>
         <div class="test-stepper-wrap" id="m-test-chips-gh">
-          <button type="button" class="test-chip" data-val="3" onclick="selectTestChip('gh', 3, this)">3°</button>
-          <button type="button" class="test-chip" data-val="5" onclick="selectTestChip('gh', 5, this)">5°</button>
-          <button type="button" class="test-chip" data-val="7" onclick="selectTestChip('gh', 7, this)">7°</button>
-          <button type="button" class="test-chip" data-val="9" onclick="selectTestChip('gh', 9, this)">9°</button>
-          <button type="button" class="test-chip" data-val="12" onclick="selectTestChip('gh', 12, this)">12°</button>
-          <button type="button" class="test-chip" data-val="16" onclick="selectTestChip('gh', 16, this)">16°+</button>
+          <button type="button" class="test-chip" data-val="3" onclick="selectTestChip('gh', 3, this)">3</button>
+          <button type="button" class="test-chip" data-val="5" onclick="selectTestChip('gh', 5, this)">5</button>
+          <button type="button" class="test-chip" data-val="7" onclick="selectTestChip('gh', 7, this)">7</button>
+          <button type="button" class="test-chip" data-val="9" onclick="selectTestChip('gh', 9, this)">9</button>
+          <button type="button" class="test-chip" data-val="12" onclick="selectTestChip('gh', 12, this)">12</button>
+          <button type="button" class="test-chip" data-val="16" onclick="selectTestChip('gh', 16, this)">16+</button>
         </div>
       </div>
 
@@ -2342,17 +2342,17 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
           <div style="display:flex; align-items:center; gap:6px;">
             <label style="margin:0; font-weight:700; font-size:12px;">Carbonate Hardness (KH)</label>
-            <span style="font-size:10px; color:var(--text-muted); font-weight:600;">Optional (°dKH)</span>
+            <span style="font-size:10px; color:var(--text-muted); font-weight:600;">Optional (dKH)</span>
           </div>
           <input type="number" id="m-test-kh" step="1" placeholder="--" style="width:76px; text-align:right; padding:4px 8px; font-size:13px; font-weight:700;" oninput="syncTestChips('kh')">
         </div>
         <div class="test-stepper-wrap" id="m-test-chips-kh">
-          <button type="button" class="test-chip" data-val="1" onclick="selectTestChip('kh', 1, this)">1°</button>
-          <button type="button" class="test-chip" data-val="3" onclick="selectTestChip('kh', 3, this)">3°</button>
-          <button type="button" class="test-chip" data-val="5" onclick="selectTestChip('kh', 5, this)">5°</button>
-          <button type="button" class="test-chip" data-val="8" onclick="selectTestChip('kh', 8, this)">8°</button>
-          <button type="button" class="test-chip" data-val="11" onclick="selectTestChip('kh', 11, this)">11°</button>
-          <button type="button" class="test-chip" data-val="14" onclick="selectTestChip('kh', 14, this)">14°+</button>
+          <button type="button" class="test-chip" data-val="1" onclick="selectTestChip('kh', 1, this)">1</button>
+          <button type="button" class="test-chip" data-val="3" onclick="selectTestChip('kh', 3, this)">3</button>
+          <button type="button" class="test-chip" data-val="5" onclick="selectTestChip('kh', 5, this)">5</button>
+          <button type="button" class="test-chip" data-val="8" onclick="selectTestChip('kh', 8, this)">8</button>
+          <button type="button" class="test-chip" data-val="11" onclick="selectTestChip('kh', 11, this)">11</button>
+          <button type="button" class="test-chip" data-val="14" onclick="selectTestChip('kh', 14, this)">14+</button>
         </div>
       </div>
 
@@ -4126,7 +4126,7 @@
               <span class="param-chip-dot ${ghStatus}"></span>
               <span class="param-chip-label">GH</span>
             </div>
-            <div class="param-chip-val">${ghNum}°</div>
+            <div class="param-chip-val">${ghNum} <span style="font-size:9.5px; font-weight:600; opacity:0.85;">dGH</span></div>
           </div>
         `;
       }
@@ -4140,7 +4140,7 @@
               <span class="param-chip-dot ${khStatus}"></span>
               <span class="param-chip-label">KH</span>
             </div>
-            <div class="param-chip-val">${khNum}°</div>
+            <div class="param-chip-val">${khNum} <span style="font-size:9.5px; font-weight:600; opacity:0.85;">dKH</span></div>
           </div>
         `;
       }
@@ -4733,7 +4733,7 @@
         : { percent: 50, label: "Normal", totalWasteUnits: 10, effectiveCapacity: 20 };
 
       const latestParams = last
-        ? `${freshness.text} (${last.date || "recent"}): Temp ${displayTemp(last.temp || 78)}${u.temp}, pH ${last.ph ?? 7.2}, NH3 ${last.nh3 ?? 0} ppm, NO2 ${last.no2 ?? 0} ppm, NO3 ${last.no3 ?? 0} ppm${last.gh !== undefined && last.gh !== null && last.gh !== "" ? `, GH ${last.gh}°` : ""}${last.kh !== undefined && last.kh !== null && last.kh !== "" ? `, KH ${last.kh}°` : ""}`
+        ? `${freshness.text} (${last.date || "recent"}): Temp ${displayTemp(last.temp || 78)}${u.temp}, pH ${last.ph ?? 7.2}, NH3 ${last.nh3 ?? 0} ppm, NO2 ${last.no2 ?? 0} ppm, NO3 ${last.no3 ?? 0} ppm${last.gh !== undefined && last.gh !== null && last.gh !== "" ? `, GH ${last.gh} dGH` : ""}${last.kh !== undefined && last.kh !== null && last.kh !== "" ? `, KH ${last.kh} dKH` : ""}`
         : "Not tested yet";
 
       const recentHistory = Array.isArray(tank.history) && tank.history.length > 0
@@ -4741,8 +4741,8 @@
             const parts = [h.date || "undated"];
             if (!h.wcOnly) {
               let chemStr = `Temp ${displayTemp(h.temp || 78)}${u.temp}, pH ${h.ph ?? 7.2}, NH3 ${h.nh3 ?? 0}, NO2 ${h.no2 ?? 0}, NO3 ${h.no3 ?? 0} ppm`;
-              if (h.gh !== undefined && h.gh !== null && h.gh !== "") chemStr += `, GH ${h.gh}°`;
-              if (h.kh !== undefined && h.kh !== null && h.kh !== "") chemStr += `, KH ${h.kh}°`;
+              if (h.gh !== undefined && h.gh !== null && h.gh !== "") chemStr += `, GH ${h.gh} dGH`;
+              if (h.kh !== undefined && h.kh !== null && h.kh !== "") chemStr += `, KH ${h.kh} dKH`;
               parts.push(chemStr);
             }
             if (h.wc) parts.push(`WC ${h.wc}%`);
@@ -4791,7 +4791,7 @@
   - Plant Care & Lighting: ${plantedSpecs || "Standard / None configured"}
   - Hardscape & Decor: ${(tank.decor || []).join(", ") || "None"}
   - Substrate & Buffering Chemistry: ${subDesc}
-  - Bio-Load Capacity: ${bioload.percent}% (${bioload.label}, ${bioload.totalWasteUnits} waste units vs ${bioload.effectiveCapacity} capacity)
+  - Bioload Capacity: ${bioload.percent}% (${bioload.label}, ${bioload.totalWasteUnits} waste units vs ${bioload.effectiveCapacity} capacity)
   - Gear & Equipment: ${(tank.equipment || []).join(", ") || "Standard"}${tank.filterType ? ` (Filter type: ${tank.filterType})` : ""}
   - Filter Media & Service: ${mediaDetails}
   - Routine Care Timestamps: ${careDates}
@@ -4919,7 +4919,7 @@
             actionSummary = "Light 15% Water Change Today • Next Test in 7 Days";
           } else {
             wcNeeded = false;
-            aiAdvice = `Nitrate is very low (${no3} ppm) with zero ammonia or nitrite. Your plants and bio-filter are handling the bio-load effortlessly. No water change needed today! Next light mineral refresh (~15%) scheduled in ${daysLeft} day${daysLeft === 1 ? '' : 's'}. Next chemistry test in 7 days.`;
+            aiAdvice = `Nitrate is very low (${no3} ppm) with zero ammonia or nitrite. Your plants and bio-filter are handling the bioload effortlessly. No water change needed today! Next light mineral refresh (~15%) scheduled in ${daysLeft} day${daysLeft === 1 ? '' : 's'}. Next chemistry test in 7 days.`;
             actionSummary = `No Water Change Needed • Next in ${daysLeft} Day${daysLeft === 1 ? '' : 's'}`;
           }
         }
@@ -4928,13 +4928,13 @@
       if (t.kh !== undefined && t.kh !== null && t.kh !== "") {
         const khVal = parseFloat(t.kh);
         if (!isNaN(khVal) && khVal < 2) {
-          aiAdvice += ` Note: Low Carbonate Hardness (${khVal}°dKH) leaves minimal acid buffer, risking rapid pH drops.`;
+          aiAdvice += ` Note: Low Carbonate Hardness (${khVal} dKH) leaves minimal acid buffer, risking rapid pH drops.`;
         }
       }
       if (t.gh !== undefined && t.gh !== null && t.gh !== "") {
         const ghVal = parseFloat(t.gh);
         if (!isNaN(ghVal) && ghVal < 3) {
-          aiAdvice += ` Very soft water (${ghVal}°dGH); consider supplemental calcium/magnesium if keeping ornamental shrimp or snails.`;
+          aiAdvice += ` Very soft water (${ghVal} dGH); consider supplemental calcium/magnesium if keeping ornamental shrimp or snails.`;
         }
       }
 
@@ -5629,7 +5629,7 @@
         renderTankPlanTab();
         renderTankOverviewTab();
       }
-      showToast(`${taskName} dismissed until next cycle`);
+      showToast(`${taskName} Dismissed Until Next Cycle`);
     }
 
     function markFilterRinsedFromDashboard(tankId, mIdx) {
@@ -5744,7 +5744,7 @@
     /* Decoupled Quick Water Change Engine (Supports both New & Edit WC Logs) */
     function openQuickWcModal(presetTankId = null, editIdx = -1) {
       if (appState.tanks.length === 0) {
-        showToast("Add an aquarium first");
+        showToast("Add an Aquarium First");
         return;
       }
       const targetId = presetTankId || activeTankId || appState.tanks[0].id;
@@ -6476,7 +6476,7 @@
       const sid = idInput ? idInput.value : "";
       const newTitle = (nameInput ? nameInput.value : "").trim();
       if (!sid || !newTitle) {
-        showToast("Title cannot be empty");
+        showToast("Title Cannot Be Empty");
         return;
       }
       ensureAiSessionsNormalized(appState);
@@ -6623,7 +6623,7 @@
 
       const tank = resolveActionTargetTank(action);
       if (!tank) {
-        showToast("Add an aquarium first");
+        showToast("Add an Aquarium First");
         return;
       }
 
@@ -7141,7 +7141,7 @@ ${actionsInstruction}`;
       const inputEl = document.getElementById(`ai-turn-edit-input-${turnIdx}`);
       const newText = inputEl ? inputEl.value.trim() : "";
       if (!newText) {
-        showToast("Message cannot be empty");
+        showToast("Message Cannot Be Empty");
         return;
       }
       if (!appState.apiKey) {
@@ -7179,7 +7179,7 @@ ${actionsInstruction}`;
       syncAiSessionState();
       saveDataToStorage();
       renderGlobalAIThreadView();
-      showToast(deletedCount === 1 ? "Message deleted" : `Deleted ${deletedCount} messages from this point`);
+      showToast(deletedCount === 1 ? "Message Deleted" : `Deleted ${deletedCount} Messages`);
     }
 
     function copyAiTurnText(turnIdx) {
@@ -7188,7 +7188,7 @@ ${actionsInstruction}`;
       if (!turn || !turn.text) return;
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(turn.text).then(() => {
-          showToast("Copied to clipboard");
+          showToast("Copied to Clipboard");
         }).catch(() => {});
       }
     }
@@ -7419,7 +7419,7 @@ ${actionsInstruction}`;
         notes.push(`<b>Hardscape Chemistry Synergy:</b> Botanicals and driftwood in ${escapeHtmlText(targetTank.name)} (${escapeHtmlText(subInfo.tanninWoods.join(", "))}) release natural humic acids and tannins, creating an optimal blackwater environment for ${escapeHtmlText(species)}.`);
       }
 
-      // 4c. Bio-Load Impact Check (2. Weighted Capacity)
+      // 4c. Bioload Impact Check (2. Weighted Capacity)
       const curBioload = calculateTankWeightedBioload(targetTank);
       const addedWaste = qty * getSpeciesWasteWeight(species);
       const projectedUnits = Math.round((curBioload.totalWasteUnits + addedWaste) * 10) / 10;
@@ -7427,9 +7427,9 @@ ${actionsInstruction}`;
 
       if (projectedPct > 110) {
         severity = Math.max(severity, 1);
-        notes.push(`<b>Bio-Load Surge Warning:</b> Adding ${qty}x ${escapeHtmlText(species)} (+${Math.round(addedWaste * 10) / 10} waste units) pushes ${escapeHtmlText(targetTank.name)} to <b>${projectedPct}% Bio-Capacity</b> (Overstocked). More frequent water changes and heavy biological filtration will be required.`);
+        notes.push(`<b>Bioload Surge Warning:</b> Adding ${qty}x ${escapeHtmlText(species)} (+${Math.round(addedWaste * 10) / 10} waste units) pushes ${escapeHtmlText(targetTank.name)} to <b>${projectedPct}% Bio-Capacity</b> (Overstocked). More frequent water changes and heavy biological filtration will be required.`);
       } else {
-        notes.push(`<b>Bio-Capacity Fit:</b> Adding ${qty}x ${escapeHtmlText(species)} brings total bio-load to <b>${projectedPct}% capacity</b> (currently ${curBioload.percent}%).`);
+        notes.push(`<b>Bio-Capacity Fit:</b> Adding ${qty}x ${escapeHtmlText(species)} brings total bioload to <b>${projectedPct}% capacity</b> (currently ${curBioload.percent}%).`);
       }
 
       if (notes.length === 0) {
@@ -7470,7 +7470,7 @@ ${actionsInstruction}`;
 
       if (!species) {
         if (speciesInput) speciesInput.focus();
-        showToast("Enter a species name first");
+        showToast("Enter a Species Name First");
         return;
       }
       if (!targetTank) {
@@ -7496,7 +7496,7 @@ ${actionsInstruction}`;
         const prompt = `You are aquAssist Stocking Advisor.
 Candidate Addition: ${qty}x ${species}
 Target Tank: ${targetTank.name} (${dispVolVal} ${u.vol}, ${targetTank.status})
-Current Parameters: ${t ? `Temp ${dispTempVal}${u.temp}, pH ${t.ph}, NH3 ${t.nh3} ppm, NO2 ${t.no2} ppm, NO3 ${t.no3} ppm${t.gh !== undefined && t.gh !== null && t.gh !== "" ? `, GH ${t.gh}°` : ""}${t.kh !== undefined && t.kh !== null && t.kh !== "" ? `, KH ${t.kh}°` : ""}` : "Untested yet"}
+Current Parameters: ${t ? `Temp ${dispTempVal}${u.temp}, pH ${t.ph}, NH3 ${t.nh3} ppm, NO2 ${t.no2} ppm, NO3 ${t.no3} ppm${t.gh !== undefined && t.gh !== null && t.gh !== "" ? `, GH ${t.gh} dGH` : ""}${t.kh !== undefined && t.kh !== null && t.kh !== "" ? `, KH ${t.kh} dKH` : ""}` : "Untested yet"}
 Tap Baseline: pH ${tap.ph ?? 7.4}, GH ${tap.gh ?? 8} dGH, KH ${tap.kh ?? 4} dKH
 Existing Livestock: ${currentLive || "Empty Tank"}
 Live Plants: ${currentPlants || "None"}
@@ -8038,8 +8038,8 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         if (currentChartFilter === "all") scaleNoteEl.innerText = "Normalized ranges";
         else if (currentChartFilter === "temp") scaleNoteEl.innerText = u.temp;
         else if (currentChartFilter === "ph") scaleNoteEl.innerText = "pH scale";
-        else if (currentChartFilter === "gh") scaleNoteEl.innerText = "°dGH";
-        else if (currentChartFilter === "kh") scaleNoteEl.innerText = "°dKH";
+        else if (currentChartFilter === "gh") scaleNoteEl.innerText = "dGH";
+        else if (currentChartFilter === "kh") scaleNoteEl.innerText = "dKH";
         else scaleNoteEl.innerText = "ppm";
       }
 
@@ -8215,7 +8215,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
 
         if (isNormalizedAll && coords.length > 0) {
           const lastPt = coords[coords.length - 1];
-          const unitSuffix = series.key === "temp" ? u.temp : (series.key === "gh" || series.key === "kh" ? "°" : "");
+          const unitSuffix = series.key === "temp" ? u.temp : (series.key === "gh" ? " dGH" : (series.key === "kh" ? " dKH" : ""));
           endLabels.push({
             y: lastPt.y,
             color: series.color,
@@ -8371,7 +8371,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
     function openTestModalForTank(tankId, editIdx = -1) {
       const targetTank = appState.tanks.find(t => t.id == tankId) || getActiveTank();
       if (!targetTank) {
-        showToast("Add an aquarium first");
+        showToast("Add an Aquarium First");
         return;
       }
       window.testingTankId = targetTank.id;
@@ -8472,8 +8472,8 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         sortRecordsByDateDesc(targetTank.history);
 
         let eventText = `Logged Chemistry: Temp ${displayTemp(temp)}${u.temp}, pH ${ph}, NH₃ ${nh3}, NO₂ ${no2}, NO₃ ${no3} ppm`;
-        if (gh !== null) eventText += `, GH ${gh}°`;
-        if (kh !== null) eventText += `, KH ${kh}°`;
+        if (gh !== null) eventText += `, GH ${gh} dGH`;
+        if (kh !== null) eventText += `, KH ${kh} dKH`;
         if (notes) eventText += ` • ${notes}`;
         addTankTimelineEvent(targetTank, eventText, date);
       }
@@ -8589,10 +8589,10 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         } else {
           let paramText = `Temp: <b>${displayTemp(h.temp ?? 78)}${u.temp}</b> • pH: <b>${escapeHtmlText(h.ph)}</b> • NH₃: <b>${escapeHtmlText(h.nh3)}</b> • NO₂: <b>${escapeHtmlText(h.no2)}</b> • NO₃: <b>${escapeHtmlText(h.no3)}</b>`;
           if (h.gh !== undefined && h.gh !== null && h.gh !== "") {
-            paramText += ` • GH: <b>${escapeHtmlText(h.gh)}°</b>`;
+            paramText += ` • GH: <b>${escapeHtmlText(h.gh)} dGH</b>`;
           }
           if (h.kh !== undefined && h.kh !== null && h.kh !== "") {
-            paramText += ` • KH: <b>${escapeHtmlText(h.kh)}°</b>`;
+            paramText += ` • KH: <b>${escapeHtmlText(h.kh)} dKH</b>`;
           }
           bodyHtml = `
             <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
@@ -8859,15 +8859,15 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
 
       if (totalSpecimens > 0) {
         if (percent <= 45) {
-          label = "Light Bio-Load";
+          label = "Light Bioload";
           color = "var(--cyan)";
           dotColor = "var(--cyan)";
         } else if (percent <= 85) {
-          label = "Balanced Bio-Load";
+          label = "Balanced Bioload";
           color = "var(--neon-green)";
           dotColor = "var(--neon-green)";
         } else if (percent <= 110) {
-          label = "Heavy Bio-Load";
+          label = "Heavy Bioload";
           color = "var(--alert-yellow)";
           dotColor = "var(--alert-yellow)";
         } else {
@@ -10681,7 +10681,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       saveDataToStorage(appState, true);
       renderDashboardTasks();
       renderSettingsBackupSection();
-      showToast("Reminder updated");
+      showToast("Reminder Updated");
     }
 
     async function renderSettingsBackupSection() {
