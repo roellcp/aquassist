@@ -1629,6 +1629,7 @@
         <button type="button" class="tab-btn-tank" onclick="switchTankTab('livestock', this)">Livestock</button>
         <button type="button" class="tab-btn-tank" onclick="switchTankTab('plants', this)">Scape</button>
         <button type="button" class="tab-btn-tank" onclick="switchTankTab('hardware', this)">Gear</button>
+        <button type="button" class="tab-btn-tank" onclick="switchTankTab('gallery', this)">Gallery</button>
       </div>
 
       <!-- TANK SUB-TAB 1: OVERVIEW -->
@@ -2512,9 +2513,24 @@
       <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
         Enter current test tube or digital readings. Aquarist AI will audit bio-filtration balance.
       </p>
-      <div style="font-size:11px; color:var(--cyan); margin-bottom:14px; background:rgba(0,210,255,0.08); border:1px solid rgba(0,210,255,0.2); border-radius:8px; padding:7px 10px; line-height:1.4;">
+      <div style="font-size:11px; color:var(--cyan); margin-bottom:12px; background:rgba(0,210,255,0.08); border:1px solid rgba(0,210,255,0.2); border-radius:8px; padding:7px 10px; line-height:1.4;">
         <b>Adaptive Scheduling:</b> Test before changing water. The AI analyzes your bioload to determine if a water change is needed, the exact volume %, and when to test next.
       </div>
+
+      <!-- AI Vision Test Strip Scanner Bar -->
+      <div style="background:linear-gradient(135deg, rgba(0,245,160,0.08), rgba(0,210,255,0.08)); border:1px solid rgba(0,245,160,0.28); border-radius:10px; padding:9px 12px; margin-bottom:13px; display:flex; justify-content:space-between; align-items:center; gap:10px;">
+        <div style="min-width:0;">
+          <div style="font-weight:700; font-size:12px; color:var(--neon-green); display:flex; align-items:center; gap:5px;">
+            <span>✦</span> AI Test Strip Scanner
+          </div>
+          <div style="font-size:10.5px; color:var(--text-muted); margin-top:1px;">Snap photo of test strip or tubes to auto-fill readings</div>
+        </div>
+        <button type="button" class="btn btn-neon" style="width:auto; font-size:11px; padding:5px 12px; border-radius:8px; white-space:nowrap; flex-shrink:0;" onclick="document.getElementById('test-strip-photo-input').click()">
+          📷 Scan Strip
+        </button>
+        <input type="file" id="test-strip-photo-input" accept="image/*" style="display:none;" onchange="handleTestStripPhotoSelected(event)">
+      </div>
+      <div id="test-strip-scan-status" style="display:none; margin-bottom:12px; background:rgba(0,210,255,0.08); border:1px solid rgba(0,210,255,0.25); border-radius:8px; padding:7px 10px; font-size:11.5px; color:var(--cyan); align-items:center; gap:8px;"></div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:8px;">
         <div style="flex:1;">
@@ -11760,10 +11776,43 @@ Keep advice concise, direct, and actionable in markdown format.`;
 
       const isDismissed = localStorage.getItem("aquassist_notif_banner_dismissed") === "true";
       const isSupported = ("Notification" in window);
-      const isDefault = isSupported && Notification.permission === "default";
 
-      if (isSupported && isDefault && !isDismissed) {
+      if (!isSupported) {
+        banner.style.display = "none";
+        return;
+      }
+
+      if (Notification.permission === "granted") {
         banner.style.display = "flex";
+        banner.innerHTML = `
+          <div style="min-width:0;">
+            <div style="font-size:12.5px; font-weight:700; color:var(--neon-green); display:flex; align-items:center; gap:5px;">
+              <span>🔔</span> Care Reminders Active
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:2px; line-height:1.4;">
+              Native pop-up alerts enabled for scheduled water changes and routine tank maintenance.
+            </div>
+          </div>
+          <div style="display:flex; gap:6px; flex-shrink:0;">
+            <button type="button" class="ghost-action-btn" style="font-size:11px; padding:5px 10px; color:var(--cyan); border-color:rgba(0,210,255,0.3);" onclick="sendTestNotification()">Test Alert</button>
+          </div>
+        `;
+      } else if (!isDismissed) {
+        banner.style.display = "flex";
+        banner.innerHTML = `
+          <div style="min-width:0;">
+            <div style="font-size:12.5px; font-weight:700; color:var(--neon-green); display:flex; align-items:center; gap:5px;">
+              <span>🔔</span> Pop-Up Care Alerts
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:2px; line-height:1.4;">
+              Get native device reminders for overdue water changes and filter cleanings.
+            </div>
+          </div>
+          <div style="display:flex; gap:6px; flex-shrink:0;">
+            <button type="button" class="btn btn-neon" style="width:auto; font-size:11px; padding:5px 12px; border-radius:8px;" onclick="requestNotificationPermissionFromBanner()">Enable</button>
+            <button type="button" class="ghost-action-btn" style="font-size:11px; padding:5px 9px;" onclick="dismissNotificationBanner()">Later</button>
+          </div>
+        `;
       } else {
         banner.style.display = "none";
       }
@@ -11825,6 +11874,12 @@ Keep advice concise, direct, and actionable in markdown format.`;
       checkBackupReminder();
 
       if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          if (!window.__swReloading) {
+            window.__swReloading = true;
+            window.location.reload();
+          }
+        });
         try {
           swRegistration = await navigator.serviceWorker.register("sw.js");
           if (swRegistration && swRegistration.update) {
