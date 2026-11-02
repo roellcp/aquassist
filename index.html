@@ -1241,6 +1241,75 @@
       border-radius: 6px;
       transition: width 0.35s ease, background 0.35s ease;
     }
+
+    /* Photo Progress Gallery */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 10px;
+    }
+    .gallery-card {
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .gallery-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(0, 245, 160, 0.4);
+    }
+    .gallery-thumb-wrap {
+      width: 100%;
+      height: 125px;
+      position: relative;
+      background: #060C18;
+      overflow: hidden;
+    }
+    .gallery-thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .gallery-tag-pill {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      font-size: 8.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 6px;
+      border-radius: 5px;
+      background: rgba(11, 19, 36, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--cyan);
+      backdrop-filter: blur(4px);
+    }
+    .gallery-card-info {
+      padding: 7px 9px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .gallery-card-date {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .gallery-card-caption {
+      font-size: 11px;
+      color: var(--text-main);
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
   </style>
 </head>
 <body>
@@ -1317,6 +1386,22 @@
 
         <div style="display:flex; justify-content:flex-end; margin-top:10px;">
           <button type="button" class="ghost-action-btn" style="font-size:11px; padding:4px 10px;" onclick="navToGlobal('global-ai')">✦ Ask Aquarist AI →</button>
+        </div>
+      </div>
+
+      <!-- Native Notification Opt-In Banner -->
+      <div id="dashboard-notif-banner" style="display:none; margin-bottom:16px; background:linear-gradient(135deg, rgba(0,245,160,0.07), rgba(0,210,255,0.07)); border:1px solid rgba(0,245,160,0.25); border-radius:14px; padding:12px 14px; align-items:center; justify-content:space-between; gap:12px;">
+        <div style="min-width:0;">
+          <div style="font-size:12.5px; font-weight:700; color:var(--neon-green); display:flex; align-items:center; gap:5px;">
+            <span>🔔</span> Pop-Up Care Alerts
+          </div>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:2px; line-height:1.4;">
+            Get native device reminders for overdue water changes and filter cleanings.
+          </div>
+        </div>
+        <div style="display:flex; gap:6px; flex-shrink:0;">
+          <button type="button" class="btn btn-neon" style="width:auto; font-size:11px; padding:5px 12px; border-radius:8px;" onclick="requestNotificationPermissionFromBanner()">Enable</button>
+          <button type="button" class="ghost-action-btn" style="font-size:11px; padding:5px 9px;" onclick="dismissNotificationBanner()">Later</button>
         </div>
       </div>
 
@@ -1557,7 +1642,10 @@
             <div style="font-size: 11px; font-weight: 800; color: var(--neon-green); text-transform: uppercase; letter-spacing: 0.8px;">
               ✦ Aquarist AI
             </div>
-            <button type="button" id="tank-open-ai-chat-btn" class="ghost-action-btn" style="padding:3px 10px; font-size:11px;" onclick="openTankFocusedChat()">Open Chat</button>
+            <div style="display:flex; gap:6px;">
+              <button type="button" class="ghost-action-btn" style="padding:3px 8px; font-size:11px; color:var(--neon-green); border-color:rgba(0,245,160,0.32);" onclick="openFishDoctorModal()">✦ Fish Doctor</button>
+              <button type="button" id="tank-open-ai-chat-btn" class="ghost-action-btn" style="padding:3px 10px; font-size:11px;" onclick="openTankFocusedChat()">Open Chat</button>
+            </div>
           </div>
           <div id="tank-overview-summary" style="font-size: 13.5px; line-height: 1.55; color: var(--text-main);"></div>
 
@@ -1707,12 +1795,20 @@
           </div>
           <div id="tank-live-list" class="pill-list"></div>
 
-          <!-- Health Event Trigger -->
-          <div style="margin-top:18px; padding-top:13px; border-top:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:11.5px; color:var(--text-muted);">Track illness, treatment, or losses</span>
-            <button type="button" class="ghost-action-btn" style="color:var(--text-muted);" onclick="openLossModal()">
-              Record Health Event
-            </button>
+          <!-- Health Event & Fish Doctor Triggers -->
+          <div style="margin-top:18px; padding-top:13px; border-top:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+            <div>
+              <div style="font-size:12px; font-weight:700; color:var(--text-main);">Clinical Fish Doctor &amp; Health Log</div>
+              <div style="font-size:10.5px; color:var(--text-muted);">AI visual disease diagnosis, symptom checks &amp; loss tracking</div>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button type="button" class="btn btn-neon" style="width:auto; font-size:11px; padding:5px 12px; border-radius:8px;" onclick="openFishDoctorModal()">
+                ✦ Fish Doctor
+              </button>
+              <button type="button" class="ghost-action-btn" style="color:var(--text-muted); font-size:11px; padding:5px 9px;" onclick="openLossModal()">
+                Record Event
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1816,6 +1912,31 @@
         </div>
       </div>
 
+      <!-- TANK SUB-TAB 6: GALLERY (Photo Progress Journal) -->
+      <div id="tanksub-gallery" class="tanksub-content" style="display:none;">
+        <div class="card">
+          <div class="card-header" style="gap:8px; flex-wrap:wrap;">
+            <div>
+              <div class="card-title">Photo Progress Gallery</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Visual timeline of aquascape growth, flora, and fauna</div>
+            </div>
+            <button type="button" class="btn btn-neon" style="width:auto; font-size:11.5px; padding:6px 13px; border-radius:9px;" onclick="openAddGalleryPhotoModal()">+ Add Photo</button>
+          </div>
+
+          <!-- Category Filter Chips -->
+          <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:6px; margin-bottom:12px;" id="gallery-category-chips">
+            <button type="button" class="test-chip active" data-cat="all" onclick="filterGalleryCategory('all', this)">All</button>
+            <button type="button" class="test-chip" data-cat="fts" onclick="filterGalleryCategory('fts', this)">Full Tank (FTS)</button>
+            <button type="button" class="test-chip" data-cat="plants" onclick="filterGalleryCategory('plants', this)">Plant Growth</button>
+            <button type="button" class="test-chip" data-cat="fauna" onclick="filterGalleryCategory('fauna', this)">Livestock</button>
+            <button type="button" class="test-chip" data-cat="scape" onclick="filterGalleryCategory('scape', this)">Hardscape</button>
+          </div>
+
+          <!-- Gallery Grid -->
+          <div id="tank-gallery-grid" class="gallery-grid"></div>
+        </div>
+      </div>
+
     </section>
 
   </main>
@@ -1841,6 +1962,166 @@
   </nav>
 
   <!-- ================= MODAL: ADD AQUARIUM ================= -->
+  
+  <!-- ================= MODAL: ADD GALLERY PHOTO ================= -->
+  <div class="modal-overlay" id="addGalleryPhotoModal">
+    <div class="modal-box">
+      <div class="card-header" style="margin-bottom:12px;">
+        <h3 style="font-size:17px; color:var(--text-main);">Add Progress Photo</h3>
+        <button class="icon-btn" style="width:28px;height:28px;" onclick="closeModalById('addGalleryPhotoModal')">×</button>
+      </div>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px; line-height:1.45;">
+        Archive visual changes over time. Photos are compressed on-device for fast offline access.
+      </p>
+
+      <div style="margin-bottom:12px;">
+        <label>Photo</label>
+        <div class="photo-upload-row">
+          <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+            <div class="photo-thumb-box" id="gallery-upload-thumb-box">
+              <span style="font-size:16px;">📷</span>
+            </div>
+            <div style="min-width:0;">
+              <div id="gallery-upload-status" style="font-size:12px; font-weight:600; color:var(--text-main); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">No photo selected</div>
+              <div id="gallery-upload-sub" style="font-size:10px; color:var(--text-muted);">Tap button to take or pick photo</div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-secondary" style="width:auto; font-size:11.5px; padding:6px 12px; flex-shrink:0;" onclick="document.getElementById('gallery-file-input').click()">Choose File</button>
+        </div>
+        <input type="file" id="gallery-file-input" accept="image/*" style="display:none;" onchange="handleGalleryPhotoSelected(event)">
+      </div>
+
+      <div class="input-grid-2">
+        <div>
+          <label>Category</label>
+          <select id="gallery-photo-cat">
+            <option value="fts">Full Tank (FTS)</option>
+            <option value="plants">Plant Growth</option>
+            <option value="fauna">Livestock</option>
+            <option value="scape">Hardscape / Setup</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label>Date Captured</label>
+          <input type="date" id="gallery-photo-date">
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label>Caption &amp; Milestones (Optional)</label>
+        <textarea id="gallery-photo-caption" rows="2" placeholder="e.g. Monte Carlo carpet 3 weeks in; trimming stem plants"></textarea>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary" onclick="closeModalById('addGalleryPhotoModal')">Cancel</button>
+        <button class="btn btn-neon" onclick="saveGalleryPhoto()">Save to Gallery</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: GALLERY LIGHTBOX ================= -->
+  <div class="modal-overlay" id="galleryLightboxModal">
+    <div class="modal-box" style="max-width:560px; padding:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span id="lightbox-tag" class="test-chip active" style="font-size:10px; padding:2px 8px;">FTS</span>
+          <span id="lightbox-date" style="font-size:12px; color:var(--text-muted); font-weight:600;">--</span>
+        </div>
+        <button class="icon-btn" style="width:28px;height:28px;" onclick="closeModalById('galleryLightboxModal')">×</button>
+      </div>
+
+      <div style="width:100%; max-height:65vh; border-radius:12px; overflow:hidden; background:#000; display:flex; align-items:center; justify-content:center; margin-bottom:12px;">
+        <img id="lightbox-img" style="max-width:100%; max-height:65vh; object-fit:contain; display:block;">
+      </div>
+
+      <div id="lightbox-caption" style="font-size:13px; color:var(--text-main); line-height:1.45; margin-bottom:14px;"></div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06);">
+        <button type="button" class="ghost-action-btn" style="color:var(--alert-red); border-color:rgba(244,63,94,0.3); font-size:11px;" onclick="deleteActiveLightboxPhoto()">Delete Photo</button>
+        <button type="button" class="btn btn-secondary" style="width:auto; font-size:11.5px; padding:5px 14px;" onclick="closeModalById('galleryLightboxModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: AI FISH DOCTOR ================= -->
+  <div class="modal-overlay" id="fishDoctorModal">
+    <div class="modal-box" style="max-width:480px;">
+      <div class="card-header" style="margin-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:7px;">
+          <span style="font-size:16px; color:var(--neon-green);">✦</span>
+          <h3 style="font-size:17px; color:var(--text-main); margin:0;">AI Fish Doctor</h3>
+        </div>
+        <button class="icon-btn" style="width:28px;height:28px;" onclick="closeModalById('fishDoctorModal')">×</button>
+      </div>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:13px; line-height:1.45;">
+        Clinical aquatic diagnosis powered by Gemini Multimodal AI. Analyzes symptoms, photo evidence, and water chemistry.
+      </p>
+
+      <div style="margin-bottom:11px;">
+        <label>Affected Aquarium &amp; Species</label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <select id="doc-tank-select" onchange="syncFishDoctorSpeciesList()"></select>
+          <select id="doc-species-select"></select>
+        </div>
+      </div>
+
+      <!-- Photo Attachment -->
+      <div style="margin-bottom:12px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:10px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <span style="font-size:11.5px; font-weight:700; color:var(--text-main);">Clinical Photo (Recommended)</span>
+            <div style="font-size:10px; color:var(--text-muted);">Snap clear photo of affected fish or symptoms</div>
+          </div>
+          <button type="button" class="btn btn-secondary" style="width:auto; font-size:11px; padding:4px 10px; flex-shrink:0;" onclick="document.getElementById('doc-photo-input').click()">
+            📷 Attach
+          </button>
+        </div>
+        <input type="file" id="doc-photo-input" accept="image/*" style="display:none;" onchange="handleFishDoctorPhotoSelected(event)">
+        <div id="doc-photo-chip" style="display:none; align-items:center; gap:8px; margin-top:8px; background:rgba(0,210,255,0.08); border:1px solid rgba(0,210,255,0.25); border-radius:8px; padding:5px 9px;">
+          <img id="doc-photo-thumb" style="width:30px; height:30px; border-radius:5px; object-fit:cover;">
+          <span style="font-size:11px; color:var(--cyan); font-weight:600; flex:1;">Photo attached (<span id="doc-photo-size">~80 KB</span>)</span>
+          <span class="delete-x" onclick="clearFishDoctorPhoto()" style="font-size:16px;">×</span>
+        </div>
+      </div>
+
+      <!-- Observed Symptoms Multi-Select Chips -->
+      <div style="margin-bottom:12px;">
+        <label>Observed Symptoms (Select all that apply)</label>
+        <div class="test-stepper-wrap" style="flex-wrap:wrap; gap:5px;" id="doc-symptom-chips">
+          <button type="button" class="test-chip" data-symptom="White Spots (Ich)" onclick="toggleFishDoctorSymptom('White Spots (Ich)', this)">Ich / White Spots</button>
+          <button type="button" class="test-chip" data-symptom="Frayed Fins / Tail Rot" onclick="toggleFishDoctorSymptom('Frayed Fins / Tail Rot', this)">Fin Rot</button>
+          <button type="button" class="test-chip" data-symptom="Bloat / Pinecone Scales (Dropsy)" onclick="toggleFishDoctorSymptom('Bloat / Pinecone Scales (Dropsy)', this)">Dropsy / Bloat</button>
+          <button type="button" class="test-chip" data-symptom="Velvet / Gold Dust" onclick="toggleFishDoctorSymptom('Velvet / Gold Dust', this)">Velvet Dust</button>
+          <button type="button" class="test-chip" data-symptom="Cloudy Eye" onclick="toggleFishDoctorSymptom('Cloudy Eye', this)">Cloudy Eye</button>
+          <button type="button" class="test-chip" data-symptom="Cotton / Fungus Growth" onclick="toggleFishDoctorSymptom('Cotton / Fungus Growth', this)">Cotton Fungus</button>
+          <button type="button" class="test-chip" data-symptom="Gasping at Surface" onclick="toggleFishDoctorSymptom('Gasping at Surface', this)">Gasping</button>
+          <button type="button" class="test-chip" data-symptom="Flashing / Scratching on Rocks" onclick="toggleFishDoctorSymptom('Flashing / Scratching on Rocks', this)">Flashing</button>
+          <button type="button" class="test-chip" data-symptom="Lethargy / Clamped Fins" onclick="toggleFishDoctorSymptom('Lethargy / Clamped Fins', this)">Clamped Fins</button>
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <label>Additional Notes / Behavior</label>
+        <input type="text" id="doc-notes-input" placeholder="e.g. Stopped eating 2 days ago, new tankmate added last week">
+      </div>
+
+      <!-- Action Button -->
+      <div style="margin-bottom:14px;">
+        <button type="button" id="doc-run-btn" class="btn btn-neon" onclick="runFishDoctorDiagnosis()">
+          ✦ Run Clinical AI Diagnosis
+        </button>
+      </div>
+
+      <!-- Diagnosis Result Display Box -->
+      <div id="doc-result-box" style="display:none; margin-bottom:14px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,245,160,0.3); border-radius:12px; padding:12px 14px;"></div>
+
+      <div id="doc-save-bar" style="display:none; justify-content:space-between; align-items:center;">
+        <button type="button" class="btn btn-secondary" onclick="closeModalById('fishDoctorModal')">Close</button>
+        <button type="button" class="btn btn-neon" style="width:auto; padding:7px 14px;" onclick="saveFishDoctorToMedicalRecord()">Save to Medical Log</button>
+      </div>
+    </div>
+  </div>
   <div class="modal-overlay" id="addTankModal">
     <div class="modal-box">
       <div class="card-header" style="margin-bottom:12px;">
@@ -3828,6 +4109,7 @@
       if (tabName === "livestock") renderTankLivestockTab();
       if (tabName === "hardware") renderTankHardwareTab();
       if (tabName === "plants") renderTankPlantsTab();
+      if (tabName === "gallery") renderTankGalleryTab();
 
       window.scrollTo(0, 0);
     }
@@ -5478,6 +5760,7 @@
     }
 
     function renderDashboardTasks() {
+      renderDashboardNotifBanner();
       const tasksCard = document.getElementById("dashboard-tasks-card");
       const tasksHeader = document.getElementById("dashboard-tasks-header");
       const listEl = document.getElementById("dashboard-tasks-list");
