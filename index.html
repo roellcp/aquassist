@@ -393,14 +393,17 @@
     .nav-tab.active svg { stroke: var(--cyan); filter: drop-shadow(0 0 6px rgba(0, 210, 255, 0.6)); }
     .nav-tab:active { transform: scale(0.92); }
 
-    /* Sub Tabs (Inside Tank Hub — 5 non-scrolling tabs) */
+    /* Sub Tabs (Inside Tank Hub — Sleek single-line scrollable pill bar) */
     .tab-bar-tank {
-      display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 16px;
+      display: flex; gap: 5px; margin-bottom: 16px;
       background: rgba(8, 16, 32, 0.85); padding: 4px; border-radius: 15px;
       border: 1px solid rgba(56, 189, 248, 0.15);
+      overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; flex-wrap: nowrap;
     }
+    .tab-bar-tank::-webkit-scrollbar { display: none; }
     .tab-btn-tank {
-      padding: 8px 4px; background: transparent; border: none; color: var(--text-muted);
+      flex: 1 0 auto; min-width: 0;
+      padding: 7px 12px; background: transparent; border: none; color: var(--text-muted);
       font-size: 12px; font-weight: 600; border-radius: 11px; cursor: pointer; white-space: nowrap; text-align: center;
       transition: all 0.15s ease;
     }
@@ -1386,22 +1389,6 @@
 
         <div style="display:flex; justify-content:flex-end; margin-top:10px;">
           <button type="button" class="ghost-action-btn" style="font-size:11px; padding:4px 10px;" onclick="navToGlobal('global-ai')">✦ Ask Aquarist AI →</button>
-        </div>
-      </div>
-
-      <!-- Native Notification Opt-In Banner -->
-      <div id="dashboard-notif-banner" style="display:none; margin-bottom:16px; background:linear-gradient(135deg, rgba(0,245,160,0.07), rgba(0,210,255,0.07)); border:1px solid rgba(0,245,160,0.25); border-radius:14px; padding:12px 14px; align-items:center; justify-content:space-between; gap:12px;">
-        <div style="min-width:0;">
-          <div style="font-size:12.5px; font-weight:700; color:var(--neon-green); display:flex; align-items:center; gap:5px;">
-            <span>🔔</span> Pop-Up Care Alerts
-          </div>
-          <div style="font-size:11px; color:var(--text-muted); margin-top:2px; line-height:1.4;">
-            Get native device reminders for overdue water changes and filter cleanings.
-          </div>
-        </div>
-        <div style="display:flex; gap:6px; flex-shrink:0;">
-          <button type="button" class="btn btn-neon" style="width:auto; font-size:11px; padding:5px 12px; border-radius:8px;" onclick="requestNotificationPermissionFromBanner()">Enable</button>
-          <button type="button" class="ghost-action-btn" style="font-size:11px; padding:5px 9px;" onclick="dismissNotificationBanner()">Later</button>
         </div>
       </div>
 
@@ -2799,8 +2786,8 @@
       <div class="settings-section">
         <div class="settings-row">
           <div style="padding-right:4px;">
-            <div class="settings-title">System Reminders</div>
-            <div class="settings-sub" id="notification-status-text">Checking notification status...</div>
+            <div class="settings-title">Care &amp; Maintenance Alerts</div>
+            <div class="settings-sub" id="notification-status-text">Checking alert status...</div>
           </div>
           <div id="notification-badge-wrap" style="flex-shrink:0;">
             <button id="notif-enable-btn" class="btn btn-neon" style="width:auto; font-size:11.5px; padding:6px 13px; border-radius:9px;" onclick="requestNotificationPermission()">
@@ -4103,11 +4090,17 @@
       document.querySelectorAll(".tab-btn-tank").forEach(b => b.classList.remove("active"));
       if (btn) {
         btn.classList.add("active");
+        if (btn.scrollIntoView) {
+          btn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+        }
       } else {
         document.querySelectorAll(".tab-btn-tank").forEach(b => {
           const onclickAttr = b.getAttribute("onclick") || "";
           if (onclickAttr.includes(`'${tabName}'`)) {
             b.classList.add("active");
+            if (b.scrollIntoView) {
+              b.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+            }
           }
         });
       }
@@ -5776,7 +5769,6 @@
     }
 
     function renderDashboardTasks() {
-      renderDashboardNotifBanner();
       const tasksCard = document.getElementById("dashboard-tasks-card");
       const tasksHeader = document.getElementById("dashboard-tasks-header");
       const listEl = document.getElementById("dashboard-tasks-list");
@@ -11766,71 +11758,6 @@ Keep advice concise, direct, and actionable in markdown format.`;
       showToast("Diagnosis Saved to Health Records");
     }
 
-
-    /* ============================================================
-       ENHANCED DASHBOARD NOTIFICATIONS BANNER
-       ============================================================ */
-    function renderDashboardNotifBanner() {
-      const banner = document.getElementById("dashboard-notif-banner");
-      if (!banner) return;
-
-      const isDismissed = localStorage.getItem("aquassist_notif_banner_dismissed") === "true";
-      const isSupported = ("Notification" in window);
-
-      if (!isSupported) {
-        banner.style.display = "none";
-        return;
-      }
-
-      if (Notification.permission === "granted") {
-        banner.style.display = "flex";
-        banner.innerHTML = `
-          <div style="min-width:0;">
-            <div style="font-size:12.5px; font-weight:700; color:var(--neon-green); display:flex; align-items:center; gap:5px;">
-              <span>🔔</span> Care Reminders Active
-            </div>
-            <div style="font-size:11px; color:var(--text-muted); margin-top:2px; line-height:1.4;">
-              Native pop-up alerts enabled for scheduled water changes and routine tank maintenance.
-            </div>
-          </div>
-          <div style="display:flex; gap:6px; flex-shrink:0;">
-            <button type="button" class="ghost-action-btn" style="font-size:11px; padding:5px 10px; color:var(--cyan); border-color:rgba(0,210,255,0.3);" onclick="sendTestNotification()">Test Alert</button>
-          </div>
-        `;
-      } else if (!isDismissed) {
-        banner.style.display = "flex";
-        banner.innerHTML = `
-          <div style="min-width:0;">
-            <div style="font-size:12.5px; font-weight:700; color:var(--neon-green); display:flex; align-items:center; gap:5px;">
-              <span>🔔</span> Pop-Up Care Alerts
-            </div>
-            <div style="font-size:11px; color:var(--text-muted); margin-top:2px; line-height:1.4;">
-              Get native device reminders for overdue water changes and filter cleanings.
-            </div>
-          </div>
-          <div style="display:flex; gap:6px; flex-shrink:0;">
-            <button type="button" class="btn btn-neon" style="width:auto; font-size:11px; padding:5px 12px; border-radius:8px;" onclick="requestNotificationPermissionFromBanner()">Enable</button>
-            <button type="button" class="ghost-action-btn" style="font-size:11px; padding:5px 9px;" onclick="dismissNotificationBanner()">Later</button>
-          </div>
-        `;
-      } else {
-        banner.style.display = "none";
-      }
-    }
-
-    async function requestNotificationPermissionFromBanner() {
-      const banner = document.getElementById("dashboard-notif-banner");
-      if (banner) banner.style.display = "none";
-      await requestNotificationPermission();
-    }
-
-    function dismissNotificationBanner() {
-      try {
-        localStorage.setItem("aquassist_notif_banner_dismissed", "true");
-      } catch (err) {}
-      const banner = document.getElementById("dashboard-notif-banner");
-      if (banner) banner.style.display = "none";
-    }
 
     // Schedule background maintenance checks while app is open (every 30 mins)
     setInterval(checkMaintenanceReminders, 1800000);
