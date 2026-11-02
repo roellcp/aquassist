@@ -11211,6 +11211,582 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       } catch (err) {}
     }
 
+
+    /* ============================================================
+       PHOTO PROGRESS GALLERY ENGINE
+       ============================================================ */
+    let activeGalleryCategory = "all";
+    let activeGalleryUploadDataUrl = null;
+    let activeLightboxPhotoId = null;
+
+    function renderTankGalleryTab() {
+      const activeTank = getActiveTank();
+      const grid = document.getElementById("tank-gallery-grid");
+      if (!grid) return;
+      if (!activeTank) {
+        grid.innerHTML = '<div style="color:var(--text-muted); font-size:12px; grid-column:1/-1;">No aquarium selected.</div>';
+        return;
+      }
+
+      const photos = Array.isArray(activeTank.gallery) ? activeTank.gallery : [];
+      const filtered = activeGalleryCategory === "all" 
+        ? photos 
+        : photos.filter(p => p.cat === activeGalleryCategory);
+
+      if (filtered.length === 0) {
+        const catLabel = activeGalleryCategory === "all" ? "photos" : `"${activeGalleryCategory}" photos`;
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 36px 16px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.08); border-radius: 14px;">
+            <div style="font-size: 28px; margin-bottom: 8px;">📷</div>
+            <div style="font-size: 13.5px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">No ${catLabel} yet</div>
+            <div style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 14px;">Snap or upload a photo to start tracking growth and visual milestones.</div>
+            <button type="button" class="btn btn-neon" style="width: auto; font-size: 11.5px; padding: 6px 14px; border-radius: 8px; margin: 0 auto;" onclick="openAddGalleryPhotoModal()">+ Add Photo</button>
+          </div>
+        `;
+        return;
+      }
+
+      const catBadgeLabels = {
+        fts: "Full Tank",
+        plants: "Flora Growth",
+        fauna: "Livestock",
+        scape: "Hardscape",
+        other: "Other"
+      };
+
+      grid.innerHTML = filtered.map(p => `
+        <div class="gallery-card" onclick="openGalleryLightbox('${p.id}')">
+          <div class="gallery-thumb-wrap">
+            <img class="gallery-thumb-img" src="${p.dataUrl}" alt="${escapeHtmlText(p.caption || 'Tank photo')}" loading="lazy">
+            <span class="gallery-tag-pill">${catBadgeLabels[p.cat] || p.cat || 'Photo'}</span>
+          </div>
+          <div class="gallery-card-info">
+            <div class="gallery-card-date">${escapeHtmlText(p.date || 'Recent')}</div>
+            ${p.caption ? `<div class="gallery-card-caption">${escapeHtmlText(p.caption)}</div>` : ''}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function openAddGalleryPhotoModal() {
+      activeGalleryUploadDataUrl = null;
+      const statusEl = document.getElementById("gallery-upload-status");
+      const subEl = document.getElementById("gallery-upload-sub");
+      const thumbBox = document.getElementById("gallery-upload-thumb-box");
+      const dateEl = document.getElementById("gallery-photo-date");
+      const captionEl = document.getElementById("gallery-photo-caption");
+      const fileInput = document.getElementById("gallery-file-input");
+
+      if (statusEl) statusEl.innerText = "No photo selected";
+      if (subEl) subEl.innerText = "Tap button to take or pick photo";
+      if (thumbBox) thumbBox.innerHTML = '<span style="font-size:16px;">📷</span>';
+      if (captionEl) captionEl.value = "";
+      if (fileInput) fileInput.value = "";
+      if (dateEl) dateEl.valueAsDate = new Date();
+
+      openModalById("addGalleryPhotoModal");
+    }
+
+    function handleGalleryPhotoSelected(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      processVisionImageFile(file, (dataUrl) => {
+        activeGalleryUploadDataUrl = dataUrl;
+        const statusEl = document.getElementById("gallery-upload-status");
+        const subEl = document.getElementById("gallery-upload-sub");
+        const thumbBox = document.getElementById("gallery-upload-thumb-box");
+        if (statusEl) statusEl.innerText = file.name || "Photo Ready";
+        if (subEl) subEl.innerText = "Optimized & ready to save";
+        if (thumbBox) thumbBox.innerHTML = `<img src="${dataUrl}" style="width:100%; height:100%; object-fit:cover;">`;
+        showToast("Photo Selected");
+      });
+    }
+
+    function saveGalleryPhoto() {
+      const activeTank = getActiveTank();
+      if (!activeTank) return;
+      if (!activeGalleryUploadDataUrl) {
+        showToast("Select or Take a Photo First");
+        return;
+      }
+
+      const catEl = document.getElementById("gallery-photo-cat");
+      const dateEl = document.getElementById("gallery-photo-date");
+      const captionEl = document.getElementById("gallery-photo-caption");
+
+      const cat = catEl ? catEl.value : "fts";
+      const date = (dateEl && dateEl.value) ? dateEl.value : new Date().toISOString().split("T")[0];
+      const caption = captionEl ? captionEl.value.trim() : "";
+
+      if (!Array.isArray(activeTank.gallery)) activeTank.gallery = [];
+
+      const newPhoto = {
+        id: "p_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+        dataUrl: activeGalleryUploadDataUrl,
+        cat,
+        date,
+        caption,
+        timestamp: Date.now()
+      };
+
+      activeTank.gallery.unshift(newPhoto);
+      logTankTimelineEvent(`Added photo to gallery (${cat}): ${caption || "Visual progress record"}`, date);
+      saveDataToStorage();
+
+      closeModalById("addGalleryPhotoModal");
+      renderTankGalleryTab();
+      showToast("Photo Saved to Gallery");
+    }
+
+    function filterGalleryCategory(cat, btn) {
+      activeGalleryCategory = cat;
+      const chips = document.querySelectorAll("#gallery-category-chips .test-chip");
+      chips.forEach(c => c.classList.remove("active"));
+      if (btn) btn.classList.add("active");
+      renderTankGalleryTab();
+    }
+
+    function openGalleryLightbox(photoId) {
+      const activeTank = getActiveTank();
+      if (!activeTank || !Array.isArray(activeTank.gallery)) return;
+      const p = activeTank.gallery.find(item => item.id === photoId);
+      if (!p) return;
+
+      activeLightboxPhotoId = photoId;
+      const img = document.getElementById("lightbox-img");
+      const tag = document.getElementById("lightbox-tag");
+      const date = document.getElementById("lightbox-date");
+      const cap = document.getElementById("lightbox-caption");
+
+      const catLabels = {
+        fts: "Full Tank Shot (FTS)",
+        plants: "Plant Growth",
+        fauna: "Livestock",
+        scape: "Hardscape & Setup",
+        other: "Other"
+      };
+
+      if (img) img.src = p.dataUrl;
+      if (tag) tag.innerText = catLabels[p.cat] || p.cat || "Photo";
+      if (date) date.innerText = p.date || "Recent";
+      if (cap) {
+        cap.innerText = p.caption || "No notes recorded for this photo.";
+        cap.style.color = p.caption ? "var(--text-main)" : "var(--text-muted)";
+      }
+
+      openModalById("galleryLightboxModal");
+    }
+
+    function deleteActiveLightboxPhoto() {
+      if (!activeLightboxPhotoId) return;
+      if (!confirm("Are you sure you want to delete this photo from your gallery?")) return;
+
+      const activeTank = getActiveTank();
+      if (!activeTank || !Array.isArray(activeTank.gallery)) return;
+
+      const idx = activeTank.gallery.findIndex(p => p.id === activeLightboxPhotoId);
+      if (idx !== -1) {
+        activeTank.gallery.splice(idx, 1);
+        saveDataToStorage();
+        closeModalById("galleryLightboxModal");
+        renderTankGalleryTab();
+        showToast("Photo Deleted");
+      }
+    }
+
+
+    /* ============================================================
+       AI VISION TEST STRIP SCANNER ENGINE
+       ============================================================ */
+    async function handleTestStripPhotoSelected(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const statusEl = document.getElementById("test-strip-scan-status");
+      if (statusEl) {
+        statusEl.style.display = "flex";
+        statusEl.innerHTML = `<span class="loading-spinner" style="display:inline-block; width:12px; height:12px; border:2px solid var(--cyan); border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite;"></span> Analyzing test strip colors with Aquarist AI...`;
+      }
+
+      if (!appState.apiKey) {
+        if (statusEl) statusEl.style.display = "none";
+        showToast("Add Gemini API Key in Settings");
+        openSettingsModal();
+        e.target.value = "";
+        return;
+      }
+
+      processVisionImageFile(file, async (dataUrl, base64) => {
+        try {
+          const prompt = `You are an expert aquatic chemistry visual analysis assistant. 
+Examine this photograph of an aquarium water test strip or liquid test tubes placed alongside or against a color reference comparison chart.
+Match each pad or tube color against the chart to estimate the parameter readings:
+- pH: standard range 6.0 to 8.6
+- Ammonia (NH3): in ppm (e.g., 0, 0.25, 0.5, 1.0, 2.0, 4.0)
+- Nitrite (NO2): in ppm (e.g., 0, 0.25, 0.5, 1.0, 2.0, 5.0)
+- Nitrate (NO3): in ppm (e.g., 0, 5, 10, 20, 40, 80)
+- General Hardness (GH): in dGH (e.g., 3, 5, 7, 9, 12, 16)
+- Carbonate Hardness (KH): in dKH (e.g., 1, 3, 5, 8, 11, 14)
+
+If a specific parameter is not present on this strip/test, return null for it.
+Return ONLY valid raw JSON with NO markdown formatting, NO backticks, NO commentary:
+{
+  "ph": number or null,
+  "nh3": number or null,
+  "no2": number or null,
+  "no3": number or null,
+  "gh": number or null,
+  "kh": number or null,
+  "confidence": "high" or "medium" or "low",
+  "notes": "brief 1-sentence observation of pad conditions"
+}`;
+
+          const rawReply = await callGeminiGenerate([
+            { inlineData: { mimeType: "image/jpeg", data: base64 } },
+            { text: prompt }
+          ], "You are Aquarist AI Test Strip Scanner. Output strictly raw valid JSON.");
+
+          let cleaned = rawReply.trim();
+          if (cleaned.startsWith("```json")) cleaned = cleaned.slice(7);
+          else if (cleaned.startsWith("```")) cleaned = cleaned.slice(3);
+          if (cleaned.endsWith("```")) cleaned = cleaned.slice(0, -3);
+          cleaned = cleaned.trim();
+
+          const parsed = JSON.parse(cleaned);
+
+          let detectedCount = 0;
+          if (parsed.ph !== undefined && parsed.ph !== null) {
+            document.getElementById("m-test-ph").value = parsed.ph;
+            syncTestChips("ph");
+            detectedCount++;
+          }
+          if (parsed.nh3 !== undefined && parsed.nh3 !== null) {
+            document.getElementById("m-test-nh3").value = parsed.nh3;
+            syncTestChips("nh3");
+            detectedCount++;
+          }
+          if (parsed.no2 !== undefined && parsed.no2 !== null) {
+            document.getElementById("m-test-no2").value = parsed.no2;
+            syncTestChips("no2");
+            detectedCount++;
+          }
+          if (parsed.no3 !== undefined && parsed.no3 !== null) {
+            document.getElementById("m-test-no3").value = parsed.no3;
+            syncTestChips("no3");
+            detectedCount++;
+          }
+          if (parsed.gh !== undefined && parsed.gh !== null) {
+            document.getElementById("m-test-gh").value = parsed.gh;
+            syncTestChips("gh");
+            detectedCount++;
+          }
+          if (parsed.kh !== undefined && parsed.kh !== null) {
+            document.getElementById("m-test-kh").value = parsed.kh;
+            syncTestChips("kh");
+            detectedCount++;
+          }
+
+          const notesInput = document.getElementById("m-test-notes");
+          if (notesInput && parsed.notes) {
+            const current = notesInput.value.trim();
+            notesInput.value = current ? `${current} | [Scan: ${parsed.notes}]` : `[Scan: ${parsed.notes}]`;
+          }
+
+          if (statusEl) {
+            statusEl.innerHTML = `<span style="color:var(--neon-green);">✓ Detected ${detectedCount} parameters (${parsed.confidence || 'good'} confidence). Verify and tap Save Chemistry.</span>`;
+          }
+          showToast("Test Strip Scanned — Values Auto-Filled!");
+        } catch (err) {
+          console.error("Test strip analysis error:", err);
+          if (statusEl) {
+            statusEl.innerHTML = `<span style="color:var(--alert-yellow);">Could not auto-read colors clearly. Please input values manually.</span>`;
+          }
+          showToast("Color Read Inconclusive — Enter Manually");
+        } finally {
+          e.target.value = "";
+        }
+      });
+    }
+
+
+    /* ============================================================
+       CLINICAL AI FISH DOCTOR ENGINE
+       ============================================================ */
+    let activeDocPhotoBase64 = null;
+    let activeDocPhotoDataUrl = null;
+    let selectedDocSymptoms = new Set();
+    let lastDocDiagnosisData = null;
+
+    function openFishDoctorModal(presetSpecies = null) {
+      selectedDocSymptoms.clear();
+      activeDocPhotoBase64 = null;
+      activeDocPhotoDataUrl = null;
+      lastDocDiagnosisData = null;
+
+      const tankSel = document.getElementById("doc-tank-select");
+      if (tankSel) {
+        tankSel.innerHTML = appState.tanks.map(t => `<option value="${t.id}" ${t.id == activeTankId ? 'selected' : ''}>${escapeHtmlText(t.name)}</option>`).join("");
+      }
+
+      syncFishDoctorSpeciesList(presetSpecies);
+
+      document.querySelectorAll("#doc-symptom-chips .test-chip").forEach(c => c.classList.remove("active"));
+      clearFishDoctorPhoto();
+
+      const notesInput = document.getElementById("doc-notes-input");
+      if (notesInput) notesInput.value = "";
+
+      const resBox = document.getElementById("doc-result-box");
+      if (resBox) {
+        resBox.style.display = "none";
+        resBox.innerHTML = "";
+      }
+
+      const saveBar = document.getElementById("doc-save-bar");
+      if (saveBar) saveBar.style.display = "none";
+
+      const runBtn = document.getElementById("doc-run-btn");
+      if (runBtn) {
+        runBtn.disabled = false;
+        runBtn.innerHTML = "✦ Run Clinical AI Diagnosis";
+      }
+
+      openModalById("fishDoctorModal");
+    }
+
+    function syncFishDoctorSpeciesList(preset = null) {
+      const tankSel = document.getElementById("doc-tank-select");
+      const speciesSel = document.getElementById("doc-species-select");
+      if (!tankSel || !speciesSel) return;
+
+      const tid = tankSel.value;
+      const targetTank = appState.tanks.find(t => t.id == tid) || getActiveTank();
+      speciesSel.innerHTML = "";
+
+      const live = (targetTank && targetTank.livestock) ? targetTank.livestock : [];
+      if (live.length === 0) {
+        speciesSel.innerHTML = '<option value="General Fauna">General Fauna / Unlisted</option>';
+      } else {
+        live.forEach(entry => {
+          const clean = entry.replace(/^\d+x\s*/i, "").trim();
+          const isSelected = preset && (preset.toLowerCase() === clean.toLowerCase() || entry.toLowerCase().includes(preset.toLowerCase()));
+          speciesSel.innerHTML += `<option value="${escapeHtmlText(clean)}" ${isSelected ? 'selected' : ''}>${escapeHtmlText(entry)}</option>`;
+        });
+        speciesSel.innerHTML += '<option value="Other / Plant">Other / Plant Issue</option>';
+      }
+    }
+
+    function toggleFishDoctorSymptom(symptom, btn) {
+      if (selectedDocSymptoms.has(symptom)) {
+        selectedDocSymptoms.delete(symptom);
+        if (btn) btn.classList.remove("active");
+      } else {
+        selectedDocSymptoms.add(symptom);
+        if (btn) btn.classList.add("active");
+      }
+    }
+
+    function handleFishDoctorPhotoSelected(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      processVisionImageFile(file, (dataUrl, base64) => {
+        activeDocPhotoBase64 = base64;
+        activeDocPhotoDataUrl = dataUrl;
+        const chip = document.getElementById("doc-photo-chip");
+        const thumb = document.getElementById("doc-photo-thumb");
+        const sizeEl = document.getElementById("doc-photo-size");
+        if (chip && thumb) {
+          thumb.src = dataUrl;
+          if (sizeEl) {
+            const kb = Math.round((base64.length * 0.75) / 1024);
+            sizeEl.innerText = `${kb} KB`;
+          }
+          chip.style.display = "flex";
+        }
+        showToast("Photo Attached");
+      });
+    }
+
+    function clearFishDoctorPhoto() {
+      activeDocPhotoBase64 = null;
+      activeDocPhotoDataUrl = null;
+      const input = document.getElementById("doc-photo-input");
+      if (input) input.value = "";
+      const chip = document.getElementById("doc-photo-chip");
+      if (chip) chip.style.display = "none";
+    }
+
+    async function runFishDoctorDiagnosis() {
+      const tankSel = document.getElementById("doc-tank-select");
+      const speciesSel = document.getElementById("doc-species-select");
+      const notesInput = document.getElementById("doc-notes-input");
+      const resBox = document.getElementById("doc-result-box");
+      const saveBar = document.getElementById("doc-save-bar");
+      const runBtn = document.getElementById("doc-run-btn");
+
+      const targetTank = appState.tanks.find(t => t.id == (tankSel ? tankSel.value : activeTankId)) || getActiveTank();
+      const species = speciesSel ? speciesSel.value : "Fauna";
+      const userNotes = notesInput ? notesInput.value.trim() : "";
+      const symptomsList = Array.from(selectedDocSymptoms);
+
+      if (symptomsList.length === 0 && !activeDocPhotoBase64 && !userNotes) {
+        showToast("Select symptoms or attach a photo first");
+        return;
+      }
+
+      if (!appState.apiKey) {
+        showToast("Add Gemini API Key in Settings");
+        openSettingsModal();
+        return;
+      }
+
+      if (runBtn) {
+        runBtn.disabled = true;
+        runBtn.innerHTML = '<span class="loading-spinner" style="display:inline-block; width:13px; height:13px; border:2px solid #000; border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite; vertical-align:middle; margin-right:6px;"></span> Consulting Aquatic Pathologist...';
+      }
+
+      if (resBox) {
+        resBox.style.display = "block";
+        resBox.innerHTML = '<div style="color:var(--cyan); font-size:12.5px; text-align:center; padding:12px;">Auditing water chemistry, environmental stressors, and symptoms...</div>';
+      }
+
+      const u = getUnitLabels();
+      const t = targetTank.lastTest || {};
+      const tested = hasTankBeenTested(targetTank);
+      const chemStr = tested
+        ? `Temp ${displayTemp(t.temp || 78)}${u.temp}, pH ${t.ph ?? '7.2'}, NH3 ${t.nh3 ?? 0} ppm, NO2 ${t.no2 ?? 0} ppm, NO3 ${t.no3 ?? 0} ppm${t.gh ? `, GH ${t.gh} dGH` : ''}${t.kh ? `, KH ${t.kh} dKH` : ''}`
+        : "No recent water test recorded";
+
+      const existingRoster = (targetTank.livestock || []).join(", ") || "None";
+      const suppliesCtx = formatSuppliesForPrompt(targetTank);
+
+      const promptText = `You are Aquarist AI Fish Doctor, a board-certified aquatic veterinarian.
+Provide a clinical disease evaluation for:
+- Patient Species: ${species}
+- Aquarium: "${targetTank.name}" (${displayVol(targetTank.vol)} ${u.vol}, status: ${targetTank.status})
+- Recent Chemistry: ${chemStr}
+- Full Livestock Roster in Tank: ${existingRoster}
+- Observed Symptoms: ${symptomsList.length ? symptomsList.join(", ") : "None checked; refer to photo/notes"}
+- Additional Caretaker Notes: ${userNotes || "None"}
+- Household Supplies & Medications On Hand: ${suppliesCtx}
+
+Provide a structured clinical diagnosis covering:
+1. Suspected Illness & Severity (Mild / Caution / Emergency)
+2. Primary Root Environmental Triggers (Ammonia/Nitrite burn, osmotic shock, temperature fluctuation, parasite introduction, bacterial)
+3. Immediate Step-by-Step Clinical Treatment (Quarantine tank vs display tank, temperature adjustments, salt bath, or medication)
+4. Tankmate / Invertebrate Safety Alert (CRITICAL: highlight if copper, malachite green, or salt will harm snails, shrimp, plants, or scaleless fish in this specific tank)
+5. Supplies Readiness (explicitly mention if any in-stock supplies help, or recommend exact active ingredient to purchase)
+
+Keep advice concise, direct, and actionable in markdown format.`;
+
+      try {
+        const parts = [];
+        if (activeDocPhotoBase64) {
+          parts.push({ inlineData: { mimeType: "image/jpeg", data: activeDocPhotoBase64 } });
+        }
+        parts.push({ text: promptText });
+
+        const reply = await callGeminiGenerate(parts, "You are Aquarist AI Fish Doctor. Provide structured, precise aquatic medical advice in clean Markdown.");
+
+        lastDocDiagnosisData = {
+          date: new Date().toISOString().split("T")[0],
+          species,
+          tankId: targetTank.id,
+          tankName: targetTank.name,
+          symptoms: symptomsList.join(", ") || "Photo diagnosed",
+          diagnosisMarkdown: reply,
+          photo: activeDocPhotoDataUrl
+        };
+
+        if (resBox) {
+          resBox.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:6px;">
+              <span style="font-weight:800; font-size:12px; color:var(--neon-green); text-transform:uppercase; letter-spacing:0.8px;">✦ Clinical Diagnosis</span>
+              <span style="font-size:11px; color:var(--text-muted);">${species} • ${targetTank.name}</span>
+            </div>
+            <div class="ai-md" style="font-size:12.5px; line-height:1.5; color:var(--text-main);">
+              ${renderAiMarkdown(reply)}
+            </div>
+          `;
+        }
+
+        if (saveBar) saveBar.style.display = "flex";
+      } catch (err) {
+        console.error("Fish Doctor error:", err);
+        if (resBox) {
+          resBox.innerHTML = `<div style="color:var(--alert-red); font-size:12px; padding:8px;">Diagnosis failed: ${escapeHtmlText(err.message || "Unknown error")}. Check your internet connection and API key.</div>`;
+        }
+      } finally {
+        if (runBtn) {
+          runBtn.disabled = false;
+          runBtn.innerHTML = "✦ Re-evaluate Diagnosis";
+        }
+      }
+    }
+
+    function saveFishDoctorToMedicalRecord() {
+      if (!lastDocDiagnosisData) return;
+      const targetTank = appState.tanks.find(t => t.id == lastDocDiagnosisData.tankId) || getActiveTank();
+      if (!targetTank) return;
+
+      if (!Array.isArray(targetTank.losses)) targetTank.losses = [];
+
+      const record = {
+        date: lastDocDiagnosisData.date,
+        species: lastDocDiagnosisData.species,
+        qty: 1,
+        symptoms: lastDocDiagnosisData.symptoms,
+        aiAudit: "Clinical AI Doctor Protocol archived",
+        photo: lastDocDiagnosisData.photo
+      };
+
+      targetTank.losses.unshift(record);
+      logTankTimelineEvent(`Fish Doctor Diagnosis for ${lastDocDiagnosisData.species}: ${lastDocDiagnosisData.symptoms}`, lastDocDiagnosisData.date);
+      saveDataToStorage();
+
+      closeModalById("fishDoctorModal");
+      renderTankLivestockTab();
+      renderTankOverviewTab();
+      showToast("Diagnosis Saved to Health Records");
+    }
+
+
+    /* ============================================================
+       ENHANCED DASHBOARD NOTIFICATIONS BANNER
+       ============================================================ */
+    function renderDashboardNotifBanner() {
+      const banner = document.getElementById("dashboard-notif-banner");
+      if (!banner) return;
+
+      const isDismissed = localStorage.getItem("aquassist_notif_banner_dismissed") === "true";
+      const isSupported = ("Notification" in window);
+      const isDefault = isSupported && Notification.permission === "default";
+
+      if (isSupported && isDefault && !isDismissed) {
+        banner.style.display = "flex";
+      } else {
+        banner.style.display = "none";
+      }
+    }
+
+    async function requestNotificationPermissionFromBanner() {
+      const banner = document.getElementById("dashboard-notif-banner");
+      if (banner) banner.style.display = "none";
+      await requestNotificationPermission();
+    }
+
+    function dismissNotificationBanner() {
+      try {
+        localStorage.setItem("aquassist_notif_banner_dismissed", "true");
+      } catch (err) {}
+      const banner = document.getElementById("dashboard-notif-banner");
+      if (banner) banner.style.display = "none";
+    }
+
+    // Schedule background maintenance checks while app is open (every 30 mins)
+    setInterval(checkMaintenanceReminders, 1800000);
+
+
     /* ============================================================
        8. SERVICE WORKER & APP STARTUP
        ============================================================ */
