@@ -1763,10 +1763,7 @@
       <div id="tanksub-livestock" class="tanksub-content" style="display:none;">
         <div class="card">
           <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
-            <div style="display:flex; align-items:center; gap:8px;">
-              <div class="card-title">Livestock Roster</div>
-              <div id="tank-livestock-bioload-badge"></div>
-            </div>
+            <div class="card-title">Livestock Roster</div>
             <button type="button" class="ghost-action-btn" onclick="openCompatibilityForActiveTank()">Check Compatibility →</button>
           </div>
           <!-- 2. Weighted Bio-Capacity Gauge & Breakdown -->
@@ -9191,20 +9188,6 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       renderLossHistory();
 
       const bioload = calculateTankWeightedBioload(activeTank);
-
-      const badgeEl = document.getElementById("tank-livestock-bioload-badge");
-      if (badgeEl) {
-        if (bioload.totalSpecimens === 0) {
-          badgeEl.innerHTML = `<span style="font-size:11px; color:var(--text-muted); font-weight:600;">0 specimens</span>`;
-        } else {
-          badgeEl.innerHTML = `
-            <span style="display:inline-flex; align-items:center; gap:5px; font-size:10.5px; font-weight:600; color:${bioload.color}; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); padding:2px 8px; border-radius:12px;">
-              <span class="legend-dot" style="background:${bioload.dotColor}; width:6px; height:6px;"></span>
-              ${bioload.label} (${bioload.percent}%)
-            </span>
-          `;
-        }
-      }
 
       const capBox = document.getElementById("tank-bioload-capacity-box");
       if (capBox) {
