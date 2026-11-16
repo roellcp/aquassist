@@ -1897,12 +1897,12 @@
       <!-- TANK SUB-TAB 6: GALLERY (Photo Progress Journal) -->
       <div id="tanksub-gallery" class="tanksub-content" style="display:none;">
         <div class="card">
-          <div class="card-header" style="gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+          <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
             <div>
               <div class="card-title">Photo Progress Gallery</div>
               <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Visual timeline of aquascape growth, flora, and fauna</div>
             </div>
-            <button type="button" class="btn btn-neon" style="width:auto; font-size:11.5px; padding:6px 13px; border-radius:9px;" onclick="openAddGalleryPhotoModal()">+ Add Photo</button>
+            <button type="button" class="icon-btn" style="width:34px; height:34px; border-radius:10px; font-size:18px; font-weight:700; color:var(--neon-green); border-color:rgba(0,245,160,0.35); background:rgba(0,245,160,0.08); display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="openAddGalleryPhotoModal()" title="Add Photo" aria-label="Add Photo">+</button>
           </div>
 
           <!-- Gallery Grid -->
@@ -11266,6 +11266,34 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
     let activeGalleryUploadDataUrl = null;
     let activeLightboxPhotoId = null;
 
+    function formatPrettyDate(dateStr, fullMonth = false) {
+      if (!dateStr || typeof dateStr !== "string") return "Recent";
+      const clean = dateStr.trim();
+      const m = clean.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+      const shortMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const longMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      if (m) {
+        const year = parseInt(m[1], 10);
+        const monthIdx = parseInt(m[2], 10) - 1;
+        const day = parseInt(m[3], 10);
+        if (monthIdx >= 0 && monthIdx < 12) {
+          const monthName = fullMonth ? longMonths[monthIdx] : shortMonths[monthIdx];
+          return `${monthName} ${day}, ${year}`;
+        }
+      }
+      const ts = parseRecordTimestamp(clean);
+      if (ts && !isNaN(ts)) {
+        const d = new Date(ts);
+        return d.toLocaleDateString("en-US", { 
+          month: fullMonth ? "long" : "short", 
+          day: "numeric", 
+          year: "numeric", 
+          timeZone: "UTC" 
+        });
+      }
+      return clean;
+    }
+
     function getSortedGalleryPhotos() {
       const activeTank = getActiveTank();
       if (!activeTank || !Array.isArray(activeTank.gallery)) return [];
@@ -11312,7 +11340,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
             <img class="gallery-thumb-img" src="${p.dataUrl}" alt="${escapeHtmlText(p.caption || 'Tank photo')}" loading="lazy">
           </div>
           <div class="gallery-card-info">
-            <div class="gallery-card-date">${escapeHtmlText(p.date || 'Recent')}</div>
+            <div class="gallery-card-date">${escapeHtmlText(formatPrettyDate(p.date))}</div>
             ${p.caption ? `<div class="gallery-card-caption">${escapeHtmlText(p.caption)}</div>` : ''}
           </div>
         </div>
@@ -11414,7 +11442,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         }
       }
 
-      if (date) date.innerText = p.date || "Recent";
+      if (date) date.innerText = formatPrettyDate(p.date, true);
       if (cap) {
         cap.innerText = p.caption || "No notes recorded for this photo.";
         cap.style.color = p.caption ? "var(--text-main)" : "var(--text-muted)";
