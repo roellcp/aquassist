@@ -1897,26 +1897,12 @@
       <!-- TANK SUB-TAB 6: GALLERY (Photo Progress Journal) -->
       <div id="tanksub-gallery" class="tanksub-content" style="display:none;">
         <div class="card">
-          <div class="card-header" style="gap:8px; flex-wrap:wrap;">
+          <div class="card-header" style="gap:8px; flex-wrap:wrap; margin-bottom:12px;">
             <div>
               <div class="card-title">Photo Progress Gallery</div>
               <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Visual timeline of aquascape growth, flora, and fauna</div>
             </div>
-            <div style="display:flex; gap:6px; align-items:center;">
-              <button type="button" id="gallery-sort-toggle-btn" class="ghost-action-btn" style="font-size:11px; padding:5px 9px; white-space:nowrap; border-radius:8px;" onclick="toggleGallerySortOrder()" title="Toggle chronological sort order">
-                <span id="gallery-sort-icon">📅</span> <span id="gallery-sort-label">Newest First</span>
-              </button>
-              <button type="button" class="btn btn-neon" style="width:auto; font-size:11.5px; padding:6px 13px; border-radius:9px;" onclick="openAddGalleryPhotoModal()">+ Add Photo</button>
-            </div>
-          </div>
-
-          <!-- Category Filter Chips (Single-line horizontal scroll pill bar) -->
-          <div style="display:flex; gap:5px; overflow-x:auto; flex-wrap:nowrap; scrollbar-width:none; -webkit-overflow-scrolling:touch; margin-bottom:12px; padding-bottom:3px;" id="gallery-category-chips">
-            <button type="button" class="test-chip active" style="flex:0 0 auto; white-space:nowrap; padding:5px 12px; font-size:11px;" data-cat="all" onclick="filterGalleryCategory('all', this)">All</button>
-            <button type="button" class="test-chip" style="flex:0 0 auto; white-space:nowrap; padding:5px 12px; font-size:11px;" data-cat="fts" onclick="filterGalleryCategory('fts', this)">Full Tank (FTS)</button>
-            <button type="button" class="test-chip" style="flex:0 0 auto; white-space:nowrap; padding:5px 12px; font-size:11px;" data-cat="plants" onclick="filterGalleryCategory('plants', this)">Plants</button>
-            <button type="button" class="test-chip" style="flex:0 0 auto; white-space:nowrap; padding:5px 12px; font-size:11px;" data-cat="fauna" onclick="filterGalleryCategory('fauna', this)">Livestock</button>
-            <button type="button" class="test-chip" style="flex:0 0 auto; white-space:nowrap; padding:5px 12px; font-size:11px;" data-cat="scape" onclick="filterGalleryCategory('scape', this)">Hardscape</button>
+            <button type="button" class="btn btn-neon" style="width:auto; font-size:11.5px; padding:6px 13px; border-radius:9px;" onclick="openAddGalleryPhotoModal()">+ Add Photo</button>
           </div>
 
           <!-- Gallery Grid -->
@@ -1978,21 +1964,9 @@
         <input type="file" id="gallery-file-input" accept="image/*" style="display:none;" onchange="handleGalleryPhotoSelected(event)">
       </div>
 
-      <div class="input-grid-2">
-        <div>
-          <label>Category</label>
-          <select id="gallery-photo-cat">
-            <option value="fts">Full Tank (FTS)</option>
-            <option value="plants">Plant Growth</option>
-            <option value="fauna">Livestock</option>
-            <option value="scape">Hardscape / Setup</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-        <div>
-          <label>Date Captured</label>
-          <input type="date" id="gallery-photo-date">
-        </div>
+      <div style="margin-bottom:13px;">
+        <label>Date Captured</label>
+        <input type="date" id="gallery-photo-date">
       </div>
 
       <div style="margin-bottom:16px;">
@@ -2012,7 +1986,6 @@
     <div class="modal-box" style="max-width:560px; padding:16px;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
         <div style="display:flex; align-items:center; gap:8px;">
-          <span id="lightbox-tag" class="test-chip active" style="font-size:10px; padding:2px 8px;">FTS</span>
           <span id="lightbox-date" style="font-size:12px; color:var(--text-muted); font-weight:600;">--</span>
           <span id="lightbox-counter" style="font-size:11px; color:var(--neon-green); font-weight:600; margin-left:4px;"></span>
         </div>
@@ -11290,44 +11263,24 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
     /* ============================================================
        PHOTO PROGRESS GALLERY ENGINE
        ============================================================ */
-    let activeGalleryCategory = "all";
     let activeGalleryUploadDataUrl = null;
     let activeLightboxPhotoId = null;
-    let gallerySortOrder = "desc"; // "desc" = Newest first, "asc" = Oldest first
 
-    function getSortedFilteredGalleryPhotos() {
+    function getSortedGalleryPhotos() {
       const activeTank = getActiveTank();
       if (!activeTank || !Array.isArray(activeTank.gallery)) return [];
 
-      let list = activeGalleryCategory === "all"
-        ? [...activeTank.gallery]
-        : activeTank.gallery.filter(p => p.cat === activeGalleryCategory);
-
+      let list = [...activeTank.gallery];
       list.sort((a, b) => {
         const timeA = parseRecordTimestamp(a.date) || a.timestamp || 0;
         const timeB = parseRecordTimestamp(b.date) || b.timestamp || 0;
-        if (timeA !== timeB) {
-          return gallerySortOrder === "asc" ? (timeA - timeB) : (timeB - timeA);
-        }
+        if (timeA !== timeB) return timeB - timeA; // Chronological: newest captured first
         const subA = a.timestamp || 0;
         const subB = b.timestamp || 0;
-        return gallerySortOrder === "asc" ? (subA - subB) : (subB - subA);
+        return subB - subA;
       });
 
       return list;
-    }
-
-    function toggleGallerySortOrder() {
-      gallerySortOrder = gallerySortOrder === "desc" ? "asc" : "desc";
-      const labelEl = document.getElementById("gallery-sort-label");
-      const iconEl = document.getElementById("gallery-sort-icon");
-      if (labelEl) {
-        labelEl.innerText = gallerySortOrder === "desc" ? "Newest First" : "Oldest First";
-      }
-      if (iconEl) {
-        iconEl.innerText = gallerySortOrder === "desc" ? "📅" : "⏳";
-      }
-      renderTankGalleryTab();
     }
 
     function renderTankGalleryTab() {
@@ -11339,14 +11292,13 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         return;
       }
 
-      const filtered = getSortedFilteredGalleryPhotos();
+      const photos = getSortedGalleryPhotos();
 
-      if (filtered.length === 0) {
-        const catLabel = activeGalleryCategory === "all" ? "photos" : `"${activeGalleryCategory}" photos`;
+      if (photos.length === 0) {
         grid.innerHTML = `
           <div style="grid-column: 1 / -1; text-align: center; padding: 36px 16px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.08); border-radius: 14px;">
             <div style="font-size: 28px; margin-bottom: 8px;">📷</div>
-            <div style="font-size: 13.5px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">No ${catLabel} yet</div>
+            <div style="font-size: 13.5px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">No photos yet</div>
             <div style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 14px;">Snap or upload a photo to start tracking growth and visual milestones.</div>
             <button type="button" class="btn btn-neon" style="width: auto; font-size: 11.5px; padding: 6px 14px; border-radius: 8px; margin: 0 auto;" onclick="openAddGalleryPhotoModal()">+ Add Photo</button>
           </div>
@@ -11354,19 +11306,10 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         return;
       }
 
-      const catBadgeLabels = {
-        fts: "Full Tank",
-        plants: "Flora Growth",
-        fauna: "Livestock",
-        scape: "Hardscape",
-        other: "Other"
-      };
-
-      grid.innerHTML = filtered.map(p => `
+      grid.innerHTML = photos.map(p => `
         <div class="gallery-card" onclick="openGalleryLightbox('${p.id}')">
           <div class="gallery-thumb-wrap">
             <img class="gallery-thumb-img" src="${p.dataUrl}" alt="${escapeHtmlText(p.caption || 'Tank photo')}" loading="lazy">
-            <span class="gallery-tag-pill">${catBadgeLabels[p.cat] || p.cat || 'Photo'}</span>
           </div>
           <div class="gallery-card-info">
             <div class="gallery-card-date">${escapeHtmlText(p.date || 'Recent')}</div>
@@ -11418,11 +11361,9 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         return;
       }
 
-      const catEl = document.getElementById("gallery-photo-cat");
       const dateEl = document.getElementById("gallery-photo-date");
       const captionEl = document.getElementById("gallery-photo-caption");
 
-      const cat = catEl ? catEl.value : "fts";
       const date = (dateEl && dateEl.value) ? dateEl.value : new Date().toISOString().split("T")[0];
       const caption = captionEl ? captionEl.value.trim() : "";
 
@@ -11431,14 +11372,13 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       const newPhoto = {
         id: "p_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
         dataUrl: activeGalleryUploadDataUrl,
-        cat,
         date,
         caption,
         timestamp: Date.now()
       };
 
       activeTank.gallery.unshift(newPhoto);
-      logTankTimelineEvent(`Added photo to gallery (${cat}): ${caption || "Visual progress record"}`, date);
+      logTankTimelineEvent(`Added photo to gallery: ${caption || "Visual progress record"}`, date);
       saveDataToStorage();
 
       closeModalById("addGalleryPhotoModal");
@@ -11446,33 +11386,16 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       showToast("Photo Saved to Gallery");
     }
 
-    function filterGalleryCategory(cat, btn) {
-      activeGalleryCategory = cat;
-      const chips = document.querySelectorAll("#gallery-category-chips .test-chip");
-      chips.forEach(c => c.classList.remove("active"));
-      if (btn) btn.classList.add("active");
-      renderTankGalleryTab();
-    }
-
     function renderLightboxPhoto(p, index, total, direction) {
       if (!p) return;
       activeLightboxPhotoId = p.id;
 
       const img = document.getElementById("lightbox-img");
-      const tag = document.getElementById("lightbox-tag");
       const date = document.getElementById("lightbox-date");
       const cap = document.getElementById("lightbox-caption");
       const counter = document.getElementById("lightbox-counter");
       const prevBtn = document.getElementById("lightbox-prev-btn");
       const nextBtn = document.getElementById("lightbox-next-btn");
-
-      const catLabels = {
-        fts: "Full Tank Shot (FTS)",
-        plants: "Plant Growth",
-        fauna: "Livestock",
-        scape: "Hardscape & Setup",
-        other: "Other"
-      };
 
       if (img) {
         if (direction) {
@@ -11491,7 +11414,6 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         }
       }
 
-      if (tag) tag.innerText = catLabels[p.cat] || p.cat || "Photo";
       if (date) date.innerText = p.date || "Recent";
       if (cap) {
         cap.innerText = p.caption || "No notes recorded for this photo.";
@@ -11509,7 +11431,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
     }
 
     function openGalleryLightbox(photoId) {
-      const list = getSortedFilteredGalleryPhotos();
+      const list = getSortedGalleryPhotos();
       if (!list.length) return;
       const idx = list.findIndex(p => p.id === photoId);
       const targetIdx = idx !== -1 ? idx : 0;
@@ -11521,7 +11443,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
 
     function showNextLightboxPhoto(e) {
       if (e && e.stopPropagation) e.stopPropagation();
-      const list = getSortedFilteredGalleryPhotos();
+      const list = getSortedGalleryPhotos();
       if (list.length <= 1) return;
       const currentIdx = list.findIndex(p => p.id === activeLightboxPhotoId);
       const nextIdx = (currentIdx + 1) % list.length;
@@ -11530,7 +11452,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
 
     function showPrevLightboxPhoto(e) {
       if (e && e.stopPropagation) e.stopPropagation();
-      const list = getSortedFilteredGalleryPhotos();
+      const list = getSortedGalleryPhotos();
       if (list.length <= 1) return;
       const currentIdx = list.findIndex(p => p.id === activeLightboxPhotoId);
       const prevIdx = (currentIdx - 1 + list.length) % list.length;
@@ -11597,7 +11519,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       const activeTank = getActiveTank();
       if (!activeTank || !Array.isArray(activeTank.gallery)) return;
 
-      const list = getSortedFilteredGalleryPhotos();
+      const list = getSortedGalleryPhotos();
       const currentIdx = list.findIndex(p => p.id === activeLightboxPhotoId);
 
       const idx = activeTank.gallery.findIndex(p => p.id === activeLightboxPhotoId);
@@ -11607,7 +11529,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         renderTankGalleryTab();
         showToast("Photo Deleted");
 
-        const remaining = getSortedFilteredGalleryPhotos();
+        const remaining = getSortedGalleryPhotos();
         if (remaining.length === 0) {
           closeModalById("galleryLightboxModal");
         } else {
