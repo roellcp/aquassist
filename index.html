@@ -523,7 +523,7 @@
     }
     .ghost-action-btn:hover { background: rgba(56, 189, 248, 0.12); border-color: rgba(56, 189, 248, 0.35); }
     .tap-strip {
-      display: grid; grid-template-columns: repeat(4, 1fr);
+      display: grid; grid-template-columns: repeat(5, 1fr);
       background: rgba(255, 255, 255, 0.025); border: 1px solid rgba(255, 255, 255, 0.07);
       border-radius: 12px; margin-top: 10px; overflow: hidden;
     }
@@ -546,7 +546,7 @@
     .tap-cell-lbl { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
     .tap-cell-val { font-size: 13px; font-weight: 700; color: #F1F5F9; margin-top: 3px; }
     .tap-edit-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px;
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px;
     }
     .tap-edit-grid label { font-size: 10px; margin-bottom: 4px; color: var(--text-muted); }
     .tap-edit-grid input { padding: 8px 8px; font-size: 13px; text-align: center; border-radius: 9px; }
@@ -1732,6 +1732,7 @@
             <button type="button" class="chart-pill-btn" data-filter="no3" onclick="setChartFilter('no3', this)">NO₃</button>
             <button type="button" class="chart-pill-btn" data-filter="gh" onclick="setChartFilter('gh', this)">GH</button>
             <button type="button" class="chart-pill-btn" data-filter="kh" onclick="setChartFilter('kh', this)">KH</button>
+            <button type="button" class="chart-pill-btn" data-filter="tds" onclick="setChartFilter('tds', this)">TDS</button>
           </div>
 
           <div class="chart-container">
@@ -1746,6 +1747,7 @@
             <div class="chart-legend-item"><span class="legend-dot" style="background:var(--cyan);"></span> NO₃</div>
             <div class="chart-legend-item"><span class="legend-dot" style="background:#38BDF8;"></span> GH</div>
             <div class="chart-legend-item"><span class="legend-dot" style="background:#F59E0B;"></span> KH</div>
+            <div class="chart-legend-item"><span class="legend-dot" style="background:#E879F9;"></span> TDS</div>
             <div class="chart-legend-item"><svg viewBox="0 0 12 14" width="10" height="11" fill="#38BDF8" style="display:inline-block; flex-shrink:0;"><path d="M6 1C8.8 4.4 9.5 7.2 9.5 9C9.5 10.9 7.9 12.5 6 12.5C4.1 12.5 2.5 10.9 2.5 9C2.5 7.2 3.2 4.4 6 1Z"/></svg> Water Change</div>
           </div>
         </div>
@@ -2626,6 +2628,25 @@
         </div>
       </div>
 
+      <!-- Optional: Total Dissolved Solids (TDS) -->
+      <div style="margin-bottom:11px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:9px 11px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <label style="margin:0; font-weight:700; font-size:12px;">Total Dissolved Solids (TDS)</label>
+            <span style="font-size:10px; color:var(--text-muted); font-weight:600;">Optional (ppm)</span>
+          </div>
+          <input type="number" id="m-test-tds" step="1" placeholder="--" style="width:76px; text-align:right; padding:4px 8px; font-size:13px; font-weight:700;" oninput="syncTestChips('tds')">
+        </div>
+        <div class="test-stepper-wrap" id="m-test-chips-tds">
+          <button type="button" class="test-chip" data-val="80" onclick="selectTestChip('tds', 80, this)">80</button>
+          <button type="button" class="test-chip" data-val="120" onclick="selectTestChip('tds', 120, this)">120</button>
+          <button type="button" class="test-chip" data-val="150" onclick="selectTestChip('tds', 150, this)">150</button>
+          <button type="button" class="test-chip" data-val="200" onclick="selectTestChip('tds', 200, this)">200</button>
+          <button type="button" class="test-chip" data-val="250" onclick="selectTestChip('tds', 250, this)">250</button>
+          <button type="button" class="test-chip" data-val="350" onclick="selectTestChip('tds', 350, this)">350+</button>
+        </div>
+      </div>
+
       <div style="margin-bottom:16px;">
         <label>Notes / Observations (Optional)</label>
         <input type="text" id="m-test-notes" placeholder="e.g. Clearest reading this month, feeding frozen brine shrimp">
@@ -2813,6 +2834,10 @@
             <div class="tap-cell-lbl">KH</div>
             <div class="tap-cell-val" id="disp-tap-kh">4 dKH</div>
           </div>
+          <div class="tap-cell">
+            <div class="tap-cell-lbl">TDS</div>
+            <div class="tap-cell-val" id="disp-tap-tds">180 ppm</div>
+          </div>
         </div>
 
         <div id="tap-edit-panel" style="display:none;">
@@ -2832,6 +2857,10 @@
             <div>
               <label>KH (dKH)</label>
               <input type="number" id="tap-kh" step="1" placeholder="4" oninput="saveTapBaseline(false)" onchange="saveTapBaseline(true)">
+            </div>
+            <div>
+              <label>TDS (ppm)</label>
+              <input type="number" id="tap-tds" step="1" placeholder="180" oninput="saveTapBaseline(false)" onchange="saveTapBaseline(true)">
             </div>
           </div>
         </div>
@@ -4422,6 +4451,20 @@
         `;
       }
 
+      if (t.tds !== undefined && t.tds !== null && t.tds !== "") {
+        const tdsNum = parseFloat(t.tds);
+        const tdsStatus = tdsNum > 500 ? "caution" : "safe";
+        html += `
+          <div class="param-chip status-${tdsStatus}">
+            <div class="param-chip-header">
+              <span class="param-chip-dot ${tdsStatus}"></span>
+              <span class="param-chip-label">TDS</span>
+            </div>
+            <div class="param-chip-val">${tdsNum} <span style="font-size:9.5px; font-weight:600; opacity:0.85;">ppm</span></div>
+          </div>
+        `;
+      }
+
       return html;
     }
 
@@ -5010,7 +5053,7 @@
         : { percent: 50, label: "Normal", totalWasteUnits: 10, effectiveCapacity: 20 };
 
       const latestParams = last
-        ? `${freshness.text} (${last.date || "recent"}): Temp ${displayTemp(last.temp || 78)}${u.temp}, pH ${last.ph ?? 7.2}, NH3 ${last.nh3 ?? 0} ppm, NO2 ${last.no2 ?? 0} ppm, NO3 ${last.no3 ?? 0} ppm${last.gh !== undefined && last.gh !== null && last.gh !== "" ? `, GH ${last.gh} dGH` : ""}${last.kh !== undefined && last.kh !== null && last.kh !== "" ? `, KH ${last.kh} dKH` : ""}`
+        ? `${freshness.text} (${last.date || "recent"}): Temp ${displayTemp(last.temp || 78)}${u.temp}, pH ${last.ph ?? 7.2}, NH3 ${last.nh3 ?? 0} ppm, NO2 ${last.no2 ?? 0} ppm, NO3 ${last.no3 ?? 0} ppm${last.gh !== undefined && last.gh !== null && last.gh !== "" ? `, GH ${last.gh} dGH` : ""}${last.kh !== undefined && last.kh !== null && last.kh !== "" ? `, KH ${last.kh} dKH` : ""}${last.tds !== undefined && last.tds !== null && last.tds !== "" ? `, TDS ${last.tds} ppm` : ""}`
         : "Not tested yet";
 
       const recentHistory = Array.isArray(tank.history) && tank.history.length > 0
@@ -5020,6 +5063,7 @@
               let chemStr = `Temp ${displayTemp(h.temp || 78)}${u.temp}, pH ${h.ph ?? 7.2}, NH3 ${h.nh3 ?? 0}, NO2 ${h.no2 ?? 0}, NO3 ${h.no3 ?? 0} ppm`;
               if (h.gh !== undefined && h.gh !== null && h.gh !== "") chemStr += `, GH ${h.gh} dGH`;
               if (h.kh !== undefined && h.kh !== null && h.kh !== "") chemStr += `, KH ${h.kh} dKH`;
+              if (h.tds !== undefined && h.tds !== null && h.tds !== "") chemStr += `, TDS ${h.tds} ppm`;
               parts.push(chemStr);
             }
             if (h.wc) parts.push(`WC ${h.wc}%`);
@@ -5212,6 +5256,12 @@
         const ghVal = parseFloat(t.gh);
         if (!isNaN(ghVal) && ghVal < 3) {
           aiAdvice += ` Very soft water (${ghVal} dGH); consider supplemental calcium/magnesium if keeping ornamental shrimp or snails.`;
+        }
+      }
+      if (t.tds !== undefined && t.tds !== null && t.tds !== "") {
+        const tdsVal = parseFloat(t.tds);
+        if (!isNaN(tdsVal) && tdsVal > 450) {
+          aiAdvice += ` Note: Elevated TDS (${tdsVal} ppm); consider monitoring dissolved mineral buildup.`;
         }
       }
 
@@ -7773,7 +7823,7 @@ ${actionsInstruction}`;
         const prompt = `You are aquAssist Stocking Advisor.
 Candidate Addition: ${qty}x ${species}
 Target Tank: ${targetTank.name} (${dispVolVal} ${u.vol}, ${targetTank.status})
-Current Parameters: ${t ? `Temp ${dispTempVal}${u.temp}, pH ${t.ph}, NH3 ${t.nh3} ppm, NO2 ${t.no2} ppm, NO3 ${t.no3} ppm${t.gh !== undefined && t.gh !== null && t.gh !== "" ? `, GH ${t.gh} dGH` : ""}${t.kh !== undefined && t.kh !== null && t.kh !== "" ? `, KH ${t.kh} dKH` : ""}` : "Untested yet"}
+Current Parameters: ${t ? `Temp ${dispTempVal}${u.temp}, pH ${t.ph}, NH3 ${t.nh3} ppm, NO2 ${t.no2} ppm, NO3 ${t.no3} ppm${t.gh !== undefined && t.gh !== null && t.gh !== "" ? `, GH ${t.gh} dGH` : ""}${t.kh !== undefined && t.kh !== null && t.kh !== "" ? `, KH ${t.kh} dKH` : ""}${t.tds !== undefined && t.tds !== null && t.tds !== "" ? `, TDS ${t.tds} ppm` : ""}` : "Untested yet"}
 Tap Baseline: pH ${tap.ph ?? 7.4}, GH ${tap.gh ?? 8} dGH, KH ${tap.kh ?? 4} dKH
 Existing Livestock: ${currentLive || "Empty Tank"}
 Live Plants: ${currentPlants || "None"}
@@ -8317,6 +8367,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         else if (currentChartFilter === "ph") scaleNoteEl.innerText = "pH scale";
         else if (currentChartFilter === "gh") scaleNoteEl.innerText = "dGH";
         else if (currentChartFilter === "kh") scaleNoteEl.innerText = "dKH";
+        else if (currentChartFilter === "tds") scaleNoteEl.innerText = "ppm";
         else scaleNoteEl.innerText = "ppm";
       }
 
@@ -8354,6 +8405,8 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       const khValues = history.filter(h => h.kh !== undefined && h.kh !== null && h.kh !== "").map(h => parseFloat(h.kh) || 0);
       const maxGhData = ghValues.length > 0 ? Math.max(...ghValues, 12) : 16;
       const maxKhData = khValues.length > 0 ? Math.max(...khValues, 8) : 12;
+      const tdsValues = history.filter(h => h.tds !== undefined && h.tds !== null && h.tds !== "").map(h => parseFloat(h.tds) || 0);
+      const maxTdsData = tdsValues.length > 0 ? Math.max(...tdsValues, 150) : 250;
 
       const seriesDomains = {
         no3: { min: 0, max: Math.max(40, Math.ceil(maxNo3Data / 10) * 10) },
@@ -8365,7 +8418,8 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
           max: Math.max(isMetric ? 31 : 86, Math.ceil(Math.max(...tempValues) + 1))
         },
         gh: { min: 0, max: Math.max(16, Math.ceil(maxGhData * 1.2)) },
-        kh: { min: 0, max: Math.max(12, Math.ceil(maxKhData * 1.2)) }
+        kh: { min: 0, max: Math.max(12, Math.ceil(maxKhData * 1.2)) },
+        tds: { min: 0, max: Math.max(300, Math.ceil(maxTdsData * 1.2)) }
       };
 
       const activeDomain = seriesDomains[currentChartFilter] || seriesDomains.no3;
@@ -8413,6 +8467,10 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
           const safeY1 = getYForDomain(8, activeDomain);
           const safeY2 = getYForDomain(3, activeDomain);
           svgHtml += `<rect x="${padL}" y="${safeY1}" width="${plotW}" height="${Math.max(0, safeY2 - safeY1)}" fill="url(#safeZoneGrad)" rx="4"/>`;
+        } else if (currentChartFilter === "tds") {
+          const safeY1 = getYForDomain(350, activeDomain);
+          const safeY2 = getYForDomain(100, activeDomain);
+          svgHtml += `<rect x="${padL}" y="${safeY1}" width="${plotW}" height="${Math.max(0, safeY2 - safeY1)}" fill="url(#safeZoneGrad)" rx="4"/>`;
         }
       }
 
@@ -8447,7 +8505,8 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         { key: "no2", label: "NO₂", color: "var(--alert-yellow)", filter: "no2" },
         { key: "no3", label: "NO₃", color: "var(--cyan)", filter: "no3" },
         { key: "gh", label: "GH", color: "#38BDF8", filter: "gh", optional: true },
-        { key: "kh", label: "KH", color: "#F59E0B", filter: "kh", optional: true }
+        { key: "kh", label: "KH", color: "#F59E0B", filter: "kh", optional: true },
+        { key: "tds", label: "TDS", color: "#E879F9", filter: "tds", optional: true }
       ];
 
       const endLabels = [];
@@ -8492,7 +8551,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
 
         if (isNormalizedAll && coords.length > 0) {
           const lastPt = coords[coords.length - 1];
-          const unitSuffix = series.key === "temp" ? u.temp : (series.key === "gh" ? " dGH" : (series.key === "kh" ? " dKH" : ""));
+          const unitSuffix = series.key === "temp" ? u.temp : (series.key === "gh" ? " dGH" : (series.key === "kh" ? " dKH" : (series.key === "tds" ? " ppm" : "")));
           endLabels.push({
             y: lastPt.y,
             color: series.color,
@@ -8609,7 +8668,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
     function selectTestChip(paramKey, val, btnEl) {
       const inputEl = document.getElementById("m-test-" + paramKey);
       const wrap = document.getElementById("m-test-chips-" + paramKey);
-      if (btnEl && btnEl.classList.contains("active") && (paramKey === "gh" || paramKey === "kh")) {
+      if (btnEl && btnEl.classList.contains("active") && (paramKey === "gh" || paramKey === "kh" || paramKey === "tds")) {
         btnEl.classList.remove("active");
         if (inputEl) inputEl.value = "";
         return;
@@ -8642,7 +8701,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
 
     function syncAllTestChips() {
       renderTempTestChips();
-      ["temp", "ph", "nh3", "no2", "no3", "gh", "kh"].forEach(p => syncTestChips(p));
+      ["temp", "ph", "nh3", "no2", "no3", "gh", "kh", "tds"].forEach(p => syncTestChips(p));
     }
 
     function openTestModalForTank(tankId, editIdx = -1) {
@@ -8678,6 +8737,8 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         if (ghInput) ghInput.value = (item.gh !== undefined && item.gh !== null) ? item.gh : "";
         const khInput = document.getElementById("m-test-kh");
         if (khInput) khInput.value = (item.kh !== undefined && item.kh !== null) ? item.kh : "";
+        const tdsInput = document.getElementById("m-test-tds");
+        if (tdsInput) tdsInput.value = (item.tds !== undefined && item.tds !== null) ? item.tds : "";
         document.getElementById("m-test-notes").value = item.notes || item.note || "";
       } else {
         if (modalTitle) modalTitle.innerText = "Record Water Chemistry Test";
@@ -8693,6 +8754,8 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         if (ghInput) ghInput.value = (last.gh !== undefined && last.gh !== null) ? last.gh : "";
         const khInput = document.getElementById("m-test-kh");
         if (khInput) khInput.value = (last.kh !== undefined && last.kh !== null) ? last.kh : "";
+        const tdsInput = document.getElementById("m-test-tds");
+        if (tdsInput) tdsInput.value = (last.tds !== undefined && last.tds !== null) ? last.tds : "";
         document.getElementById("m-test-notes").value = "";
       }
       syncAllTestChips();
@@ -8721,6 +8784,8 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       const gh = ghRaw !== "" && !isNaN(parseFloat(ghRaw)) ? parseFloat(ghRaw) : null;
       const khRaw = document.getElementById("m-test-kh") ? document.getElementById("m-test-kh").value.trim() : "";
       const kh = khRaw !== "" && !isNaN(parseFloat(khRaw)) ? parseFloat(khRaw) : null;
+      const tdsRaw = document.getElementById("m-test-tds") ? document.getElementById("m-test-tds").value.trim() : "";
+      const tds = tdsRaw !== "" && !isNaN(parseFloat(tdsRaw)) ? parseFloat(tdsRaw) : null;
       const notes = document.getElementById("m-test-notes").value.trim();
       const u = getUnitLabels();
 
@@ -8738,12 +8803,14 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         existing.no3 = no3;
         if (gh !== null) existing.gh = gh; else delete existing.gh;
         if (kh !== null) existing.kh = kh; else delete existing.kh;
+        if (tds !== null) existing.tds = tds; else delete existing.tds;
         existing.notes = notes;
         sortRecordsByDateDesc(targetTank.history);
       } else {
         const newLog = { date, temp, nh3, no2, no3, ph, wc: 0, dose: "", notes };
         if (gh !== null) newLog.gh = gh;
         if (kh !== null) newLog.kh = kh;
+        if (tds !== null) newLog.tds = tds;
         if (!targetTank.history) targetTank.history = [];
         targetTank.history.unshift(newLog);
         sortRecordsByDateDesc(targetTank.history);
@@ -8751,6 +8818,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         let eventText = `Logged Chemistry: Temp ${displayTemp(temp)}${u.temp}, pH ${ph}, NH₃ ${nh3}, NO₂ ${no2}, NO₃ ${no3} ppm`;
         if (gh !== null) eventText += `, GH ${gh} dGH`;
         if (kh !== null) eventText += `, KH ${kh} dKH`;
+        if (tds !== null) eventText += `, TDS ${tds} ppm`;
         if (notes) eventText += ` • ${notes}`;
         addTankTimelineEvent(targetTank, eventText, date);
       }
@@ -8768,10 +8836,12 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         };
         if (newestChem.gh !== undefined && newestChem.gh !== null && newestChem.gh !== "") targetTank.lastTest.gh = newestChem.gh;
         if (newestChem.kh !== undefined && newestChem.kh !== null && newestChem.kh !== "") targetTank.lastTest.kh = newestChem.kh;
+        if (newestChem.tds !== undefined && newestChem.tds !== null && newestChem.tds !== "") targetTank.lastTest.tds = newestChem.tds;
       } else {
         targetTank.lastTest = { nh3, no2, no3, ph, temp, date };
         if (gh !== null) targetTank.lastTest.gh = gh;
         if (kh !== null) targetTank.lastTest.kh = kh;
+        if (tds !== null) targetTank.lastTest.tds = tds;
       }
 
       // Analyze new readings with Aquarist AI engine
@@ -8870,6 +8940,9 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
           }
           if (h.kh !== undefined && h.kh !== null && h.kh !== "") {
             paramText += ` • KH: <b>${escapeHtmlText(h.kh)} dKH</b>`;
+          }
+          if (h.tds !== undefined && h.tds !== null && h.tds !== "") {
+            paramText += ` • TDS: <b>${escapeHtmlText(h.tds)} ppm</b>`;
           }
           bodyHtml = `
             <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
@@ -10680,20 +10753,24 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
 
     function openSettingsModal() {
       syncSettingsUnitsButtons(appState.units || "us");
-      const tap = appState.tapBaseline || { ph: 7.4, no3: 5, gh: 8, kh: 4 };
+      const tap = appState.tapBaseline || { ph: 7.4, no3: 5, gh: 8, kh: 4, tds: 180 };
       document.getElementById("tap-ph").value = tap.ph !== undefined ? tap.ph : "";
       document.getElementById("tap-no3").value = tap.no3 !== undefined ? tap.no3 : "";
       document.getElementById("tap-gh").value = tap.gh !== undefined ? tap.gh : "";
       document.getElementById("tap-kh").value = tap.kh !== undefined ? tap.kh : "";
+      const tapTdsInput = document.getElementById("tap-tds");
+      if (tapTdsInput) tapTdsInput.value = tap.tds !== undefined ? tap.tds : "";
 
       const dispPh = document.getElementById("disp-tap-ph");
       const dispNo3 = document.getElementById("disp-tap-no3");
       const dispGh = document.getElementById("disp-tap-gh");
       const dispKh = document.getElementById("disp-tap-kh");
+      const dispTds = document.getElementById("disp-tap-tds");
       if (dispPh) dispPh.innerText = tap.ph !== undefined ? tap.ph : "7.4";
       if (dispNo3) dispNo3.innerText = (tap.no3 !== undefined ? tap.no3 : "5") + " ppm";
       if (dispGh) dispGh.innerText = (tap.gh !== undefined ? tap.gh : "8") + " dGH";
       if (dispKh) dispKh.innerText = (tap.kh !== undefined ? tap.kh : "4") + " dKH";
+      if (dispTds) dispTds.innerText = (tap.tds !== undefined ? tap.tds : "180") + " ppm";
 
       toggleTapEditMode(false);
 
@@ -10720,20 +10797,25 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       const no3Raw = parseFloat(document.getElementById("tap-no3").value);
       const ghRaw = parseFloat(document.getElementById("tap-gh").value);
       const khRaw = parseFloat(document.getElementById("tap-kh").value);
+      const tdsEl = document.getElementById("tap-tds");
+      const tdsRaw = tdsEl ? parseFloat(tdsEl.value) : NaN;
       const ph = Number.isNaN(phRaw) ? 7.4 : phRaw;
       const no3 = Number.isNaN(no3Raw) ? 0 : no3Raw;
       const gh = Number.isNaN(ghRaw) ? 0 : ghRaw;
       const kh = Number.isNaN(khRaw) ? 0 : khRaw;
-      appState.tapBaseline = { ph, no3, gh, kh };
+      const tds = Number.isNaN(tdsRaw) ? 180 : tdsRaw;
+      appState.tapBaseline = { ph, no3, gh, kh, tds };
 
       const dispPh = document.getElementById("disp-tap-ph");
       const dispNo3 = document.getElementById("disp-tap-no3");
       const dispGh = document.getElementById("disp-tap-gh");
       const dispKh = document.getElementById("disp-tap-kh");
+      const dispTds = document.getElementById("disp-tap-tds");
       if (dispPh) dispPh.innerText = ph;
       if (dispNo3) dispNo3.innerText = no3 + " ppm";
       if (dispGh) dispGh.innerText = gh + " dGH";
       if (dispKh) dispKh.innerText = kh + " dKH";
+      if (dispTds) dispTds.innerText = tds + " ppm";
 
       if (persist) {
         saveDataToStorage();
@@ -11407,6 +11489,7 @@ Match each pad or tube color against the chart to estimate the parameter reading
 - Nitrate (NO3): in ppm (e.g., 0, 5, 10, 20, 40, 80)
 - General Hardness (GH): in dGH (e.g., 3, 5, 7, 9, 12, 16)
 - Carbonate Hardness (KH): in dKH (e.g., 1, 3, 5, 8, 11, 14)
+- Total Dissolved Solids (TDS): in ppm (e.g., 80, 150, 200, 300, if present or digitally visible)
 
 If a specific parameter is not present on this strip/test, return null for it.
 Return ONLY valid raw JSON with NO markdown formatting, NO backticks, NO commentary:
@@ -11417,6 +11500,7 @@ Return ONLY valid raw JSON with NO markdown formatting, NO backticks, NO comment
   "no3": number or null,
   "gh": number or null,
   "kh": number or null,
+  "tds": number or null,
   "confidence": "high" or "medium" or "low",
   "notes": "brief 1-sentence observation of pad conditions"
 }`;
@@ -11463,6 +11547,11 @@ Return ONLY valid raw JSON with NO markdown formatting, NO backticks, NO comment
           if (parsed.kh !== undefined && parsed.kh !== null) {
             document.getElementById("m-test-kh").value = parsed.kh;
             syncTestChips("kh");
+            detectedCount++;
+          }
+          if (parsed.tds !== undefined && parsed.tds !== null) {
+            document.getElementById("m-test-tds").value = parsed.tds;
+            syncTestChips("tds");
             detectedCount++;
           }
 
@@ -11634,7 +11723,7 @@ Return ONLY valid raw JSON with NO markdown formatting, NO backticks, NO comment
       const t = targetTank.lastTest || {};
       const tested = hasTankBeenTested(targetTank);
       const chemStr = tested
-        ? `Temp ${displayTemp(t.temp || 78)}${u.temp}, pH ${t.ph ?? '7.2'}, NH3 ${t.nh3 ?? 0} ppm, NO2 ${t.no2 ?? 0} ppm, NO3 ${t.no3 ?? 0} ppm${t.gh ? `, GH ${t.gh} dGH` : ''}${t.kh ? `, KH ${t.kh} dKH` : ''}`
+        ? `Temp ${displayTemp(t.temp || 78)}${u.temp}, pH ${t.ph ?? '7.2'}, NH3 ${t.nh3 ?? 0} ppm, NO2 ${t.no2 ?? 0} ppm, NO3 ${t.no3 ?? 0} ppm${t.gh ? `, GH ${t.gh} dGH` : ''}${t.kh ? `, KH ${t.kh} dKH` : ''}${t.tds ? `, TDS ${t.tds} ppm` : ''}`
         : "No recent water test recorded";
 
       const existingRoster = (targetTank.livestock || []).join(", ") || "None";
