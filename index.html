@@ -1902,7 +1902,12 @@
               <div class="card-title">Photo Progress Gallery</div>
               <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Visual timeline of aquascape growth, flora, and fauna</div>
             </div>
-            <button type="button" class="btn btn-neon" style="width:auto; font-size:11.5px; padding:6px 13px; border-radius:9px;" onclick="openAddGalleryPhotoModal()">+ Add Photo</button>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <button type="button" id="gallery-sort-toggle-btn" class="ghost-action-btn" style="font-size:11px; padding:5px 9px; white-space:nowrap; border-radius:8px;" onclick="toggleGallerySortOrder()" title="Toggle chronological sort order">
+                <span id="gallery-sort-icon">📅</span> <span id="gallery-sort-label">Newest First</span>
+              </button>
+              <button type="button" class="btn btn-neon" style="width:auto; font-size:11.5px; padding:6px 13px; border-radius:9px;" onclick="openAddGalleryPhotoModal()">+ Add Photo</button>
+            </div>
           </div>
 
           <!-- Category Filter Chips (Single-line horizontal scroll pill bar) -->
@@ -2009,19 +2014,27 @@
         <div style="display:flex; align-items:center; gap:8px;">
           <span id="lightbox-tag" class="test-chip active" style="font-size:10px; padding:2px 8px;">FTS</span>
           <span id="lightbox-date" style="font-size:12px; color:var(--text-muted); font-weight:600;">--</span>
+          <span id="lightbox-counter" style="font-size:11px; color:var(--neon-green); font-weight:600; margin-left:4px;"></span>
         </div>
         <button class="icon-btn" style="width:28px;height:28px;" onclick="closeModalById('galleryLightboxModal')">×</button>
       </div>
 
-      <div style="width:100%; max-height:65vh; border-radius:12px; overflow:hidden; background:#000; display:flex; align-items:center; justify-content:center; margin-bottom:12px;">
-        <img id="lightbox-img" style="max-width:100%; max-height:65vh; object-fit:contain; display:block;">
+      <!-- Lightbox stage with swipe support and navigation arrows -->
+      <div id="lightbox-stage" style="width:100%; max-height:65vh; min-height:180px; border-radius:12px; overflow:hidden; background:#000; position:relative; display:flex; align-items:center; justify-content:center; margin-bottom:12px; user-select:none; touch-action:pan-y;">
+        <button type="button" id="lightbox-prev-btn" class="icon-btn" style="position:absolute; left:8px; top:50%; transform:translateY(-50%); width:34px; height:34px; background:rgba(0,0,0,0.65); color:#fff; border:1px solid rgba(255,255,255,0.25); border-radius:50%; z-index:3; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; transition:background 0.2s, transform 0.15s;" onclick="showPrevLightboxPhoto(event)" title="Previous photo (Swipe Right / Left Arrow)">‹</button>
+        <img id="lightbox-img" style="max-width:100%; max-height:65vh; object-fit:contain; display:block; transition:opacity 0.18s ease, transform 0.18s ease;">
+        <button type="button" id="lightbox-next-btn" class="icon-btn" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); width:34px; height:34px; background:rgba(0,0,0,0.65); color:#fff; border:1px solid rgba(255,255,255,0.25); border-radius:50%; z-index:3; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; transition:background 0.2s, transform 0.15s;" onclick="showNextLightboxPhoto(event)" title="Next photo (Swipe Left / Right Arrow)">›</button>
       </div>
 
       <div id="lightbox-caption" style="font-size:13px; color:var(--text-main); line-height:1.45; margin-bottom:14px;"></div>
 
-      <div style="display:flex; justify-content:space-between; align-items:center; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06);">
+      <div style="display:flex; justify-content:space-between; align-items:center; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06); gap:8px; flex-wrap:wrap;">
         <button type="button" class="ghost-action-btn" style="color:var(--alert-red); border-color:rgba(244,63,94,0.3); font-size:11px;" onclick="deleteActiveLightboxPhoto()">Delete Photo</button>
-        <button type="button" class="btn btn-secondary" style="width:auto; font-size:11.5px; padding:5px 14px;" onclick="closeModalById('galleryLightboxModal')">Close</button>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <button type="button" class="btn btn-secondary" style="width:auto; font-size:11.5px; padding:5px 12px;" onclick="showPrevLightboxPhoto(event)">‹ Prev</button>
+          <button type="button" class="btn btn-secondary" style="width:auto; font-size:11.5px; padding:5px 12px;" onclick="showNextLightboxPhoto(event)">Next ›</button>
+          <button type="button" class="btn btn-secondary" style="width:auto; font-size:11.5px; padding:5px 14px;" onclick="closeModalById('galleryLightboxModal')">Close</button>
+        </div>
       </div>
     </div>
   </div>
@@ -11280,6 +11293,42 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
     let activeGalleryCategory = "all";
     let activeGalleryUploadDataUrl = null;
     let activeLightboxPhotoId = null;
+    let gallerySortOrder = "desc"; // "desc" = Newest first, "asc" = Oldest first
+
+    function getSortedFilteredGalleryPhotos() {
+      const activeTank = getActiveTank();
+      if (!activeTank || !Array.isArray(activeTank.gallery)) return [];
+
+      let list = activeGalleryCategory === "all"
+        ? [...activeTank.gallery]
+        : activeTank.gallery.filter(p => p.cat === activeGalleryCategory);
+
+      list.sort((a, b) => {
+        const timeA = parseRecordTimestamp(a.date) || a.timestamp || 0;
+        const timeB = parseRecordTimestamp(b.date) || b.timestamp || 0;
+        if (timeA !== timeB) {
+          return gallerySortOrder === "asc" ? (timeA - timeB) : (timeB - timeA);
+        }
+        const subA = a.timestamp || 0;
+        const subB = b.timestamp || 0;
+        return gallerySortOrder === "asc" ? (subA - subB) : (subB - subA);
+      });
+
+      return list;
+    }
+
+    function toggleGallerySortOrder() {
+      gallerySortOrder = gallerySortOrder === "desc" ? "asc" : "desc";
+      const labelEl = document.getElementById("gallery-sort-label");
+      const iconEl = document.getElementById("gallery-sort-icon");
+      if (labelEl) {
+        labelEl.innerText = gallerySortOrder === "desc" ? "Newest First" : "Oldest First";
+      }
+      if (iconEl) {
+        iconEl.innerText = gallerySortOrder === "desc" ? "📅" : "⏳";
+      }
+      renderTankGalleryTab();
+    }
 
     function renderTankGalleryTab() {
       const activeTank = getActiveTank();
@@ -11290,10 +11339,7 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         return;
       }
 
-      const photos = Array.isArray(activeTank.gallery) ? activeTank.gallery : [];
-      const filtered = activeGalleryCategory === "all" 
-        ? photos 
-        : photos.filter(p => p.cat === activeGalleryCategory);
+      const filtered = getSortedFilteredGalleryPhotos();
 
       if (filtered.length === 0) {
         const catLabel = activeGalleryCategory === "all" ? "photos" : `"${activeGalleryCategory}" photos`;
@@ -11408,17 +11454,17 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       renderTankGalleryTab();
     }
 
-    function openGalleryLightbox(photoId) {
-      const activeTank = getActiveTank();
-      if (!activeTank || !Array.isArray(activeTank.gallery)) return;
-      const p = activeTank.gallery.find(item => item.id === photoId);
+    function renderLightboxPhoto(p, index, total, direction) {
       if (!p) return;
+      activeLightboxPhotoId = p.id;
 
-      activeLightboxPhotoId = photoId;
       const img = document.getElementById("lightbox-img");
       const tag = document.getElementById("lightbox-tag");
       const date = document.getElementById("lightbox-date");
       const cap = document.getElementById("lightbox-caption");
+      const counter = document.getElementById("lightbox-counter");
+      const prevBtn = document.getElementById("lightbox-prev-btn");
+      const nextBtn = document.getElementById("lightbox-next-btn");
 
       const catLabels = {
         fts: "Full Tank Shot (FTS)",
@@ -11428,16 +11474,121 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
         other: "Other"
       };
 
-      if (img) img.src = p.dataUrl;
+      if (img) {
+        if (direction) {
+          const shiftX = direction === "next" ? -14 : 14;
+          img.style.opacity = "0.35";
+          img.style.transform = `translateX(${shiftX}px) scale(0.97)`;
+          setTimeout(() => {
+            img.src = p.dataUrl;
+            img.style.opacity = "1";
+            img.style.transform = "translateX(0) scale(1)";
+          }, 60);
+        } else {
+          img.src = p.dataUrl;
+          img.style.opacity = "1";
+          img.style.transform = "none";
+        }
+      }
+
       if (tag) tag.innerText = catLabels[p.cat] || p.cat || "Photo";
       if (date) date.innerText = p.date || "Recent";
       if (cap) {
         cap.innerText = p.caption || "No notes recorded for this photo.";
         cap.style.color = p.caption ? "var(--text-main)" : "var(--text-muted)";
       }
-
-      openModalById("galleryLightboxModal");
+      if (counter) {
+        counter.innerText = total > 1 ? `${index + 1} of ${total}` : "";
+      }
+      if (prevBtn) {
+        prevBtn.style.display = total > 1 ? "flex" : "none";
+      }
+      if (nextBtn) {
+        nextBtn.style.display = total > 1 ? "flex" : "none";
+      }
     }
+
+    function openGalleryLightbox(photoId) {
+      const list = getSortedFilteredGalleryPhotos();
+      if (!list.length) return;
+      const idx = list.findIndex(p => p.id === photoId);
+      const targetIdx = idx !== -1 ? idx : 0;
+
+      renderLightboxPhoto(list[targetIdx], targetIdx, list.length);
+      openModalById("galleryLightboxModal");
+      initLightboxSwipe();
+    }
+
+    function showNextLightboxPhoto(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
+      const list = getSortedFilteredGalleryPhotos();
+      if (list.length <= 1) return;
+      const currentIdx = list.findIndex(p => p.id === activeLightboxPhotoId);
+      const nextIdx = (currentIdx + 1) % list.length;
+      renderLightboxPhoto(list[nextIdx], nextIdx, list.length, "next");
+    }
+
+    function showPrevLightboxPhoto(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
+      const list = getSortedFilteredGalleryPhotos();
+      if (list.length <= 1) return;
+      const currentIdx = list.findIndex(p => p.id === activeLightboxPhotoId);
+      const prevIdx = (currentIdx - 1 + list.length) % list.length;
+      renderLightboxPhoto(list[prevIdx], prevIdx, list.length, "prev");
+    }
+
+    let lightboxTouchStartX = 0;
+    let lightboxTouchStartY = 0;
+    let lightboxTouchEndX = 0;
+    let lightboxTouchEndY = 0;
+
+    function initLightboxSwipe() {
+      const stage = document.getElementById("lightbox-stage");
+      if (!stage || stage.dataset.swipeInitialized) return;
+      stage.dataset.swipeInitialized = "true";
+
+      stage.addEventListener("touchstart", (e) => {
+        if (e.touches && e.touches.length === 1) {
+          lightboxTouchStartX = e.touches[0].clientX;
+          lightboxTouchStartY = e.touches[0].clientY;
+          lightboxTouchEndX = lightboxTouchStartX;
+          lightboxTouchEndY = lightboxTouchStartY;
+        }
+      }, { passive: true });
+
+      stage.addEventListener("touchmove", (e) => {
+        if (e.touches && e.touches.length === 1) {
+          lightboxTouchEndX = e.touches[0].clientX;
+          lightboxTouchEndY = e.touches[0].clientY;
+        }
+      }, { passive: true });
+
+      stage.addEventListener("touchend", () => {
+        const diffX = lightboxTouchEndX - lightboxTouchStartX;
+        const diffY = lightboxTouchEndY - lightboxTouchStartY;
+        // Horizontal swipe: threshold 35px, and horizontal distance > 1.2 * vertical distance
+        if (Math.abs(diffX) > 35 && Math.abs(diffX) > Math.abs(diffY) * 1.2) {
+          if (diffX < 0) {
+            showNextLightboxPhoto();
+          } else {
+            showPrevLightboxPhoto();
+          }
+        }
+      }, { passive: true });
+    }
+
+    // Keyboard navigation (ArrowLeft = Prev, ArrowRight = Next) for lightbox
+    document.addEventListener("keydown", (e) => {
+      const modal = document.getElementById("galleryLightboxModal");
+      if (!modal || !modal.classList.contains("open")) return;
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        showPrevLightboxPhoto();
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        showNextLightboxPhoto();
+      }
+    });
 
     function deleteActiveLightboxPhoto() {
       if (!activeLightboxPhotoId) return;
@@ -11446,13 +11597,23 @@ Start with a concise heading ('### Verdict: Compatible', '### Verdict: Caution',
       const activeTank = getActiveTank();
       if (!activeTank || !Array.isArray(activeTank.gallery)) return;
 
+      const list = getSortedFilteredGalleryPhotos();
+      const currentIdx = list.findIndex(p => p.id === activeLightboxPhotoId);
+
       const idx = activeTank.gallery.findIndex(p => p.id === activeLightboxPhotoId);
       if (idx !== -1) {
         activeTank.gallery.splice(idx, 1);
         saveDataToStorage();
-        closeModalById("galleryLightboxModal");
         renderTankGalleryTab();
         showToast("Photo Deleted");
+
+        const remaining = getSortedFilteredGalleryPhotos();
+        if (remaining.length === 0) {
+          closeModalById("galleryLightboxModal");
+        } else {
+          const nextIdx = Math.min(currentIdx, remaining.length - 1);
+          renderLightboxPhoto(remaining[nextIdx], nextIdx, remaining.length);
+        }
       }
     }
 
